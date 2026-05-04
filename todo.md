@@ -9,6 +9,8 @@
 
 ## AJUSTES SOLICITADOS
 - [x] Adicionar opções Ativo01 até Ativo10 no campo de Situação
+- [x] Adicionar "Cancelado" no campo de Situação
+- [x] Mover o formulário de login para o canto direito da bandeira
 - [x] Implementar módulo de Auditoria/Logs com:
   - [x] Número de entrada (ID de sessão)
   - [x] Nome do agente

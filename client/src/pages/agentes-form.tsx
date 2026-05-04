@@ -299,6 +299,7 @@ export default function AgentesFormPage() {
                     <SelectItem value="Inativo">Inativo</SelectItem>
                     <SelectItem value="Afastado">Afastado</SelectItem>
                     <SelectItem value="Licença">Licença</SelectItem>
+                    <SelectItem value="Cancelado">Cancelado</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

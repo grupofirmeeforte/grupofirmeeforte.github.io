@@ -30,14 +30,14 @@ export default function AuditoriaPage() {
 
   const { data: logs, isLoading } = trpc.auditoria.list.useQuery({
     chaveJ: filtroChaveJ || undefined,
-    modulo: filtroModulo || undefined,
+    modulo: filtroModulo && filtroModulo !== 'todos' ? filtroModulo : undefined,
     limit,
     offset: page * limit,
   });
 
   const { data: totalCount } = trpc.auditoria.count.useQuery({
     chaveJ: filtroChaveJ || undefined,
-    modulo: filtroModulo || undefined,
+    modulo: filtroModulo && filtroModulo !== 'todos' ? filtroModulo : undefined,
   });
 
   const totalPages = totalCount ? Math.ceil(totalCount / limit) : 0;
@@ -129,7 +129,7 @@ export default function AuditoriaPage() {
                 <SelectValue placeholder="Módulo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="todos">Todos</SelectItem>
                 <SelectItem value="Agentes">Agentes</SelectItem>
                 <SelectItem value="Certificações">Certificações</SelectItem>
                 <SelectItem value="Fornecedores">Fornecedores</SelectItem>

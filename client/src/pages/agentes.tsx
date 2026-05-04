@@ -154,6 +154,9 @@ export default function AgentesPage() {
                 <SelectItem value="Ativo09">Ativo09</SelectItem>
                 <SelectItem value="Ativo10">Ativo10</SelectItem>
                 <SelectItem value="Inativo">Inativo</SelectItem>
+                <SelectItem value="Afastado">Afastado</SelectItem>
+                <SelectItem value="Licença">Licença</SelectItem>
+                <SelectItem value="Cancelado">Cancelado</SelectItem>
               </SelectContent>
             </Select>
           </div>

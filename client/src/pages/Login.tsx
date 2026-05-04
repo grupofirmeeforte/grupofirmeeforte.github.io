@@ -41,7 +41,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen flex items-end justify-end relative overflow-hidden p-6">
       {/* Fundo com bandeira do Brasil */}
       <div className="absolute inset-0 z-0">
         {/* Verde (fundo) */}
@@ -78,8 +78,8 @@ export default function Login() {
         </svg>
       </div>
 
-      {/* Card de login */}
-      <Card className="relative z-10 w-full max-w-md mx-4 bg-white/95 backdrop-blur shadow-2xl">
+      {/* Card de login - Canto direito */}
+      <Card className="relative z-10 w-full max-w-md bg-white/95 backdrop-blur shadow-2xl">
         <div className="p-8">
           {/* Logo/Título */}
           <div className="text-center mb-8">
@@ -100,8 +100,8 @@ export default function Login() {
                 type="text"
                 placeholder="Digite sua ChaveJ"
                 value={chaveJ}
-                onChange={(e) => setChaveJ(e.target.value.toUpperCase())}
-                disabled={isBlocked || loginMutation.isPending}
+                onChange={(e) => setChaveJ(e.target.value)}
+                disabled={isBlocked}
                 className="w-full"
               />
             </div>
@@ -116,58 +116,52 @@ export default function Login() {
                 placeholder="Digite sua senha"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                disabled={isBlocked || loginMutation.isPending}
+                disabled={isBlocked}
                 className="w-full"
-                autoComplete="current-password"
               />
             </div>
 
             {/* Mensagem de erro */}
             {error && (
               <div className={`flex items-start gap-3 p-3 rounded-lg ${
-                isBlocked
-                  ? 'bg-red-50 border border-red-200'
+                isBlocked 
+                  ? 'bg-red-50 border border-red-200' 
                   : 'bg-yellow-50 border border-yellow-200'
               }`}>
-                <AlertCircle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                <AlertCircle className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
                   isBlocked ? 'text-red-600' : 'text-yellow-600'
                 }`} />
-                <p className={isBlocked ? 'text-red-800' : 'text-yellow-800'}>
+                <p className={`text-sm ${
+                  isBlocked ? 'text-red-700' : 'text-yellow-700'
+                }`}>
                   {error}
                 </p>
               </div>
             )}
 
-            {/* Botão de login */}
+            {/* Botão Entrar */}
             <Button
               type="submit"
-              disabled={isBlocked || loginMutation.isPending || !chaveJ || !senha}
-              className="w-full bg-green-700 hover:bg-green-800 text-white font-semibold py-2"
+              disabled={isBlocked || loginMutation.isPending}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition-colors"
             >
               {isBlocked ? (
-                <div className="flex items-center gap-2">
-                  <Lock className="h-4 w-4" />
+                <span className="flex items-center gap-2">
+                  <Lock className="w-4 h-4" />
                   Sistema Bloqueado
-                </div>
+                </span>
               ) : loginMutation.isPending ? (
-                'Autenticando...'
+                'Entrando...'
               ) : (
                 'Entrar'
               )}
             </Button>
           </form>
 
-          {/* Contador de tentativas */}
-          {!isBlocked && attemptCount > 0 && (
-            <div className="mt-4 text-center text-sm text-gray-600">
-              Tentativas restantes: {3 - attemptCount}
-            </div>
-          )}
-
           {/* Rodapé */}
-          <div className="mt-6 text-center text-xs text-gray-500">
-            <p>Sistema seguro com autenticação por ChaveJ</p>
-          </div>
+          <p className="text-center text-xs text-gray-500 mt-6">
+            Sistema seguro com autenticação por ChaveJ
+          </p>
         </div>
       </Card>
     </div>

@@ -5,7 +5,7 @@ import { publicProcedure, router } from "./_core/trpc";
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { z } from "zod";
-import { getAgenteByChaveJ } from "./db";
+import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog } from "./db";
 import { sdk } from "./_core/sdk";
 import { TRPCError } from "@trpc/server";
 
@@ -27,10 +27,20 @@ export const appRouter = router({
         senha: z.string().min(1, "Senha é obrigatória"),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Verificar se está bloqueado
+        const loginAttempt = await getLoginAttempts(input.chaveJ);
+        if (loginAttempt?.isBlocked) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Sistema bloqueado após 3 tentativas falhas. Contate o administrador.",
+          });
+        }
+        
         // Buscar agente pelo ChaveJ
         const agente = await getAgenteByChaveJ(input.chaveJ);
         
         if (!agente) {
+          await incrementLoginAttempts(input.chaveJ);
           throw new TRPCError({
             code: "UNAUTHORIZED",
             message: "ChaveJ ou Senha inválidos",
@@ -39,11 +49,31 @@ export const appRouter = router({
         
         // Verificar senha
         if (agente.senha !== input.senha) {
+          await incrementLoginAttempts(input.chaveJ);
           throw new TRPCError({
             code: "UNAUTHORIZED",
             message: "ChaveJ ou Senha inválidos",
           });
         }
+        
+        // Reset tentativas após login bem-sucedido
+        await resetLoginAttempts(input.chaveJ);
+        
+        // Gerar número de entrada único
+        const numeroEntrada = `ENT-${Date.now()}-${agente.id}`;
+        
+        // Criar registro de auditoria
+        await createAuditLog({
+          agenteId: agente.id,
+          chaveJ: agente.chaveJ,
+          nomeAgente: agente.nomeAgente,
+          numeroEntrada,
+          modulo: "Login",
+          acao: "Entrada",
+          descricao: `Agente ${agente.nomeAgente} fez login no sistema`,
+          ipAddress: (ctx.req as any).ip || (ctx.req.headers as any)['x-forwarded-for'] || 'unknown',
+          userAgent: (ctx.req.headers as any)['user-agent'] || 'unknown',
+        });
         
         // Criar token de sessão customizado
         const sessionToken = await sdk.signSession(
@@ -64,6 +94,7 @@ export const appRouter = router({
         
         return {
           success: true,
+          numeroEntrada,
           agente: {
             id: agente.id,
             chaveJ: agente.chaveJ,
