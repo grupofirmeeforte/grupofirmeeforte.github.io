@@ -36,6 +36,23 @@ export default function Login() {
     e.preventDefault();
     if (isBlocked) return;
 
+    // Validar horário de acesso
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = domingo, 1 = segunda, ..., 6 = sábado
+    const hour = now.getHours();
+
+    // Verificar se é dia útil (segunda a sexta)
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      setError('Acesso permitido apenas de segunda a sexta.');
+      return;
+    }
+
+    // Verificar se está dentro do horário (08:00 às 19:00)
+    if (hour < 8 || hour >= 19) {
+      setError('Acesso permitido apenas entre 08:00 e 19:00.');
+      return;
+    }
+
     setError('');
     loginMutation.mutate({ chaveJ, senha });
   };
