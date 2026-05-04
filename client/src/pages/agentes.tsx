@@ -19,10 +19,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Edit2, Trash2, Search } from "lucide-react";
-import { useRouter } from "wouter";
+import { useLocation } from "wouter";
 
 export default function AgentesPage() {
-  const [, navigate] = useRouter() as any;
+  const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [empresa, setEmpresa] = useState<string>("");
   const [situacao, setSituacao] = useState<string>("");
