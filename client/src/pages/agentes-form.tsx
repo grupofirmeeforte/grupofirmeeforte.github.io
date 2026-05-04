@@ -1,5 +1,5 @@
+import { useLocation, useRoute } from "wouter";
 import { useState, useEffect } from "react";
-import { useRoute, useRouter } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AgentesFormPage() {
-  const [, navigate] = useRouter() as any;
+  const [, navigate] = useLocation();
   const [match, params] = useRoute("/agentes/:id");
   const agenteId = params?.id ? parseInt(params.id) : null;
 
@@ -49,7 +49,6 @@ export default function AgentesFormPage() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // Carregar dados do agente se for edição
   const { data: agente } = trpc.agentes.getById.useQuery(
     { id: agenteId! },
     { enabled: !!agenteId }
@@ -86,7 +85,6 @@ export default function AgentesFormPage() {
     }
   }, [agente]);
 
-  // Mutations
   const createAgente = trpc.agentes.create.useMutation();
   const updateAgente = trpc.agentes.update.useMutation();
 
@@ -132,9 +130,9 @@ export default function AgentesFormPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 p-6 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 mb-8">
         <Button
           variant="ghost"
           size="sm"
@@ -146,18 +144,60 @@ export default function AgentesFormPage() {
           <h1 className="text-3xl font-bold">
             {agenteId ? "Editar Agente" : "Novo Agente"}
           </h1>
+          <p className="text-gray-600 text-sm mt-1">Preencha todos os campos obrigatórios (*)</p>
         </div>
       </div>
 
       {/* Formulário */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Seção: Dados Pessoais */}
+        {/* SEÇÃO 1: CADASTRO BÁSICO */}
         <Card>
           <CardHeader>
-            <CardTitle>Dados Pessoais</CardTitle>
+            <CardTitle className="text-lg">1. Cadastro Básico</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="numCadastro">Número de Cadastro *</Label>
+                <Input
+                  id="numCadastro"
+                  name="numCadastro"
+                  value={formData.numCadastro}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="empresa">Empresa *</Label>
+                <Input
+                  id="empresa"
+                  name="empresa"
+                  value={formData.empresa}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="chaveJ">Chave J *</Label>
+                <Input
+                  id="chaveJ"
+                  name="chaveJ"
+                  value={formData.chaveJ}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="senha">Senha *</Label>
+                <Input
+                  id="senha"
+                  name="senha"
+                  type="password"
+                  value={formData.senha}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
               <div>
                 <Label htmlFor="nomeAgente">Nome do Agente *</Label>
                 <Input
@@ -169,286 +209,272 @@ export default function AgentesFormPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="cpfAgente">CPF</Label>
-                <Input
-                  id="cpfAgente"
-                  name="cpfAgente"
-                  value={formData.cpfAgente}
-                  onChange={handleInputChange}
-                  placeholder="000.000.000-00"
-                />
-              </div>
-              <div>
-                <Label htmlFor="dataNascimento">Data de Nascimento</Label>
-                <Input
-                  id="dataNascimento"
-                  name="dataNascimento"
-                  type="date"
-                  value={formData.dataNascimento}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="celular">Celular</Label>
-                <Input
-                  id="celular"
-                  name="celular"
-                  value={formData.celular}
-                  onChange={handleInputChange}
-                  placeholder="(00) 00000-0000"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Seção: Dados Profissionais */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Dados Profissionais</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="chaveJ">Chave J</Label>
-                <Input
-                  id="chaveJ"
-                  name="chaveJ"
-                  value={formData.chaveJ}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="numCadastro">Número de Cadastro</Label>
-                <Input
-                  id="numCadastro"
-                  name="numCadastro"
-                  value={formData.numCadastro}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="empresa">Empresa</Label>
-                <Input
-                  id="empresa"
-                  name="empresa"
-                  value={formData.empresa}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="cargo">Cargo</Label>
-                <Input
-                  id="cargo"
-                  name="cargo"
-                  value={formData.cargo}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="area">Área</Label>
-                <Input
-                  id="area"
-                  name="area"
-                  value={formData.area}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="supervisor">Supervisor</Label>
-                <Input
-                  id="supervisor"
-                  name="supervisor"
-                  value={formData.supervisor}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="dataAdmissao">Data de Admissão</Label>
+                <Label htmlFor="dataAdmissao">Data de Admissão *</Label>
                 <Input
                   id="dataAdmissao"
                   name="dataAdmissao"
                   type="date"
                   value={formData.dataAdmissao}
                   onChange={handleInputChange}
+                  required
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* SEÇÃO 2: DADOS PROFISSIONAIS */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">2. Dados Profissionais</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="cargo">Cargo *</Label>
+                <Input
+                  id="cargo"
+                  name="cargo"
+                  value={formData.cargo}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
               <div>
-                <Label htmlFor="situacao">Situação</Label>
-                <Select
-                  value={formData.situacao}
-                  onValueChange={(value) =>
-                    handleSelectChange("situacao", value)
-                  }
-                >
+                <Label htmlFor="area">Área *</Label>
+                <Input
+                  id="area"
+                  name="area"
+                  value={formData.area}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="vinculo">Vínculo *</Label>
+                <Input
+                  id="vinculo"
+                  name="vinculo"
+                  value={formData.vinculo}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="situacao">Situação *</Label>
+                <Select value={formData.situacao} onValueChange={(value) => handleSelectChange("situacao", value)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Ativo">Ativo</SelectItem>
                     <SelectItem value="Inativo">Inativo</SelectItem>
+                    <SelectItem value="Afastado">Afastado</SelectItem>
+                    <SelectItem value="Licença">Licença</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Seção: Dados Bancários */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Dados Bancários</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="banco">Banco</Label>
-                <Input
-                  id="banco"
-                  name="banco"
-                  value={formData.banco}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="agencia">Agência</Label>
-                <Input
-                  id="agencia"
-                  name="agencia"
-                  value={formData.agencia}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="conta">Conta</Label>
-                <Input
-                  id="conta"
-                  name="conta"
-                  value={formData.conta}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="tipo">Tipo de Conta</Label>
-                <Input
-                  id="tipo"
-                  name="tipo"
-                  value={formData.tipo}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="pix">Chave PIX</Label>
-                <Input
-                  id="pix"
-                  name="pix"
-                  value={formData.pix}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="favorecido">Favorecido</Label>
-                <Input
-                  id="favorecido"
-                  name="favorecido"
-                  value={formData.favorecido}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Seção: Localização */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Localização</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="cidade">Cidade</Label>
-                <Input
-                  id="cidade"
-                  name="cidade"
-                  value={formData.cidade}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <Label htmlFor="uf">UF</Label>
-                <Input
-                  id="uf"
-                  name="uf"
-                  value={formData.uf}
-                  onChange={handleInputChange}
-                  maxLength={2}
-                />
-              </div>
-              <div>
-                <Label htmlFor="nrAgencia">Número da Agência</Label>
+                <Label htmlFor="nrAgencia">Número da Agência *</Label>
                 <Input
                   id="nrAgencia"
                   name="nrAgencia"
                   value={formData.nrAgencia}
                   onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="supervisor">Supervisor *</Label>
+                <Input
+                  id="supervisor"
+                  name="supervisor"
+                  value={formData.supervisor}
+                  onChange={handleInputChange}
+                  required
                 />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Seção: Outros */}
+        {/* SEÇÃO 3: LOCALIZAÇÃO */}
         <Card>
           <CardHeader>
-            <CardTitle>Outros</CardTitle>
+            <CardTitle className="text-lg">3. Localização</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="vinculo">Vínculo</Label>
+                <Label htmlFor="cidade">Cidade *</Label>
                 <Input
-                  id="vinculo"
-                  name="vinculo"
-                  value={formData.vinculo}
+                  id="cidade"
+                  name="cidade"
+                  value={formData.cidade}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
               <div>
-                <Label htmlFor="senha">Senha</Label>
+                <Label htmlFor="uf">UF *</Label>
                 <Input
-                  id="senha"
-                  name="senha"
-                  type="password"
-                  value={formData.senha}
+                  id="uf"
+                  name="uf"
+                  maxLength={2}
+                  value={formData.uf}
                   onChange={handleInputChange}
+                  required
                 />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Botões */}
+        {/* SEÇÃO 4: DADOS PESSOAIS */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">4. Dados Pessoais</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="cpfAgente">CPF *</Label>
+                <Input
+                  id="cpfAgente"
+                  name="cpfAgente"
+                  value={formData.cpfAgente}
+                  onChange={handleInputChange}
+                  placeholder="000.000.000-00"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="dataNascimento">Data de Nascimento *</Label>
+                <Input
+                  id="dataNascimento"
+                  name="dataNascimento"
+                  type="date"
+                  value={formData.dataNascimento}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="celular">Celular *</Label>
+                <Input
+                  id="celular"
+                  name="celular"
+                  value={formData.celular}
+                  onChange={handleInputChange}
+                  placeholder="(00) 00000-0000"
+                  required
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* SEÇÃO 5: DADOS BANCÁRIOS */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">5. Dados Bancários</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="favorecido">Favorecido *</Label>
+                <Input
+                  id="favorecido"
+                  name="favorecido"
+                  value={formData.favorecido}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="banco">Banco *</Label>
+                <Input
+                  id="banco"
+                  name="banco"
+                  value={formData.banco}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="agencia">Agência *</Label>
+                <Input
+                  id="agencia"
+                  name="agencia"
+                  value={formData.agencia}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="conta">Conta *</Label>
+                <Input
+                  id="conta"
+                  name="conta"
+                  value={formData.conta}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="tipo">Tipo de Conta *</Label>
+                <Select value={formData.tipo} onValueChange={(value) => handleSelectChange("tipo", value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CC">Conta Corrente</SelectItem>
+                    <SelectItem value="CP">Conta Poupança</SelectItem>
+                    <SelectItem value="CE">Conta Empresa</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="pix">PIX</Label>
+                <Input
+                  id="pix"
+                  name="pix"
+                  value={formData.pix}
+                  onChange={handleInputChange}
+                  placeholder="Email, CPF ou Chave Aleatória"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Botões de Ação */}
         <div className="flex gap-4 justify-end">
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate("/agentes")}          >
+            onClick={() => navigate("/agentes")}
+          >
             Cancelar
           </Button>
-          <Button type="submit" disabled={isLoading} className="gap-2">
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="flex items-center gap-2"
+          >
             <Save className="w-4 h-4" />
-            {isLoading ? "Salvando..." : "Salvar"}
+            {isLoading ? "Salvando..." : "Salvar Agente"}
           </Button>
         </div>
       </form>
