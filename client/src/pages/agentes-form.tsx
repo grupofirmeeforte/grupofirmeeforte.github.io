@@ -63,11 +63,38 @@ export default function AgentesFormPage() {
     return text.toUpperCase();
   };
 
+  // Função para formatar CPF (000.000.000-00)
+  const formatCPF = (value: string): string => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 3) return cleaned;
+    if (cleaned.length <= 6) return `${cleaned.slice(0, 3)}.${cleaned.slice(3)}`;
+    if (cleaned.length <= 9) return `${cleaned.slice(0, 3)}.${cleaned.slice(3, 6)}.${cleaned.slice(6)}`;
+    return `${cleaned.slice(0, 3)}.${cleaned.slice(3, 6)}.${cleaned.slice(6, 9)}-${cleaned.slice(9, 11)}`;
+  };
+
+  // Função para formatar Celular ((00) 00000-0000)
+  const formatCelular = (value: string): string => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length <= 2) return cleaned;
+    if (cleaned.length <= 7) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`;
+    return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     // Aplicar formatação de nome para campos de nome (MAIUSCULO)
     const isNameField = ['nomeAgente', 'chaveJ', 'empresa', 'favorecido', 'supervisor', 'cargo', 'area', 'vinculo', 'banco', 'cidade'].includes(name);
-    const formattedValue = isNameField ? formatNameUppercase(value) : value;
+    let formattedValue = isNameField ? formatNameUppercase(value) : value;
+    
+    // Aplicar formatação de CPF
+    if (name === 'cpfAgente') {
+      formattedValue = formatCPF(value);
+    }
+    
+    // Aplicar formatação de Celular
+    if (name === 'celular') {
+      formattedValue = formatCelular(value);
+    }
     
     setFormData((prev) => ({
       ...prev,
