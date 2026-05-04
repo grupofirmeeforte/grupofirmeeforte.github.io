@@ -1,4 +1,15 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { 
+  int, 
+  mysqlEnum, 
+  mysqlTable, 
+  text, 
+  timestamp, 
+  varchar,
+  decimal,
+  date,
+  boolean,
+  index
+} from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -25,4 +36,463 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+// ============================================================================
+// TABELAS DO SISTEMA GRUPO FIRME E FORTE
+// ============================================================================
+
+/**
+ * Tabela de Agentes
+ * Armazena informações de todos os agentes do sistema
+ */
+export const agentes = mysqlTable("agentes", {
+  id: int("id").autoincrement().primaryKey(),
+  numCadastro: varchar("numCadastro", { length: 50 }).unique(),
+  empresa: varchar("empresa", { length: 100 }),
+  chaveJ: varchar("chaveJ", { length: 50 }).unique(),
+  senha: varchar("senha", { length: 255 }),
+  nomeAgente: varchar("nomeAgente", { length: 255 }).notNull(),
+  dataAdmissao: date("dataAdmissao"),
+  cargo: varchar("cargo", { length: 100 }),
+  area: varchar("area", { length: 100 }),
+  vinculo: varchar("vinculo", { length: 100 }),
+  situacao: varchar("situacao", { length: 50 }),
+  nrAgencia: varchar("nrAgencia", { length: 50 }),
+  cidade: varchar("cidade", { length: 100 }),
+  uf: varchar("uf", { length: 2 }),
+  supervisor: varchar("supervisor", { length: 255 }),
+  email: varchar("email", { length: 255 }),
+  favorecido: varchar("favorecido", { length: 255 }),
+  banco: varchar("banco", { length: 100 }),
+  agencia: varchar("agencia", { length: 50 }),
+  conta: varchar("conta", { length: 50 }),
+  tipo: varchar("tipo", { length: 50 }),
+  cpfAgente: varchar("cpfAgente", { length: 14 }).unique(),
+  pix: varchar("pix", { length: 255 }),
+  dataNascimento: date("dataNascimento"),
+  celular: varchar("celular", { length: 20 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  chaveJIdx: index("idx_agentes_chaveJ").on(table.chaveJ),
+  cpfIdx: index("idx_agentes_cpf").on(table.cpfAgente),
+  empresaIdx: index("idx_agentes_empresa").on(table.empresa),
+}));
+
+export type Agente = typeof agentes.$inferSelect;
+export type InsertAgente = typeof agentes.$inferInsert;
+
+/**
+ * Tabela de Certificações
+ * Controla certificações dos agentes
+ */
+export const certificacoes = mysqlTable("certificacoes", {
+  id: int("id").autoincrement().primaryKey(),
+  agenteId: int("agenteId").notNull(),
+  cadastro: varchar("cadastro", { length: 50 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  cpf: varchar("cpf", { length: 14 }),
+  situacao: varchar("situacao", { length: 50 }),
+  dataCertif: date("dataCertif"),
+  ventoCertif: date("ventoCertif"),
+  diasFaltando: int("diasFaltando"),
+  situacaoCertif: varchar("situacaoCertif", { length: 50 }),
+  nrCertificadoConsig: varchar("nrCertificadoConsig", { length: 100 }),
+  dataCertif2: date("dataCertif2"),
+  ventoCertif3: date("ventoCertif3"),
+  diasFaltando2: int("diasFaltando2"),
+  situacaoCertif3: varchar("situacaoCertif3", { length: 50 }),
+  nrCertificadoPldft: varchar("nrCertificadoPldft", { length: 100 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  agenteIdx: index("idx_certificacoes_agente").on(table.agenteId),
+  ventIdx: index("idx_certificacoes_vencto").on(table.ventoCertif),
+}));
+
+export type Certificacao = typeof certificacoes.$inferSelect;
+export type InsertCertificacao = typeof certificacoes.$inferInsert;
+
+/**
+ * Tabela de Fornecedores
+ */
+export const fornecedores = mysqlTable("fornecedores", {
+  id: int("id").autoincrement().primaryKey(),
+  numCadastro: varchar("numCadastro", { length: 50 }).unique(),
+  empresa: varchar("empresa", { length: 100 }),
+  nomeFornecedor: varchar("nomeFornecedor", { length: 255 }).notNull(),
+  cpfCnpj: varchar("cpfCnpj", { length: 18 }).unique(),
+  situacao: varchar("situacao", { length: 50 }),
+  contato: varchar("contato", { length: 255 }),
+  email: varchar("email", { length: 255 }),
+  telefone: varchar("telefone", { length: 20 }),
+  celular: varchar("celular", { length: 20 }),
+  endereco: varchar("endereco", { length: 255 }),
+  cidade: varchar("cidade", { length: 100 }),
+  uf: varchar("uf", { length: 2 }),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Fornecedor = typeof fornecedores.$inferSelect;
+export type InsertFornecedor = typeof fornecedores.$inferInsert;
+
+/**
+ * Tabela de Tabelas de Comissão
+ * Define as faixas e percentuais de comissão
+ */
+export const tabelasComissao = mysqlTable("tabelasComissao", {
+  id: int("id").autoincrement().primaryKey(),
+  empresa: varchar("empresa", { length: 100 }),
+  faixa1: decimal("faixa1", { precision: 10, scale: 4 }),
+  faixa2: decimal("faixa2", { precision: 10, scale: 4 }),
+  faixa3: decimal("faixa3", { precision: 10, scale: 4 }),
+  faixa4: decimal("faixa4", { precision: 10, scale: 4 }),
+  faixa5: decimal("faixa5", { precision: 10, scale: 4 }),
+  tabelaCalculo: varchar("tabelaCalculo", { length: 100 }),
+  referencia: varchar("referencia", { length: 255 }),
+  txJuros: decimal("txJuros", { precision: 10, scale: 4 }),
+  mesesMinimo: int("mesesMinimo"),
+  mesesMaximo: int("mesesMaximo"),
+  valorMinimo: decimal("valorMinimo", { precision: 15, scale: 2 }),
+  valorMaximo: decimal("valorMaximo", { precision: 15, scale: 2 }),
+  agenteJefinho: decimal("agenteJefinho", { precision: 10, scale: 4 }),
+  agenteGuilherme: decimal("agenteGuilherme", { precision: 10, scale: 4 }),
+  agenteKelly: decimal("agenteKelly", { precision: 10, scale: 4 }),
+  agenteAmauricio: decimal("agenteAmauricio", { precision: 10, scale: 4 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TabelaComissao = typeof tabelasComissao.$inferSelect;
+export type InsertTabelaComissao = typeof tabelasComissao.$inferInsert;
+
+/**
+ * Tabela de Consignados (Operações)
+ */
+export const consignados = mysqlTable("consignados", {
+  id: int("id").autoincrement().primaryKey(),
+  mesAno: varchar("mesAno", { length: 10 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  nrOperacao: varchar("nrOperacao", { length: 100 }),
+  parcelas: int("parcelas"),
+  convenio: varchar("convenio", { length: 100 }),
+  juros: decimal("juros", { precision: 10, scale: 4 }),
+  valorLiquido: decimal("valorLiquido", { precision: 15, scale: 2 }),
+  percentual: decimal("percentual", { precision: 10, scale: 4 }),
+  comissao: decimal("comissao", { precision: 15, scale: 2 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesAnoIdx: index("idx_consignados_mesAno").on(table.mesAno),
+}));
+
+export type Consignado = typeof consignados.$inferSelect;
+export type InsertConsignado = typeof consignados.$inferInsert;
+
+/**
+ * Tabela de Contas Correntes (Operações)
+ */
+export const contasCorrentes = mysqlTable("contasCorrentes", {
+  id: int("id").autoincrement().primaryKey(),
+  empresa: varchar("empresa", { length: 100 }),
+  mesAno: varchar("mesAno", { length: 10 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  agente: varchar("agente", { length: 255 }),
+  agencia: varchar("agencia", { length: 50 }),
+  contaCorrente: varchar("contaCorrente", { length: 50 }),
+  tipoServ: varchar("tipoServ", { length: 100 }),
+  dataOperacao: date("dataOperacao"),
+  produto: varchar("produto", { length: 100 }),
+  modalidade: varchar("modalidade", { length: 100 }),
+  agRelacionamento: varchar("agRelacionamento", { length: 255 }),
+  rbm: decimal("rbm", { precision: 15, scale: 2 }),
+  percComissao: decimal("percComissao", { precision: 10, scale: 4 }),
+  comissao: decimal("comissao", { precision: 15, scale: 2 }),
+  supervisor: varchar("supervisor", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesAnoIdx: index("idx_contasCorrentes_mesAno").on(table.mesAno),
+}));
+
+export type ContaCorrente = typeof contasCorrentes.$inferSelect;
+export type InsertContaCorrente = typeof contasCorrentes.$inferInsert;
+
+/**
+ * Tabela de Consórcios (Operações)
+ */
+export const consorcios = mysqlTable("consorcios", {
+  id: int("id").autoincrement().primaryKey(),
+  mesAno: varchar("mesAno", { length: 10 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  nrOperacao: varchar("nrOperacao", { length: 100 }),
+  parcelas: int("parcelas"),
+  segmento: varchar("segmento", { length: 100 }),
+  valorBem: decimal("valorBem", { precision: 15, scale: 2 }),
+  comissao: decimal("comissao", { precision: 15, scale: 2 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesAnoIdx: index("idx_consorcios_mesAno").on(table.mesAno),
+}));
+
+export type Consorcio = typeof consorcios.$inferSelect;
+export type InsertConsorcio = typeof consorcios.$inferInsert;
+
+/**
+ * Tabela de OuroCap (Operações)
+ */
+export const ourocap = mysqlTable("ourocap", {
+  id: int("id").autoincrement().primaryKey(),
+  empresa: varchar("empresa", { length: 100 }),
+  mesAno: varchar("mesAno", { length: 10 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  proposta: varchar("proposta", { length: 100 }),
+  cpfCliente: varchar("cpfCliente", { length: 14 }),
+  dtVenda: date("dtVenda"),
+  dtDebito: date("dtDebito"),
+  codProduto: varchar("codProduto", { length: 50 }),
+  vrProduto: decimal("vrProduto", { precision: 15, scale: 2 }),
+  rbm: decimal("rbm", { precision: 15, scale: 2 }),
+  comissao: decimal("comissao", { precision: 15, scale: 2 }),
+  supervisor: varchar("supervisor", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesAnoIdx: index("idx_ourocap_mesAno").on(table.mesAno),
+}));
+
+export type Ourocap = typeof ourocap.$inferSelect;
+export type InsertOurocap = typeof ourocap.$inferInsert;
+
+/**
+ * Tabela de Seguros (Operações)
+ */
+export const seguros = mysqlTable("seguros", {
+  id: int("id").autoincrement().primaryKey(),
+  empresa: varchar("empresa", { length: 100 }),
+  mesAno: varchar("mesAno", { length: 10 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  dtOperacao: date("dtOperacao"),
+  prazo: int("prazo"),
+  banco: varchar("banco", { length: 100 }),
+  nrContrato: varchar("nrContrato", { length: 100 }),
+  vrEmprestimo: decimal("vrEmprestimo", { precision: 15, scale: 2 }),
+  refinanciado: boolean("refinanciado"),
+  dtPagto: date("dtPagto"),
+  digitadoPor: varchar("digitadoPor", { length: 255 }),
+  vrComissao: decimal("vrComissao", { precision: 15, scale: 2 }),
+  percComissao: decimal("percComissao", { precision: 10, scale: 4 }),
+  incremento: decimal("incremento", { precision: 10, scale: 4 }),
+  parcela: int("parcela"),
+  comissaoAgente: decimal("comissaoAgente", { precision: 15, scale: 2 }),
+  observacao: text("observacao"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesAnoIdx: index("idx_seguros_mesAno").on(table.mesAno),
+}));
+
+export type Seguro = typeof seguros.$inferSelect;
+export type InsertSeguro = typeof seguros.$inferInsert;
+
+/**
+ * Tabela de Pagamentos
+ */
+export const pagamentos = mysqlTable("pagamentos", {
+  id: int("id").autoincrement().primaryKey(),
+  empresa: varchar("empresa", { length: 100 }),
+  mesAno: varchar("mesAno", { length: 10 }),
+  tipoPagamento: varchar("tipoPagamento", { length: 100 }),
+  total: decimal("total", { precision: 15, scale: 2 }),
+  menorMaior: varchar("menorMaior", { length: 50 }),
+  agenteId: int("agenteId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesAnoIdx: index("idx_pagamentos_mesAno").on(table.mesAno),
+}));
+
+export type Pagamento = typeof pagamentos.$inferSelect;
+export type InsertPagamento = typeof pagamentos.$inferInsert;
+
+/**
+ * Tabela de Cálculos Consolidados
+ */
+export const calculos = mysqlTable("calculos", {
+  id: int("id").autoincrement().primaryKey(),
+  mesRef: varchar("mesRef", { length: 10 }),
+  empresa: varchar("empresa", { length: 100 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  cidade: varchar("cidade", { length: 100 }),
+  situacao: varchar("situacao", { length: 50 }),
+  percentual: decimal("percentual", { precision: 10, scale: 4 }),
+  comissaoTotal: decimal("comissaoTotal", { precision: 15, scale: 2 }),
+  rbmTotal: decimal("rbmTotal", { precision: 15, scale: 2 }),
+  comissaoConsig: decimal("comissaoConsig", { precision: 15, scale: 2 }),
+  comissaoConsorcio: decimal("comissaoConsorcio", { precision: 15, scale: 2 }),
+  comissaoOurocap: decimal("comissaoOurocap", { precision: 15, scale: 2 }),
+  comissaoCc: decimal("comissaoCc", { precision: 15, scale: 2 }),
+  ajudaCusto: decimal("ajudaCusto", { precision: 15, scale: 2 }),
+  creditosDebitos: decimal("creditosDebitos", { precision: 15, scale: 2 }),
+  adiantamento: decimal("adiantamento", { precision: 15, scale: 2 }),
+  reajuste: decimal("reajuste", { precision: 15, scale: 2 }),
+  comissaoSupervisor: decimal("comissaoSupervisor", { precision: 15, scale: 2 }),
+  rbmCreditoC2: decimal("rbmCreditoC2", { precision: 15, scale: 2 }),
+  rbmContaCorrente: decimal("rbmContaCorrente", { precision: 15, scale: 2 }),
+  rbmConsorcioC2: decimal("rbmConsorcioC2", { precision: 15, scale: 2 }),
+  rbmOurocap: decimal("rbmOurocap", { precision: 15, scale: 2 }),
+  qtdeContas: int("qtdeContas"),
+  vrLiquidoC2: decimal("vrLiquidoC2", { precision: 15, scale: 2 }),
+  srccC2: decimal("srccC2", { precision: 15, scale: 2 }),
+  vrLiquidoSrcc: decimal("vrLiquidoSrcc", { precision: 15, scale: 2 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesRefIdx: index("idx_calculos_mesRef").on(table.mesRef),
+}));
+
+export type Calculo = typeof calculos.$inferSelect;
+export type InsertCalculo = typeof calculos.$inferInsert;
+
+/**
+ * Tabela de Produção Banco do Brasil
+ */
+export const producaoBb = mysqlTable("producaoBb", {
+  id: int("id").autoincrement().primaryKey(),
+  mesData: varchar("mesData", { length: 10 }),
+  empresa: varchar("empresa", { length: 100 }),
+  recConsignado: decimal("recConsignado", { precision: 15, scale: 2 }),
+  recProRata: decimal("recProRata", { precision: 15, scale: 2 }),
+  recCc: decimal("recCc", { precision: 15, scale: 2 }),
+  recConsorcio: decimal("recConsorcio", { precision: 15, scale: 2 }),
+  recOurocap: decimal("recOurocap", { precision: 15, scale: 2 }),
+  recSeguro: decimal("recSeguro", { precision: 15, scale: 2 }),
+  prtSeguro: decimal("prtSeguro", { precision: 15, scale: 2 }),
+  recBonus: decimal("recBonus", { precision: 15, scale: 2 }),
+  recCreditos: decimal("recCreditos", { precision: 15, scale: 2 }),
+  descDebitos: decimal("descDebitos", { precision: 15, scale: 2 }),
+  recTotal: decimal("recTotal", { precision: 15, scale: 2 }),
+  vrLiquido: decimal("vrLiquido", { precision: 15, scale: 2 }),
+  qtdeOpCredito: int("qtdeOpCredito"),
+  qtdeOpCc: int("qtdeOpCc"),
+  qtdeOpConsorcio: int("qtdeOpConsorcio"),
+  qtdeOpOurocap: int("qtdeOpOurocap"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesDataIdx: index("idx_producaoBb_mesData").on(table.mesData),
+}));
+
+export type ProducaoBb = typeof producaoBb.$inferSelect;
+export type InsertProducaoBb = typeof producaoBb.$inferInsert;
+
+/**
+ * Tabela de Extratos Consignados
+ */
+export const extratoConsignados = mysqlTable("extratoConsignados", {
+  id: int("id").autoincrement().primaryKey(),
+  mesAno: varchar("mesAno", { length: 10 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  nrOperacao: varchar("nrOperacao", { length: 100 }),
+  parcelas: int("parcelas"),
+  convenio: varchar("convenio", { length: 100 }),
+  juros: decimal("juros", { precision: 10, scale: 4 }),
+  valorLiquido: decimal("valorLiquido", { precision: 15, scale: 2 }),
+  percentual: decimal("percentual", { precision: 10, scale: 4 }),
+  comissao: decimal("comissao", { precision: 15, scale: 2 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ExtratoConsignado = typeof extratoConsignados.$inferSelect;
+export type InsertExtratoConsignado = typeof extratoConsignados.$inferInsert;
+
+/**
+ * Tabela de Extratos Contas Correntes
+ */
+export const extratoContas = mysqlTable("extratoContas", {
+  id: int("id").autoincrement().primaryKey(),
+  mesAno: varchar("mesAno", { length: 10 }),
+  agencia: varchar("agencia", { length: 50 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nome: varchar("nome", { length: 255 }),
+  comissao: decimal("comissao", { precision: 15, scale: 2 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ExtratoConta = typeof extratoContas.$inferSelect;
+export type InsertExtratoConta = typeof extratoContas.$inferInsert;
+
+/**
+ * Tabela de Extratos Consórcios
+ */
+export const extratoConsorcios = mysqlTable("extratoConsorcios", {
+  id: int("id").autoincrement().primaryKey(),
+  mesAno: varchar("mesAno", { length: 10 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nome: varchar("nome", { length: 255 }),
+  nrOperacao: varchar("nrOperacao", { length: 100 }),
+  parcelas: int("parcelas"),
+  segmento: varchar("segmento", { length: 100 }),
+  valorBem: decimal("valorBem", { precision: 15, scale: 2 }),
+  comissao: decimal("comissao", { precision: 15, scale: 2 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ExtratoConsorcio = typeof extratoConsorcios.$inferSelect;
+export type InsertExtratoConsorcio = typeof extratoConsorcios.$inferInsert;
+
+/**
+ * Tabela de Extratos OuroCap
+ */
+export const extratoOurocap = mysqlTable("extratoOurocap", {
+  id: int("id").autoincrement().primaryKey(),
+  mesAno: varchar("mesAno", { length: 10 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nome: varchar("nome", { length: 255 }),
+  nrOperacao: varchar("nrOperacao", { length: 100 }),
+  valorLiquido: decimal("valorLiquido", { precision: 15, scale: 2 }),
+  comissao: decimal("comissao", { precision: 15, scale: 2 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ExtratoOurocap = typeof extratoOurocap.$inferSelect;
+export type InsertExtratoOurocap = typeof extratoOurocap.$inferInsert;
+
+/**
+ * Tabela de Documentação
+ */
+export const documentacao = mysqlTable("documentacao", {
+  id: int("id").autoincrement().primaryKey(),
+  empresa: varchar("empresa", { length: 100 }),
+  situacao: varchar("situacao", { length: 50 }),
+  nomeDocumento: varchar("nomeDocumento", { length: 255 }),
+  finalidade: varchar("finalidade", { length: 255 }),
+  naPasta: varchar("naPasta", { length: 255 }),
+  area: varchar("area", { length: 100 }),
+  responsavelDocumento: varchar("responsavelDocumento", { length: 255 }),
+  aprovador: varchar("aprovador", { length: 255 }),
+  versao: varchar("versao", { length: 50 }),
+  dataCriacao: date("dataCriacao"),
+  publicacaoAtual: varchar("publicacaoAtual", { length: 50 }),
+  dataAtualizacao: date("dataAtualizacao"),
+  codigoDocumento: varchar("codigoDocumento", { length: 100 }),
+  fluxoAprovacao: varchar("fluxoAprovacao", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Documentacao = typeof documentacao.$inferSelect;
+export type InsertDocumentacao = typeof documentacao.$inferInsert;
