@@ -54,7 +54,64 @@ export default function AgentesFormPage() {
     { enabled: !!agenteId }
   );
 
-  // Não gerar número de cadastro no frontend - deixar o backend gerar
+  const createAgente = trpc.agentes.create.useMutation();
+  const updateAgente = trpc.agentes.update.useMutation();
+
+  // Função para formatar nomes (primeira letra maiúscula + resto minúsculo)
+  const formatName = (text: string): string => {
+    if (!text) return text;
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    // Aplicar formatação de nome para campos de nome
+    const isNameField = ['nomeAgente', 'favorecido', 'supervisor', 'empresa', 'cargo', 'area', 'vinculo', 'banco', 'cidade'].includes(name);
+    const formattedValue = isNameField ? formatName(value) : value;
+    
+    setFormData((prev) => ({
+      ...prev,
+      [name]: formattedValue,
+    }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validar campos obrigatórios
+    if (!formData.chaveJ || !formData.nomeAgente) {
+      toast.error("ChaveJ e Nome do Agente são obrigatórios!");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      if (agenteId) {
+        await updateAgente.mutateAsync({
+          id: agenteId,
+          data: formData,
+        });
+        toast.success("Agente atualizado com sucesso!");
+      } else {
+        await createAgente.mutateAsync(formData);
+        toast.success("Agente criado com sucesso!");
+      }
+      navigate("/agentes");
+    } catch (error) {
+      toast.error("Erro ao salvar agente");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (agente) {
@@ -87,50 +144,6 @@ export default function AgentesFormPage() {
     }
   }, [agente]);
 
-  const createAgente = trpc.agentes.create.useMutation();
-  const updateAgente = trpc.agentes.update.useMutation();
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      if (agenteId) {
-        await updateAgente.mutateAsync({
-          id: agenteId,
-          data: formData,
-        });
-        toast.success("Agente atualizado com sucesso!");
-      } else {
-        await createAgente.mutateAsync(formData);
-        toast.success("Agente criado com sucesso!");
-      }
-      navigate("/agentes");
-    } catch (error) {
-      toast.error("Erro ao salvar agente");
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="space-y-6 p-6 max-w-6xl mx-auto">
       {/* Header */}
@@ -146,7 +159,7 @@ export default function AgentesFormPage() {
           <h1 className="text-3xl font-bold">
             {agenteId ? "Editar Agente" : "Novo Agente"}
           </h1>
-          <p className="text-gray-600 text-sm mt-1">Preencha todos os campos obrigatórios (*)</p>
+          <p className="text-gray-600 text-sm mt-1">Preencha os campos obrigatórios (*)</p>
         </div>
       </div>
 
@@ -160,24 +173,13 @@ export default function AgentesFormPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="numCadastro">Número de Cadastro *</Label>
+                <Label htmlFor="numCadastro">Número de Cadastro</Label>
                 <Input
                   id="numCadastro"
                   name="numCadastro"
                   value={formData.numCadastro}
                   disabled
                   className="bg-gray-100 cursor-not-allowed"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="empresa">Empresa *</Label>
-                <Input
-                  id="empresa"
-                  name="empresa"
-                  value={formData.empresa}
-                  onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
@@ -186,17 +188,6 @@ export default function AgentesFormPage() {
                   id="chaveJ"
                   name="chaveJ"
                   value={formData.chaveJ}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="senha">Senha *</Label>
-                <Input
-                  id="senha"
-                  name="senha"
-                  type="password"
-                  value={formData.senha}
                   onChange={handleInputChange}
                   required
                 />
@@ -212,14 +203,32 @@ export default function AgentesFormPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="dataAdmissao">Data de Admissão *</Label>
+                <Label htmlFor="empresa">Empresa</Label>
+                <Input
+                  id="empresa"
+                  name="empresa"
+                  value={formData.empresa}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <Label htmlFor="senha">Senha</Label>
+                <Input
+                  id="senha"
+                  name="senha"
+                  type="password"
+                  value={formData.senha}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <Label htmlFor="dataAdmissao">Data de Admissão</Label>
                 <Input
                   id="dataAdmissao"
                   name="dataAdmissao"
                   type="date"
                   value={formData.dataAdmissao}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
             </div>
@@ -234,37 +243,34 @@ export default function AgentesFormPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="cargo">Cargo *</Label>
+                <Label htmlFor="cargo">Cargo</Label>
                 <Input
                   id="cargo"
                   name="cargo"
                   value={formData.cargo}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="area">Área *</Label>
+                <Label htmlFor="area">Área</Label>
                 <Input
                   id="area"
                   name="area"
                   value={formData.area}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="vinculo">Vínculo *</Label>
+                <Label htmlFor="vinculo">Vínculo</Label>
                 <Input
                   id="vinculo"
                   name="vinculo"
                   value={formData.vinculo}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="situacao">Situação *</Label>
+                <Label htmlFor="situacao">Situação</Label>
                 <Select value={formData.situacao} onValueChange={(value) => handleSelectChange("situacao", value)}>
                   <SelectTrigger>
                     <SelectValue />
@@ -278,23 +284,21 @@ export default function AgentesFormPage() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="nrAgencia">Número da Agência *</Label>
+                <Label htmlFor="nrAgencia">Número da Agência</Label>
                 <Input
                   id="nrAgencia"
                   name="nrAgencia"
                   value={formData.nrAgencia}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="supervisor">Supervisor *</Label>
+                <Label htmlFor="supervisor">Supervisor</Label>
                 <Input
                   id="supervisor"
                   name="supervisor"
                   value={formData.supervisor}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
             </div>
@@ -309,24 +313,21 @@ export default function AgentesFormPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="cidade">Cidade *</Label>
+                <Label htmlFor="cidade">Cidade</Label>
                 <Input
                   id="cidade"
                   name="cidade"
                   value={formData.cidade}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="uf">UF *</Label>
+                <Label htmlFor="uf">UF</Label>
                 <Input
                   id="uf"
                   name="uf"
-                  maxLength={2}
                   value={formData.uf}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
             </div>
@@ -341,47 +342,39 @@ export default function AgentesFormPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="cpfAgente">CPF *</Label>
+                <Label htmlFor="cpfAgente">CPF</Label>
                 <Input
                   id="cpfAgente"
-                  name="cpfAgente"
+                  placeholder="000.000.000-00"
                   value={formData.cpfAgente}
                   onChange={handleInputChange}
-                  placeholder="000.000.000-00"
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="dataNascimento">Data de Nascimento *</Label>
+                <Label htmlFor="dataNascimento">Data de Nascimento</Label>
                 <Input
                   id="dataNascimento"
-                  name="dataNascimento"
                   type="date"
                   value={formData.dataNascimento}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
-                  name="email"
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="celular">Celular *</Label>
+                <Label htmlFor="celular">Celular</Label>
                 <Input
                   id="celular"
-                  name="celular"
+                  placeholder="(00) 00000-0000"
                   value={formData.celular}
                   onChange={handleInputChange}
-                  placeholder="(00) 00000-0000"
-                  required
                 />
               </div>
             </div>
@@ -396,55 +389,47 @@ export default function AgentesFormPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="favorecido">Favorecido *</Label>
+                <Label htmlFor="favorecido">Favorecido</Label>
                 <Input
                   id="favorecido"
-                  name="favorecido"
                   value={formData.favorecido}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="banco">Banco *</Label>
+                <Label htmlFor="banco">Banco</Label>
                 <Input
                   id="banco"
-                  name="banco"
                   value={formData.banco}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="agencia">Agência *</Label>
+                <Label htmlFor="agencia">Agência</Label>
                 <Input
                   id="agencia"
-                  name="agencia"
                   value={formData.agencia}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="conta">Conta *</Label>
+                <Label htmlFor="conta">Conta</Label>
                 <Input
                   id="conta"
-                  name="conta"
                   value={formData.conta}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
               <div>
-                <Label htmlFor="tipo">Tipo de Conta *</Label>
+                <Label htmlFor="tipo">Tipo de Conta</Label>
                 <Select value={formData.tipo} onValueChange={(value) => handleSelectChange("tipo", value)}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="CC">Conta Corrente</SelectItem>
-                    <SelectItem value="CP">Conta Poupança</SelectItem>
-                    <SelectItem value="CE">Conta Empresa</SelectItem>
+                    <SelectItem value="Conta Corrente">Conta Corrente</SelectItem>
+                    <SelectItem value="Conta Poupança">Conta Poupança</SelectItem>
+                    <SelectItem value="Conta Empresa">Conta Empresa</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -452,17 +437,16 @@ export default function AgentesFormPage() {
                 <Label htmlFor="pix">PIX</Label>
                 <Input
                   id="pix"
-                  name="pix"
+                  placeholder="Email, CPF ou Chave Aleatória"
                   value={formData.pix}
                   onChange={handleInputChange}
-                  placeholder="Email, CPF ou Chave Aleatória"
                 />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Botões de Ação */}
+        {/* Botões */}
         <div className="flex gap-4 justify-end">
           <Button
             type="button"
@@ -474,7 +458,7 @@ export default function AgentesFormPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="flex items-center gap-2"
+            className="gap-2"
           >
             <Save className="w-4 h-4" />
             {isLoading ? "Salvando..." : "Salvar Agente"}
