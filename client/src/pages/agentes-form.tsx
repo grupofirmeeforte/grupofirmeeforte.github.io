@@ -16,7 +16,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AgentesFormPage() {
-  const navigate = (useRouter() as any)[1];
+  const [, navigate] = useRouter() as any;
   const [match, params] = useRoute("/agentes/:id");
   const agenteId = params?.id ? parseInt(params.id) : null;
 

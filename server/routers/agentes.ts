@@ -161,15 +161,20 @@ export const agentesRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
-      await db.insert(agentes).values({
+      const result = await db.insert(agentes).values({
         ...input,
         dataAdmissao: input.dataAdmissao ? new Date(input.dataAdmissao) : undefined,
         dataNascimento: input.dataNascimento ? new Date(input.dataNascimento) : undefined,
       });
 
-      return {
-        success: true,
-      };
+      // Buscar o agente criado para retornar com ID
+      const created = await db
+        .select()
+        .from(agentes)
+        .where(input.chaveJ ? eq(agentes.chaveJ, input.chaveJ) : isNotNull(agentes.id))
+        .limit(1);
+
+      return created.length > 0 ? created[0] : null;
     }),
 
   // Atualizar agente

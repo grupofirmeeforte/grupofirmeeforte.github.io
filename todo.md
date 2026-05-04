@@ -7,10 +7,10 @@
 - [ ] Criar seeds iniciais com dados de exemplo
 
 ## FASE 2: MÓDULO DE AGENTES
-- [ ] Criar página de listagem de agentes
-- [ ] Criar formulário de cadastro de agentes
-- [ ] Criar formulário de edição de agentes
-- [ ] Implementar busca e filtros por empresa, situação, cidade
+- [x] Criar página de listagem de agentes
+- [x] Criar formulário de cadastro de agentes
+- [x] Criar formulário de edição de agentes
+- [x] Implementar busca e filtros por empresa, situação, cidade
 - [ ] Criar visualização de detalhes do agente
 - [ ] Implementar importação de CSV para agentes
 

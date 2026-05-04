@@ -19,8 +19,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { useRouter } from "wouter";
 
 export default function AgentesPage() {
+  const [, navigate] = useRouter() as any;
   const [search, setSearch] = useState("");
   const [empresa, setEmpresa] = useState<string>("");
   const [situacao, setSituacao] = useState<string>("");
@@ -30,9 +32,9 @@ export default function AgentesPage() {
 
   const { data: agentes, isLoading } = trpc.agentes.list.useQuery({
     search,
-    empresa: empresa || undefined,
-    situacao: situacao || undefined,
-    cidade: cidade || undefined,
+    empresa: empresa && empresa !== "__all__" ? empresa : undefined,
+    situacao: situacao && situacao !== "__all__" ? situacao : undefined,
+    cidade: cidade && cidade !== "__all__" ? cidade : undefined,
     limit,
     offset: page * limit,
   });
@@ -41,9 +43,9 @@ export default function AgentesPage() {
   const { data: cidades } = trpc.agentes.getCidades.useQuery();
   const { data: totalCount } = trpc.agentes.count.useQuery({
     search,
-    empresa: empresa || undefined,
-    situacao: situacao || undefined,
-    cidade: cidade || undefined,
+    empresa: empresa && empresa !== "__all__" ? empresa : undefined,
+    situacao: situacao && situacao !== "__all__" ? situacao : undefined,
+    cidade: cidade && cidade !== "__all__" ? cidade : undefined,
   });
 
   const deleteAgente = trpc.agentes.delete.useMutation({
@@ -69,7 +71,10 @@ export default function AgentesPage() {
             {totalCount ? `Total: ${totalCount} agentes` : "Carregando..."}
           </p>
         </div>
-        <Button className="gap-2">
+        <Button
+          onClick={() => navigate("/agentes/novo")}
+          className="gap-2"
+        >
           <Plus className="w-4 h-4" />
           Novo Agente
         </Button>
@@ -102,9 +107,9 @@ export default function AgentesPage() {
                 <SelectValue placeholder="Empresa" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas</SelectItem>
+                <SelectItem value="__all__">Todas</SelectItem>
                 {empresas?.map((emp) => (
-                  <SelectItem key={emp} value={emp || ""}>
+                  <SelectItem key={emp} value={emp || "__empty__"}>
                     {emp}
                   </SelectItem>
                 ))}
@@ -119,9 +124,9 @@ export default function AgentesPage() {
                 <SelectValue placeholder="Cidade" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas</SelectItem>
+                <SelectItem value="__all__">Todas</SelectItem>
                 {cidades?.map((cid) => (
-                  <SelectItem key={cid} value={cid || ""}>
+                  <SelectItem key={cid} value={cid || "__empty__"}>
                     {cid}
                   </SelectItem>
                 ))}
@@ -136,7 +141,7 @@ export default function AgentesPage() {
                 <SelectValue placeholder="Situação" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas</SelectItem>
+                <SelectItem value="__all__">Todas</SelectItem>
                 <SelectItem value="Ativo">Ativo</SelectItem>
                 <SelectItem value="Inativo">Inativo</SelectItem>
               </SelectContent>
@@ -191,7 +196,11 @@ export default function AgentesPage() {
                       </TableCell>
                       <TableCell>{agente.email}</TableCell>
                       <TableCell className="text-right space-x-2">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => navigate(`/agentes/${agente.id}`)}
+                        >
                           <Edit2 className="w-4 h-4" />
                         </Button>
                         <Button
