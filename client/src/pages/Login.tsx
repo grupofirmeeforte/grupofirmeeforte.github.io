@@ -103,6 +103,7 @@ export default function Login() {
                 onChange={(e) => setChaveJ(e.target.value)}
                 disabled={isBlocked}
                 className="w-full"
+                autoComplete="off"
               />
             </div>
 
@@ -118,6 +119,7 @@ export default function Login() {
                 onChange={(e) => setSenha(e.target.value)}
                 disabled={isBlocked}
                 className="w-full"
+                autoComplete="off"
               />
             </div>
 

@@ -95,22 +95,27 @@ export default function AgentesFormPage() {
 
     try {
       // Normalizar campos vazios para undefined
-      const normalizedData = {
-        ...formData,
-        email: formData.email || undefined,
-        cpfAgente: formData.cpfAgente || undefined,
-        celular: formData.celular || undefined,
-        dataNascimento: formData.dataNascimento || undefined,
-      };
+      const normalizedData: Record<string, any> = {};
+      
+      // Apenas incluir campos que têm valor (não vazios)
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value && value !== '') {
+          normalizedData[key] = value;
+        }
+      });
+      
+      // Garantir que campos obrigatórios estejam presentes
+      normalizedData.chaveJ = formData.chaveJ;
+      normalizedData.nomeAgente = formData.nomeAgente;
 
       if (agenteId) {
         await updateAgente.mutateAsync({
           id: agenteId,
-          data: normalizedData,
+          data: normalizedData as any,
         });
         toast.success("Agente atualizado com sucesso!");
       } else {
-        await createAgente.mutateAsync(normalizedData);
+        await createAgente.mutateAsync(normalizedData as any);
         toast.success("Agente criado com sucesso!");
       }
       navigate("/agentes");

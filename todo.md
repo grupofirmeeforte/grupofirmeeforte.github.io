@@ -23,6 +23,7 @@
   - [ ] Notificação ao admin quando bloqueado
   - [ ] Página de status de bloqueio
   - [ ] Testes de segurança
+  - [x] Desabilitar autocomplete nos campos de ChaveJ e Senha
 - [x] Implementar módulo de Auditoria/Logs com:
   - [x] Número de entrada (ID de sessão)
   - [x] Nome do agente
@@ -43,6 +44,7 @@
 - [x] Criar formulário de cadastro de agentes
 - [x] Criar formulário de edição de agentes
 - [x] Implementar busca e filtros por empresa, situação, cidade
+- [x] CORRIGIR: Erro ao editar um único campo (valores vazios sendo enviados)
 - [ ] Criar visualização de detalhes do agente
 - [ ] Implementar importação de CSV para agentes
 
