@@ -13,7 +13,15 @@
 - [x] Mover o formulário de login para o canto direito da bandeira
 - [x] Adicionar lista de cargos em ordem alfabética: CEO, Gerente, Promotor, Suporte, Supervisor
 - [x] Adicionar lista de áreas em ordem alfabética: ADM, Comercial, Vendas
-- [x] Adicionar lista de vínculos em ordem alfabética: CLT, Prestador
+- [x] Adicionar lista de vínculos em ordem alfabética: CLT, Prestador, Sócio
+- [x] Eliminar tela de OAuth e deixar entrar direto com login customizado
+- [ ] MELHORIAS NO SISTEMA DE BLOQUEIO (ESSENCIAL):
+  - [ ] Persistência real do bloqueio (não reseta ao recarregar)
+  - [ ] Desbloquear manual por admin
+  - [ ] Registro detalhado de tentativas falhas
+  - [ ] Notificação ao admin quando bloqueado
+  - [ ] Página de status de bloqueio
+  - [ ] Testes de segurança
 - [x] Implementar módulo de Auditoria/Logs com:
   - [x] Número de entrada (ID de sessão)
   - [x] Nome do agente

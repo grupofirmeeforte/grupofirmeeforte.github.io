@@ -294,6 +294,7 @@ export default function AgentesFormPage() {
                   <SelectContent>
                     <SelectItem value="CLT">CLT</SelectItem>
                     <SelectItem value="Prestador">Prestador</SelectItem>
+                    <SelectItem value="Sócio">Sócio</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

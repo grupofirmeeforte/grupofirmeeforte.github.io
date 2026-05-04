@@ -119,11 +119,14 @@ export async function incrementLoginAttempts(chaveJ: string) {
   if (existing) {
     const newAttempts = existing.attempts + 1;
     const isBlocked = newAttempts >= 3;
+    // Bloqueio persiste por 24 horas
+    const blockedUntil = isBlocked ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null;
     
     await db.update(loginAttempts)
       .set({
         attempts: newAttempts,
         isBlocked,
+        blockedUntil,
         lastAttempt: new Date(),
       })
       .where(eq(loginAttempts.chaveJ, chaveJ));
@@ -184,4 +187,35 @@ export async function updateAuditLogSaida(numeroEntrada: string) {
   return await db.update(auditoria)
     .set({ horarioSaida: new Date() })
     .where(eq(auditoria.numeroEntrada, numeroEntrada));
+}
+
+// Função para desbloquear manualmente por admin
+export async function unlockLoginAttempts(chaveJ: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  await db.update(loginAttempts)
+    .set({
+      attempts: 0,
+      isBlocked: false,
+      blockedUntil: null,
+      lastAttempt: new Date(),
+    })
+    .where(eq(loginAttempts.chaveJ, chaveJ));
+}
+
+// Função para obter status de bloqueio de todos os agentes
+export async function getAllBlockedAttempts() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(loginAttempts).where(eq(loginAttempts.isBlocked, true));
+}
+
+// Função para obter histórico de tentativas de um agente
+export async function getLoginAttemptsHistory(chaveJ: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(loginAttempts).where(eq(loginAttempts.chaveJ, chaveJ));
 }
