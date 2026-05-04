@@ -47,6 +47,7 @@
 - [x] Implementar busca e filtros por empresa, situação, cidade
 - [x] CORRIGIR: Erro ao editar um único campo (valores vazios sendo enviados)
 - [x] CORRIGIR: Mascarar senha na tabela de agentes (mostrar *** em vez do valor)
+- [ ] DEBUG: Erro ao fazer login - volta para a página de login
 - [ ] Criar visualização de detalhes do agente
 - [ ] Implementar importação de CSV para agentes
 

@@ -5,7 +5,7 @@ import { publicProcedure, router, adminProcedure } from "./_core/trpc";
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { z } from "zod";
-import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory } from "./db";
+import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser } from "./db";
 import { sdk } from "./_core/sdk";
 import { TRPCError } from "@trpc/server";
 
@@ -62,6 +62,15 @@ export const appRouter = router({
         // Gerar número de entrada único
         const numeroEntrada = `ENT-${Date.now()}-${agente.id}`;
         
+        // Criar/atualizar usuário no banco de dados
+        const openId = `agente_${agente.id}`;
+        await upsertUser({
+          openId,
+          name: agente.nomeAgente || "",
+          email: agente.email || null,
+          loginMethod: "custom",
+        });
+        
         // Criar registro de auditoria
         await createAuditLog({
           agenteId: agente.id,
@@ -78,7 +87,7 @@ export const appRouter = router({
         // Criar token de sessão customizado
         const sessionToken = await sdk.signSession(
           {
-            openId: `agente_${agente.id}`,
+            openId,
             appId: process.env.VITE_APP_ID || "app",
             name: agente.nomeAgente || "",
           },
