@@ -212,7 +212,7 @@ export default function AgentesPage() {
                       </TableCell>
                       <TableCell>{agente.empresa}</TableCell>
                       <TableCell>{agente.chaveJ}</TableCell>
-                      <TableCell>{agente.senha}</TableCell>
+                      <TableCell>{'*'.repeat(6)}</TableCell>
                       <TableCell className="font-medium">
                         {agente.nomeAgente}
                       </TableCell>
