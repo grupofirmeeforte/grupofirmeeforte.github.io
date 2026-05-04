@@ -183,12 +183,12 @@ export const agentesRouter = router({
       // Gerar número de cadastro automaticamente se não fornecido
       const numCadastro = input.numCadastro || (await generateNumCadastro(db));
 
-      const result = await db.insert(agentes).values({
-        ...input,
-        numCadastro,
-        dataAdmissao: input.dataAdmissao ? new Date(input.dataAdmissao) : undefined,
-        dataNascimento: input.dataNascimento ? new Date(input.dataNascimento) : undefined,
-      });
+      const dataToInsert: any = { ...input, numCadastro };
+      // Remover conversão de Date para manter string YYYY-MM-DD
+      delete dataToInsert.dataAdmissao;
+      delete dataToInsert.dataNascimento;
+      
+      const result = await db.insert(agentes).values(dataToInsert as any);
 
       // Buscar o agente criado para retornar com ID
       const created = await db
@@ -214,13 +214,7 @@ export const agentesRouter = router({
 
       const updateData: Record<string, unknown> = { ...input.data };
 
-      // Converter datas se fornecidas
-      if (input.data.dataAdmissao) {
-        updateData.dataAdmissao = new Date(input.data.dataAdmissao);
-      }
-      if (input.data.dataNascimento) {
-        updateData.dataNascimento = new Date(input.data.dataNascimento);
-      }
+      // Manter datas como string (YYYY-MM-DD) sem conversão para evitar fuso horário
 
       await db
         .update(agentes)
