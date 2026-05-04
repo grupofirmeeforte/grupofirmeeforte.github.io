@@ -156,33 +156,49 @@ export default function AgentesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Número</TableHead>
                   <TableHead>Nome</TableHead>
                   <TableHead>ChaveJ</TableHead>
-                  <TableHead>CPF</TableHead>
                   <TableHead>Empresa</TableHead>
-                  <TableHead>Cidade</TableHead>
+                  <TableHead>Cargo</TableHead>
+                  <TableHead>Área</TableHead>
+                  <TableHead>Vínculo</TableHead>
                   <TableHead>Situação</TableHead>
+                  <TableHead>Supervisor</TableHead>
+                  <TableHead>Cidade</TableHead>
+                  <TableHead>UF</TableHead>
+                  <TableHead>CPF</TableHead>
+                  <TableHead>Data Nascimento</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead>Celular</TableHead>
+                  <TableHead>Banco</TableHead>
+                  <TableHead>Agencia</TableHead>
+                  <TableHead>Conta</TableHead>
+                  <TableHead>PIX</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
+                    <TableCell colSpan={20} className="text-center py-8">
                       Carregando...
                     </TableCell>
                   </TableRow>
                 ) : agentes && agentes.length > 0 ? (
                   agentes.map((agente) => (
                     <TableRow key={agente.id}>
+                      <TableCell className="font-medium text-sm">
+                        {agente.numCadastro}
+                      </TableCell>
                       <TableCell className="font-medium">
                         {agente.nomeAgente}
                       </TableCell>
                       <TableCell>{agente.chaveJ}</TableCell>
-                      <TableCell>{agente.cpfAgente}</TableCell>
                       <TableCell>{agente.empresa}</TableCell>
-                      <TableCell>{agente.cidade}</TableCell>
+                      <TableCell>{agente.cargo}</TableCell>
+                      <TableCell>{agente.area}</TableCell>
+                      <TableCell>{agente.vinculo}</TableCell>
                       <TableCell>
                         <span
                           className={`px-2 py-1 rounded text-xs font-semibold ${
@@ -194,7 +210,17 @@ export default function AgentesPage() {
                           {agente.situacao}
                         </span>
                       </TableCell>
+                      <TableCell>{agente.supervisor}</TableCell>
+                      <TableCell>{agente.cidade}</TableCell>
+                      <TableCell>{agente.uf}</TableCell>
+                      <TableCell>{agente.cpfAgente}</TableCell>
+                      <TableCell>{agente.dataNascimento ? new Date(agente.dataNascimento).toLocaleDateString('pt-BR') : '-'}</TableCell>
                       <TableCell>{agente.email}</TableCell>
+                      <TableCell>{agente.celular}</TableCell>
+                      <TableCell>{agente.banco}</TableCell>
+                      <TableCell>{agente.agencia}</TableCell>
+                      <TableCell>{agente.conta}</TableCell>
+                      <TableCell>{agente.pix}</TableCell>
                       <TableCell className="text-right space-x-2">
                         <Button
                           variant="ghost"
