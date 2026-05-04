@@ -5,7 +5,7 @@ import { publicProcedure, router, adminProcedure } from "./_core/trpc";
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { z } from "zod";
-import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao } from "./db";
+import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas } from "./db";
 import { sdk } from "./_core/sdk";
 import { TRPCError } from "@trpc/server";
 
@@ -184,7 +184,57 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await getLoginAttemptsHistory(input.chaveJ);
       }),
+   }),
+  chat: router({
+    // Enviar mensagem privada
+    enviarMensagem: publicProcedure
+      .input(z.object({
+        remetenteId: z.number(),
+        remetenteNome: z.string(),
+        destinatarioId: z.number(),
+        destinatarioNome: z.string(),
+        conteudo: z.string().min(1, "Mensagem não pode estar vazia"),
+      }))
+      .mutation(async ({ input }) => {
+        return await criarMensagem({
+          remetenteId: input.remetenteId,
+          remetenteNome: input.remetenteNome,
+          destinatarioId: input.destinatarioId,
+          destinatarioNome: input.destinatarioNome,
+          conteudo: input.conteudo,
+          tipo: "texto",
+          lida: false,
+        });
+      }),
+    
+    // Obter mensagens privadas entre dois usuários
+    obterMensagensPrivadas: publicProcedure
+      .input(z.object({
+        usuarioId: z.number(),
+        outroUsuarioId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        return await obterMensagensPrivadas(input.usuarioId, input.outroUsuarioId);
+      }),
+    
+    // Obter mensagens não lidas
+    obterNaoLidas: publicProcedure
+      .input(z.object({
+        usuarioId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        return await obterMensagensNaoLidas(input.usuarioId);
+      }),
+    
+    // Marcar mensagens como lidas
+    marcarComoLidas: publicProcedure
+      .input(z.object({
+        usuarioId: z.number(),
+        remetenteId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        return await marcarMensagensComoLidas(input.usuarioId, input.remetenteId);
+      }),
   }),
 });
-
 export type AppRouter = typeof appRouter;

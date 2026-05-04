@@ -78,13 +78,22 @@ export default function AgentesPage() {
             {totalCount ? `Total: ${totalCount} agentes` : "Carregando..."}
           </p>
         </div>
-        <Button
-          onClick={() => navigate("/agentes/novo")}
-          className="gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Novo Agente
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => navigate("/")}
+            variant="outline"
+            className="gap-2"
+          >
+            ← Voltar
+          </Button>
+          <Button
+            onClick={() => navigate("/agentes/novo")}
+            className="gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Novo Agente
+          </Button>
+        </div>
       </div>
 
       <Card>

@@ -5,6 +5,7 @@ import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut } from "luci
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
+import { ChatWidget } from "@/components/ChatWidget";
 
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
