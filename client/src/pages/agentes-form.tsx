@@ -285,12 +285,17 @@ export default function AgentesFormPage() {
               </div>
               <div>
                 <Label htmlFor="vinculo">Vínculo</Label>
-                <Input
-                  id="vinculo"
-                  name="vinculo"
-                  value={formData.vinculo}
-                  onChange={handleInputChange}
-                />
+                <Select value={formData.vinculo} onValueChange={(value) => {
+                  setFormData(prev => ({ ...prev, vinculo: value }));
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um vínculo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CLT">CLT</SelectItem>
+                    <SelectItem value="Prestador">Prestador</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="situacao">Situação</Label>
