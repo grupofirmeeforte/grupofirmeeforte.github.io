@@ -179,7 +179,7 @@ export default function AgentesFormPage() {
         tipo: agente.tipo || "",
         cpfAgente: agente.cpfAgente || "",
         pix: agente.pix || "",
-        dataNascimento: agente.dataNascimento ? new Date(agente.dataNascimento).toISOString().split('T')[0] : "",
+        dataNascimento: agente.dataNascimento ? (typeof agente.dataNascimento === 'string' ? (agente.dataNascimento as string).split('T')[0] : new Date(agente.dataNascimento as Date).toLocaleDateString('en-CA')) : "",
         celular: agente.celular || "",
       });
     }
