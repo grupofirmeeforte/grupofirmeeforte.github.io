@@ -57,17 +57,17 @@ export default function AgentesFormPage() {
   const createAgente = trpc.agentes.create.useMutation();
   const updateAgente = trpc.agentes.update.useMutation();
 
-  // Função para formatar nomes (primeira letra maiúscula + resto minúsculo)
-  const formatName = (text: string): string => {
+  // Função para formatar nomes em MAIUSCULO
+  const formatNameUppercase = (text: string): string => {
     if (!text) return text;
-    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    return text.toUpperCase();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    // Aplicar formatação de nome para campos de nome
-    const isNameField = ['nomeAgente', 'favorecido', 'supervisor', 'empresa', 'cargo', 'area', 'vinculo', 'banco', 'cidade'].includes(name);
-    const formattedValue = isNameField ? formatName(value) : value;
+    // Aplicar formatação de nome para campos de nome (MAIUSCULO)
+    const isNameField = ['nomeAgente', 'chaveJ', 'empresa', 'favorecido', 'supervisor', 'cargo', 'area', 'vinculo', 'banco', 'cidade'].includes(name);
+    const formattedValue = isNameField ? formatNameUppercase(value) : value;
     
     setFormData((prev) => ({
       ...prev,
@@ -94,20 +94,29 @@ export default function AgentesFormPage() {
     setIsLoading(true);
 
     try {
+      // Normalizar campos vazios para undefined
+      const normalizedData = {
+        ...formData,
+        email: formData.email || undefined,
+        cpfAgente: formData.cpfAgente || undefined,
+        celular: formData.celular || undefined,
+        dataNascimento: formData.dataNascimento || undefined,
+      };
+
       if (agenteId) {
         await updateAgente.mutateAsync({
           id: agenteId,
-          data: formData,
+          data: normalizedData,
         });
         toast.success("Agente atualizado com sucesso!");
       } else {
-        await createAgente.mutateAsync(formData);
+        await createAgente.mutateAsync(normalizedData);
         toast.success("Agente criado com sucesso!");
       }
       navigate("/agentes");
-    } catch (error) {
-      toast.error("Erro ao salvar agente");
-      console.error(error);
+    } catch (error: any) {
+      console.error("Erro ao salvar agente:", error);
+      toast.error(error?.message || "Erro ao salvar agente");
     } finally {
       setIsLoading(false);
     }
@@ -345,6 +354,7 @@ export default function AgentesFormPage() {
                 <Label htmlFor="cpfAgente">CPF</Label>
                 <Input
                   id="cpfAgente"
+                  name="cpfAgente"
                   placeholder="000.000.000-00"
                   value={formData.cpfAgente}
                   onChange={handleInputChange}
@@ -354,6 +364,7 @@ export default function AgentesFormPage() {
                 <Label htmlFor="dataNascimento">Data de Nascimento</Label>
                 <Input
                   id="dataNascimento"
+                  name="dataNascimento"
                   type="date"
                   value={formData.dataNascimento}
                   onChange={handleInputChange}
@@ -363,6 +374,7 @@ export default function AgentesFormPage() {
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
@@ -372,6 +384,7 @@ export default function AgentesFormPage() {
                 <Label htmlFor="celular">Celular</Label>
                 <Input
                   id="celular"
+                  name="celular"
                   placeholder="(00) 00000-0000"
                   value={formData.celular}
                   onChange={handleInputChange}
@@ -392,6 +405,7 @@ export default function AgentesFormPage() {
                 <Label htmlFor="favorecido">Favorecido</Label>
                 <Input
                   id="favorecido"
+                  name="favorecido"
                   value={formData.favorecido}
                   onChange={handleInputChange}
                 />
@@ -400,6 +414,7 @@ export default function AgentesFormPage() {
                 <Label htmlFor="banco">Banco</Label>
                 <Input
                   id="banco"
+                  name="banco"
                   value={formData.banco}
                   onChange={handleInputChange}
                 />
@@ -408,6 +423,7 @@ export default function AgentesFormPage() {
                 <Label htmlFor="agencia">Agência</Label>
                 <Input
                   id="agencia"
+                  name="agencia"
                   value={formData.agencia}
                   onChange={handleInputChange}
                 />
@@ -416,6 +432,7 @@ export default function AgentesFormPage() {
                 <Label htmlFor="conta">Conta</Label>
                 <Input
                   id="conta"
+                  name="conta"
                   value={formData.conta}
                   onChange={handleInputChange}
                 />
@@ -437,6 +454,7 @@ export default function AgentesFormPage() {
                 <Label htmlFor="pix">PIX</Label>
                 <Input
                   id="pix"
+                  name="pix"
                   placeholder="Email, CPF ou Chave Aleatória"
                   value={formData.pix}
                   onChange={handleInputChange}
