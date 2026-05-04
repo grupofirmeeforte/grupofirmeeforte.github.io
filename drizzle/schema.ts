@@ -1,4 +1,4 @@
-import { 
+import {
   int, 
   mysqlEnum, 
   mysqlTable, 
@@ -51,7 +51,7 @@ export const agentes = mysqlTable("agentes", {
   chaveJ: varchar("chaveJ", { length: 50 }).unique(),
   senha: varchar("senha", { length: 255 }),
   nomeAgente: varchar("nomeAgente", { length: 255 }).notNull(),
-  dataAdmissao: date("dataAdmissao"),
+  dataAdmissao: varchar("dataAdmissao", { length: 10 }), // YYYY-MM-DD format
   cargo: varchar("cargo", { length: 100 }),
   area: varchar("area", { length: 100 }),
   vinculo: varchar("vinculo", { length: 100 }),
@@ -68,7 +68,7 @@ export const agentes = mysqlTable("agentes", {
   tipo: varchar("tipo", { length: 50 }),
   cpfAgente: varchar("cpfAgente", { length: 14 }).unique(),
   pix: varchar("pix", { length: 255 }),
-  dataNascimento: date("dataNascimento"),
+  dataNascimento: varchar("dataNascimento", { length: 10 }), // YYYY-MM-DD format
   celular: varchar("celular", { length: 20 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

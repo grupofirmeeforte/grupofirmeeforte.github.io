@@ -184,9 +184,7 @@ export const agentesRouter = router({
       const numCadastro = input.numCadastro || (await generateNumCadastro(db));
 
       const dataToInsert: any = { ...input, numCadastro };
-      // Remover conversão de Date para manter string YYYY-MM-DD
-      delete dataToInsert.dataAdmissao;
-      delete dataToInsert.dataNascimento;
+      // Manter datas como string YYYY-MM-DD (sem conversão)
       
       const result = await db.insert(agentes).values(dataToInsert as any);
 

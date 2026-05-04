@@ -1,0 +1,1 @@
+ALTER TABLE `agentes` MODIFY COLUMN `dataNascimento` varchar(10);

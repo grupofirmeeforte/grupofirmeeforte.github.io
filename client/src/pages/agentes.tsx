@@ -21,6 +21,13 @@ import {
 import { Plus, Edit2, Trash2, Search } from "lucide-react";
 import { useLocation } from "wouter";
 
+// Função para formatar data YYYY-MM-DD para DD/MM/YYYY
+const formatDateString = (dateStr: string): string => {
+  if (!dateStr) return '-';
+  const [year, month, day] = dateStr.split('-');
+  return `${day}/${month}/${year}`;
+};
+
 export default function AgentesPage() {
   const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
@@ -216,7 +223,7 @@ export default function AgentesPage() {
                       <TableCell className="font-medium">
                         {agente.nomeAgente}
                       </TableCell>
-                      <TableCell>{agente.dataAdmissao ? new Date(agente.dataAdmissao).toLocaleDateString('pt-BR') : '-'}</TableCell>
+                      <TableCell>{agente.dataAdmissao ? formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '') : '-'}</TableCell>
                       <TableCell>{agente.cargo}</TableCell>
                       <TableCell>{agente.area}</TableCell>
                       <TableCell>{agente.vinculo}</TableCell>
@@ -235,7 +242,7 @@ export default function AgentesPage() {
                       <TableCell>{agente.cidade}</TableCell>
                       <TableCell>{agente.uf}</TableCell>
                       <TableCell>{agente.cpfAgente}</TableCell>
-                      <TableCell>{agente.dataNascimento ? new Date(agente.dataNascimento).toLocaleDateString('pt-BR') : '-'}</TableCell>
+                      <TableCell>{agente.dataNascimento ? formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '') : '-'}</TableCell>
                       <TableCell>{agente.email}</TableCell>
                       <TableCell>{agente.celular}</TableCell>
                       <TableCell>{agente.banco}</TableCell>

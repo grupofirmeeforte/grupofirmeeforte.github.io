@@ -67,13 +67,21 @@ describe("agentes router", () => {
 
   it("should create an agente", async () => {
     const timestamp = Date.now();
+    // Helper to get YYYY-MM-DD format
+    const toDateString = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
     const result = await caller.agentes.create({
       numCadastro: `TEST${timestamp}`,
       empresa: "Test Company",
       chaveJ: `KEY${timestamp}`,
       senha: "pass123",
-      nomeAgente: "Test Agent",
-      dataAdmissao: new Date().toISOString(),
+      nomeAgente: "Unique Agent Name",
+      dataAdmissao: toDateString(new Date()),
       cargo: "Agente",
       area: "Vendas",
       vinculo: "CLT",
@@ -82,7 +90,7 @@ describe("agentes router", () => {
       cidade: "São Paulo",
       uf: "SP",
       supervisor: "Supervisor Name",
-      email: "agent@test.com",
+      email: "agent4@test.com",
       favorecido: "Favorecido Name",
       banco: "001",
       agencia: "0001",
@@ -90,12 +98,12 @@ describe("agentes router", () => {
       tipo: "CC",
       cpfAgente: `${String(timestamp).padEnd(14, '0').slice(0, 14)}`,
       pix: "pix@test.com",
-      dataNascimento: new Date("1990-01-01").toISOString(),
+      dataNascimento: "1990-01-01",
       celular: "11999999999",
     });
 
     expect(result).toHaveProperty("id");
-    expect(result.nomeAgente).toBe("Test Agent");
+    expect(result.nomeAgente).toBe("Unique Agent Name");
     expect(result.situacao).toBe("Ativo");
   });
 

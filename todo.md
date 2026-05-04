@@ -50,6 +50,9 @@
 - [x] DEBUG: Erro ao fazer login - volta para a página de login
 - [x] Adicionar formatação automática de CPF (000.000.000-00) e Celular ((00) 00000-0000)
 - [x] CORRIGIR: Data de nascimento voltando um dia antes (fuso horário)
+  - [x] Migração de coluna date para varchar(10)
+  - [x] Remoção de conversões new Date() no frontend
+  - [x] Formatação de datas como YYYY-MM-DD puro
 - [ ] Criar visualização de detalhes do agente
 - [ ] Implementar importação de CSV para agentes
 
