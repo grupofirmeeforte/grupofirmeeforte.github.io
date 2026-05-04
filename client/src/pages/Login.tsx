@@ -90,7 +90,7 @@ export default function Login() {
           </div>
 
           {/* Formulário */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
             {/* ChaveJ */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -104,6 +104,8 @@ export default function Login() {
                 disabled={isBlocked}
                 className="w-full"
                 autoComplete="off"
+                data-lpignore="true"
+                data-form-type="other"
               />
             </div>
 
@@ -120,6 +122,8 @@ export default function Login() {
                 disabled={isBlocked}
                 className="w-full"
                 autoComplete="off"
+                data-lpignore="true"
+                data-form-type="other"
               />
             </div>
 

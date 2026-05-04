@@ -24,6 +24,7 @@
   - [ ] Página de status de bloqueio
   - [ ] Testes de segurança
   - [x] Desabilitar autocomplete nos campos de ChaveJ e Senha
+  - [x] Desabilitar pop-up de salvar senha do navegador (usar sempre ChaveJ)
 - [x] Implementar módulo de Auditoria/Logs com:
   - [x] Número de entrada (ID de sessão)
   - [x] Nome do agente
