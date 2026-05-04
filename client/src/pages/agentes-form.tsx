@@ -54,18 +54,7 @@ export default function AgentesFormPage() {
     { enabled: !!agenteId }
   );
 
-  // Gerar número de cadastro automaticamente ao abrir formulário de novo agente
-  useEffect(() => {
-    if (!agenteId && !formData.numCadastro) {
-      const timestamp = Date.now();
-      const random = Math.floor(Math.random() * 10000);
-      const numCadastro = `CAD-${timestamp}-${random}`;
-      setFormData((prev) => ({
-        ...prev,
-        numCadastro,
-      }));
-    }
-  }, []);
+  // Não gerar número de cadastro no frontend - deixar o backend gerar
 
   useEffect(() => {
     if (agente) {

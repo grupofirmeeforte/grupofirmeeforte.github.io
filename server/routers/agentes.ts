@@ -34,6 +34,25 @@ const agenteSchema = z.object({
 
 const agenteUpdateSchema = agenteSchema.partial();
 
+// Função para gerar número de cadastro sequencial (0001/2026, 0002/2026, etc)
+async function generateNumCadastro(db: any): Promise<string> {
+  const currentYear = new Date().getFullYear();
+  const result = await db
+    .select({ numCadastro: agentes.numCadastro })
+    .from(agentes)
+    .where(like(agentes.numCadastro, `%/${currentYear}`))
+    .orderBy(desc(agentes.id))
+    .limit(1);
+
+  let nextNumber = 1;
+  if (result.length > 0 && result[0].numCadastro) {
+    const lastNum = parseInt(result[0].numCadastro.split('/')[0]);
+    nextNumber = lastNum + 1;
+  }
+
+  return `${String(nextNumber).padStart(4, '0')}/${currentYear}`;
+}
+
 export const agentesRouter = router({
   // Listar todos os agentes com filtros
   list: protectedProcedure
@@ -161,8 +180,12 @@ export const agentesRouter = router({
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
+      // Gerar número de cadastro automaticamente se não fornecido
+      const numCadastro = input.numCadastro || (await generateNumCadastro(db));
+
       const result = await db.insert(agentes).values({
         ...input,
+        numCadastro,
         dataAdmissao: input.dataAdmissao ? new Date(input.dataAdmissao) : undefined,
         dataNascimento: input.dataNascimento ? new Date(input.dataNascimento) : undefined,
       });
