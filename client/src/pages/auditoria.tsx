@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Download, Search } from 'lucide-react';
+import { Download, Search, ArrowLeft, FileSpreadsheet } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 export default function AuditoriaPage() {
@@ -83,6 +83,33 @@ export default function AuditoriaPage() {
     document.body.removeChild(link);
   };
 
+  const handleExportExcel = () => {
+    if (!logs || logs.length === 0) return;
+
+    const headers = ['Número Entrada', 'Nome Agente', 'ChaveJ', 'Módulo', 'Ação', 'Horário Entrada', 'Horário Saída', 'Descrição'];
+    const rows = logs.map((log: any) => [
+      log.numeroEntrada,
+      log.nomeAgente,
+      log.chaveJ,
+      log.modulo || '-',
+      log.acao || '-',
+      new Date(log.horarioEntrada).toLocaleString('pt-BR'),
+      log.horarioSaida ? new Date(log.horarioSaida).toLocaleString('pt-BR') : '-',
+      log.descricao || '-',
+    ]);
+
+    const html = `<table border="1"><thead><tr>${headers.map((h: string) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map((row: any[]) => `<tr>${row.map((cell: any) => `<td>${cell}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+    const blob = new Blob([html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `auditoria_${new Date().toISOString().split('T')[0]}.xls`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex justify-between items-center">
@@ -92,14 +119,32 @@ export default function AuditoriaPage() {
             {totalCount ? `Total: ${totalCount} registros` : 'Carregando...'}
           </p>
         </div>
-        <Button
-          onClick={handleExportCSV}
-          variant="outline"
-          className="gap-2"
-        >
-          <Download className="w-4 h-4" />
-          Exportar CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => navigate('/')}
+            variant="outline"
+            className="gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Voltar
+          </Button>
+          <Button
+            onClick={handleExportExcel}
+            variant="outline"
+            className="gap-2"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Exportar Excel
+          </Button>
+          <Button
+            onClick={handleExportCSV}
+            variant="outline"
+            className="gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Exportar CSV
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -227,3 +272,4 @@ export default function AuditoriaPage() {
     </div>
   );
 }
+
