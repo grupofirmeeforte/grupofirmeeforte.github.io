@@ -127,7 +127,12 @@ export default function AgentesFormPage() {
       // Apenas incluir campos que têm valor (não vazios)
       Object.entries(formData).forEach(([key, value]) => {
         if (value && value !== '') {
-          normalizedData[key] = value;
+          // Para datas, manter apenas YYYY-MM-DD sem conversão de fuso
+          if (key === 'dataNascimento' || key === 'dataAdmissao') {
+            normalizedData[key] = value; // Já está em formato YYYY-MM-DD
+          } else {
+            normalizedData[key] = value;
+          }
         }
       });
       
