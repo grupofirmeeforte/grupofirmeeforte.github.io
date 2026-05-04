@@ -157,9 +157,11 @@ export default function AgentesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Número</TableHead>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>ChaveJ</TableHead>
                   <TableHead>Empresa</TableHead>
+                  <TableHead>ChaveJ</TableHead>
+                  <TableHead>Senha</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Data Admissão</TableHead>
                   <TableHead>Cargo</TableHead>
                   <TableHead>Área</TableHead>
                   <TableHead>Vínculo</TableHead>
@@ -181,7 +183,7 @@ export default function AgentesPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={20} className="text-center py-8">
+                    <TableCell colSpan={22} className="text-center py-8">
                       Carregando...
                     </TableCell>
                   </TableRow>
@@ -191,11 +193,13 @@ export default function AgentesPage() {
                       <TableCell className="font-medium text-sm">
                         {agente.numCadastro}
                       </TableCell>
+                      <TableCell>{agente.empresa}</TableCell>
+                      <TableCell>{agente.chaveJ}</TableCell>
+                      <TableCell>{agente.senha}</TableCell>
                       <TableCell className="font-medium">
                         {agente.nomeAgente}
                       </TableCell>
-                      <TableCell>{agente.chaveJ}</TableCell>
-                      <TableCell>{agente.empresa}</TableCell>
+                      <TableCell>{agente.dataAdmissao ? new Date(agente.dataAdmissao).toLocaleDateString('pt-BR') : '-'}</TableCell>
                       <TableCell>{agente.cargo}</TableCell>
                       <TableCell>{agente.area}</TableCell>
                       <TableCell>{agente.vinculo}</TableCell>
