@@ -106,6 +106,9 @@ export default function Login() {
                 autoComplete="off"
                 data-lpignore="true"
                 data-form-type="other"
+                data-1p-ignore="true"
+                data-bm-ignore="true"
+                spellCheck="false"
               />
             </div>
 
@@ -124,6 +127,8 @@ export default function Login() {
                 autoComplete="off"
                 data-lpignore="true"
                 data-form-type="other"
+                data-1p-ignore="true"
+                data-bm-ignore="true"
               />
             </div>
 
