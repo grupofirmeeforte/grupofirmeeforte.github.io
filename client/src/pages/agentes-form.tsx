@@ -253,21 +253,35 @@ export default function AgentesFormPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="cargo">Cargo</Label>
-                <Input
-                  id="cargo"
-                  name="cargo"
-                  value={formData.cargo}
-                  onChange={handleInputChange}
-                />
+                <Select value={formData.cargo} onValueChange={(value) => {
+                  setFormData(prev => ({ ...prev, cargo: value }));
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um cargo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CEO">CEO</SelectItem>
+                    <SelectItem value="Gerente">Gerente</SelectItem>
+                    <SelectItem value="Promotor">Promotor</SelectItem>
+                    <SelectItem value="Suporte">Suporte</SelectItem>
+                    <SelectItem value="Supervisor">Supervisor</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="area">Área</Label>
-                <Input
-                  id="area"
-                  name="area"
-                  value={formData.area}
-                  onChange={handleInputChange}
-                />
+                <Select value={formData.area} onValueChange={(value) => {
+                  setFormData(prev => ({ ...prev, area: value }));
+                }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione uma área" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ADM">ADM</SelectItem>
+                    <SelectItem value="Comercial">Comercial</SelectItem>
+                    <SelectItem value="Vendas">Vendas</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="vinculo">Vínculo</Label>

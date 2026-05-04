@@ -11,6 +11,8 @@
 - [x] Adicionar opções Ativo01 até Ativo10 no campo de Situação
 - [x] Adicionar "Cancelado" no campo de Situação
 - [x] Mover o formulário de login para o canto direito da bandeira
+- [x] Adicionar lista de cargos em ordem alfabética: CEO, Gerente, Promotor, Suporte, Supervisor
+- [x] Adicionar lista de áreas em ordem alfabética: ADM, Comercial, Vendas
 - [x] Implementar módulo de Auditoria/Logs com:
   - [x] Número de entrada (ID de sessão)
   - [x] Nome do agente
