@@ -1,11 +1,11 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, router, adminProcedure } from "./_core/trpc";
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { z } from "zod";
-import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog } from "./db";
+import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory } from "./db";
 import { sdk } from "./_core/sdk";
 import { TRPCError } from "@trpc/server";
 
@@ -105,6 +105,31 @@ export const appRouter = router({
   }),
   agentes: agentesRouter,
   auditoria: auditoriaRouter,
+  admin: router({
+    // Desbloquear um agente bloqueado (apenas admin)
+    unlockAgent: adminProcedure
+      .input(z.object({
+        chaveJ: z.string().min(1, "ChaveJ é obrigatório"),
+      }))
+      .mutation(async ({ input }) => {
+        await unlockLoginAttempts(input.chaveJ);
+        return { success: true, message: `Agente ${input.chaveJ} desbloqueado com sucesso` };
+      }),
+    
+    // Obter todos os agentes bloqueados (apenas admin)
+    getBlockedAgents: adminProcedure.query(async () => {
+      return await getAllBlockedAttempts();
+    }),
+    
+    // Obter histórico de tentativas de um agente (apenas admin)
+    getAttemptHistory: adminProcedure
+      .input(z.object({
+        chaveJ: z.string().min(1, "ChaveJ é obrigatório"),
+      }))
+      .query(async ({ input }) => {
+        return await getLoginAttemptsHistory(input.chaveJ);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -8,6 +8,7 @@
 - [x] Testar fluxo de login e bloqueio
 
 ## AJUSTES SOLICITADOS
+- [x] Aplicar degradê em todas as linhas de tabelas para melhor visualização
 - [x] Adicionar opções Ativo01 até Ativo10 no campo de Situação
 - [x] Adicionar "Cancelado" no campo de Situação
 - [x] Mover o formulário de login para o canto direito da bandeira
@@ -15,10 +16,10 @@
 - [x] Adicionar lista de áreas em ordem alfabética: ADM, Comercial, Vendas
 - [x] Adicionar lista de vínculos em ordem alfabética: CLT, Prestador, Sócio
 - [x] Eliminar tela de OAuth e deixar entrar direto com login customizado
-- [ ] MELHORIAS NO SISTEMA DE BLOQUEIO (ESSENCIAL):
-  - [ ] Persistência real do bloqueio (não reseta ao recarregar)
-  - [ ] Desbloquear manual por admin
-  - [ ] Registro detalhado de tentativas falhas
+- [x] MELHORIAS NO SISTEMA DE BLOQUEIO (ESSENCIAL):
+  - [x] Persistência real do bloqueio (não reseta ao recarregar)
+  - [x] Desbloquear manual por admin
+  - [x] Registro detalhado de tentativas falhas
   - [ ] Notificação ao admin quando bloqueado
   - [ ] Página de status de bloqueio
   - [ ] Testes de segurança

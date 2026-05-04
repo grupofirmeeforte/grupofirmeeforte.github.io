@@ -165,8 +165,12 @@ export default function AuditoriaPage() {
                     </TableCell>
                   </TableRow>
                 ) : logs && logs.length > 0 ? (
-                  logs.map((log: any) => (
-                    <TableRow key={log.id}>
+                  logs.map((log: any, index: number) => (
+                    <TableRow key={log.id} className={`${
+                      index % 2 === 0 
+                        ? 'bg-gradient-to-r from-green-50 to-transparent' 
+                        : 'bg-gradient-to-r from-green-100 to-transparent'
+                    } hover:from-green-200 hover:to-green-100 transition-colors`}>
                       <TableCell className="font-medium text-sm">
                         {log.numeroEntrada}
                       </TableCell>

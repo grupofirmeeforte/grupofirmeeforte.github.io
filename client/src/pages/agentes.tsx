@@ -201,8 +201,12 @@ export default function AgentesPage() {
                     </TableCell>
                   </TableRow>
                 ) : agentes && agentes.length > 0 ? (
-                  agentes.map((agente) => (
-                    <TableRow key={agente.id}>
+                  agentes.map((agente, index) => (
+                    <TableRow key={agente.id} className={`${
+                      index % 2 === 0 
+                        ? 'bg-gradient-to-r from-blue-50 to-transparent' 
+                        : 'bg-gradient-to-r from-blue-100 to-transparent'
+                    } hover:from-blue-200 hover:to-blue-100 transition-colors`}>
                       <TableCell className="font-medium text-sm">
                         {agente.numCadastro}
                       </TableCell>
