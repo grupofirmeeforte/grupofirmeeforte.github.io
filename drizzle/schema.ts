@@ -576,3 +576,29 @@ export const sessoes = mysqlTable("sessoes", {
 
 export type Sessao = typeof sessoes.$inferSelect;
 export type InsertSessao = typeof sessoes.$inferInsert;
+
+/**
+ * Tabela de Mensagens de Chat
+ * Armazena mensagens entre usuários em tempo real
+ */
+export const mensagens = mysqlTable("mensagens", {
+  id: int("id").autoincrement().primaryKey(),
+  remetenteId: int("remetenteId").notNull(),
+  remetenteNome: varchar("remetenteNome", { length: 255 }).notNull(),
+  destinatarioId: int("destinatarioId"),
+  destinatarioNome: varchar("destinatarioNome", { length: 255 }),
+  conteudo: text("conteudo").notNull(),
+  tipo: varchar("tipo", { length: 50 }).default("texto"), // texto, imagem, arquivo
+  lida: boolean("lida").default(false).notNull(),
+  grupoChat: varchar("grupoChat", { length: 100 }), // Para chats em grupo
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  remetenteIdIdx: index("idx_mensagens_remetenteId").on(table.remetenteId),
+  destinatarioIdIdx: index("idx_mensagens_destinatarioId").on(table.destinatarioId),
+  grupoChatIdx: index("idx_mensagens_grupoChat").on(table.grupoChat),
+  lidaIdx: index("idx_mensagens_lida").on(table.lida),
+}));
+
+export type Mensagem = typeof mensagens.$inferSelect;
+export type InsertMensagem = typeof mensagens.$inferInsert;

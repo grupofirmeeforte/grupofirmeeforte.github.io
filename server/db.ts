@@ -1,7 +1,8 @@
-import { eq, and, lt } from "drizzle-orm";
+import { eq, and, lt, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao } from "../drizzle/schema";
+import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao, mensagens, InsertMensagem, Mensagem } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import { or } from "drizzle-orm";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -268,4 +269,55 @@ export async function encerrarSessao(sessaoId: number) {
   return await db.update(sessoes)
     .set({ ativo: false })
     .where(eq(sessoes.id, sessaoId));
+}
+
+// Queries para Mensagens de Chat
+export async function criarMensagem(data: InsertMensagem) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  return await db.insert(mensagens).values(data);
+}
+
+export async function obterMensagensPrivadas(usuarioId: number, outroUsuarioId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(mensagens)
+    .where(
+      or(
+        and(eq(mensagens.remetenteId, usuarioId), eq(mensagens.destinatarioId, outroUsuarioId)),
+        and(eq(mensagens.remetenteId, outroUsuarioId), eq(mensagens.destinatarioId, usuarioId))
+      )
+    )
+    .orderBy(desc(mensagens.createdAt))
+    .limit(50);
+}
+
+export async function obterMensagensNaoLidas(usuarioId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(mensagens)
+    .where(and(eq(mensagens.destinatarioId, usuarioId), eq(mensagens.lida, false)))
+    .orderBy(desc(mensagens.createdAt));
+}
+
+export async function marcarMensagensComoLidas(usuarioId: number, remetenteId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  return await db.update(mensagens)
+    .set({ lida: true })
+    .where(and(eq(mensagens.destinatarioId, usuarioId), eq(mensagens.remetenteId, remetenteId)));
+}
+
+export async function obterMensagensGrupo(grupoChat: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(mensagens)
+    .where(eq(mensagens.grupoChat, grupoChat))
+    .orderBy(desc(mensagens.createdAt))
+    .limit(100);
 }

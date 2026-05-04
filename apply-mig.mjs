@@ -1,28 +1,31 @@
-import mysql from 'mysql2/promise';
-import fs from 'fs';
-import path from 'path';
+import { drizzle } from "drizzle-orm/mysql2/promise";
+import mysql from "mysql2/promise";
+import fs from "fs";
 
-async function applyMigration() {
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "grupo_firme_forte",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+const db = drizzle(pool);
+
+const sql = fs.readFileSync("drizzle/0007_optimal_meteorite.sql", "utf-8");
+const statements = sql.split("-->").map(s => s.trim()).filter(s => s && !s.startsWith("statement-breakpoint"));
+
+(async () => {
   try {
-    const connection = await mysql.createConnection(process.env.DATABASE_URL);
-    
-    const sqlFile = path.join(process.cwd(), 'drizzle/0006_amazing_trish_tilby.sql');
-    const sql = fs.readFileSync(sqlFile, 'utf8');
-    
-    const statements = sql.split('--> statement-breakpoint').map(s => s.trim()).filter(s => s);
-    
     for (const statement of statements) {
-      if (statement) {
-        console.log(`Executing: ${statement.substring(0, 50)}...`);
-        await connection.execute(statement);
-      }
+      console.log("Executando:", statement.substring(0, 50) + "...");
+      await pool.query(statement);
     }
-    
-    console.log('✅ Migration applied successfully!');
-    await connection.end();
+    console.log("✅ Migração aplicada com sucesso!");
   } catch (error) {
-    console.error('Error:', error.message);
+    console.error("❌ Erro:", error.message);
   }
-}
-
-applyMigration();
+  process.exit(0);
+})();

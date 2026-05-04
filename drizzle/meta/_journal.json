@@ -50,6 +50,13 @@
       "when": 1777930842337,
       "tag": "0006_amazing_trish_tilby",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1777931230282,
+      "tag": "0007_optimal_meteorite",
+      "breakpoints": true
     }
   ]
 }
