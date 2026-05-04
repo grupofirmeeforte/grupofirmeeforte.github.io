@@ -496,3 +496,57 @@ export const documentacao = mysqlTable("documentacao", {
 
 export type Documentacao = typeof documentacao.$inferSelect;
 export type InsertDocumentacao = typeof documentacao.$inferInsert;
+
+/**
+ * Tabela de Bloqueio de Login
+ * Controla tentativas falhas de login e bloqueio do sistema
+ */
+export const loginAttempts = mysqlTable("loginAttempts", {
+  id: int("id").autoincrement().primaryKey(),
+  chaveJ: varchar("chaveJ", { length: 50 }).notNull(),
+  attempts: int("attempts").default(0).notNull(),
+  isBlocked: boolean("isBlocked").default(false).notNull(),
+  blockedUntil: timestamp("blockedUntil"),
+  lastAttempt: timestamp("lastAttempt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  chaveJIdx: index("idx_loginAttempts_chaveJ").on(table.chaveJ),
+}));
+
+export type LoginAttempt = typeof loginAttempts.$inferSelect;
+export type InsertLoginAttempt = typeof loginAttempts.$inferInsert;
+
+/**
+ * Tabela de Auditoria/Logs
+ * Rastreia todas as atividades dos agentes no sistema
+ */
+export const auditoria = mysqlTable("auditoria", {
+  id: int("id").autoincrement().primaryKey(),
+  agenteId: int("agenteId").notNull(),
+  chaveJ: varchar("chaveJ", { length: 50 }).notNull(),
+  nomeAgente: varchar("nomeAgente", { length: 255 }).notNull(),
+  numeroEntrada: varchar("numeroEntrada", { length: 50 }).unique().notNull(),
+  horarioEntrada: timestamp("horarioEntrada").defaultNow().notNull(),
+  horarioSaida: timestamp("horarioSaida"),
+  modulo: varchar("modulo", { length: 100 }),
+  acao: varchar("acao", { length: 100 }),
+  descricao: text("descricao"),
+  tabela: varchar("tabela", { length: 100 }),
+  registroId: int("registroId"),
+  valorAnterior: text("valorAnterior"),
+  valorNovo: text("valorNovo"),
+  ipAddress: varchar("ipAddress", { length: 50 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  agenteIdIdx: index("idx_auditoria_agenteId").on(table.agenteId),
+  chaveJIdx: index("idx_auditoria_chaveJ").on(table.chaveJ),
+  numeroEntradaIdx: index("idx_auditoria_numeroEntrada").on(table.numeroEntrada),
+  moduloIdx: index("idx_auditoria_modulo").on(table.modulo),
+  acaoIdx: index("idx_auditoria_acao").on(table.acao),
+}));
+
+export type Auditoria = typeof auditoria.$inferSelect;
+export type InsertAuditoria = typeof auditoria.$inferInsert;

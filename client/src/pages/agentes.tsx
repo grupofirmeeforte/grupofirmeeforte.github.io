@@ -143,6 +143,16 @@ export default function AgentesPage() {
               <SelectContent>
                 <SelectItem value="__all__">Todas</SelectItem>
                 <SelectItem value="Ativo">Ativo</SelectItem>
+                <SelectItem value="Ativo01">Ativo01</SelectItem>
+                <SelectItem value="Ativo02">Ativo02</SelectItem>
+                <SelectItem value="Ativo03">Ativo03</SelectItem>
+                <SelectItem value="Ativo04">Ativo04</SelectItem>
+                <SelectItem value="Ativo05">Ativo05</SelectItem>
+                <SelectItem value="Ativo06">Ativo06</SelectItem>
+                <SelectItem value="Ativo07">Ativo07</SelectItem>
+                <SelectItem value="Ativo08">Ativo08</SelectItem>
+                <SelectItem value="Ativo09">Ativo09</SelectItem>
+                <SelectItem value="Ativo10">Ativo10</SelectItem>
                 <SelectItem value="Inativo">Inativo</SelectItem>
               </SelectContent>
             </Select>
@@ -206,7 +216,7 @@ export default function AgentesPage() {
                       <TableCell>
                         <span
                           className={`px-2 py-1 rounded text-xs font-semibold ${
-                            agente.situacao === "Ativo"
+                            agente.situacao === "Ativo" || agente.situacao?.startsWith("Ativo")
                               ? "bg-green-100 text-green-800"
                               : "bg-red-100 text-red-800"
                           }`}

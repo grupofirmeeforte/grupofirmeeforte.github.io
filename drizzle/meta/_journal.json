@@ -15,6 +15,13 @@
       "when": 1777911130562,
       "tag": "0001_redundant_revanche",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1777915756335,
+      "tag": "0002_nostalgic_norman_osborn",
+      "breakpoints": true
     }
   ]
 }

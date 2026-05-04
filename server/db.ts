@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, agentes, loginAttempts, auditoria } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,99 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Queries para Agentes
+export async function getAgenteByChaveJ(chaveJ: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get agente: database not available");
+    return undefined;
+  }
+
+  const result = await db.select().from(agentes).where(eq(agentes.chaveJ, chaveJ)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// Queries para Login Attempts
+export async function getLoginAttempts(chaveJ: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(loginAttempts).where(eq(loginAttempts.chaveJ, chaveJ)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function incrementLoginAttempts(chaveJ: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const existing = await getLoginAttempts(chaveJ);
+  
+  if (existing) {
+    const newAttempts = existing.attempts + 1;
+    const isBlocked = newAttempts >= 3;
+    
+    await db.update(loginAttempts)
+      .set({
+        attempts: newAttempts,
+        isBlocked,
+        lastAttempt: new Date(),
+      })
+      .where(eq(loginAttempts.chaveJ, chaveJ));
+  } else {
+    await db.insert(loginAttempts).values({
+      chaveJ,
+      attempts: 1,
+      isBlocked: false,
+      lastAttempt: new Date(),
+    });
+  }
+}
+
+export async function resetLoginAttempts(chaveJ: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  await db.update(loginAttempts)
+    .set({
+      attempts: 0,
+      isBlocked: false,
+      lastAttempt: new Date(),
+    })
+    .where(eq(loginAttempts.chaveJ, chaveJ));
+}
+
+// Queries para Auditoria
+export async function createAuditLog(data: any) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  return await db.insert(auditoria).values(data);
+}
+
+export async function getAuditLogs(filters?: any) {
+  const db = await getDb();
+  if (!db) return [];
+
+  let baseQuery: any = db.select().from(auditoria);
+  
+  if (filters?.agenteId) {
+    baseQuery = baseQuery.where(eq(auditoria.agenteId, filters.agenteId));
+  }
+  if (filters?.chaveJ) {
+    baseQuery = baseQuery.where(eq(auditoria.chaveJ, filters.chaveJ));
+  }
+  if (filters?.modulo) {
+    baseQuery = baseQuery.where(eq(auditoria.modulo, filters.modulo));
+  }
+
+  return await baseQuery.orderBy(auditoria.horarioEntrada);
+}
+
+export async function updateAuditLogSaida(numeroEntrada: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  return await db.update(auditoria)
+    .set({ horarioSaida: new Date() })
+    .where(eq(auditoria.numeroEntrada, numeroEntrada));
+}

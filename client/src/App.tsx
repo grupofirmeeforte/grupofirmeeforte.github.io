@@ -7,15 +7,19 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import AgentesPage from "./pages/agentes";
 import AgentesFormPage from "./pages/agentes-form";
+import Login from "./pages/Login";
+import AuditoriaPage from "./pages/auditoria";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
+      <Route path={"/login"} component={Login} />
       <Route path={"/"} component={Home} />
       <Route path={"/agentes"} component={AgentesPage} />
       <Route path={"/agentes/novo"} component={AgentesFormPage} />
       <Route path={"/agentes/:id"} component={AgentesFormPage} />
+      <Route path={"/auditoria"} component={AuditoriaPage} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

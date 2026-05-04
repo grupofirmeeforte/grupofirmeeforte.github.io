@@ -1,5 +1,23 @@
 # TODO - Sistema de Gestão Grupo Firme e Forte
 
+## FASE 0: AUTENTICAÇÃO CUSTOMIZADA
+- [x] Criar página de login com design da bandeira do Brasil
+- [x] Implementar autenticação com ChaveJ e Senha
+- [x] Implementar bloqueio após 3 tentativas falhas
+- [x] Criar sistema de sessão customizado
+- [x] Testar fluxo de login e bloqueio
+
+## AJUSTES SOLICITADOS
+- [x] Adicionar opções Ativo01 até Ativo10 no campo de Situação
+- [x] Implementar módulo de Auditoria/Logs com:
+  - [x] Número de entrada (ID de sessão)
+  - [x] Nome do agente
+  - [x] Horário de entrada
+  - [x] Horário de saída
+  - [x] Qual aba/módulo foi acessado
+  - [x] O que foi alterado/mexido
+- [x] Implementar bloqueio do sistema após 3 tentativas falhas de login
+
 ## FASE 1: ESQUELETO DO BANCO DE DADOS
 - [x] Criar migração SQL com todas as tabelas
 - [x] Corrigir erros de TypeScript

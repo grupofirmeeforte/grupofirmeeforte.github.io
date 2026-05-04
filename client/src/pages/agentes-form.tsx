@@ -286,6 +286,16 @@ export default function AgentesFormPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Ativo">Ativo</SelectItem>
+                    <SelectItem value="Ativo01">Ativo01</SelectItem>
+                    <SelectItem value="Ativo02">Ativo02</SelectItem>
+                    <SelectItem value="Ativo03">Ativo03</SelectItem>
+                    <SelectItem value="Ativo04">Ativo04</SelectItem>
+                    <SelectItem value="Ativo05">Ativo05</SelectItem>
+                    <SelectItem value="Ativo06">Ativo06</SelectItem>
+                    <SelectItem value="Ativo07">Ativo07</SelectItem>
+                    <SelectItem value="Ativo08">Ativo08</SelectItem>
+                    <SelectItem value="Ativo09">Ativo09</SelectItem>
+                    <SelectItem value="Ativo10">Ativo10</SelectItem>
                     <SelectItem value="Inativo">Inativo</SelectItem>
                     <SelectItem value="Afastado">Afastado</SelectItem>
                     <SelectItem value="Licença">Licença</SelectItem>
