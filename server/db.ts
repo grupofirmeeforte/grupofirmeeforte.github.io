@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, and, lt } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, agentes, loginAttempts, auditoria } from "../drizzle/schema";
+import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -218,4 +218,54 @@ export async function getLoginAttemptsHistory(chaveJ: string) {
   if (!db) return [];
 
   return await db.select().from(loginAttempts).where(eq(loginAttempts.chaveJ, chaveJ));
+}
+
+// Queries para Sessões Ativas
+export async function createSessao(data: any) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  return await db.insert(sessoes).values(data);
+}
+
+export async function getSessaoByChaveJ(chaveJ: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(sessoes)
+    .where(and(eq(sessoes.chaveJ, chaveJ), eq(sessoes.ativo, true)))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getTodasSessoesAtivas() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(sessoes)
+    .where(eq(sessoes.ativo, true))
+    .orderBy(sessoes.horarioConexao);
+}
+
+export async function updateSessaoUltimoAcesso(sessaoId: number, modulo?: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const updateData: any = { ultimoAcesso: new Date() };
+  if (modulo) {
+    updateData.modulo = modulo;
+  }
+
+  return await db.update(sessoes)
+    .set(updateData)
+    .where(eq(sessoes.id, sessaoId));
+}
+
+export async function encerrarSessao(sessaoId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  return await db.update(sessoes)
+    .set({ ativo: false })
+    .where(eq(sessoes.id, sessaoId));
 }

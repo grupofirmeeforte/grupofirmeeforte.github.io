@@ -5,7 +5,7 @@ import { publicProcedure, router, adminProcedure } from "./_core/trpc";
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { z } from "zod";
-import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser } from "./db";
+import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao } from "./db";
 import { sdk } from "./_core/sdk";
 import { TRPCError } from "@trpc/server";
 
@@ -94,6 +94,17 @@ export const appRouter = router({
           { expiresInMs: ONE_YEAR_MS }
         );
         
+        // Registrar sessão ativa
+        const ipAddress = ((ctx.req as any).ip || (ctx.req.headers as any)['x-forwarded-for'] || 'unknown') as string;
+        const userAgent = ((ctx.req.headers as any)['user-agent'] || 'unknown') as string;
+        await createSessao({
+          agenteId: agente.id,
+          chaveJ: agente.chaveJ,
+          nomeAgente: agente.nomeAgente,
+          ipAddress,
+          userAgent,
+        });
+        
         // Definir cookie de sessão
         const cookieOptions = getSessionCookieOptions(ctx.req);
         ctx.res.cookie(COOKIE_NAME, sessionToken, {
@@ -114,6 +125,41 @@ export const appRouter = router({
   }),
   agentes: agentesRouter,
   auditoria: auditoriaRouter,
+  sessoes: router({
+    // Obter todas as sessões ativas
+    getAtivas: publicProcedure.query(async () => {
+      return await getTodasSessoesAtivas();
+    }),
+    
+    // Criar sessão ao fazer login
+    criar: publicProcedure
+      .input(z.object({
+        agenteId: z.number(),
+        chaveJ: z.string(),
+        nomeAgente: z.string(),
+        ipAddress: z.string().optional(),
+        userAgent: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await createSessao({
+          agenteId: input.agenteId,
+          chaveJ: input.chaveJ,
+          nomeAgente: input.nomeAgente,
+          ipAddress: input.ipAddress,
+          userAgent: input.userAgent,
+        });
+      }),
+    
+    // Atualizar último acesso
+    atualizarAcesso: publicProcedure
+      .input(z.object({
+        sessaoId: z.number(),
+        modulo: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await updateSessaoUltimoAcesso(input.sessaoId, input.modulo);
+      }),
+  }),
   admin: router({
     // Desbloquear um agente bloqueado (apenas admin)
     unlockAgent: adminProcedure

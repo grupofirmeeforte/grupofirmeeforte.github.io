@@ -9,8 +9,12 @@ import AgentesPage from "./pages/agentes";
 import AgentesFormPage from "./pages/agentes-form";
 import Login from "./pages/Login";
 import AuditoriaPage from "./pages/auditoria";
+import { useInactivityLogout } from "./hooks/useInactivityLogout";
 
-function Router() {
+function RouterWithInactivity() {
+  // Ativar desconexão por inatividade
+  useInactivityLogout();
+  
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
@@ -41,7 +45,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <RouterWithInactivity />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

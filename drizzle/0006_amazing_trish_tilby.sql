@@ -1,0 +1,1 @@
+ALTER TABLE `sessoes` MODIFY COLUMN `nomeAgente` varchar(255);

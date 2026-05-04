@@ -550,3 +550,29 @@ export const auditoria = mysqlTable("auditoria", {
 
 export type Auditoria = typeof auditoria.$inferSelect;
 export type InsertAuditoria = typeof auditoria.$inferInsert;
+
+/**
+ * Tabela de Sessões Ativas
+ * Rastreia usuários conectados em tempo real
+ */
+export const sessoes = mysqlTable("sessoes", {
+  id: int("id").autoincrement().primaryKey(),
+  agenteId: int("agenteId").notNull(),
+  chaveJ: varchar("chaveJ", { length: 50 }).notNull(),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  horarioConexao: timestamp("horarioConexao").defaultNow().notNull(),
+  ultimoAcesso: timestamp("ultimoAcesso").defaultNow().notNull(),
+  modulo: varchar("modulo", { length: 100 }).default("dashboard"),
+  ipAddress: varchar("ipAddress", { length: 50 }),
+  userAgent: text("userAgent"),
+  ativo: boolean("ativo").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  agenteIdIdx: index("idx_sessoes_agenteId").on(table.agenteId),
+  chaveJIdx: index("idx_sessoes_chaveJ").on(table.chaveJ),
+  ativoIdx: index("idx_sessoes_ativo").on(table.ativo),
+}));
+
+export type Sessao = typeof sessoes.$inferSelect;
+export type InsertSessao = typeof sessoes.$inferInsert;

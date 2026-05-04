@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
+import { UsuariosConectados } from "@/components/UsuariosConectados";
 
 export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
@@ -107,29 +108,38 @@ export default function Home() {
           <p className="text-slate-600">Selecione um módulo para começar</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-          {modules.map((module) => {
-            const Icon = module.icon;
-            return (
-              <Card 
-                key={module.path}
-                className="hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(module.path)}
-              >
-                <CardHeader>
-                  <div className={`${module.color} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
-                    <Icon className="w-6 h-6 text-white" />
-                  </div>
-                  <CardTitle className="text-lg">{module.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-sm">
-                    {module.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            );
-          })}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {modules.map((module) => {
+                const Icon = module.icon;
+                return (
+                  <Card 
+                    key={module.path}
+                    className="hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => navigate(module.path)}
+                  >
+                    <CardHeader>
+                      <div className={`${module.color} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
+                      <CardTitle className="text-lg">{module.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="text-sm">
+                        {module.description}
+                      </CardDescription>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+          
+          {/* Widget de Usuários Conectados */}
+          <div className="lg:col-span-1">
+            <UsuariosConectados />
+          </div>
         </div>
 
         {/* Quick Stats */}

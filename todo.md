@@ -162,3 +162,12 @@
 3. Criar interfaces de usuário responsivas
 4. Implementar as fórmulas de cálculo
 5. Adicionar funcionalidades de importação/exportação
+
+## FASE 13: MONITORAMENTO EM TEMPO REAL
+- [ ] Criar tabela de sessões ativas no banco de dados
+- [ ] Implementar API para rastrear conexões/desconexões
+- [ ] Implementar rastreamento de atividades (último acesso, módulo em uso)
+- [ ] Criar página de "Usuários Conectados" no dashboard
+- [ ] Implementar atualização em tempo real a cada 10 segundos
+- [ ] Implementar desconexão automática após 1 hora de inatividade
+- [ ] Testar monitoramento em tempo real
