@@ -235,8 +235,7 @@ export default function TabelaComissao() {
                   <th className="px-3 py-2 text-center whitespace-nowrap">Tx Juros De</th>
                   <th className="px-3 py-2 text-center whitespace-nowrap">Tx Juros Até</th>
                   <th className="px-3 py-2 text-center whitespace-nowrap">Valor Mín.</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap">Meses De</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap">Meses Até</th>
+                  <th className="px-3 py-2 text-center whitespace-nowrap">Meses</th>
                   <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-900">Ativo 01</th>
                   <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-900">Ativo 02</th>
                   <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-900">Ativo 03</th>
@@ -245,6 +244,8 @@ export default function TabelaComissao() {
                   <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-800">Ativo 06</th>
                   <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-800">Ativo 07</th>
                   <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-800">Ativo 08</th>
+                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-700">Ativo 09</th>
+                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-700">Ativo 10</th>
                   <th className="px-3 py-2 text-center whitespace-nowrap">Ações</th>
                 </tr>
               </thead>
@@ -265,8 +266,7 @@ export default function TabelaComissao() {
                       <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{pct(row.txJurosDe)}</td>
                       <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{row.txJurosAte === 'acima' ? 'acima' : pct(row.txJurosAte)}</td>
                       <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{row.valorMinimo || '-'}</td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{row.mesesDe || '-'}</td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{row.mesesAte || '-'}</td>
+                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{row.mesesDe && row.mesesAte ? `${row.mesesDe} - ${row.mesesAte}` : row.mesesDe || row.mesesAte || '-'}</td>
                       <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct(row.ativo01)}</td>
                       <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct(row.ativo02)}</td>
                       <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct(row.ativo03)}</td>
@@ -275,6 +275,8 @@ export default function TabelaComissao() {
                       <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">{pct(row.ativo06)}</td>
                       <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">{pct(row.ativo07)}</td>
                       <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">{pct(row.ativo08)}</td>
+                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct((row as any).ativo09)}</td>
+                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct((row as any).ativo10)}</td>
                       <td className="px-3 py-1.5 text-center whitespace-nowrap">
                         <div className="flex items-center justify-center gap-1">
                           <Button
@@ -372,7 +374,7 @@ export default function TabelaComissao() {
             <div className="col-span-2 border-t pt-3">
               <p className="text-sm font-semibold text-gray-700 mb-2">Ativos (percentuais de comissão)</p>
               <div className="grid grid-cols-4 gap-2">
-                {(['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08'] as const).map((a, i) => (
+                {(['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'] as (keyof FormData)[]).map((a, i) => (
                   <div key={a}>
                     <label className="text-xs font-medium text-gray-600 mb-1 block">Ativo {String(i+1).padStart(2,'0')}</label>
                     <Input value={form[a] || ''} onChange={e => setField(a, e.target.value)} placeholder="0.0065" className="text-sm" />

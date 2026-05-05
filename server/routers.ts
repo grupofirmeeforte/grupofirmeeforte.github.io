@@ -313,6 +313,7 @@ export const appRouter = router({
         ativo03: z.string().optional(), ativo04: z.string().optional(),
         ativo05: z.string().optional(), ativo06: z.string().optional(),
         ativo07: z.string().optional(), ativo08: z.string().optional(),
+        ativo09: z.string().optional(), ativo10: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const db = await getDb();
@@ -336,6 +337,7 @@ export const appRouter = router({
         ativo03: z.string().optional(), ativo04: z.string().optional(),
         ativo05: z.string().optional(), ativo06: z.string().optional(),
         ativo07: z.string().optional(), ativo08: z.string().optional(),
+        ativo09: z.string().optional(), ativo10: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const db = await getDb();

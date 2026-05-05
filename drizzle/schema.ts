@@ -167,6 +167,8 @@ export const tabelasComissao = mysqlTable("tabelasComissao", {
   ativo06: varchar("ativo06", { length: 20 }),
   ativo07: varchar("ativo07", { length: 20 }),
   ativo08: varchar("ativo08", { length: 20 }),
+  ativo09: varchar("ativo09", { length: 20 }),
+  ativo10: varchar("ativo10", { length: 20 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
