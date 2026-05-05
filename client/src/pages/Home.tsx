@@ -81,19 +81,6 @@ export default function Home() {
     },
     {
       type: 'group',
-      key: 'financeiro',
-      title: 'Financeiro',
-      description: 'Comissões, Pagamentos e Relatórios',
-      icon: DollarSign,
-      color: 'bg-red-600',
-      borderColor: 'border-red-200',
-      bgColor: 'from-red-50 to-orange-50',
-      subModules: [
-        // Abas serão adicionadas aqui futuramente
-      ],
-    },
-    {
-      type: 'group',
       key: 'febraban',
       title: 'Febraban',
       description: 'Regulamentações e conformidade Febraban',
@@ -101,6 +88,19 @@ export default function Home() {
       color: 'bg-amber-600',
       borderColor: 'border-amber-200',
       bgColor: 'from-amber-50 to-yellow-50',
+      subModules: [
+        // Abas serão adicionadas aqui futuramente
+      ],
+    },
+    {
+      type: 'group',
+      key: 'financeiro',
+      title: 'Financeiro',
+      description: 'Comissões, Pagamentos e Relatórios',
+      icon: DollarSign,
+      color: 'bg-red-600',
+      borderColor: 'border-red-200',
+      bgColor: 'from-red-50 to-orange-50',
       subModules: [
         // Abas serão adicionadas aqui futuramente
       ],
