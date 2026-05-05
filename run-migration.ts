@@ -1,22 +1,23 @@
-import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
-import * as schema from "./drizzle/schema";
-
-const DATABASE_URL = process.env.DATABASE_URL;
+import { getDb } from './server/db';
+import { sql } from 'drizzle-orm';
 
 async function runMigration() {
+  const db = await getDb();
+  if (!db) {
+    console.error('Database not available');
+    return;
+  }
+
   try {
-    const connection = await mysql.createConnection(DATABASE_URL);
-    
-    // Execute the migration
-    const sql = `ALTER TABLE \`agentes\` MODIFY COLUMN \`dataNascimento\` varchar(10);`;
-    await connection.execute(sql);
-    
-    console.log("✅ Migration applied successfully");
-    await connection.end();
-  } catch (error: any) {
-    console.error("❌ Migration failed:", error.message);
-    process.exit(1);
+    // Adicionar coluna tokenSessao se não existir
+    await db.execute(sql`ALTER TABLE sessoes ADD COLUMN tokenSessao VARCHAR(255) UNIQUE`);
+    console.log('✓ Coluna tokenSessao adicionada');
+  } catch (e: any) {
+    if (e.message.includes('Duplicate column')) {
+      console.log('✓ Coluna tokenSessao já existe');
+    } else {
+      console.error('✗ Erro:', e.message);
+    }
   }
 }
 

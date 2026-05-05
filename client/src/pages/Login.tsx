@@ -59,6 +59,11 @@ export default function Login() {
     }
 
     setError('');
+    
+    // Limpar cookies antigos para forcar logout da sessao anterior
+    document.cookie = 'app_session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    
     loginMutation.mutate({ chaveJ, senha });
   };
 

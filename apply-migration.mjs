@@ -1,31 +1,25 @@
+import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import fs from 'fs';
-import path from 'path';
 
-async function applyMigration() {
+const sql = fs.readFileSync('./drizzle/0008_cultured_gorgon.sql', 'utf-8');
+const statements = sql.split('-->').map(s => s.trim()).filter(s => s);
+
+const pool = await mysql.createPool({
+  connectionLimit: 1,
+  host: process.env.DATABASE_URL?.split('@')[1]?.split('/')[0],
+  user: process.env.DATABASE_URL?.split('://')[1]?.split(':')[0],
+  password: process.env.DATABASE_URL?.split(':')[2]?.split('@')[0],
+  database: process.env.DATABASE_URL?.split('/').pop(),
+});
+
+for (const stmt of statements) {
   try {
-    const connection = await mysql.createConnection(process.env.DATABASE_URL);
-    
-    // Read SQL file
-    const sqlFile = path.join(process.cwd(), 'drizzle/0005_jazzy_pandemic.sql');
-    const sql = fs.readFileSync(sqlFile, 'utf8');
-    
-    // Split by statement-breakpoint and execute each
-    const statements = sql.split('--> statement-breakpoint').map(s => s.trim()).filter(s => s);
-    
-    for (const statement of statements) {
-      if (statement) {
-        console.log(`Executing: ${statement.substring(0, 50)}...`);
-        await connection.execute(statement);
-      }
-    }
-    
-    console.log('✅ Migration applied successfully!');
-    await connection.end();
-  } catch (error) {
-    console.error('❌ Error:', error.message);
-    process.exit(1);
+    await pool.execute(stmt);
+    console.log('✓', stmt);
+  } catch (e) {
+    console.error('✗', stmt, e.message);
   }
 }
 
-applyMigration();
+await pool.end();

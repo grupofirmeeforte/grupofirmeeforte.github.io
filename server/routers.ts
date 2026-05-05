@@ -97,7 +97,7 @@ export const appRouter = router({
         // Registrar sessão ativa
         const ipAddress = ((ctx.req as any).ip || (ctx.req.headers as any)['x-forwarded-for'] || 'unknown') as string;
         const userAgent = ((ctx.req.headers as any)['user-agent'] || 'unknown') as string;
-        await createSessao({
+        const sessaoResult = await createSessao({
           agenteId: agente.id,
           chaveJ: agente.chaveJ,
           nomeAgente: agente.nomeAgente,
@@ -111,6 +111,14 @@ export const appRouter = router({
           ...cookieOptions,
           maxAge: ONE_YEAR_MS,
         });
+        
+        // Adicionar ID da sessão ao cookie para validação
+        if (sessaoResult && (sessaoResult as any).insertId) {
+          ctx.res.cookie('sessionId', String((sessaoResult as any).insertId), {
+            ...cookieOptions,
+            maxAge: ONE_YEAR_MS,
+          });
+        }
         
         return {
           success: true,

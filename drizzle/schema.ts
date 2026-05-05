@@ -31,6 +31,7 @@ export const users = mysqlTable("users", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
+  ultimaTrocaSenha: timestamp("ultimaTrocaSenha"),
 });
 
 export type User = typeof users.$inferSelect;
@@ -566,6 +567,7 @@ export const sessoes = mysqlTable("sessoes", {
   ipAddress: varchar("ipAddress", { length: 50 }),
   userAgent: text("userAgent"),
   ativo: boolean("ativo").default(true).notNull(),
+  motivoDesconexao: varchar("motivoDesconexao", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
