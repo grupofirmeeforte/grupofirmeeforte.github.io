@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 
-const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutos em ms
+const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutos em ms
 
 export function useInactivityLogout() {
   const { logout, isAuthenticated } = useAuth();

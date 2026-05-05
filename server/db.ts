@@ -226,6 +226,13 @@ export async function createSessao(data: any) {
   const db = await getDb();
   if (!db) return undefined;
 
+  // Desconectar todas as sessões ativas anteriores do mesmo usuário
+  if (data.chaveJ) {
+    await db.update(sessoes)
+      .set({ ativo: false })
+      .where(and(eq(sessoes.chaveJ, data.chaveJ), eq(sessoes.ativo, true)));
+  }
+
   return await db.insert(sessoes).values(data);
 }
 

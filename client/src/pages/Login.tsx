@@ -47,9 +47,14 @@ export default function Login() {
       return;
     }
 
-    // Verificar se está dentro do horário (08:00 às 19:00)
-    if (hour < 8 || hour >= 19) {
-      setError('Acesso permitido apenas entre 08:00 e 19:00.');
+    // Verificar se está dentro do horário (07:30 às 19:30)
+    const minute = now.getMinutes();
+    const totalMinutes = hour * 60 + minute;
+    const startTime = 7 * 60 + 30; // 07:30
+    const endTime = 19 * 60 + 30; // 19:30
+    
+    if (totalMinutes < startTime || totalMinutes >= endTime) {
+      setError('Acesso permitido apenas entre 07:30 e 19:30.');
       return;
     }
 
