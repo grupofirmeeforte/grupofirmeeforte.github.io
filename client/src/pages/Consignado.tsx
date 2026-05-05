@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -94,6 +94,14 @@ export default function Consignado() {
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [confirmandoExclusao, setConfirmandoExclusao] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Estado para controlar quando calcular fórmulas (só quando chaveJ tem 7+ chars)
+  const [calcInput, setCalcInput] = useState<{chaveJ: string; convenio?: string; juros?: string; meses?: string; valorLiquido?: string; rbm?: string} | null>(null);
+
+  // Hook de cálculo automático
+  const { data: formulasData } = trpc.consignado.calcularFormulas.useQuery(
+    calcInput || { chaveJ: '' },
+    { enabled: !!(calcInput && calcInput.chaveJ.length >= 5) }
+  );
 
   const utils = trpc.useUtils();
 
@@ -125,8 +133,38 @@ export default function Consignado() {
     onError: (e) => toast.error('Erro na importação: ' + e.message),
   });
 
+  // Preencher campos automáticos quando formulasData chegar
+  useEffect(() => {
+    if (!formulasData || 'erro' in formulasData) return;
+    setForm(prev => ({
+      ...prev,
+      empresa: formulasData.empresa || prev.empresa,
+      nomeAgente: formulasData.nomeAgente || prev.nomeAgente,
+      supervisor: formulasData.supervisor || prev.supervisor,
+      percPago: formulasData.percPago || prev.percPago,
+      totalComissao: formulasData.totalComissao || prev.totalComissao,
+      difEmpresa: formulasData.difEmpresa || prev.difEmpresa,
+    }));
+  }, [formulasData]);
+
   function setField(field: keyof FormData, value: string) {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm(prev => {
+      const updated = { ...prev, [field]: value };
+      // Recalcular fórmulas quando campos-chave mudam
+      if (['chaveJ', 'convenio', 'juros', 'valorLiquido', 'rbm'].includes(field)) {
+        const chaveJ = field === 'chaveJ' ? value : (prev.chaveJ || '');
+        if (chaveJ.length >= 5) {
+          setCalcInput({
+            chaveJ,
+            convenio: field === 'convenio' ? value : prev.convenio,
+            juros: field === 'juros' ? value : prev.juros,
+            valorLiquido: field === 'valorLiquido' ? value : prev.valorLiquido,
+            rbm: field === 'rbm' ? value : prev.rbm,
+          });
+        }
+      }
+      return updated;
+    });
   }
 
   function openNovo() {
@@ -432,7 +470,7 @@ export default function Consignado() {
             {/* Linha 1 */}
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Empresa</label>
-              <Input value={form.empresa || ''} onChange={e => setField('empresa', e.target.value)} placeholder="BMF / FLEX" />
+              <Input value={form.empresa || ''} readOnly className="bg-blue-50 text-blue-800 font-medium cursor-default" placeholder="auto: busca pelo ChaveJ" />
             </div>
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Mês (MM/AAAA)</label>
@@ -445,7 +483,7 @@ export default function Consignado() {
             {/* Linha 2 */}
             <div className="col-span-2">
               <label className="text-xs font-medium text-gray-600 mb-1 block">Nome Agente</label>
-              <Input value={form.nomeAgente || ''} onChange={e => setField('nomeAgente', e.target.value)} placeholder="Nome completo" />
+              <Input value={form.nomeAgente || ''} readOnly className="bg-blue-50 text-blue-800 font-medium cursor-default" placeholder="auto: busca pelo ChaveJ" />
             </div>
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Convênio</label>
@@ -510,16 +548,16 @@ export default function Consignado() {
             </div>
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Perc. Pago (fórmula)</label>
-              <Input value={form.percPago || ''} onChange={e => setField('percPago', e.target.value)} placeholder="calculado" />
+              <Input value={form.percPago || ''} readOnly className="bg-green-50 text-green-800 font-medium cursor-default" placeholder="auto: Tabela Comissão" />
             </div>
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Total Comissão (fórmula)</label>
-              <Input value={form.totalComissao || ''} onChange={e => setField('totalComissao', e.target.value)} placeholder="calculado" />
+              <Input value={form.totalComissao || ''} readOnly className="bg-green-50 text-green-800 font-medium cursor-default" placeholder="auto: Vr.Líquido × Perc.Pago" />
             </div>
             {/* Linha 8 */}
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Dif. Empresa (fórmula)</label>
-              <Input value={form.difEmpresa || ''} onChange={e => setField('difEmpresa', e.target.value)} placeholder="calculado" />
+              <Input value={form.difEmpresa || ''} readOnly className="bg-amber-50 text-amber-800 font-medium cursor-default" placeholder="auto: RBM − Total Comissão" />
             </div>
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Tabela (fórmula)</label>
@@ -527,7 +565,7 @@ export default function Consignado() {
             </div>
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Supervisor (fórmula)</label>
-              <Input value={form.supervisor || ''} onChange={e => setField('supervisor', e.target.value)} placeholder="calculado" />
+              <Input value={form.supervisor || ''} readOnly className="bg-blue-50 text-blue-800 font-medium cursor-default" placeholder="auto: busca pelo ChaveJ" />
             </div>
           </div>
           <DialogFooter>

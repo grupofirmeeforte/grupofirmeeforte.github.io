@@ -464,6 +464,81 @@ export const appRouter = router({
         return await db.delete(consignados).where(eq(consignados.id, input.id));
       }),
 
+    // Procedure para calcular fórmulas automáticas dado chaveJ e convenio
+    calcularFormulas: publicProcedure
+      .input(z.object({
+        chaveJ: z.string(),
+        convenio: z.string().optional(),
+        juros: z.string().optional(),
+        meses: z.string().optional(),
+        valorLiquido: z.string().optional(),
+        rbm: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        const { agentes, tabelasComissao } = await import('../drizzle/schema');
+        const { eq, and, lte, gte, or, isNull } = await import('drizzle-orm');
+
+        // 1. Buscar agente pelo chaveJ
+        const [agente] = await db.select().from(agentes).where(eq(agentes.chaveJ, input.chaveJ)).limit(1);
+        if (!agente) return { erro: 'Agente não encontrado' };
+
+        // 2. Determinar nível do agente (situacao: Ativo01..Ativo10 → ativo01..ativo10)
+        const situacao = agente.situacao || '';
+        const nivelMatch = situacao.match(/Ativo(\d{2})/i);
+        const nivelNum = nivelMatch ? parseInt(nivelMatch[1]) : null;
+        const ativoCol = nivelNum ? `ativo${String(nivelNum).padStart(2, '0')}` : null;
+
+        // 3. Buscar percentual na Tabela Comissão pelo convênio
+        let percPago: string | null = null;
+        if (input.convenio && ativoCol) {
+          const tabelas = await db.select().from(tabelasComissao)
+            .where(eq(tabelasComissao.convenio, input.convenio))
+            .limit(20);
+          // Filtrar pela faixa de juros e meses se fornecidos
+          let tabelaMatch = tabelas[0];
+          if (input.juros && input.meses) {
+            const jurosNum = parseFloat(input.juros.replace(',', '.'));
+            const mesesNum = parseInt(input.meses);
+            tabelaMatch = tabelas.find(t => {
+              const jDe = t.txJurosDe ? parseFloat(t.txJurosDe) : 0;
+              const jAte = t.txJurosAte && t.txJurosAte !== 'acima' ? parseFloat(t.txJurosAte) : 999;
+              const mDe = t.mesesDe ? parseInt(t.mesesDe) : 0;
+              const mAte = t.mesesAte ? parseInt(t.mesesAte) : 999;
+              return jurosNum >= jDe && jurosNum <= jAte && mesesNum >= mDe && mesesNum <= mAte;
+            }) || tabelas[0];
+          }
+          if (tabelaMatch) {
+            percPago = (tabelaMatch as any)[ativoCol] || null;
+          }
+        }
+
+        // 4. Calcular totalComissao e difEmpresa
+        let totalComissao: string | null = null;
+        let difEmpresa: string | null = null;
+        if (percPago && input.valorLiquido) {
+          const vl = parseFloat(input.valorLiquido.replace(',', '.').replace(/[^0-9.]/g, ''));
+          const pp = parseFloat(percPago) > 1 ? parseFloat(percPago) / 100 : parseFloat(percPago);
+          if (!isNaN(vl) && !isNaN(pp)) {
+            totalComissao = (vl * pp).toFixed(2);
+            if (input.rbm) {
+              const rbmNum = parseFloat(input.rbm.replace(',', '.').replace(/[^0-9.]/g, ''));
+              if (!isNaN(rbmNum)) difEmpresa = (rbmNum - vl * pp).toFixed(2);
+            }
+          }
+        }
+
+        return {
+          empresa: agente.empresa || null,
+          nomeAgente: agente.nomeAgente || null,
+          supervisor: agente.supervisor || null,
+          percPago,
+          totalComissao,
+          difEmpresa,
+        };
+      }),
+
     listarMeses: publicProcedure.query(async () => {
       const db = await getDb();
       if (!db) return [];
