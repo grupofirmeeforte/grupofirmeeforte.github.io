@@ -122,13 +122,27 @@ export const appRouter = router({
           });
         }
         
+        // Verificar se hoje é aniversário do agente
+        const hoje = new Date();
+        const diaHoje = hoje.getDate();
+        const mesHoje = hoje.getMonth() + 1;
+        let isAniversario = false;
+        if (agente.dataNascimento) {
+          const partes = agente.dataNascimento.split('-');
+          const mesNasc = parseInt(partes[1], 10);
+          const diaNasc = parseInt(partes[2], 10);
+          isAniversario = diaNasc === diaHoje && mesNasc === mesHoje;
+        }
+
         return {
           success: true,
           numeroEntrada,
+          isAniversario,
           agente: {
             id: agente.id,
             chaveJ: agente.chaveJ,
             nome: agente.nomeAgente,
+            dataNascimento: agente.dataNascimento,
           },
         };
       }),
