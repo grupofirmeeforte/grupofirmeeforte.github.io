@@ -69,41 +69,8 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-end justify-end relative overflow-hidden p-6">
-      {/* Fundo com bandeira do Brasil */}
-      <div className="absolute inset-0 z-0">
-        {/* Verde (fundo) */}
-        <div className="absolute inset-0 bg-green-700" />
-
-        {/* Amarelo (losango) */}
-        <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 1200 800"
-          preserveAspectRatio="xMidYMid slice"
-        >
-          {/* Losango amarelo */}
-          <polygon
-            points="600,100 1050,400 600,700 150,400"
-            fill="#FCD116"
-          />
-
-          {/* Círculo azul */}
-          <circle cx="600" cy="400" r="200" fill="#002776" />
-
-          {/* Faixa branca com texto */}
-          <ellipse cx="600" cy="400" rx="180" ry="40" fill="white" />
-          <text
-            x="600"
-            y="410"
-            textAnchor="middle"
-            fontSize="24"
-            fontWeight="bold"
-            fill="#002776"
-            fontFamily="serif"
-          >
-            ORDEM E PROGRESSO
-          </text>
-        </svg>
-      </div>
+      {/* Fundo azul (cor da bandeira do Brasil) */}
+      <div className="absolute inset-0 z-0 bg-blue-900" style={{ backgroundColor: '#002776' }} />
 
       {/* Card de login - Canto direito */}
       <Card className="relative z-10 w-full max-w-md bg-white/95 backdrop-blur shadow-2xl">
