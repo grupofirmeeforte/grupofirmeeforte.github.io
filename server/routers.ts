@@ -174,6 +174,16 @@ export const appRouter = router({
         });
       }),
     
+    // Desconectar forçado (apenas admin)
+    desconectarForcado: adminProcedure
+      .input(z.object({
+        sessaoId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await encerrarSessao(input.sessaoId);
+        return { success: true };
+      }),
+
     // Atualizar último acesso
     atualizarAcesso: publicProcedure
       .input(z.object({
