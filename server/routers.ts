@@ -184,6 +184,24 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await getLoginAttemptsHistory(input.chaveJ);
       }),
+    
+    validateSession: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user) {
+        return { isValid: false };
+      }
+      
+      let chaveJ: string | null = null;
+      if (ctx.user.email && ctx.user.email.includes('@')) {
+        chaveJ = ctx.user.email.split('@')[0];
+      }
+      
+      if (!chaveJ) {
+        return { isValid: false };
+      }
+      
+      const sessao = await getSessaoByChaveJ(chaveJ);
+      return { isValid: sessao ? true : false };
+    }),
    }),
   chat: router({
     // Enviar mensagem privada
