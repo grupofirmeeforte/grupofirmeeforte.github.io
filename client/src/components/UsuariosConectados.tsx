@@ -18,6 +18,7 @@ export function UsuariosConectados() {
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
+  const isOwner = user?.openId === process.env.VITE_OWNER_OPEN_ID;
 
   const { data: sessoesData, refetch } = trpc.sessoes.getAtivas.useQuery();
   const desconectar = trpc.sessoes.desconectarForcado.useMutation({
@@ -103,7 +104,7 @@ export function UsuariosConectados() {
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  {user?.role === 'admin' && (
+                  {isOwner && (
                     <Button
                       size="sm"
                       variant="ghost"

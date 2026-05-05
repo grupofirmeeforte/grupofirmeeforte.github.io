@@ -6,7 +6,7 @@ import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb } from "./db";
-import { users } from "../drizzle/schema";
+import { users, agentes } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { sdk } from "./_core/sdk";
 import { TRPCError } from "@trpc/server";
@@ -219,6 +219,7 @@ export const appRouter = router({
         return await getLoginAttemptsHistory(input.chaveJ);
       }),
     
+
     validateSession: publicProcedure.query(async ({ ctx }) => {
       if (!ctx.user) {
         return { isValid: false };
