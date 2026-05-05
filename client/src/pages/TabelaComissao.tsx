@@ -30,6 +30,7 @@ type TabelaRow = {
   ativo01: string | null; ativo02: string | null; ativo03: string | null;
   ativo04: string | null; ativo05: string | null; ativo06: string | null;
   ativo07: string | null; ativo08: string | null;
+  ativo09?: string | null; ativo10?: string | null;
 };
 
 type FormData = {
@@ -39,15 +40,21 @@ type FormData = {
   mesesDe?: string; mesesAte?: string;
   ativo01?: string; ativo02?: string; ativo03?: string; ativo04?: string;
   ativo05?: string; ativo06?: string; ativo07?: string; ativo08?: string;
+  ativo09?: string; ativo10?: string;
 };
 
 const EMPTY_FORM: FormData = {};
 
 function pct(val: string | null) {
   if (!val) return '-';
-  const n = parseFloat(val);
+  // Aceita vírgula como separador decimal
+  const normalized = String(val).replace(',', '.');
+  const n = parseFloat(normalized);
   if (isNaN(n)) return val;
-  return (n * 100).toFixed(2).replace('.', ',') + '%';
+  // Se o valor já é maior que 1, é percentual direto (ex: 60 = 60,00%)
+  // Se menor ou igual a 1, é decimal (ex: 0.0065 = 0,65%)
+  const pctVal = n > 1 ? n : n * 100;
+  return pctVal.toFixed(2).replace('.', ',') + '%';
 }
 
 export default function TabelaComissao() {
@@ -229,24 +236,25 @@ export default function TabelaComissao() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-800 text-white">
-                  <th className="px-3 py-2 text-left whitespace-nowrap">Empresa</th>
-                  <th className="px-3 py-2 text-left whitespace-nowrap">Convênio</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap">Tx Juros De</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap">Tx Juros Até</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap">Valor Mín.</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap">Meses</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-900">Ativo 01</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-900">Ativo 02</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-900">Ativo 03</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-900">Ativo 04</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-800">Ativo 05</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-800">Ativo 06</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-800">Ativo 07</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-800">Ativo 08</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-700">Ativo 09</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap bg-blue-700">Ativo 10</th>
-                  <th className="px-3 py-2 text-center whitespace-nowrap">Ações</th>
+                <tr style={{background: 'linear-gradient(90deg, #002776 0%, #003d99 40%, #0055cc 70%, #1a6ed8 100%)'}} className="text-white">
+                  <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Empresa</th>
+                  <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Convênio</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Tx Juros De</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Tx Juros Até</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Valor Mín.</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Meses De</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Meses Até</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 01</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 02</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 03</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 04</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 05</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 06</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 07</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 08</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.16)'}}>Ativo 09</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.16)'}}>Ativo 10</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -260,7 +268,7 @@ export default function TabelaComissao() {
                   </tr>
                 ) : (
                   filteredRows.map((row, idx) => (
-                    <tr key={row.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <tr key={row.id} className={idx % 2 === 0 ? 'bg-white hover:bg-blue-50/50 transition-colors' : 'bg-gradient-to-r from-blue-50/70 to-indigo-50/50 hover:from-blue-100/70 hover:to-indigo-100/50 transition-colors'}>
                       <td className="px-3 py-1.5 font-medium text-gray-900 whitespace-nowrap">{row.empresa || '-'}</td>
                       <td className="px-3 py-1.5 text-gray-700 whitespace-nowrap max-w-[180px] truncate" title={row.convenio || ''}>{row.convenio || '-'}</td>
                       <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{pct(row.txJurosDe)}</td>
