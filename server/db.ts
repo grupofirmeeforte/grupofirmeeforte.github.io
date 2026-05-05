@@ -229,8 +229,8 @@ export async function createSessao(data: any) {
   // Desconectar todas as sessões ativas anteriores do mesmo usuário
   if (data.chaveJ) {
     await db.update(sessoes)
-      .set({ ativo: false, motivoDesconexao: 'Desconectado: nova sessão iniciada em outro dispositivo' })
-      .where(and(eq(sessoes.chaveJ, data.chaveJ), eq(sessoes.ativo, true)));
+      .set({ ativo: 0, motivoDesconexao: 'Desconectado: nova sessão iniciada em outro dispositivo' })
+      .where(and(eq(sessoes.chaveJ, data.chaveJ), eq(sessoes.ativo, 1)));
   }
 
   return await db.insert(sessoes).values(data);
@@ -241,7 +241,7 @@ export async function getSessaoByChaveJ(chaveJ: string) {
   if (!db) return undefined;
 
   const result = await db.select().from(sessoes)
-    .where(and(eq(sessoes.chaveJ, chaveJ), eq(sessoes.ativo, true)))
+    .where(and(eq(sessoes.chaveJ, chaveJ), eq(sessoes.ativo, 1)))
     .limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
@@ -251,7 +251,7 @@ export async function getSessaoById(sessaoId: number) {
   if (!db) return undefined;
 
   const result = await db.select().from(sessoes)
-    .where(and(eq(sessoes.id, sessaoId), eq(sessoes.ativo, true)))
+    .where(and(eq(sessoes.id, sessaoId), eq(sessoes.ativo, 1)))
     .limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
@@ -261,7 +261,7 @@ export async function getTodasSessoesAtivas() {
   if (!db) return [];
 
   return await db.select().from(sessoes)
-    .where(eq(sessoes.ativo, true))
+    .where(eq(sessoes.ativo, 1))
     .orderBy(sessoes.horarioConexao);
 }
 
@@ -284,7 +284,7 @@ export async function encerrarSessao(sessaoId: number) {
   if (!db) return undefined;
 
   return await db.update(sessoes)
-    .set({ ativo: false })
+    .set({ ativo: 0 })
     .where(eq(sessoes.id, sessaoId));
 }
 

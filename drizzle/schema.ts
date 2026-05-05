@@ -8,6 +8,7 @@ import {
   decimal,
   date,
   boolean,
+  tinyint,
   index
 } from "drizzle-orm/mysql-core";
 
@@ -565,7 +566,7 @@ export const sessoes = mysqlTable("sessoes", {
   modulo: varchar("modulo", { length: 100 }).default("dashboard"),
   ipAddress: varchar("ipAddress", { length: 50 }),
   userAgent: text("userAgent"),
-  ativo: boolean("ativo").default(true).notNull(),
+  ativo: tinyint("ativo").default(1).notNull(),
   motivoDesconexao: varchar("motivoDesconexao", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
