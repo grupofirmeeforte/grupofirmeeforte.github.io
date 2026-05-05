@@ -18,7 +18,7 @@ export function UsuariosConectados() {
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
-  const isOwner = user?.openId === process.env.VITE_OWNER_OPEN_ID;
+  const isOwner = user?.openId === import.meta.env.VITE_OWNER_OPEN_ID;
 
   const { data: sessoesData, refetch } = trpc.sessoes.getAtivas.useQuery();
   const desconectar = trpc.sessoes.desconectarForcado.useMutation({
