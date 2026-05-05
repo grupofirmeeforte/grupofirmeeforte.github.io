@@ -47,7 +47,7 @@ function pct(val: string | null) {
   if (!val) return '-';
   const n = parseFloat(val);
   if (isNaN(n)) return val;
-  return (n * 100).toFixed(4).replace(/\.?0+$/, '') + '%';
+  return (n * 100).toFixed(2).replace('.', ',') + '%';
 }
 
 export default function TabelaComissao() {
