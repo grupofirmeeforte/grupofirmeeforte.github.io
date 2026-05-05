@@ -11,11 +11,10 @@ export default function ChangePasswordPage() {
   const [senhaNova, setSenhaNova] = useState('');
   const [senhaConfirm, setSenhaConfirm] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { user } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -40,46 +39,37 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    // Aqui você faria a chamada para a API
-    setIsLoading(true);
-    
-    // Simular mudança de senha
+    // Chamar a API para trocar a senha
+    // Por enquanto, apenas redirecionar após sucesso
     setTimeout(() => {
-      setIsLoading(false);
       // Redirecionar para home após sucesso
       setLocation('/');
-    }, 1000);
+    }, 500);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md shadow-lg">
         <div className="p-8">
           <div className="flex items-center justify-center mb-6">
-            <div className="bg-red-100 p-3 rounded-full">
-              <Lock className="w-6 h-6 text-red-600" />
-            </div>
+            <Lock className="w-8 h-8 text-blue-600 mr-3" />
+            <h1 className="text-2xl font-bold text-gray-900">Trocar Senha</h1>
           </div>
 
-          <h1 className="text-2xl font-bold text-center mb-2">
-            Troca de Senha Obrigatória
-          </h1>
-          
-          <p className="text-center text-gray-600 mb-6">
-            Você deve trocar sua senha para continuar usando o sistema.
-            {user && <span className="block mt-1 font-semibold">{user.name}</span>}
+          <p className="text-gray-600 text-center mb-6">
+            Você precisa trocar sua senha para continuar usando o sistema.
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <span className="text-sm text-red-700">{error}</span>
+              <p className="text-red-700 text-sm">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Senha Atual
               </label>
               <Input
@@ -87,48 +77,43 @@ export default function ChangePasswordPage() {
                 value={senhaAtual}
                 onChange={(e) => setSenhaAtual(e.target.value)}
                 placeholder="Digite sua senha atual"
-                disabled={isLoading}
+                disabled={false}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Nova Senha
               </label>
               <Input
                 type="password"
                 value={senhaNova}
                 onChange={(e) => setSenhaNova(e.target.value)}
-                placeholder="Digite a nova senha"
-                disabled={isLoading}
+                placeholder="Digite sua nova senha"
+                disabled={false}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Confirmar Nova Senha
               </label>
               <Input
                 type="password"
                 value={senhaConfirm}
                 onChange={(e) => setSenhaConfirm(e.target.value)}
-                placeholder="Confirme a nova senha"
-                disabled={isLoading}
+                placeholder="Confirme sua nova senha"
+                disabled={false}
               />
             </div>
 
             <Button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
-              {isLoading ? 'Processando...' : 'Confirmar Troca de Senha'}
+              Trocar Senha
             </Button>
           </form>
-
-          <p className="text-xs text-gray-500 text-center mt-4">
-            Esta ação é obrigatória para continuar usando o sistema.
-          </p>
         </div>
       </Card>
     </div>
