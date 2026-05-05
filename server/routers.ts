@@ -579,5 +579,179 @@ export const appRouter = router({
         return { count: input.length };
       }),
   }),
+
+  contaCorrente: router({
+    listar: publicProcedure
+      .input(z.object({
+        mesAno: z.string().optional(),
+        empresa: z.string().optional(),
+        chaveJ: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { contasCorrentes } = await import('../drizzle/schema');
+        const { eq, and, like } = await import('drizzle-orm');
+        const conditions: any[] = [];
+        if (input?.mesAno) conditions.push(eq(contasCorrentes.mesAno, input.mesAno));
+        if (input?.empresa) conditions.push(eq(contasCorrentes.empresa, input.empresa));
+        if (input?.chaveJ) conditions.push(like(contasCorrentes.chaveJ, `%${input.chaveJ}%`));
+        return conditions.length > 0
+          ? await db.select().from(contasCorrentes).where(and(...conditions)).orderBy(contasCorrentes.mesAno, contasCorrentes.agente)
+          : await db.select().from(contasCorrentes).orderBy(contasCorrentes.mesAno, contasCorrentes.agente);
+      }),
+
+    criar: publicProcedure
+      .input(z.object({
+        empresa: z.string().optional(), mesAno: z.string().optional(),
+        chaveJ: z.string().optional(), agente: z.string().optional(),
+        agencia: z.string().optional(), contaCorrente: z.string().optional(),
+        tipoServ: z.string().optional(), dataOperacao: z.string().optional(),
+        produto: z.string().optional(), modalidade: z.string().optional(),
+        agRelacionamento: z.string().optional(), rbm: z.string().optional(),
+        percComissao: z.string().optional(), comissao: z.string().optional(),
+        supervisor: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { contasCorrentes } = await import('../drizzle/schema');
+        const data: any = { ...input };
+        if (data.rbm) data.rbm = parseFloat(data.rbm.replace(',', '.').replace(/[^0-9.]/g, '')) || null;
+        if (data.percComissao) data.percComissao = parseFloat(data.percComissao.replace(',', '.').replace(/[^0-9.]/g, '')) || null;
+        if (data.comissao) data.comissao = parseFloat(data.comissao.replace(',', '.').replace(/[^0-9.]/g, '')) || null;
+        if (data.dataOperacao) data.dataOperacao = data.dataOperacao || null;
+        return await db.insert(contasCorrentes).values(data);
+      }),
+
+    atualizar: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        empresa: z.string().optional(), mesAno: z.string().optional(),
+        chaveJ: z.string().optional(), agente: z.string().optional(),
+        agencia: z.string().optional(), contaCorrente: z.string().optional(),
+        tipoServ: z.string().optional(), dataOperacao: z.string().optional(),
+        produto: z.string().optional(), modalidade: z.string().optional(),
+        agRelacionamento: z.string().optional(), rbm: z.string().optional(),
+        percComissao: z.string().optional(), comissao: z.string().optional(),
+        supervisor: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { contasCorrentes } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        const { id, ...rest } = input;
+        const data: any = { ...rest };
+        if (data.rbm) data.rbm = parseFloat(data.rbm.replace(',', '.').replace(/[^0-9.]/g, '')) || null;
+        if (data.percComissao) data.percComissao = parseFloat(data.percComissao.replace(',', '.').replace(/[^0-9.]/g, '')) || null;
+        if (data.comissao) data.comissao = parseFloat(data.comissao.replace(',', '.').replace(/[^0-9.]/g, '')) || null;
+        return await db.update(contasCorrentes).set(data).where(eq(contasCorrentes.id, id));
+      }),
+
+    excluir: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { contasCorrentes } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        return await db.delete(contasCorrentes).where(eq(contasCorrentes.id, input.id));
+      }),
+
+    listarMeses: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return [];
+      const { contasCorrentes } = await import('../drizzle/schema');
+      const rows = await db.selectDistinct({ mesAno: contasCorrentes.mesAno }).from(contasCorrentes).orderBy(contasCorrentes.mesAno);
+      return rows.map(r => r.mesAno).filter(Boolean) as string[];
+    }),
+
+    listarEmpresas: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return [];
+      const { contasCorrentes } = await import('../drizzle/schema');
+      const rows = await db.selectDistinct({ empresa: contasCorrentes.empresa }).from(contasCorrentes).orderBy(contasCorrentes.empresa);
+      return rows.map(r => r.empresa).filter(Boolean) as string[];
+    }),
+
+    // Cálculos automáticos: busca empresa, agente, supervisor pelo chaveJ e percComissao na Tabela
+    calcularFormulas: publicProcedure
+      .input(z.object({
+        chaveJ: z.string(),
+        rbm: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        const { agentes, tabelasComissao } = await import('../drizzle/schema');
+        const { eq, like } = await import('drizzle-orm');
+
+        // 1. Buscar agente pelo chaveJ
+        const [agente] = await db.select().from(agentes).where(eq(agentes.chaveJ, input.chaveJ)).limit(1);
+        if (!agente) return { erro: 'Agente não encontrado' };
+
+        // 2. Buscar percentual de Conta Corrente na Tabela Comissão
+        // Busca pela linha com convenio = 'Conta Corrente' ou 'CONTA CORRENTE'
+        const situacao = agente.situacao || '';
+        const nivelMatch = situacao.match(/Ativo(\d{2})/i);
+        const nivelNum = nivelMatch ? parseInt(nivelMatch[1]) : null;
+        const ativoCol = nivelNum ? `ativo${String(nivelNum).padStart(2, '0')}` : null;
+
+        let percComissao: string | null = null;
+        if (ativoCol) {
+          const tabelas = await db.select().from(tabelasComissao)
+            .where(like(tabelasComissao.convenio, '%Conta%'))
+            .limit(5);
+          if (tabelas.length > 0) {
+            percComissao = (tabelas[0] as any)[ativoCol] || null;
+          }
+        }
+
+        // 3. Calcular comissao = rbm * percComissao
+        let comissao: string | null = null;
+        if (percComissao && input.rbm) {
+          const rbmNum = parseFloat(input.rbm.replace(',', '.').replace(/[^0-9.]/g, ''));
+          const pp = parseFloat(percComissao) > 1 ? parseFloat(percComissao) / 100 : parseFloat(percComissao);
+          if (!isNaN(rbmNum) && !isNaN(pp)) {
+            comissao = (rbmNum * pp).toFixed(2);
+          }
+        }
+
+        return {
+          empresa: agente.empresa || null,
+          agente: agente.nomeAgente || null,
+          supervisor: agente.supervisor || null,
+          percComissao,
+          comissao,
+        };
+      }),
+
+    importar: publicProcedure
+      .input(z.array(z.object({
+        empresa: z.string().optional(), mesAno: z.string().optional(),
+        chaveJ: z.string().optional(), agente: z.string().optional(),
+        agencia: z.string().optional(), contaCorrente: z.string().optional(),
+        tipoServ: z.string().optional(), dataOperacao: z.string().optional(),
+        produto: z.string().optional(), modalidade: z.string().optional(),
+        agRelacionamento: z.string().optional(), rbm: z.string().optional(),
+        percComissao: z.string().optional(), comissao: z.string().optional(),
+        supervisor: z.string().optional(),
+      })))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { contasCorrentes } = await import('../drizzle/schema');
+        if (input.length === 0) return { count: 0 };
+        const rows = input.map((r: any) => ({
+          ...r,
+          rbm: r.rbm ? parseFloat(r.rbm.replace(',', '.').replace(/[^0-9.]/g, '')) || null : null,
+          percComissao: r.percComissao ? parseFloat(r.percComissao.replace(',', '.').replace(/[^0-9.]/g, '')) || null : null,
+          comissao: r.comissao ? parseFloat(r.comissao.replace(',', '.').replace(/[^0-9.]/g, '')) || null : null,
+        }));
+        await db.insert(contasCorrentes).values(rows);
+        return { count: rows.length };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

@@ -116,6 +116,7 @@ export default function Home() {
       bgColor: 'from-teal-50 to-cyan-50',
       subModules: [
         { title: 'Consignado', description: 'Operações de crédito consignado', icon: Briefcase, color: 'bg-teal-600', path: '/consignado' },
+        { title: 'Conta Corrente', description: 'Operações de conta corrente', icon: DollarSign, color: 'bg-teal-500', path: '/conta-corrente' },
       ],
     },
   ];
