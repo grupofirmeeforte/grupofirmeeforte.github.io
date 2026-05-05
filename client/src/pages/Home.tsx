@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -79,6 +79,13 @@ export default function Home() {
       icon: DollarSign,
       color: "bg-red-500",
       path: "/financeiro",
+    },
+    {
+      title: "Tabela Comissão",
+      description: "Faixas e percentuais de comissão por convênio",
+      icon: TableProperties,
+      color: "bg-indigo-500",
+      path: "/tabela-comissao",
     },
   ];
 

@@ -9,6 +9,7 @@ import AgentesPage from "./pages/agentes";
 import AgentesFormPage from "./pages/agentes-form";
 import Login from "./pages/Login";
 import AuditoriaPage from "./pages/auditoria";
+import TabelaComissaoPage from "./pages/TabelaComissao";
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
 import { useDisconnectNotification } from "./hooks/useDisconnectNotification";
@@ -33,6 +34,7 @@ function RouterWithInactivity() {
       <Route path={"/agentes/novo"} component={AgentesFormPage} />
       <Route path={"/agentes/:id"} component={AgentesFormPage} />
       <Route path={"/auditoria"} component={AuditoriaPage} />
+      <Route path={"/tabela-comissao"} component={TabelaComissaoPage} />
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

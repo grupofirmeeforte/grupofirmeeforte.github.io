@@ -278,5 +278,99 @@ export const appRouter = router({
         return await marcarMensagensComoLidas(input.usuarioId, input.remetenteId);
       }),
   }),
+  tabelaComissao: router({
+    listar: publicProcedure
+      .input(z.object({
+        empresa: z.string().optional(),
+        convenio: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { tabelasComissao } = await import('../drizzle/schema');
+        const { and, eq, like } = await import('drizzle-orm');
+        let query = db.select().from(tabelasComissao);
+        const conditions = [];
+        if (input?.empresa) conditions.push(eq(tabelasComissao.empresa, input.empresa));
+        if (input?.convenio) conditions.push(like(tabelasComissao.convenio, `%${input.convenio}%`));
+        if (conditions.length > 0) {
+          return await query.where(and(...conditions)).orderBy(tabelasComissao.empresa, tabelasComissao.convenio);
+        }
+        return await query.orderBy(tabelasComissao.empresa, tabelasComissao.convenio);
+      }),
+
+    criar: publicProcedure
+      .input(z.object({
+        empresa: z.string().optional(),
+        faixa1: z.string().optional(), faixa2: z.string().optional(),
+        faixa3: z.string().optional(), faixa4: z.string().optional(), faixa5: z.string().optional(),
+        tabelaCalculo: z.string().optional(), referencia: z.string().optional(),
+        convenio: z.string().optional(),
+        txJurosDe: z.string().optional(), txJurosAte: z.string().optional(),
+        valorMinimo: z.string().optional(),
+        mesesDe: z.string().optional(), mesesAte: z.string().optional(),
+        ativo01: z.string().optional(), ativo02: z.string().optional(),
+        ativo03: z.string().optional(), ativo04: z.string().optional(),
+        ativo05: z.string().optional(), ativo06: z.string().optional(),
+        ativo07: z.string().optional(), ativo08: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { tabelasComissao } = await import('../drizzle/schema');
+        return await db.insert(tabelasComissao).values(input);
+      }),
+
+    atualizar: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        empresa: z.string().optional(),
+        faixa1: z.string().optional(), faixa2: z.string().optional(),
+        faixa3: z.string().optional(), faixa4: z.string().optional(), faixa5: z.string().optional(),
+        tabelaCalculo: z.string().optional(), referencia: z.string().optional(),
+        convenio: z.string().optional(),
+        txJurosDe: z.string().optional(), txJurosAte: z.string().optional(),
+        valorMinimo: z.string().optional(),
+        mesesDe: z.string().optional(), mesesAte: z.string().optional(),
+        ativo01: z.string().optional(), ativo02: z.string().optional(),
+        ativo03: z.string().optional(), ativo04: z.string().optional(),
+        ativo05: z.string().optional(), ativo06: z.string().optional(),
+        ativo07: z.string().optional(), ativo08: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { tabelasComissao } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        const { id, ...data } = input;
+        return await db.update(tabelasComissao).set(data).where(eq(tabelasComissao.id, id));
+      }),
+
+    excluir: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { tabelasComissao } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        return await db.delete(tabelasComissao).where(eq(tabelasComissao.id, input.id));
+      }),
+
+    listarEmpresas: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return [];
+      const { tabelasComissao } = await import('../drizzle/schema');
+      const rows = await db.selectDistinct({ empresa: tabelasComissao.empresa }).from(tabelasComissao).orderBy(tabelasComissao.empresa);
+      return rows.map(r => r.empresa).filter(Boolean);
+    }),
+
+    listarConvenios: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return [];
+      const { tabelasComissao } = await import('../drizzle/schema');
+      const rows = await db.selectDistinct({ convenio: tabelasComissao.convenio }).from(tabelasComissao).orderBy(tabelasComissao.convenio);
+      return rows.map(r => r.convenio).filter(Boolean);
+    }),
+  }),
 });
 export type AppRouter = typeof appRouter;
