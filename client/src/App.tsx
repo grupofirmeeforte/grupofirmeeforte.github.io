@@ -9,10 +9,10 @@ import AgentesPage from "./pages/agentes";
 import AgentesFormPage from "./pages/agentes-form";
 import Login from "./pages/Login";
 import AuditoriaPage from "./pages/auditoria";
-import ChangePasswordPage from "./pages/change-password";
+// import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
 import { useDisconnectNotification } from "./hooks/useDisconnectNotification";
-import { useCheckPasswordChange } from "./hooks/useCheckPasswordChange";
+// import { useCheckPasswordChange } from "./hooks/useCheckPasswordChange";
 
 function RouterWithInactivity() {
   // Ativar desconexão por inatividade
@@ -22,7 +22,7 @@ function RouterWithInactivity() {
   useDisconnectNotification();
   
   // Verificar se precisa trocar senha
-  useCheckPasswordChange();
+  // useCheckPasswordChange();
   
   // make sure to consider if you need authentication for certain routes
   return (
@@ -33,7 +33,7 @@ function RouterWithInactivity() {
       <Route path={"/agentes/novo"} component={AgentesFormPage} />
       <Route path={"/agentes/:id"} component={AgentesFormPage} />
       <Route path={"/auditoria"} component={AuditoriaPage} />
-      <Route path={"/change-password"} component={ChangePasswordPage} />
+      {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
