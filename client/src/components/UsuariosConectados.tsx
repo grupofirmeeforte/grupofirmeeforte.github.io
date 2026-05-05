@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card } from "@/components/ui/card";
-import { Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, LogOut } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 interface Sessao {
   id: number;
@@ -14,8 +17,16 @@ interface Sessao {
 export function UsuariosConectados() {
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
   const { data: sessoesData, refetch } = trpc.sessoes.getAtivas.useQuery();
+  const desconectar = trpc.sessoes.desconectarForcado.useMutation({
+    onSuccess: () => {
+      toast.success('Usuário desconectado com sucesso!');
+      refetch();
+    },
+    onError: (e) => toast.error('Erro: ' + e.message),
+  });
 
   // Atualizar a cada 10 segundos
   useEffect(() => {
@@ -90,8 +101,19 @@ export function UsuariosConectados() {
                     Módulo: <span className="font-medium">{sessao.modulo || "Dashboard"}</span>
                   </p>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  {user?.role === 'admin' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-red-500 hover:bg-red-100 hover:text-red-700"
+                      onClick={() => desconectar.mutate({ sessaoId: sessao.id })}
+                      disabled={desconectar.isPending}
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
                 </div>
               </div>
 
