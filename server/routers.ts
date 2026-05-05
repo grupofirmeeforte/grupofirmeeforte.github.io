@@ -365,7 +365,6 @@ export const appRouter = router({
       const rows = await db.selectDistinct({ empresa: tabelasComissao.empresa }).from(tabelasComissao).orderBy(tabelasComissao.empresa);
       return rows.map(r => r.empresa).filter(Boolean);
     }),
-
     listarConvenios: publicProcedure.query(async () => {
       const db = await getDb();
       if (!db) return [];
@@ -373,6 +372,127 @@ export const appRouter = router({
       const rows = await db.selectDistinct({ convenio: tabelasComissao.convenio }).from(tabelasComissao).orderBy(tabelasComissao.convenio);
       return rows.map(r => r.convenio).filter(Boolean);
     }),
+  }),
+
+  consignado: router({
+    listar: publicProcedure
+      .input(z.object({
+        mes: z.string().optional(),
+        empresa: z.string().optional(),
+        chaveJ: z.string().optional(),
+        convenio: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { consignados } = await import('../drizzle/schema');
+        const { eq, and, like } = await import('drizzle-orm');
+        const conditions: any[] = [];
+        if (input?.mes) conditions.push(eq(consignados.mes, input.mes));
+        if (input?.empresa) conditions.push(eq(consignados.empresa, input.empresa));
+        if (input?.chaveJ) conditions.push(like(consignados.chaveJ, `%${input.chaveJ}%`));
+        if (input?.convenio) conditions.push(eq(consignados.convenio, input.convenio));
+        return conditions.length > 0
+          ? await db.select().from(consignados).where(and(...conditions)).orderBy(consignados.mes, consignados.nomeAgente)
+          : await db.select().from(consignados).orderBy(consignados.mes, consignados.nomeAgente);
+      }),
+
+    criar: publicProcedure
+      .input(z.object({
+        empresa: z.string().optional(), mes: z.string().optional(),
+        chaveJ: z.string().optional(), nomeAgente: z.string().optional(),
+        convenio: z.string().optional(), nrOperacao: z.string().optional(),
+        valorBruto: z.string().optional(), valorLiquido: z.string().optional(),
+        rbm: z.string().optional(), parcela: z.number().optional(),
+        prefixoBB: z.string().optional(), dtContratacao: z.string().optional(),
+        produto: z.string().optional(), descricaoProduto: z.string().optional(),
+        juros: z.string().optional(), tabelaMes: z.string().optional(),
+        percAVista: z.string().optional(), restricaoSRCC: z.string().optional(),
+        percPago: z.string().optional(), totalComissao: z.string().optional(),
+        difEmpresa: z.string().optional(), tabela: z.string().optional(),
+        supervisor: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { consignados } = await import('../drizzle/schema');
+        return await db.insert(consignados).values(input as any);
+      }),
+
+    atualizar: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        empresa: z.string().optional(), mes: z.string().optional(),
+        chaveJ: z.string().optional(), nomeAgente: z.string().optional(),
+        convenio: z.string().optional(), nrOperacao: z.string().optional(),
+        valorBruto: z.string().optional(), valorLiquido: z.string().optional(),
+        rbm: z.string().optional(), parcela: z.number().optional(),
+        prefixoBB: z.string().optional(), dtContratacao: z.string().optional(),
+        produto: z.string().optional(), descricaoProduto: z.string().optional(),
+        juros: z.string().optional(), tabelaMes: z.string().optional(),
+        percAVista: z.string().optional(), restricaoSRCC: z.string().optional(),
+        percPago: z.string().optional(), totalComissao: z.string().optional(),
+        difEmpresa: z.string().optional(), tabela: z.string().optional(),
+        supervisor: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { consignados } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        const { id, ...data } = input;
+        return await db.update(consignados).set(data as any).where(eq(consignados.id, id));
+      }),
+
+    excluir: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { consignados } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        return await db.delete(consignados).where(eq(consignados.id, input.id));
+      }),
+
+    listarMeses: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return [];
+      const { consignados } = await import('../drizzle/schema');
+      const rows = await db.selectDistinct({ mes: consignados.mes }).from(consignados).orderBy(consignados.mes);
+      return rows.map(r => r.mes).filter(Boolean) as string[];
+    }),
+
+    listarEmpresas: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return [];
+      const { consignados } = await import('../drizzle/schema');
+      const rows = await db.selectDistinct({ empresa: consignados.empresa }).from(consignados).orderBy(consignados.empresa);
+      return rows.map(r => r.empresa).filter(Boolean) as string[];
+    }),
+
+    importar: publicProcedure
+      .input(z.array(z.object({
+        empresa: z.string().optional(), mes: z.string().optional(),
+        chaveJ: z.string().optional(), nomeAgente: z.string().optional(),
+        convenio: z.string().optional(), nrOperacao: z.string().optional(),
+        valorBruto: z.string().optional(), valorLiquido: z.string().optional(),
+        rbm: z.string().optional(), parcela: z.number().optional(),
+        prefixoBB: z.string().optional(), dtContratacao: z.string().optional(),
+        produto: z.string().optional(), descricaoProduto: z.string().optional(),
+        juros: z.string().optional(), tabelaMes: z.string().optional(),
+        percAVista: z.string().optional(), restricaoSRCC: z.string().optional(),
+        percPago: z.string().optional(), totalComissao: z.string().optional(),
+        difEmpresa: z.string().optional(), tabela: z.string().optional(),
+        supervisor: z.string().optional(),
+      })))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { consignados } = await import('../drizzle/schema');
+        if (input.length === 0) return { count: 0 };
+        await db.insert(consignados).values(input as any[]);
+        return { count: input.length };
+      }),
   }),
 });
 export type AppRouter = typeof appRouter;

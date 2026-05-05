@@ -171,3 +171,7 @@
 - [x] Implementar atualização em tempo real a cada 10 segundos
 - [x] Implementar desconexão automática após 30 minutos de inatividade
 - [x] Testar monitoramento em tempo real
+
+- [ ] Aba Consignado: tabela com 23 colunas, filtros, importação de planilha, cálculos automáticos
+
+- [ ] Aba Consignado: tabela com 23 colunas, filtros, importação de planilha, cálculos automáticos

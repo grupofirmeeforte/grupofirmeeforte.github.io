@@ -87,6 +87,13 @@ export default function Home() {
       color: "bg-indigo-500",
       path: "/tabela-comissao",
     },
+    {
+      title: "Consignado",
+      description: "Operações de crédito consignado",
+      icon: Briefcase,
+      color: "bg-teal-600",
+      path: "/consignado",
+    },
   ];
 
   return (

@@ -181,20 +181,40 @@ export type InsertTabelaComissao = typeof tabelasComissao.$inferInsert;
  */
 export const consignados = mysqlTable("consignados", {
   id: int("id").autoincrement().primaryKey(),
-  mesAno: varchar("mesAno", { length: 10 }),
+  // Colunas de importação
+  empresa: varchar("empresa", { length: 100 }),
+  mes: varchar("mes", { length: 10 }),
   chaveJ: varchar("chaveJ", { length: 50 }),
   nomeAgente: varchar("nomeAgente", { length: 255 }),
-  nrOperacao: varchar("nrOperacao", { length: 100 }),
-  parcelas: int("parcelas"),
   convenio: varchar("convenio", { length: 100 }),
-  juros: decimal("juros", { precision: 10, scale: 4 }),
+  nrOperacao: varchar("nrOperacao", { length: 100 }),
+  valorBruto: decimal("valorBruto", { precision: 15, scale: 2 }),
   valorLiquido: decimal("valorLiquido", { precision: 15, scale: 2 }),
+  rbm: decimal("rbm", { precision: 15, scale: 2 }),
+  parcela: int("parcela"),
+  prefixoBB: varchar("prefixoBB", { length: 20 }),
+  dtContratacao: date("dtContratacao"),
+  produto: varchar("produto", { length: 100 }),
+  descricaoProduto: varchar("descricaoProduto", { length: 255 }),
+  juros: decimal("juros", { precision: 10, scale: 4 }),
+  tabelaMes: varchar("tabelaMes", { length: 50 }),
+  percAVista: decimal("percAVista", { precision: 10, scale: 4 }),
+  restricaoSRCC: varchar("restricaoSRCC", { length: 100 }),
+  // Colunas calculadas por fórmula
+  mesAno: varchar("mesAno", { length: 10 }),
+  percPago: decimal("percPago", { precision: 10, scale: 4 }),
+  totalComissao: decimal("totalComissao", { precision: 15, scale: 2 }),
+  difEmpresa: decimal("difEmpresa", { precision: 15, scale: 2 }),
+  tabela: varchar("tabela", { length: 100 }),
+  supervisor: varchar("supervisor", { length: 255 }),
+  // Legado
+  parcelas: int("parcelas"),
   percentual: decimal("percentual", { precision: 10, scale: 4 }),
   comissao: decimal("comissao", { precision: 15, scale: 2 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
-  mesAnoIdx: index("idx_consignados_mesAno").on(table.mesAno),
+  mesAnoIdx: index("idx_consignados_mesAno").on(table.mes),
 }));
 
 export type Consignado = typeof consignados.$inferSelect;
