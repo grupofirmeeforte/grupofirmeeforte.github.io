@@ -310,7 +310,21 @@ export default function TabelaComissao() {
       {/* Valores para Cálculo por Nível - Editáveis Inline */}
       <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b">
         <div className="mb-3">
-          <label className="text-sm font-semibold text-blue-900 mb-2 block">Valores para Cálculo por Nível:</label>
+          <div className="flex justify-between items-center mb-2">
+            <label className="text-sm font-semibold text-blue-900 block">Valores para Cálculo por Nível:</label>
+            <Button
+              onClick={() => {
+                const dadosAtualizar: Record<string, string> = {};
+                Object.keys(valoresAtivos).forEach(nivel => {
+                  dadosAtualizar[nivel.toLowerCase()] = valoresAtivos[nivel];
+                });
+                atualizarValoresCalculoMutation.mutate(dadosAtualizar as any);
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 text-sm rounded"
+            >
+              💾 Salvar Tudo
+            </Button>
+          </div>
           <div className="grid grid-cols-5 gap-3">
             {Object.keys(valoresAtivos).map((nivel) => (
               <div key={nivel}>
