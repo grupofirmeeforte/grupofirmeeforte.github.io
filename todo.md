@@ -212,4 +212,6 @@
 - [x] Adicionar coluna isDuplicate na tabela consignados
 - [x] Criar procedure para verificar duplicatas
 - [x] Implementar sinalizacao visual (vermelho/alerta)
-- [ ] Testar com dados duplicados
+- [x] Testar com dados duplicados
+- [x] Marcar duplicatas ao carregar pagina
+- [x] Marcar duplicatas apos criar/editar/excluir

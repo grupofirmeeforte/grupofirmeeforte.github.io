@@ -812,13 +812,16 @@ export const appRouter = router({
       await db.update(consignados).set({ isDuplicate: false });
 
       // 2. Buscar todos os registros com nrOperacao duplicado
-      const duplicatas = await db.execute(sql`
+      const result = await db.execute(sql`
         SELECT nrOperacao, COUNT(*) as cnt
         FROM consignados
         WHERE nrOperacao IS NOT NULL AND nrOperacao != ''
         GROUP BY nrOperacao
         HAVING cnt > 1
       `);
+      
+      // Extrair dados do resultado
+      const duplicatas = Array.isArray(result[0]) ? result[0] : [];
 
       // 3. Marcar como duplicado
       for (const row of duplicatas) {
