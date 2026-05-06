@@ -102,7 +102,7 @@ export default function Home() {
       borderColor: 'border-red-200',
       bgColor: 'from-red-50 to-orange-50',
       subModules: [
-        // Abas serão adicionadas aqui futuramente
+        { title: 'Cálculo', description: 'Calcule comissões, RBM e outras métricas', icon: DollarSign, color: 'bg-red-500', path: '/calculo' },
       ],
     },
     {

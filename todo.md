@@ -238,3 +238,16 @@
 - [x] Adicionar botão para baixar template
 - [x] Implementar mutations editar e deletar
 - [ ] Testar fluxo completo de importação
+
+
+## FASE 21: ABA CALCULO DENTRO DE FINANCEIRO
+- [ ] Analisar estrutura do arquivo calculo.xlsx
+- [ ] Criar schema para tabela de calculos
+- [ ] Criar tabela calculos no banco
+- [ ] Criar routers para CRUD
+- [ ] Criar página Calculo em Financeiro
+- [ ] Implementar buscas automáticas em Consignado
+- [ ] Implementar buscas automáticas em Cadastro
+- [ ] Implementar cálculos de comissões
+- [ ] Implementar cálculos de RBM
+- [ ] Testar fluxo completo

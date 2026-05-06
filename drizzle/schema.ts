@@ -686,3 +686,6 @@ export const relatorioBB = mysqlTable("relatorioBB", {
 
 export type RelatorioBB = typeof relatorioBB.$inferSelect;
 export type InsertRelatorioBB = typeof relatorioBB.$inferInsert;
+
+
+
