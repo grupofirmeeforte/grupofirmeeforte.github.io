@@ -34,6 +34,7 @@ type Consignado = {
   difEmpresa?: string | null;
   tabela?: string | null;
   supervisor?: string | null;
+  isDuplicate?: boolean | null;
 };
 
 type FormData = {
@@ -170,8 +171,17 @@ export default function Consignado() {
     onError: (e) => toast.error('Erro: ' + e.message),
   });
 
+  const marcarDuplicatas = trpc.consignado.marcarDuplicatas.useMutation();
+
   const importar = trpc.consignado.importar.useMutation({
-    onSuccess: (r) => { utils.consignado.listar.invalidate(); utils.consignado.listarMeses.invalidate(); utils.consignado.listarEmpresas.invalidate(); toast.success(`${r.count} registros importados!`); },
+    onSuccess: (r) => {
+      utils.consignado.listar.invalidate();
+      utils.consignado.listarMeses.invalidate();
+      utils.consignado.listarEmpresas.invalidate();
+      toast.success(`${r.count} registros importados!`);
+      // Marcar duplicatas apos importacao
+      marcarDuplicatas.mutate();
+    },
     onError: (e) => toast.error('Erro na importação: ' + e.message),
   });
 
@@ -649,7 +659,12 @@ export default function Consignado() {
                   <td className="px-2 py-1.5 border-b border-gray-100 font-mono">{strVal(r.chaveJ)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 whitespace-nowrap">{strVal(r.nomeAgente)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.convenio)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 font-mono">{strVal(r.nrOperacao)}</td>
+                  <td className={`px-2 py-1.5 border-b border-gray-100 font-mono ${
+                    r.isDuplicate ? 'bg-red-100 text-red-900 font-bold' : ''
+                  }`}>
+                    {strVal(r.nrOperacao)}
+                    {r.isDuplicate && <span className="ml-1 text-red-600">⚠️</span>}
+                  </td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{moeda(r.valorBruto)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right font-semibold text-blue-800">{moeda(r.valorLiquido)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{moeda(r.rbm)}</td>

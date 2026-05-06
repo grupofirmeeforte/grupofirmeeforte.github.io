@@ -207,3 +207,9 @@
 - [ ] Testar calculos com dados reais
 - [ ] Verificar se importação funciona corretamente
 - [ ] Validar cálculos com dados da planilha
+
+## FASE 18: DETECCAO DE DUPLICATAS EM NR. OPERACAO
+- [ ] Adicionar coluna isDuplicate na tabela consignados
+- [ ] Criar procedure para verificar duplicatas
+- [ ] Implementar sinalizacao visual (vermelho/alerta)
+- [ ] Testar com dados duplicados

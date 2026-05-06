@@ -801,6 +801,35 @@ export const appRouter = router({
         await db.insert(consignados).values(processedRecords as any[]);
         return { count: processedRecords.length };
       }),
+
+    marcarDuplicatas: publicProcedure.mutation(async () => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponivel' });
+      const { consignados } = await import('../drizzle/schema');
+      const { eq, sql } = await import('drizzle-orm');
+
+      // 1. Limpar isDuplicate anterior
+      await db.update(consignados).set({ isDuplicate: false });
+
+      // 2. Buscar todos os registros com nrOperacao duplicado
+      const duplicatas = await db.execute(sql`
+        SELECT nrOperacao, COUNT(*) as cnt
+        FROM consignados
+        WHERE nrOperacao IS NOT NULL AND nrOperacao != ''
+        GROUP BY nrOperacao
+        HAVING cnt > 1
+      `);
+
+      // 3. Marcar como duplicado
+      for (const row of duplicatas) {
+        const nrOp = (row as any).nrOperacao;
+        await db.update(consignados)
+          .set({ isDuplicate: true })
+          .where(eq(consignados.nrOperacao, nrOp));
+      }
+
+      return { duplicatasEncontradas: duplicatas.length };
+    }),
   }),
 
   contaCorrente: router({

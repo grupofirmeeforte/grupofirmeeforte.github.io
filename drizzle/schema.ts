@@ -211,6 +211,8 @@ export const consignados = mysqlTable("consignados", {
   difEmpresa: decimal("difEmpresa", { precision: 15, scale: 2 }),
   tabela: varchar("tabela", { length: 100 }),
   supervisor: varchar("supervisor", { length: 255 }),
+  // Sinalização de duplicatas
+  isDuplicate: boolean("isDuplicate").default(false).notNull(),
   // Legado
   parcelas: int("parcelas"),
   percentual: decimal("percentual", { precision: 10, scale: 4 }),
