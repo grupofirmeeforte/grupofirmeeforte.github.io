@@ -77,9 +77,9 @@ export default function Calculo() {
           rbmOurocapSoma: parseFloat(registro.rbmOurocap) || 0,
           rbmSegurosSoma: parseFloat(registro.rbmSeguros) || 0,
           qtdeContasSoma: parseFloat(registro.qtdeContas) || 0,
-          vrLiquidoSoma: parseFloat(registro.vrLiquido) || 0,
-          srccSoma: parseFloat(registro.srcc) || 0,
-          vrLiquidoSrccSoma: parseFloat(registro.vrLiquidoSrcc) || 0,
+          vrLiquidoSoma: parseFloat(registro.valorLiquido) || 0,
+          srccSoma: parseFloat(registro.restricaoSRCC) || 0,
+          vrLiquidoSrccSoma: 0, // Calcular depois
         };
       } else {
         // Incrementar contador de operações e somar TODOS os campos
@@ -103,9 +103,9 @@ export default function Calculo() {
         grupos[chaveJ].rbmOurocapSoma = (grupos[chaveJ].rbmOurocapSoma || 0) + (parseFloat(registro.rbmOurocap) || 0);
         grupos[chaveJ].rbmSegurosSoma = (grupos[chaveJ].rbmSegurosSoma || 0) + (parseFloat(registro.rbmSeguros) || 0);
         grupos[chaveJ].qtdeContasSoma = (grupos[chaveJ].qtdeContasSoma || 0) + (parseFloat(registro.qtdeContas) || 0);
-        grupos[chaveJ].vrLiquidoSoma = (grupos[chaveJ].vrLiquidoSoma || 0) + (parseFloat(registro.vrLiquido) || 0);
-        grupos[chaveJ].srccSoma = (grupos[chaveJ].srccSoma || 0) + (parseFloat(registro.srcc) || 0);
-        grupos[chaveJ].vrLiquidoSrccSoma = (grupos[chaveJ].vrLiquidoSrccSoma || 0) + (parseFloat(registro.vrLiquidoSrcc) || 0);
+        grupos[chaveJ].vrLiquidoSoma = (grupos[chaveJ].vrLiquidoSoma || 0) + (parseFloat(registro.valorLiquido) || 0);
+        grupos[chaveJ].srccSoma = (grupos[chaveJ].srccSoma || 0) + (parseFloat(registro.restricaoSRCC) || 0);
+        grupos[chaveJ].vrLiquidoSrccSoma = (grupos[chaveJ].vrLiquidoSrccSoma || 0) + 0;
       }
     });
     
@@ -195,9 +195,9 @@ export default function Calculo() {
     { label: "RBM OuroCap", key: "rbmOurocap" },
     { label: "RBM Seguros", key: "rbmSeguros" },
     { label: "Qtde Contas", key: "qtdeContas" },
-    { label: "Vr. Líquido", key: "vrLiquido" },
-    { label: "SRCC", key: "srcc" },
-    { label: "Vr. Líquido-SRCC", key: "vrLiquidoSrcc" },
+    { label: "Vr. Líquido", key: "vrLiquidoSoma" },
+    { label: "SRCC", key: "srccSoma" },
+    { label: "Vr. Líquido-SRCC", key: "vrLiquidoSrccSoma" },
     { label: "Qtde Operações", key: "qtdeOperacoes" },
   ];
 
