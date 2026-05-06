@@ -391,11 +391,6 @@ export async function calcularPercPago(
   descricao: string,
   juros: string
 ): Promise<number> {
-  // 1. Se RBM = 0, resultado é 0%
-  if (rbm === 0) {
-    return 0;
-  }
-
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot calculate perc pago: database not available");
@@ -468,7 +463,9 @@ export async function calcularPercPago(
       return ((Number(valores.ativo10) || 0) / 100);
     }
 
-    return 0;
+    // 3. Se não é Ativo nem Ativo01-10, usar Ativo 01 como padrão
+    // Para situações genéricas como "CONSIGNADO INSS"
+    return (Number(valores.ativo01) || 0) / 100;
   } catch (error) {
     console.error("[Database] Error calculating perc pago:", error);
     return 0;

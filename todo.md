@@ -203,6 +203,7 @@
 - [x] Aguardando formula completa do usuario
 - [x] Implementar logica de calculo (backend em db.ts)
 - [x] Implementar cálculo automático durante importação
+- [x] Corrigir atualização automática quando tabelaMes muda
 - [ ] Testar calculos com dados reais
 - [ ] Verificar se importação funciona corretamente
 - [ ] Validar cálculos com dados da planilha
