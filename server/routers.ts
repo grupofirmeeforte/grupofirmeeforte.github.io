@@ -574,10 +574,93 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const db = await getDb();
         if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
-        const { consignados } = await import('../drizzle/schema');
+        const { consignados, agentes, tabelasComissao } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        
         if (input.length === 0) return { count: 0 };
-        await db.insert(consignados).values(input as any[]);
-        return { count: input.length };
+        
+        // Processar cada registro para calcular as 5 colunas finais
+        const processedRecords = await Promise.all(
+          input.map(async (record) => {
+            const processed = { ...record };
+            
+            // Se chaveJ está preenchido, buscar dados do agente e calcular fórmulas
+            if (record.chaveJ) {
+              try {
+                // 1. Buscar agente
+                const [agente] = await db.select().from(agentes)
+                  .where(eq(agentes.chaveJ, record.chaveJ))
+                  .limit(1);
+                
+                if (agente) {
+                  // Preencher campos que vêm do agente
+                  if (!processed.empresa) processed.empresa = agente.empresa || undefined;
+                  if (!processed.nomeAgente) processed.nomeAgente = agente.nomeAgente || undefined;
+                  if (!processed.supervisor) processed.supervisor = agente.supervisor || undefined;
+                  
+                  // 2. Determinar nível do agente
+                  const situacao = agente.situacao || '';
+                  const nivelMatch = situacao.match(/Ativo(\d{2})/i);
+                  const nivelNum = nivelMatch ? parseInt(nivelMatch[1]) : null;
+                  const ativoCol = nivelNum ? `ativo${String(nivelNum).padStart(2, '0')}` : null;
+                  
+                  // 3. Buscar percentual na Tabela Comissão
+                  if (record.convenio && ativoCol) {
+                    const tabelas = await db.select().from(tabelasComissao)
+                      .where(eq(tabelasComissao.convenio, record.convenio))
+                      .limit(20);
+                    
+                    let tabelaMatch = tabelas[0];
+                    if (record.juros && record.tabelaMes) {
+                      const jurosNum = parseFloat((record.juros as string).replace(',', '.'));
+                      const mesesNum = parseInt(record.tabelaMes);
+                      tabelaMatch = tabelas.find(t => {
+                        const jDe = t.txJurosDe ? parseFloat(t.txJurosDe) : 0;
+                        const jAte = t.txJurosAte && t.txJurosAte !== 'acima' ? parseFloat(t.txJurosAte) : 999;
+                        const mDe = t.mesesDe ? parseInt(t.mesesDe) : 0;
+                        const mAte = t.mesesAte ? parseInt(t.mesesAte) : 999;
+                        return jurosNum >= jDe && jurosNum <= jAte && mesesNum >= mDe && mesesNum <= mAte;
+                      }) || tabelas[0];
+                    }
+                    
+                    if (tabelaMatch) {
+                      const percPagoVal = (tabelaMatch as any)[ativoCol];
+                      if (percPagoVal) {
+                        processed.percPago = String(percPagoVal);
+                        processed.tabela = tabelaMatch.convenio || undefined;
+                        
+                        // 4. Calcular totalComissao
+                        if (record.valorLiquido) {
+                          const vl = parseFloat((record.valorLiquido as string).replace(',', '.').replace(/[^0-9.]/g, ''));
+                          const pp = parseFloat(String(percPagoVal)) > 1 ? parseFloat(String(percPagoVal)) / 100 : parseFloat(String(percPagoVal));
+                          if (!isNaN(vl) && !isNaN(pp)) {
+                            processed.totalComissao = String((vl * pp).toFixed(2));
+                            
+                            // 5. Calcular difEmpresa
+                            if (record.rbm) {
+                              const rbmNum = parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, ''));
+                              if (!isNaN(rbmNum)) {
+                                processed.difEmpresa = String((rbmNum - vl * pp).toFixed(2));
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              } catch (err) {
+                console.error(`Erro ao processar ChaveJ ${record.chaveJ}:`, err);
+              }
+            }
+            
+            return processed;
+          })
+        );
+        
+        // Inserir registros processados
+        await db.insert(consignados).values(processedRecords as any[]);
+        return { count: processedRecords.length };
       }),
   }),
 

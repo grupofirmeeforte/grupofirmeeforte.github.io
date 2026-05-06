@@ -72,6 +72,7 @@ export const agentes = mysqlTable("agentes", {
   pix: varchar("pix", { length: 255 }),
   dataNascimento: varchar("dataNascimento", { length: 10 }), // YYYY-MM-DD format
   celular: varchar("celular", { length: 20 }),
+  permissoes: varchar("permissoes", { length: 50 }).default("leitor"), // admin, editor, leitor, sem_acesso
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
