@@ -376,6 +376,23 @@ export default function Consignado() {
             <Button onClick={openNovo} className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800">
               <Plus className="w-4 h-4" /> Novo
             </Button>
+            {modoSelecao ? (
+              <>
+                <Button onClick={selecionarTodos} variant="outline" className="flex items-center gap-2">
+                  {selecionados.size === registros.length ? 'Desselecionar Tudo' : 'Selecionar Tudo'}
+                </Button>
+                <Button onClick={deletarSelecionados} className="flex items-center gap-2 bg-red-600 hover:bg-red-700">
+                  <Trash2 className="w-4 h-4" /> Deletar ({selecionados.size})
+                </Button>
+                <Button onClick={() => { setModoSelecao(false); setSelecionados(new Set()); }} variant="outline" className="flex items-center gap-2">
+                  Cancelar
+                </Button>
+              </>
+            ) : (
+              <Button onClick={() => setModoSelecao(true)} variant="outline" className="flex items-center gap-2 border-red-500 text-red-700 hover:bg-red-50">
+                <Trash2 className="w-4 h-4" /> Selecionar e Deletar
+              </Button>
+            )}
             <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportar} />
           </div>
         </div>
@@ -440,6 +457,16 @@ export default function Consignado() {
           <table className="w-full text-xs border-collapse min-w-[2200px]">
             <thead>
               <tr className="bg-gradient-to-r from-blue-800 to-blue-600 text-white">
+                {modoSelecao && (
+                  <th className="px-2 py-2 text-center font-semibold whitespace-nowrap w-8">
+                    <input
+                      type="checkbox"
+                      checked={selecionados.size === registros.length && registros.length > 0}
+                      onChange={selecionarTodos}
+                      className="w-4 h-4 cursor-pointer"
+                    />
+                  </th>
+                )}
                 <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Empresa</th>
                 <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Mês</th>
                 <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">ChaveJ</th>
@@ -484,6 +511,16 @@ export default function Consignado() {
                       : 'bg-blue-50/40 hover:bg-blue-100/60 transition-colors'
                   }
                 >
+                  {modoSelecao && (
+                    <td className="px-2 py-1.5 border-b border-gray-100 text-center">
+                      <input
+                        type="checkbox"
+                        checked={selecionados.has(r.id)}
+                        onChange={() => toggleSelecionado(r.id)}
+                        className="w-4 h-4 cursor-pointer"
+                      />
+                    </td>
+                  )}
                   <td className="px-2 py-1.5 border-b border-gray-100 font-medium text-blue-900">{strVal(r.empresa)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.mes)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 font-mono">{strVal(r.chaveJ)}</td>
