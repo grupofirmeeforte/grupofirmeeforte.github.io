@@ -57,12 +57,55 @@ export default function Calculo() {
         grupos[chaveJ] = {
           ...registro,
           qtdeOperacoes: 1,
+          // Agregados
+          percentualSoma: parseFloat(registro.percentual) || 0,
+          comissaoTotalSoma: parseFloat(registro.comissaoTotal) || 0,
+          rbmTotalSoma: parseFloat(registro.rbmTotal) || 0,
+          comissaoConsigSoma: parseFloat(registro.comissaoConsig) || 0,
+          comissaoConsorcioSoma: parseFloat(registro.comissaoConsorcio) || 0,
+          comissaoOurocapSoma: parseFloat(registro.comissaoOurocap) || 0,
+          comissaoCcSoma: parseFloat(registro.comissaoCc) || 0,
+          comissaoSegurosSoma: parseFloat(registro.comissaoSeguros) || 0,
+          ajudaCustoSoma: parseFloat(registro.ajudaCusto) || 0,
+          creditosDebitosSoma: parseFloat(registro.creditosDebitos) || 0,
+          adiantamentoSoma: parseFloat(registro.adiantamento) || 0,
+          reajusteSoma: parseFloat(registro.reajuste) || 0,
+          comissaoSupervisorSoma: parseFloat(registro.comissaoSupervisor) || 0,
+          rbmCreditoSoma: parseFloat(registro.rbmCredito) || 0,
+          rbmCcSoma: parseFloat(registro.rbmCc) || 0,
+          rbmConsorcioSoma: parseFloat(registro.rbmConsorcio) || 0,
+          rbmOurocapSoma: parseFloat(registro.rbmOurocap) || 0,
+          rbmSegurosSoma: parseFloat(registro.rbmSeguros) || 0,
+          qtdeContasSoma: parseFloat(registro.qtdeContas) || 0,
           vrLiquidoSoma: parseFloat(registro.vrLiquido) || 0,
+          srccSoma: parseFloat(registro.srcc) || 0,
+          vrLiquidoSrccSoma: parseFloat(registro.vrLiquidoSrcc) || 0,
         };
       } else {
-        // Incrementar contador de operações e somar Vr. Líquido
+        // Incrementar contador de operações e somar TODOS os campos
         grupos[chaveJ].qtdeOperacoes = (grupos[chaveJ].qtdeOperacoes || 1) + 1;
+        grupos[chaveJ].percentualSoma = (grupos[chaveJ].percentualSoma || 0) + (parseFloat(registro.percentual) || 0);
+        grupos[chaveJ].comissaoTotalSoma = (grupos[chaveJ].comissaoTotalSoma || 0) + (parseFloat(registro.comissaoTotal) || 0);
+        grupos[chaveJ].rbmTotalSoma = (grupos[chaveJ].rbmTotalSoma || 0) + (parseFloat(registro.rbmTotal) || 0);
+        grupos[chaveJ].comissaoConsigSoma = (grupos[chaveJ].comissaoConsigSoma || 0) + (parseFloat(registro.comissaoConsig) || 0);
+        grupos[chaveJ].comissaoConsorcioSoma = (grupos[chaveJ].comissaoConsorcioSoma || 0) + (parseFloat(registro.comissaoConsorcio) || 0);
+        grupos[chaveJ].comissaoOurocapSoma = (grupos[chaveJ].comissaoOurocapSoma || 0) + (parseFloat(registro.comissaoOurocap) || 0);
+        grupos[chaveJ].comissaoCcSoma = (grupos[chaveJ].comissaoCcSoma || 0) + (parseFloat(registro.comissaoCc) || 0);
+        grupos[chaveJ].comissaoSegurosSoma = (grupos[chaveJ].comissaoSegurosSoma || 0) + (parseFloat(registro.comissaoSeguros) || 0);
+        grupos[chaveJ].ajudaCustoSoma = (grupos[chaveJ].ajudaCustoSoma || 0) + (parseFloat(registro.ajudaCusto) || 0);
+        grupos[chaveJ].creditosDebitosSoma = (grupos[chaveJ].creditosDebitosSoma || 0) + (parseFloat(registro.creditosDebitos) || 0);
+        grupos[chaveJ].adiantamentoSoma = (grupos[chaveJ].adiantamentoSoma || 0) + (parseFloat(registro.adiantamento) || 0);
+        grupos[chaveJ].reajusteSoma = (grupos[chaveJ].reajusteSoma || 0) + (parseFloat(registro.reajuste) || 0);
+        grupos[chaveJ].comissaoSupervisorSoma = (grupos[chaveJ].comissaoSupervisorSoma || 0) + (parseFloat(registro.comissaoSupervisor) || 0);
+        grupos[chaveJ].rbmCreditoSoma = (grupos[chaveJ].rbmCreditoSoma || 0) + (parseFloat(registro.rbmCredito) || 0);
+        grupos[chaveJ].rbmCcSoma = (grupos[chaveJ].rbmCcSoma || 0) + (parseFloat(registro.rbmCc) || 0);
+        grupos[chaveJ].rbmConsorcioSoma = (grupos[chaveJ].rbmConsorcioSoma || 0) + (parseFloat(registro.rbmConsorcio) || 0);
+        grupos[chaveJ].rbmOurocapSoma = (grupos[chaveJ].rbmOurocapSoma || 0) + (parseFloat(registro.rbmOurocap) || 0);
+        grupos[chaveJ].rbmSegurosSoma = (grupos[chaveJ].rbmSegurosSoma || 0) + (parseFloat(registro.rbmSeguros) || 0);
+        grupos[chaveJ].qtdeContasSoma = (grupos[chaveJ].qtdeContasSoma || 0) + (parseFloat(registro.qtdeContas) || 0);
         grupos[chaveJ].vrLiquidoSoma = (grupos[chaveJ].vrLiquidoSoma || 0) + (parseFloat(registro.vrLiquido) || 0);
+        grupos[chaveJ].srccSoma = (grupos[chaveJ].srccSoma || 0) + (parseFloat(registro.srcc) || 0);
+        grupos[chaveJ].vrLiquidoSrccSoma = (grupos[chaveJ].vrLiquidoSrccSoma || 0) + (parseFloat(registro.vrLiquidoSrcc) || 0);
       }
     });
     
