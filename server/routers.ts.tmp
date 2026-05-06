@@ -1,0 +1,33 @@
+// Adicionar antes da linha 1142 (antes do fechamento de relatorioBB)
+    editar: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        bmf: z.string().optional(),
+        mes: z.number().optional(),
+        proposta: z.string().optional(),
+        linha: z.string().optional(),
+        situacao: z.string().optional(),
+        operador: z.string().optional(),
+        solicitacao: z.string().optional(),
+        prazo: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponivel' });
+        
+        const { relatorioBB } = await import('../drizzle/schema');
+        const { id, ...dados } = input;
+        
+        await db.update(relatorioBB).set(dados).where((r: any) => r.id === id);
+        return { success: true };
+      }),
+    deletar: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponivel' });
+        
+        const { relatorioBB } = await import('../drizzle/schema');
+        await db.delete(relatorioBB).where((r: any) => r.id === input.id);
+        return { success: true };
+      }),

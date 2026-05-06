@@ -1139,6 +1139,42 @@ export const appRouter = router({
       const { relatorioBB } = await import('../drizzle/schema');
       return await db.select().from(relatorioBB);
     }),
+    editar: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        bmf: z.string().optional(),
+        mes: z.number().optional(),
+        proposta: z.string().optional(),
+        linha: z.string().optional(),
+        situacao: z.string().optional(),
+        operador: z.string().optional(),
+        solicitacao: z.string().optional(),
+        prazo: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponivel' });
+        
+        const { relatorioBB } = await import('../drizzle/schema');
+        const { id, solicitacao, ...dados } = input;
+        const dataAtualizada = {
+          ...dados,
+          solicitacao: solicitacao ? new Date(solicitacao) : undefined,
+        };
+        
+        await db.update(relatorioBB).set(dataAtualizada as any).where(eq(relatorioBB.id, id));
+        return { success: true };
+      }),
+    deletar: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponivel' });
+        
+        const { relatorioBB } = await import('../drizzle/schema');
+        await db.delete(relatorioBB).where(eq(relatorioBB.id, input.id));
+        return { success: true };
+      }),
   }),
 });
 export type AppRouter = typeof appRouter;

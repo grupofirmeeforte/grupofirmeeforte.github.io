@@ -228,3 +228,13 @@
 - [x] Adicionar link no menu Febraban
 - [x] Criar mutation para criar tabela automaticamente
 - [ ] Testar com arquivo fornecido
+
+
+## FASE 20: MELHORIAS NA PAGINA FEBRABAN
+- [x] Adicionar botão para importar arquivo RELATORIOPRODUÇÃOBB.xlsx
+- [x] Preparar planilha para facilitar futuras importações
+- [x] Adicionar botão de edição para cada registro
+- [x] Permitir múltiplas importações (append vs replace)
+- [x] Adicionar botão para baixar template
+- [x] Implementar mutations editar e deletar
+- [ ] Testar fluxo completo de importação
