@@ -8,7 +8,6 @@
 - [x] Testar fluxo de login e bloqueio
 
 ## AJUSTES SOLICITADOS
-- [x] Atualizar nome de "Grupo Firme e Forte" para "Grupo Firme & Forte"
 - [x] Aplicar degradê em todas as linhas de tabelas para melhor visualização
 - [x] Adicionar opções Ativo01 até Ativo10 no campo de Situação
 - [x] Adicionar "Cancelado" no campo de Situação
