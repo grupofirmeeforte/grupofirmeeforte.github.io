@@ -383,14 +383,38 @@ export async function atualizarValoresCalculo(dados: Partial<ValoresCalculo>): P
 
 
 export async function calcularPercPago(
-  rbm: number,
-  situacao: string,
-  chaveJ: string,
-  empresa: string,
-  parcela: string,
-  descricao: string,
-  juros: string
+  params: {
+    situacao?: string;
+    juros?: string;
+    rbm?: string;
+    valorLiquido?: string;
+    nrOperacao?: string;
+  } | {
+    rbm: number;
+    situacao: string;
+    chaveJ: string;
+    empresa: string;
+    parcela: string;
+    descricao: string;
+    juros: string;
+  }
 ): Promise<number> {
+  // Normalizar parâmetros para aceitar ambos os formatos
+  let rbm: number;
+  let situacao: string;
+  let juros: string;
+  
+  if ('rbm' in params && typeof params.rbm === 'number') {
+    // Formato antigo com 7 parâmetros
+    rbm = params.rbm;
+    situacao = params.situacao;
+    juros = params.juros;
+  } else {
+    // Novo formato com objeto
+    rbm = parseFloat(String(params.rbm || 0).replace(',', '.'));
+    situacao = params.situacao || '';
+    juros = params.juros || '';
+  }
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot calculate perc pago: database not available");
