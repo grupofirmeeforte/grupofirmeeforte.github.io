@@ -1,6 +1,6 @@
 import { eq, and, lt, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao, mensagens, InsertMensagem, Mensagem, valoresCalculo, ValoresCalculo } from "../drizzle/schema";
+import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao, mensagens, InsertMensagem, Mensagem, valoresCalculo, ValoresCalculo, consignados } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { or } from "drizzle-orm";
 
@@ -425,22 +425,22 @@ export async function calcularPercPago(
     // 2. Se situação é "Ativo", calcular baseado na soma de Vr. Líquido
     if (situacao === 'Ativo') {
       // Buscar consignados com mesma ChaveJ, Empresa, Parcela, Descrição e Juros
-      const consignados = await db.select()
-        .from(db.query.consignados || {})
+      const consignadosList = await db.select()
+        .from(consignados)
         .where(
           and(
-            eq(db.query.consignados?.chaveJ, chaveJ),
-            eq(db.query.consignados?.empresa, empresa),
-            eq(db.query.consignados?.parcela, parcela),
-            eq(db.query.consignados?.descricao, descricao),
-            eq(db.query.consignados?.juros, juros)
+            eq(consignados.chaveJ, chaveJ),
+            eq(consignados.empresa, empresa),
+            eq(consignados.parcela, parseInt(parcela) || 0),
+            eq(consignados.descricaoProduto, descricao),
+            eq(consignados.juros, juros)
           )
         );
 
       // Somar Vr. Líquido
       let somaVrLiquido = 0;
-      for (const cons of consignados) {
-        somaVrLiquido += (cons.vrLiquido || 0);
+      for (const cons of consignadosList) {
+        somaVrLiquido += (cons.valorLiquido ? Number(cons.valorLiquido) : 0);
       }
 
       // Encontrar qual Ativo encaixa
