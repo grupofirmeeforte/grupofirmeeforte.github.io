@@ -107,6 +107,19 @@ export default function Home() {
         { title: 'Conta Corrente', description: 'Operações de conta corrente', icon: DollarSign, color: 'bg-teal-500', path: '/conta-corrente' },
       ],
     },
+    {
+      type: 'group',
+      key: 'relatorios',
+      title: 'Relatórios',
+      description: 'Cálculo de comissões e relatórios',
+      icon: Landmark,
+      color: 'bg-amber-600',
+      borderColor: 'border-amber-200',
+      bgColor: 'from-amber-50 to-yellow-50',
+      subModules: [
+        { title: 'Cálculo', description: 'Cálculo de comissões e RBM', icon: DollarSign, color: 'bg-amber-500', path: '/relatorios' },
+      ],
+    },
   ];
 
   const grupoAtual = grupos.find(g => g.key === grupoAberto);

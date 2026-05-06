@@ -46,6 +46,7 @@ function RouterWithInactivity() {
       <Route path={"/consignado"} component={Consignado} />
       <Route path={"/conta-corrente"} component={ContaCorrente} />
       <Route path={"/calculo"} component={Calculo} />
+      <Route path={"/relatorios"} component={Calculo} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />
