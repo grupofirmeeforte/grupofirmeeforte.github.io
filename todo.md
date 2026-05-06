@@ -198,3 +198,8 @@
 - [x] Formatar valores em moeda brasileira (R$)
 - [x] Adicionar persistência em banco de dados
 - [ ] Adicionar validação de valores (mínimo/máximo)
+
+## FASE 17: CALCULOS NA COLUNA PERC. PAGO DO CONSIGNADO
+- [ ] Aguardando formula completa do usuario
+- [ ] Implementar logica de calculo
+- [ ] Testar calculos com dados reais

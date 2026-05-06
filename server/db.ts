@@ -380,3 +380,97 @@ export async function atualizarValoresCalculo(dados: Partial<ValoresCalculo>): P
     throw error;
   }
 }
+
+
+export async function calcularPercPago(
+  rbm: number,
+  situacao: string,
+  chaveJ: string,
+  empresa: string,
+  parcela: string,
+  descricao: string,
+  juros: string
+): Promise<number> {
+  // 1. Se RBM = 0, resultado é 0%
+  if (rbm === 0) {
+    return 0;
+  }
+
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot calculate perc pago: database not available");
+    return 0;
+  }
+
+  try {
+    // Buscar valores de cálculo salvos
+    const valoresResult = await db.select().from(valoresCalculo).where(eq(valoresCalculo.id, 1)).limit(1);
+    const valores = valoresResult.length > 0 ? valoresResult[0] : null;
+
+    if (!valores) {
+      return 0;
+    }
+
+    // 3. Se situação é Ativo01-Ativo10, usar direto
+    if (situacao.match(/^Ativo(\d+)$/)) {
+      const match = situacao.match(/^Ativo(\d+)$/);
+      if (match) {
+        const ativoNum = parseInt(match[1]);
+        const campoAtivo = `ativo${String(ativoNum).padStart(2, '0')}` as keyof ValoresCalculo;
+        const valor = valores[campoAtivo] as number | undefined;
+        return valor ? (valor / 100) : 0; // Converter de centavos para percentual
+      }
+    }
+
+    // 2. Se situação é "Ativo", calcular baseado na soma de Vr. Líquido
+    if (situacao === 'Ativo') {
+      // Buscar consignados com mesma ChaveJ, Empresa, Parcela, Descrição e Juros
+      const consignados = await db.select()
+        .from(db.query.consignados || {})
+        .where(
+          and(
+            eq(db.query.consignados?.chaveJ, chaveJ),
+            eq(db.query.consignados?.empresa, empresa),
+            eq(db.query.consignados?.parcela, parcela),
+            eq(db.query.consignados?.descricao, descricao),
+            eq(db.query.consignados?.juros, juros)
+          )
+        );
+
+      // Somar Vr. Líquido
+      let somaVrLiquido = 0;
+      for (const cons of consignados) {
+        somaVrLiquido += (cons.vrLiquido || 0);
+      }
+
+      // Encontrar qual Ativo encaixa
+      const ativos = [
+        { num: 1, valor: Number(valores.ativo01) || 0 },
+        { num: 2, valor: Number(valores.ativo02) || 0 },
+        { num: 3, valor: Number(valores.ativo03) || 0 },
+        { num: 4, valor: Number(valores.ativo04) || 0 },
+        { num: 5, valor: Number(valores.ativo05) || 0 },
+        { num: 6, valor: Number(valores.ativo06) || 0 },
+        { num: 7, valor: Number(valores.ativo07) || 0 },
+        { num: 8, valor: Number(valores.ativo08) || 0 },
+        { num: 9, valor: Number(valores.ativo09) || 0 },
+        { num: 10, valor: Number(valores.ativo10) || 0 },
+      ];
+
+      // Encontrar o primeiro Ativo onde somaVrLiquido <= valor
+      for (const ativo of ativos) {
+        if (somaVrLiquido <= ativo.valor) {
+          return (ativo.valor / 100); // Converter de centavos para percentual
+        }
+      }
+
+      // Se passou de todos, usar o último (Ativo 10)
+      return ((Number(valores.ativo10) || 0) / 100);
+    }
+
+    return 0;
+  } catch (error) {
+    console.error("[Database] Error calculating perc pago:", error);
+    return 0;
+  }
+}

@@ -5,7 +5,7 @@ import { publicProcedure, router, adminProcedure } from "./_core/trpc";
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { z } from "zod";
-import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo } from "./db";
+import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
 import { users, agentes } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { sdk } from "./_core/sdk";
@@ -972,6 +972,30 @@ export const appRouter = router({
 
         await atualizarValoresCalculo(dados as any);
         return { success: true };
+      }),
+  }),
+  consignado: router({
+    calcularPercPago: publicProcedure
+      .input(z.object({
+        rbm: z.number(),
+        situacao: z.string(),
+        chaveJ: z.string(),
+        empresa: z.string(),
+        parcela: z.string(),
+        descricao: z.string(),
+        juros: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const resultado = await calcularPercPago(
+          input.rbm,
+          input.situacao,
+          input.chaveJ,
+          input.empresa,
+          input.parcela,
+          input.descricao,
+          input.juros
+        );
+        return { percPago: resultado };
       }),
   }),
 });
