@@ -157,17 +157,34 @@ export default function Consignado() {
   );
 
   const criar = trpc.consignado.criar.useMutation({
-    onSuccess: () => { utils.consignado.listar.invalidate(); utils.consignado.listarMeses.invalidate(); utils.consignado.listarEmpresas.invalidate(); toast.success('Registro criado!'); setModalAberto(false); },
+    onSuccess: () => {
+      utils.consignado.listar.invalidate();
+      utils.consignado.listarMeses.invalidate();
+      utils.consignado.listarEmpresas.invalidate();
+      marcarDuplicatas.mutate();
+      toast.success('Registro criado!');
+      setModalAberto(false);
+    },
     onError: (e) => toast.error('Erro: ' + e.message),
   });
 
   const atualizar = trpc.consignado.atualizar.useMutation({
-    onSuccess: () => { utils.consignado.listar.invalidate(); toast.success('Registro atualizado!'); setModalAberto(false); },
+    onSuccess: () => {
+      utils.consignado.listar.invalidate();
+      marcarDuplicatas.mutate();
+      toast.success('Registro atualizado!');
+      setModalAberto(false);
+    },
     onError: (e) => toast.error('Erro: ' + e.message),
   });
 
   const excluir = trpc.consignado.excluir.useMutation({
-    onSuccess: () => { utils.consignado.listar.invalidate(); toast.success('Registro excluído!'); setConfirmandoExclusao(null); },
+    onSuccess: () => {
+      utils.consignado.listar.invalidate();
+      marcarDuplicatas.mutate();
+      toast.success('Registro excluído!');
+      setConfirmandoExclusao(null);
+    },
     onError: (e) => toast.error('Erro: ' + e.message),
   });
 
@@ -223,6 +240,11 @@ export default function Consignado() {
   useEffect(() => {
     localStorage.setItem('valoresAtivos', JSON.stringify(valoresAtivos));
   }, [valoresAtivos]);
+
+  // Marcar duplicatas ao carregar página
+  useEffect(() => {
+    marcarDuplicatas.mutate();
+  }, []);
 
   // Carregar valores de ativos do localStorage
   useEffect(() => {
