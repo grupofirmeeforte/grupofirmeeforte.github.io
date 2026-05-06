@@ -93,6 +93,8 @@ export default function Consignado() {
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [confirmandoExclusao, setConfirmandoExclusao] = useState<number | null>(null);
+  const [selecionados, setSelecionados] = useState<Set<number>>(new Set());
+  const [modoSelecao, setModoSelecao] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Estado para controlar quando calcular fórmulas (só quando chaveJ tem 7+ chars)
   const [calcInput, setCalcInput] = useState<{chaveJ: string; convenio?: string; juros?: string; meses?: string; valorLiquido?: string; rbm?: string} | null>(null);
@@ -165,6 +167,47 @@ export default function Consignado() {
       }
       return updated;
     });
+  }
+
+  function toggleSelecionado(id: number) {
+    setSelecionados(prev => {
+      const novo = new Set(prev);
+      if (novo.has(id)) {
+        novo.delete(id);
+      } else {
+        novo.add(id);
+      }
+      return novo;
+    });
+  }
+
+  function selecionarTodos() {
+    if (selecionados.size === registros.length) {
+      setSelecionados(new Set());
+    } else {
+      setSelecionados(new Set(registros.map(r => r.id)));
+    }
+  }
+
+  async function deletarSelecionados() {
+    if (selecionados.size === 0) {
+      toast.error('Nenhum registro selecionado!');
+      return;
+    }
+    
+    const confirmar = window.confirm(`Tem certeza que deseja deletar ${selecionados.size} registro(s)?`);
+    if (!confirmar) return;
+    
+    try {
+      for (const id of Array.from(selecionados)) {
+        await excluir.mutateAsync({ id });
+      }
+      setSelecionados(new Set());
+      setModoSelecao(false);
+      toast.success(`${selecionados.size} registro(s) deletado(s)!`);
+    } catch (err) {
+      toast.error('Erro ao deletar registros');
+    }
   }
 
   function openNovo() {
