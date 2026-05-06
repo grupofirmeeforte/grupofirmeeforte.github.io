@@ -154,6 +154,8 @@ export default function TabelaComissao() {
     'Ativo09': '',
     'Ativo10': '',
   });
+  const [editingValor, setEditingValor] = useState<string | null>(null);
+  const [tempValueValor, setTempValueValor] = useState<string>('');
 
   const utils = trpc.useUtils();
 
@@ -310,62 +312,52 @@ export default function TabelaComissao() {
         <div className="mb-3">
           <label className="text-sm font-semibold text-blue-900 mb-2 block">Valores para Cálculo por Nível:</label>
           <div className="grid grid-cols-5 gap-3">
-            {Object.keys(valoresAtivos).map((nivel) => {
-              const [isEditing, setIsEditing] = useState(false);
-              const [tempValue, setTempValue] = useState(valoresAtivos[nivel]);
-
-              const handleSave = () => {
-                const novoValor = {...valoresAtivos, [nivel]: tempValue};
-                setValoresAtivos(novoValor);
-                setIsEditing(false);
-                
-                // Salvar no banco
-                const dadosAtualizar: Record<string, string> = {};
-                dadosAtualizar[nivel.toLowerCase()] = tempValue;
-                atualizarValoresCalculoMutation.mutate(dadosAtualizar as any);
-              };
-
-              const handleCancel = () => {
-                setTempValue(valoresAtivos[nivel]);
-                setIsEditing(false);
-              };
-
-              const handleKeyDown = (e: React.KeyboardEvent) => {
-                if (e.key === 'Enter') {
-                  handleSave();
-                } else if (e.key === 'Escape') {
-                  handleCancel();
-                }
-              };
-
-              return (
-                <div key={nivel}>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">{nivel.replace('Ativo', 'Ativo ')}</label>
-                  {isEditing ? (
-                    <div className="flex gap-1">
-                      <input
-                        autoFocus
-                        type="number"
-                        step="0.01"
-                        value={tempValue}
-                        onChange={(e) => setTempValue(e.target.value)}
-                        onBlur={handleSave}
-                        onKeyDown={handleKeyDown}
-                        className="flex-1 px-2 py-1.5 border border-blue-400 rounded bg-white text-right text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      />
-                    </div>
-                  ) : (
-                    <div
-                      onClick={() => setIsEditing(true)}
-                      className="px-2 py-1.5 border border-gray-300 rounded bg-white text-right text-sm cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all"
-                      title="Clique para editar"
-                    >
-                      {moeda(valoresAtivos[nivel])}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {Object.keys(valoresAtivos).map((nivel) => (
+              <div key={nivel}>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">{nivel.replace('Ativo', 'Ativo ')}</label>
+                {editingValor === nivel ? (
+                  <div className="flex gap-1">
+                    <input
+                      autoFocus
+                      type="number"
+                      step="0.01"
+                      value={tempValueValor}
+                      onChange={(e) => setTempValueValor(e.target.value)}
+                      onBlur={() => {
+                        setValoresAtivos({...valoresAtivos, [nivel]: tempValueValor});
+                        const dadosAtualizar: Record<string, string> = {};
+                        dadosAtualizar[nivel.toLowerCase()] = tempValueValor;
+                        atualizarValoresCalculoMutation.mutate(dadosAtualizar as any);
+                        setEditingValor(null);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          setValoresAtivos({...valoresAtivos, [nivel]: tempValueValor});
+                          const dadosAtualizar: Record<string, string> = {};
+                          dadosAtualizar[nivel.toLowerCase()] = tempValueValor;
+                          atualizarValoresCalculoMutation.mutate(dadosAtualizar as any);
+                          setEditingValor(null);
+                        } else if (e.key === 'Escape') {
+                          setEditingValor(null);
+                        }
+                      }}
+                      className="flex-1 px-2 py-1.5 border border-blue-400 rounded bg-white text-right text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => {
+                      setEditingValor(nivel);
+                      setTempValueValor(valoresAtivos[nivel]);
+                    }}
+                    className="px-2 py-1.5 border border-gray-300 rounded bg-white text-right text-sm cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all"
+                    title="Clique para editar"
+                  >
+                    {moeda(valoresAtivos[nivel])}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
