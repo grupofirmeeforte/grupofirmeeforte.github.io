@@ -167,33 +167,22 @@ export default function TabelaComissao() {
   const { data: empresas = [] } = trpc.tabelaComissao.listarEmpresas.useQuery();
   const { data: convenios = [] } = trpc.tabelaComissao.listarConvenios.useQuery();
 
-  // Carregar valores de calculo do banco
-  const { data: valoresCalculoDB } = trpc.valoresCalculo.obter.useQuery();
-  const atualizarValoresCalculoMutation = trpc.valoresCalculo.atualizar.useMutation({
-    onSuccess: () => {
-      utils.valoresCalculo.obter.invalidate();
-      toast.success('Valores de calculo salvos!');
-    },
-    onError: (e) => toast.error('Erro ao salvar: ' + e.message),
-  });
-
-  // Sincronizar valores do BD com estado local
+  // Carregar valores do localStorage ao montar
   useEffect(() => {
-    if (valoresCalculoDB) {
-      setValoresAtivos({
-        'Ativo01': valoresCalculoDB.ativo01 || '',
-        'Ativo02': valoresCalculoDB.ativo02 || '',
-        'Ativo03': valoresCalculoDB.ativo03 || '',
-        'Ativo04': valoresCalculoDB.ativo04 || '',
-        'Ativo05': valoresCalculoDB.ativo05 || '',
-        'Ativo06': valoresCalculoDB.ativo06 || '',
-        'Ativo07': valoresCalculoDB.ativo07 || '',
-        'Ativo08': valoresCalculoDB.ativo08 || '',
-        'Ativo09': valoresCalculoDB.ativo09 || '',
-        'Ativo10': valoresCalculoDB.ativo10 || '',
-      });
+    const saved = localStorage.getItem('valoresAtivos');
+    if (saved) {
+      try {
+        setValoresAtivos(JSON.parse(saved));
+      } catch (e) {
+        console.error('Erro ao carregar valores:', e);
+      }
     }
-  }, [valoresCalculoDB]);
+  }, []);
+
+  const salvarValoresLocalmente = (valores: Record<string, string>) => {
+    localStorage.setItem('valoresAtivos', JSON.stringify(valores));
+    toast.success('Valores salvos!');
+  };
 
   const criarMutation = trpc.tabelaComissao.criar.useMutation({
     onSuccess: () => {
@@ -318,7 +307,7 @@ export default function TabelaComissao() {
                 Object.keys(valoresAtivos).forEach(nivel => {
                   dadosAtualizar[nivel.toLowerCase()] = valoresAtivos[nivel];
                 });
-                atualizarValoresCalculoMutation.mutate(dadosAtualizar as any);
+                salvarValoresLocalmente(valoresAtivos);
               }}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 text-sm rounded"
             >
@@ -341,7 +330,7 @@ export default function TabelaComissao() {
                         setValoresAtivos({...valoresAtivos, [nivel]: tempValueValor});
                         const dadosAtualizar: Record<string, string> = {};
                         dadosAtualizar[nivel.toLowerCase()] = tempValueValor;
-                        atualizarValoresCalculoMutation.mutate(dadosAtualizar as any);
+                        salvarValoresLocalmente(valoresAtivos);
                         setEditingValor(null);
                       }}
                       onKeyDown={(e) => {
@@ -349,7 +338,7 @@ export default function TabelaComissao() {
                           setValoresAtivos({...valoresAtivos, [nivel]: tempValueValor});
                           const dadosAtualizar: Record<string, string> = {};
                           dadosAtualizar[nivel.toLowerCase()] = tempValueValor;
-                          atualizarValoresCalculoMutation.mutate(dadosAtualizar as any);
+                          salvarValoresLocalmente(valoresAtivos);
                           setEditingValor(null);
                         } else if (e.key === 'Escape') {
                           setEditingValor(null);
