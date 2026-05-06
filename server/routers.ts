@@ -941,6 +941,29 @@ export const appRouter = router({
         await db.insert(contasCorrentes).values(rows);
         return { count: rows.length };
       }),
+
+    calcularPercPago: publicProcedure
+      .input(z.object({
+        rbm: z.number(),
+        situacao: z.string(),
+        chaveJ: z.string(),
+        empresa: z.string(),
+        parcela: z.string(),
+        descricao: z.string(),
+        juros: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const resultado = await calcularPercPago(
+          input.rbm,
+          input.situacao,
+          input.chaveJ,
+          input.empresa,
+          input.parcela,
+          input.descricao,
+          input.juros
+        );
+        return { percPago: resultado };
+      }),
   }),
   valoresCalculo: router({
     obter: publicProcedure.query(async () => {
@@ -972,30 +995,6 @@ export const appRouter = router({
 
         await atualizarValoresCalculo(dados as any);
         return { success: true };
-      }),
-  }),
-  consignado: router({
-    calcularPercPago: publicProcedure
-      .input(z.object({
-        rbm: z.number(),
-        situacao: z.string(),
-        chaveJ: z.string(),
-        empresa: z.string(),
-        parcela: z.string(),
-        descricao: z.string(),
-        juros: z.string(),
-      }))
-      .query(async ({ input }) => {
-        const resultado = await calcularPercPago(
-          input.rbm,
-          input.situacao,
-          input.chaveJ,
-          input.empresa,
-          input.parcela,
-          input.descricao,
-          input.juros
-        );
-        return { percPago: resultado };
       }),
   }),
 });
