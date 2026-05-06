@@ -661,3 +661,28 @@ export const valoresCalculo = mysqlTable("valoresCalculo", {
 
 export type ValoresCalculo = typeof valoresCalculo.$inferSelect;
 export type InsertValoresCalculo = typeof valoresCalculo.$inferInsert;
+
+
+/**
+ * Tabela de Relatório de Produção BB (Febraban)
+ * Armazena dados do relatório de produção do Banco do Brasil
+ */
+export const relatorioBB = mysqlTable("relatorioBB", {
+  id: int("id").autoincrement().primaryKey(),
+  bmf: varchar("bmf", { length: 50 }),
+  mes: int("mes"),
+  proposta: varchar("proposta", { length: 100 }),
+  linha: varchar("linha", { length: 100 }),
+  situacao: varchar("situacao", { length: 100 }),
+  operador: varchar("operador", { length: 100 }),
+  solicitacao: date("solicitacao"),
+  prazo: varchar("prazo", { length: 100 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  propostaIdx: index("idx_relatorioBB_proposta").on(table.proposta),
+  situacaoIdx: index("idx_relatorioBB_situacao").on(table.situacao),
+}));
+
+export type RelatorioBB = typeof relatorioBB.$inferSelect;
+export type InsertRelatorioBB = typeof relatorioBB.$inferInsert;

@@ -1062,5 +1062,83 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+  relatorioBB: router({
+    criarTabela: publicProcedure
+      .mutation(async () => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        
+        const sql = `CREATE TABLE IF NOT EXISTS \`relatorioBB\` (
+          \`id\` int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+          \`bmf\` varchar(50),
+          \`mes\` int,
+          \`proposta\` varchar(100),
+          \`linha\` varchar(100),
+          \`situacao\` varchar(100),
+          \`operador\` varchar(100),
+          \`solicitacao\` date,
+          \`prazo\` varchar(100),
+          \`createdAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          \`updatedAt\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          KEY \`idx_relatorioBB_proposta\` (\`proposta\`),
+          KEY \`idx_relatorioBB_situacao\` (\`situacao\`)
+        );`;
+        
+        try {
+          await db.execute(sql);
+          return { success: true, message: 'Tabela criada com sucesso' };
+        } catch (err: any) {
+          if (err.message.includes('already exists')) {
+            return { success: true, message: 'Tabela já existe' };
+          }
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: err.message });
+        }
+      }),
+    importar: publicProcedure
+      .input(z.array(z.object({
+        bmf: z.string().optional(),
+        mes: z.number().optional(),
+        proposta: z.string().optional(),
+        linha: z.string().optional(),
+        situacao: z.string().optional(),
+        operador: z.string().optional(),
+        solicitacao: z.any().optional(),
+        prazo: z.string().optional(),
+      })))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        
+        const { relatorioBB } = await import('../drizzle/schema');
+        
+        if (input.length === 0) return { count: 0 };
+        
+        // Limpar dados antigos
+        await db.delete(relatorioBB);
+        
+        // Inserir novos dados
+        for (const record of input) {
+          await db.insert(relatorioBB).values({
+            bmf: record.bmf,
+            mes: record.mes,
+            proposta: record.proposta,
+            linha: record.linha,
+            situacao: record.situacao,
+            operador: record.operador,
+            solicitacao: record.solicitacao instanceof Date ? record.solicitacao : null,
+            prazo: record.prazo,
+          });
+        }
+        
+        return { count: input.length };
+      }),
+    listar: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return [];
+      
+      const { relatorioBB } = await import('../drizzle/schema');
+      return await db.select().from(relatorioBB);
+    }),
+  }),
 });
 export type AppRouter = typeof appRouter;

@@ -89,7 +89,7 @@ export default function Home() {
       borderColor: 'border-amber-200',
       bgColor: 'from-amber-50 to-yellow-50',
       subModules: [
-        // Abas serão adicionadas aqui futuramente
+        { title: 'Relatório BB', description: 'Importar e visualizar relatório de produção BB', icon: Factory, color: 'bg-amber-500', path: '/febraban' },
       ],
     },
     {

@@ -218,3 +218,13 @@
 - [x] Executar migração SQL no banco
 - [x] Criar testes automatizados
 - [x] Validar testes com sucesso
+
+
+## FASE 19: RELATORIO DE PRODUCAO BB NA ABA FEBRABAN
+- [x] Criar schema para tabela de relatório BB
+- [x] Criar router para importar/listar relatório
+- [x] Criar página Febraban com tabela
+- [x] Implementar importação de arquivo Excel
+- [x] Adicionar link no menu Febraban
+- [x] Criar mutation para criar tabela automaticamente
+- [ ] Testar com arquivo fornecido
