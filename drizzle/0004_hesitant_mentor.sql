@@ -1,1 +1,0 @@
-ALTER TABLE `agentes` MODIFY COLUMN `dataAdmissao` varchar(10);
