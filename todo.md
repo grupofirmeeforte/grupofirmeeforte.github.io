@@ -195,5 +195,6 @@
 - [x] Clique para editar, Enter para salvar, Escape para cancelar
 - [x] Feedback visual com hover e toast de sucesso
 - [x] Mover seção de Consignado para Tabela de Comissão
-- [ ] Adicionar persistência em banco de dados
+- [x] Formatar valores em moeda brasileira (R$)
+- [x] Adicionar persistência em banco de dados
 - [ ] Adicionar validação de valores (mínimo/máximo)

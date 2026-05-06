@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -165,6 +165,34 @@ export default function TabelaComissao() {
   const { data: empresas = [] } = trpc.tabelaComissao.listarEmpresas.useQuery();
   const { data: convenios = [] } = trpc.tabelaComissao.listarConvenios.useQuery();
 
+  // Carregar valores de calculo do banco
+  const { data: valoresCalculoDB } = trpc.valoresCalculo.obter.useQuery();
+  const atualizarValoresCalculoMutation = trpc.valoresCalculo.atualizar.useMutation({
+    onSuccess: () => {
+      utils.valoresCalculo.obter.invalidate();
+      toast.success('Valores de calculo salvos!');
+    },
+    onError: (e) => toast.error('Erro ao salvar: ' + e.message),
+  });
+
+  // Sincronizar valores do BD com estado local
+  useEffect(() => {
+    if (valoresCalculoDB) {
+      setValoresAtivos({
+        'Ativo01': valoresCalculoDB.ativo01 || '',
+        'Ativo02': valoresCalculoDB.ativo02 || '',
+        'Ativo03': valoresCalculoDB.ativo03 || '',
+        'Ativo04': valoresCalculoDB.ativo04 || '',
+        'Ativo05': valoresCalculoDB.ativo05 || '',
+        'Ativo06': valoresCalculoDB.ativo06 || '',
+        'Ativo07': valoresCalculoDB.ativo07 || '',
+        'Ativo08': valoresCalculoDB.ativo08 || '',
+        'Ativo09': valoresCalculoDB.ativo09 || '',
+        'Ativo10': valoresCalculoDB.ativo10 || '',
+      });
+    }
+  }, [valoresCalculoDB]);
+
   const criarMutation = trpc.tabelaComissao.criar.useMutation({
     onSuccess: () => {
       utils.tabelaComissao.listar.invalidate();
@@ -287,9 +315,14 @@ export default function TabelaComissao() {
               const [tempValue, setTempValue] = useState(valoresAtivos[nivel]);
 
               const handleSave = () => {
-                setValoresAtivos({...valoresAtivos, [nivel]: tempValue});
+                const novoValor = {...valoresAtivos, [nivel]: tempValue};
+                setValoresAtivos(novoValor);
                 setIsEditing(false);
-                toast.success(`${nivel.replace('Ativo', 'Ativo ')} atualizado!`);
+                
+                // Salvar no banco
+                const dadosAtualizar: Record<string, string> = {};
+                dadosAtualizar[nivel.toLowerCase()] = tempValue;
+                atualizarValoresCalculoMutation.mutate(dadosAtualizar as any);
               };
 
               const handleCancel = () => {

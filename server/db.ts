@@ -1,6 +1,6 @@
 import { eq, and, lt, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao, mensagens, InsertMensagem, Mensagem } from "../drizzle/schema";
+import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao, mensagens, InsertMensagem, Mensagem, valoresCalculo, ValoresCalculo } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { or } from "drizzle-orm";
 
@@ -337,4 +337,46 @@ export async function obterMensagensGrupo(grupoChat: string) {
     .where(eq(mensagens.grupoChat, grupoChat))
     .orderBy(desc(mensagens.createdAt))
     .limit(100);
+}
+
+
+// ============================================================================
+// VALORES PARA CÁLCULO
+// ============================================================================
+
+export async function obterValoresCalculo(): Promise<ValoresCalculo | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const resultado = await db.select().from(valoresCalculo).where(eq(valoresCalculo.id, 1)).limit(1);
+  return resultado.length > 0 ? resultado[0] : null;
+}
+
+export async function atualizarValoresCalculo(dados: Partial<ValoresCalculo>): Promise<void> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update valores calculo: database not available");
+    return;
+  }
+
+  try {
+    const updateData: Record<string, unknown> = {};
+    
+    const campos = ['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10'] as const;
+    
+    campos.forEach(campo => {
+      if (dados[campo] !== undefined) {
+        updateData[campo] = dados[campo];
+      }
+    });
+
+    if (Object.keys(updateData).length > 0) {
+      await db.update(valoresCalculo)
+        .set(updateData)
+        .where(eq(valoresCalculo.id, 1));
+    }
+  } catch (error) {
+    console.error("[Database] Error updating valores calculo:", error);
+    throw error;
+  }
 }

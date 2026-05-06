@@ -5,7 +5,7 @@ import { publicProcedure, router, adminProcedure } from "./_core/trpc";
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { z } from "zod";
-import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb } from "./db";
+import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo } from "./db";
 import { users, agentes } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { sdk } from "./_core/sdk";
@@ -940,6 +940,38 @@ export const appRouter = router({
         }));
         await db.insert(contasCorrentes).values(rows);
         return { count: rows.length };
+      }),
+  }),
+  valoresCalculo: router({
+    obter: publicProcedure.query(async () => {
+      return await obterValoresCalculo();
+    }),
+    atualizar: publicProcedure
+      .input(z.object({
+        ativo01: z.string().optional(),
+        ativo02: z.string().optional(),
+        ativo03: z.string().optional(),
+        ativo04: z.string().optional(),
+        ativo05: z.string().optional(),
+        ativo06: z.string().optional(),
+        ativo07: z.string().optional(),
+        ativo08: z.string().optional(),
+        ativo09: z.string().optional(),
+        ativo10: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const dados: Record<string, string | number> = {};
+        const campos = ['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10'] as const;
+        
+        campos.forEach(campo => {
+          if (input[campo] !== undefined && input[campo] !== '') {
+            const normalized = String(input[campo]).replace(',', '.');
+            dados[campo] = parseFloat(normalized) || 0;
+          }
+        });
+
+        await atualizarValoresCalculo(dados as any);
+        return { success: true };
       }),
   }),
 });

@@ -635,3 +635,27 @@ export const mensagens = mysqlTable("mensagens", {
 
 export type Mensagem = typeof mensagens.$inferSelect;
 export type InsertMensagem = typeof mensagens.$inferInsert;
+
+
+/**
+ * Tabela de Valores para Cálculo por Nível
+ * Armazena os valores dos Ativos 01-10 usados nos cálculos de comissão
+ */
+export const valoresCalculo = mysqlTable("valoresCalculo", {
+  id: int("id").autoincrement().primaryKey(),
+  ativo01: decimal("ativo01", { precision: 10, scale: 2 }).default("0.00"),
+  ativo02: decimal("ativo02", { precision: 10, scale: 2 }).default("0.00"),
+  ativo03: decimal("ativo03", { precision: 10, scale: 2 }).default("0.00"),
+  ativo04: decimal("ativo04", { precision: 10, scale: 2 }).default("0.00"),
+  ativo05: decimal("ativo05", { precision: 10, scale: 2 }).default("0.00"),
+  ativo06: decimal("ativo06", { precision: 10, scale: 2 }).default("0.00"),
+  ativo07: decimal("ativo07", { precision: 10, scale: 2 }).default("0.00"),
+  ativo08: decimal("ativo08", { precision: 10, scale: 2 }).default("0.00"),
+  ativo09: decimal("ativo09", { precision: 10, scale: 2 }).default("0.00"),
+  ativo10: decimal("ativo10", { precision: 10, scale: 2 }).default("0.00"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ValoresCalculo = typeof valoresCalculo.$inferSelect;
+export type InsertValoresCalculo = typeof valoresCalculo.$inferInsert;
