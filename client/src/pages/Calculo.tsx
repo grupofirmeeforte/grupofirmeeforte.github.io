@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
@@ -24,6 +24,28 @@ export default function Calculo() {
     },
     { enabled: true }
   );
+
+  // Agrupar por Chave J e remover duplicatas
+  const registrosAgrupados = useMemo(() => {
+    const grupos: { [key: string]: any } = {};
+    
+    registros.forEach((registro: any) => {
+      const chaveJ = registro.chaveJ || "SEM_CHAVE";
+      
+      if (!grupos[chaveJ]) {
+        // Primeira ocorrência - salvar como está
+        grupos[chaveJ] = {
+          ...registro,
+          qtdeOperacoes: 1,
+        };
+      } else {
+        // Incrementar contador de operações
+        grupos[chaveJ].qtdeOperacoes = (grupos[chaveJ].qtdeOperacoes || 1) + 1;
+      }
+    });
+    
+    return Object.values(grupos);
+  }, [registros]);
 
   const handleFiltroChange = (field: string, value: string) => {
     setFiltros(prev => ({
@@ -70,6 +92,7 @@ export default function Calculo() {
     { label: "Vr. Líquido", key: "vrLiquido" },
     { label: "SRCC", key: "srcc" },
     { label: "Vr. Líquido-SRCC", key: "vrLiquidoSrcc" },
+    { label: "Qtde Operações", key: "qtdeOperacoes" },
   ];
 
   return (
@@ -129,11 +152,11 @@ export default function Calculo() {
           </div>
         </div>
 
-        {/* Tabela com todos os registros */}
+        {/* Tabela com registros agrupados (uma linha por Chave J) */}
         <div className="bg-white rounded-lg shadow overflow-x-auto">
           {isLoading ? (
             <div className="p-8 text-center text-slate-500">Carregando...</div>
-          ) : registros.length === 0 ? (
+          ) : registrosAgrupados.length === 0 ? (
             <div className="p-8 text-center text-slate-500">Nenhum registro encontrado</div>
           ) : (
             <table className="w-full border-collapse">
@@ -147,7 +170,7 @@ export default function Calculo() {
                 </tr>
               </thead>
               <tbody>
-                {registros.map((registro: any, index: number) => (
+                {registrosAgrupados.map((registro: any, index: number) => (
                   <tr key={index} className="border-b border-slate-200 hover:bg-slate-50">
                     {campos.map((campo) => (
                       <td key={campo.key} className="px-3 py-2 text-sm whitespace-nowrap">
@@ -160,7 +183,7 @@ export default function Calculo() {
             </table>
           )}
           <div className="p-4 bg-slate-50 border-t border-slate-200 text-sm text-slate-600">
-            Total: {registros.length} registro(s)
+            Total: {registrosAgrupados.length} Chave(s) J única(s) | {registros.length} operação(ões) total
           </div>
         </div>
       </div>
