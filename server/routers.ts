@@ -752,6 +752,40 @@ export const appRouter = router({
                         }
                       }
                     }
+                  } else if (ativoCol && record.rbm) {
+                    // Se não tem convenio, usar calcularPercPago com RBM
+                    const rbmNum = parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, '')) || 0;
+                    const situacao = agente.situacao || '';
+                    const chaveJ = record.chaveJ || '';
+                    const empresa = record.empresa || agente.empresa || '';
+                    const parcela = String(record.parcela || '');
+                    const descricao = record.descricaoProduto || '';
+                    const juros = record.juros || '';
+                    
+                    // Chamar calcularPercPago
+                    const { calcularPercPago } = await import('./db');
+                    const percPagoVal = await calcularPercPago(rbmNum, situacao, chaveJ, empresa, parcela, descricao, juros);
+                    
+                    if (percPagoVal > 0) {
+                      processed.percPago = String(percPagoVal);
+                      
+                      // 4. Calcular totalComissao
+                      if (record.valorLiquido) {
+                        const vl = parseFloat((record.valorLiquido as string).replace(',', '.').replace(/[^0-9.]/g, ''));
+                        const pp = percPagoVal > 1 ? percPagoVal / 100 : percPagoVal;
+                        if (!isNaN(vl) && !isNaN(pp)) {
+                          processed.totalComissao = String((vl * pp).toFixed(2));
+                          
+                          // 5. Calcular difEmpresa
+                          if (record.rbm) {
+                            const rbmNum2 = parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, ''));
+                            if (!isNaN(rbmNum2)) {
+                              processed.difEmpresa = String((rbmNum2 - vl * pp).toFixed(2));
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               } catch (err) {
