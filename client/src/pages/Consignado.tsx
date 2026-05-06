@@ -29,6 +29,8 @@ type Consignado = {
   tabelaMes?: string | null;
   percAVista?: string | null;
   restricaoSRCC?: string | null;
+  srcc?: string | null;
+  vrLiquidoSrcc?: string | null;
   percPago?: string | null;
   totalComissao?: string | null;
   difEmpresa?: string | null;
@@ -56,6 +58,8 @@ type FormData = {
   tabelaMes?: string;
   percAVista?: string;
   restricaoSRCC?: string;
+  srcc?: string;
+  vrLiquidoSrcc?: string;
   percPago?: string;
   totalComissao?: string;
   difEmpresa?: string;
@@ -219,6 +223,16 @@ export default function Consignado() {
   function setField(field: keyof FormData, value: string) {
     setForm(prev => {
       const updated = { ...prev, [field]: value };
+      
+      // Calcular Vr. Líquido - SRCC quando srcc ou valorLiquido mudam
+      if (field === 'srcc' || field === 'valorLiquido') {
+        const vl = parseFloat(field === 'valorLiquido' ? value : (prev.valorLiquido || '0'));
+        const srcc = parseFloat(field === 'srcc' ? value : (prev.srcc || '0'));
+        if (!isNaN(vl) && !isNaN(srcc)) {
+          updated.vrLiquidoSrcc = String(vl - srcc);
+        }
+      }
+      
       // Recalcular fórmulas quando campos-chave mudam
       if (['chaveJ', 'convenio', 'juros', 'valorLiquido', 'rbm', 'tabelaMes'].includes(field)) {
         const chaveJ = field === 'chaveJ' ? value : (prev.chaveJ || '');
@@ -311,7 +325,7 @@ export default function Consignado() {
       valorLiquido: r.valorLiquido, rbm: r.rbm, parcela: r.parcela,
       prefixoBB: r.prefixoBB, dtContratacao: r.dtContratacao instanceof Date ? r.dtContratacao.toISOString().split('T')[0] : r.dtContratacao,
       produto: r.produto, descricaoProduto: r.descricaoProduto, juros: r.juros, tabelaMes: r.tabelaMes,
-      percAVista: r.percAVista, restricaoSRCC: r.restricaoSRCC, percPago: r.percPago,
+      percAVista: r.percAVista, restricaoSRCC: r.restricaoSRCC, srcc: r.srcc, vrLiquidoSrcc: r.vrLiquidoSrcc, percPago: r.percPago,
       totalComissao: r.totalComissao, difEmpresa: r.difEmpresa, tabela: r.tabela,
       supervisor: r.supervisor,
     } as FormData);
@@ -443,6 +457,10 @@ export default function Consignado() {
 
   // Totalizadores
   const totalVL = registrosFiltrados.reduce((s, r) => s + (parseFloat(r.valorLiquido || '0') || 0), 0);
+  const totalSRCC = registrosFiltrados
+    .filter(r => r.restricaoSRCC === 'Sim' || r.restricaoSRCC === 'SIM' || r.restricaoSRCC === 'sim')
+    .reduce((s, r) => s + (parseFloat(r.valorLiquido || '0') || 0), 0);
+  const totalVrLiquidoSRCC = totalVL - totalSRCC;
   const totalComissao = registrosFiltrados.reduce((s, r) => s + (parseFloat(r.totalComissao || '0') || 0), 0);
 
   return (
@@ -598,8 +616,10 @@ export default function Consignado() {
 
       {/* Totalizadores */}
       {registrosFiltrados.length > 0 && (
-        <div className="px-6 py-3 bg-blue-50 border-b flex gap-6 text-sm">
+        <div className="px-6 py-3 bg-blue-50 border-b flex gap-6 text-sm flex-wrap">
           <span className="font-medium text-blue-800">Total Vr. Líquido: <span className="font-bold">{moeda(String(totalVL))}</span></span>
+          <span className="font-medium text-amber-800">Total SRCC: <span className="font-bold">{moeda(String(totalSRCC))}</span></span>
+          <span className="font-medium text-purple-800">Total Vr. Líquido-SRCC: <span className="font-bold">{moeda(String(totalVrLiquidoSRCC))}</span></span>
           <span className="font-medium text-green-800">Total Comissão: <span className="font-bold">{moeda(String(totalComissao))}</span></span>
         </div>
       )}
@@ -640,6 +660,8 @@ export default function Consignado() {
                 <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Tabela Mês</th>
                 <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Perc. À Vista</th>
                 <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Restrição SRCC</th>
+                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">SRCC</th>
+                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Vr. Líquido - SRCC</th>
                 <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Perc. Pago</th>
                 <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Total Comissão</th>
                 <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Dif. Empresa</th>
@@ -699,6 +721,8 @@ export default function Consignado() {
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.tabelaMes)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.percAVista)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.restricaoSRCC)}</td>
+                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{moeda(r.srcc)}</td>
+                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{moeda(r.vrLiquidoSrcc)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.percPago)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right font-semibold text-green-700">{moeda(r.totalComissao)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{moeda(r.difEmpresa)}</td>
@@ -807,6 +831,15 @@ export default function Consignado() {
               <label className="text-xs font-medium text-gray-600 mb-1 block">Restrição SRCC</label>
               <Input value={form.restricaoSRCC || ''} onChange={e => setField('restricaoSRCC', e.target.value)} />
             </div>
+            <div>
+              <label className="text-xs font-medium text-gray-600 mb-1 block">SRCC</label>
+              <Input value={form.srcc || ''} onChange={e => setField('srcc', e.target.value)} placeholder="0.00" />
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-600 mb-1 block">Vr. Líquido - SRCC</label>
+              <Input value={form.vrLiquidoSrcc || ''} readOnly className="bg-amber-50 text-amber-800 font-medium cursor-default" placeholder="auto: Vr.Líquido - SRCC" />
+            </div>
+            {/* Linha 8 */}
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Perc. Pago (fórmula)</label>
               <Input value={form.percPago || ''} readOnly className="bg-green-50 text-green-800 font-medium cursor-default" placeholder="auto: Tabela Comissão" />

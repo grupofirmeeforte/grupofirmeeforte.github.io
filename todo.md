@@ -259,7 +259,7 @@
 - [x] Implementar filtros em tempo real (Mês/Ano, Chave J, Nome Agente)
 - [x] Implementar mês anterior pré-preenchido dinamicamente
 - [x] Adicionar rota /relatorios ao App.tsx
-- [x] Adicionar link "Cálculo" em Relatórios no Home.tsx
+- [x] Remover link "Cálculo" de Relatórios (deixar apenas em Financeiro)
 - [x] Testar com dados reais (17 Chaves J únicas, 151 operações)
 - [x] Validar formatação de moeda (R$ 133.854,57, etc.)
 - [ ] Implementar exportação para Excel
