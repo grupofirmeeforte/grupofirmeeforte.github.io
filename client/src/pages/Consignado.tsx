@@ -75,9 +75,9 @@ function pct(val: string | null | undefined) {
   if (!val) return '-';
   const n = parseFloat(val);
   if (isNaN(n)) return val;
-  // Se valor já é decimal (< 10), não multiplicar por 100
-  const displayVal = n < 10 ? n : (n * 100);
-  return displayVal.toFixed(2).replace('.', ',') + '%';
+  // Sempre multiplicar por 100 para exibir como percentual
+  // O backend já envia valores decimais (0.0183 para 1.83%)
+  return (n * 100).toFixed(2).replace('.', ',') + '%';
 }
 
 function strVal(val: string | Date | null | undefined) {
@@ -538,7 +538,7 @@ export default function Consignado() {
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.produto)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 max-w-32 truncate" title={r.descricaoProduto || ''}>{strVal(r.descricaoProduto)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.juros)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.tabelaMes)}</td>
+                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.tabelaMes)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.percAVista)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.restricaoSRCC)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.percPago)}</td>
