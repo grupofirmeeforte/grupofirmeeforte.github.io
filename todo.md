@@ -202,6 +202,7 @@
 ## FASE 17: CALCULOS NA COLUNA PERC. PAGO DO CONSIGNADO
 - [x] Aguardando formula completa do usuario
 - [x] Implementar logica de calculo (backend em db.ts)
+- [x] Implementar cálculo automático durante importação
 - [ ] Testar calculos com dados reais
 - [ ] Verificar se importação funciona corretamente
 - [ ] Validar cálculos com dados da planilha

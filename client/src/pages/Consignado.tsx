@@ -193,7 +193,7 @@ export default function Consignado() {
     setForm(prev => {
       const updated = { ...prev, [field]: value };
       // Recalcular fórmulas quando campos-chave mudam
-      if (['chaveJ', 'convenio', 'juros', 'valorLiquido', 'rbm'].includes(field)) {
+      if (['chaveJ', 'convenio', 'juros', 'valorLiquido', 'rbm', 'tabelaMes'].includes(field)) {
         const chaveJ = field === 'chaveJ' ? value : (prev.chaveJ || '');
         if (chaveJ.length >= 5) {
           setCalcInput({
@@ -202,6 +202,7 @@ export default function Consignado() {
             juros: field === 'juros' ? value : prev.juros,
             valorLiquido: field === 'valorLiquido' ? value : prev.valorLiquido,
             rbm: field === 'rbm' ? value : prev.rbm,
+            meses: field === 'tabelaMes' ? value : prev.tabelaMes,
           });
         }
       }
