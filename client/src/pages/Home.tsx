@@ -118,6 +118,17 @@ export default function Home() {
       bgColor: 'from-amber-50 to-yellow-50',
       subModules: [],
     },
+    {
+      type: 'group',
+      key: 'febraban',
+      title: 'Febraban',
+      description: 'Gestão de arquivos e conformidade Febraban',
+      icon: Landmark,
+      color: 'bg-purple-600',
+      borderColor: 'border-purple-200',
+      bgColor: 'from-purple-50 to-pink-50',
+      subModules: [],
+    },
   ];
 
   const grupoAtual = grupos.find(g => g.key === grupoAberto);
