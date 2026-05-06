@@ -13,6 +13,7 @@ import TabelaComissao from './pages/TabelaComissao';
 import Consignado from './pages/Consignado';
 import ContaCorrente from './pages/ContaCorrente';
 import Calculo from './pages/Calculo';
+import Relatorios from './pages/Relatorios';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -46,7 +47,7 @@ function RouterWithInactivity() {
       <Route path={"/consignado"} component={Consignado} />
       <Route path={"/conta-corrente"} component={ContaCorrente} />
       <Route path={"/calculo"} component={Calculo} />
-      <Route path={"/relatorios"} component={Calculo} />
+      <Route path={"/relatorios"} component={Relatorios} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />

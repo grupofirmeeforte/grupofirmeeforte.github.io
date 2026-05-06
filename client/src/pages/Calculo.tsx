@@ -5,6 +5,17 @@ import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 
+// Função para formatar número como moeda brasileira
+const formatarMoeda = (valor: any) => {
+  if (!valor && valor !== 0) return "-";
+  const num = parseFloat(valor);
+  if (isNaN(num)) return "-";
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(num);
+};
+
 export default function Calculo() {
   const [, navigate] = useLocation();
 
@@ -280,11 +291,18 @@ export default function Calculo() {
               <tbody>
                 {registrosComMesAno.map((registro: any, index: number) => (
                   <tr key={index} className="border-b border-slate-200 hover:bg-slate-50">
-                    {campos.map((campo) => (
-                      <td key={campo.key} className="px-3 py-2 text-sm whitespace-nowrap">
-                        {registro[campo.key] || "-"}
-                      </td>
-                    ))}
+                    {campos.map((campo) => {
+                      // Campos que devem ser formatados como moeda
+                      const camposMoeda = ['vrLiquidoSoma', 'srccSoma', 'vrLiquidoSrccSoma'];
+                      const valor = registro[campo.key];
+                      const exibicao = camposMoeda.includes(campo.key) ? formatarMoeda(valor) : (valor || "-");
+                      return (
+                        <td key={campo.key} className="px-3 py-2 text-sm whitespace-nowrap">
+                          {exibicao}
+                        </td>
+                      );
+                    })}
+                    
                     <td className="px-3 py-2 text-sm whitespace-nowrap">
                       <button
                         onClick={() => handleDeletar(registro)}
