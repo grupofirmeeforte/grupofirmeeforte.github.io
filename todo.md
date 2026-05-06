@@ -241,13 +241,14 @@
 
 
 ## FASE 21: ABA CALCULO DENTRO DE FINANCEIRO
-- [ ] Analisar estrutura do arquivo calculo.xlsx
-- [ ] Criar schema para tabela de calculos
-- [ ] Criar tabela calculos no banco
+- [x] Analisar estrutura do arquivo calculo.xlsx
+- [x] Criar schema para tabela de calculos
+- [x] Criar tabela calculos no banco
 - [ ] Criar routers para CRUD
-- [ ] Criar página Calculo em Financeiro
+- [x] Criar página Calculo em Financeiro com esqueleto completo
 - [ ] Implementar buscas automáticas em Consignado
 - [ ] Implementar buscas automáticas em Cadastro
 - [ ] Implementar cálculos de comissões
 - [ ] Implementar cálculos de RBM
+- [x] Adicionar campo RBM Seguro
 - [ ] Testar fluxo completo
