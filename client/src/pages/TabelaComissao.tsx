@@ -129,6 +129,18 @@ export default function TabelaComissao() {
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [savingCell, setSavingCell] = useState<string | null>(null);
+  const [valoresAtivos, setValoresAtivos] = useState<Record<string, string>>({
+    'Ativo01': '',
+    'Ativo02': '',
+    'Ativo03': '',
+    'Ativo04': '',
+    'Ativo05': '',
+    'Ativo06': '',
+    'Ativo07': '',
+    'Ativo08': '',
+    'Ativo09': '',
+    'Ativo10': '',
+  });
 
   const utils = trpc.useUtils();
 
@@ -248,6 +260,66 @@ export default function TabelaComissao() {
               <Plus className="w-4 h-4" />
               Novo
             </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Valores para Cálculo por Nível - Editáveis Inline */}
+      <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b">
+        <div className="mb-3">
+          <label className="text-sm font-semibold text-blue-900 mb-2 block">Valores para Cálculo por Nível:</label>
+          <div className="grid grid-cols-5 gap-3">
+            {Object.keys(valoresAtivos).map((nivel) => {
+              const [isEditing, setIsEditing] = useState(false);
+              const [tempValue, setTempValue] = useState(valoresAtivos[nivel]);
+
+              const handleSave = () => {
+                setValoresAtivos({...valoresAtivos, [nivel]: tempValue});
+                setIsEditing(false);
+                toast.success(`${nivel.replace('Ativo', 'Ativo ')} atualizado!`);
+              };
+
+              const handleCancel = () => {
+                setTempValue(valoresAtivos[nivel]);
+                setIsEditing(false);
+              };
+
+              const handleKeyDown = (e: React.KeyboardEvent) => {
+                if (e.key === 'Enter') {
+                  handleSave();
+                } else if (e.key === 'Escape') {
+                  handleCancel();
+                }
+              };
+
+              return (
+                <div key={nivel}>
+                  <label className="text-xs font-medium text-gray-600 mb-1 block">{nivel.replace('Ativo', 'Ativo ')}</label>
+                  {isEditing ? (
+                    <div className="flex gap-1">
+                      <input
+                        autoFocus
+                        type="number"
+                        step="0.01"
+                        value={tempValue}
+                        onChange={(e) => setTempValue(e.target.value)}
+                        onBlur={handleSave}
+                        onKeyDown={handleKeyDown}
+                        className="flex-1 px-2 py-1.5 border border-blue-400 rounded bg-white text-right text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => setIsEditing(true)}
+                      className="px-2 py-1.5 border border-gray-300 rounded bg-white text-right text-sm cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all"
+                      title="Clique para editar"
+                    >
+                      {valoresAtivos[nivel] || '0,00'}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

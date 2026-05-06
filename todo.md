@@ -188,4 +188,11 @@
 - [x] Adicionar edição direta em todas as colunas da tabela
 - [x] Salvar automaticamente ao sair da célula
 - [x] Feedback visual com hover e validação
-- [ ] Testar edição inline com dados reais
+- [x] Testar edição inline com dados reais
+
+## FASE 16: CÉLULAS EDITÁVEIS NA SEÇÃO DE VALORES PARA CÁLCULO
+- [x] Implementar edição inline na seção "Valores para Cálculo por Nível"
+- [x] Clique para editar, Enter para salvar, Escape para cancelar
+- [x] Feedback visual com hover e toast de sucesso
+- [ ] Adicionar persistência em banco de dados
+- [ ] Adicionar validação de valores (mínimo/máximo)
