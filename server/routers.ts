@@ -762,8 +762,7 @@ export const appRouter = router({
                     const descricao = record.descricaoProduto || '';
                     const juros = record.juros || '';
                     
-                    // Chamar calcularPercPago
-                    const { calcularPercPago } = await import('./db');
+                    // Chamar calcularPercPago (já importado no topo)
                     const percPagoVal = await calcularPercPago(rbmNum, situacao, chaveJ, empresa, parcela, descricao, juros);
                     
                     if (percPagoVal > 0) {
