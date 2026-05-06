@@ -238,3 +238,29 @@
 - [x] Adicionar botão para baixar template
 - [x] Implementar mutations editar e deletar
 - [ ] Testar fluxo completo de importação
+
+## FASE 21: PÁGINA CÁLCULO COM DADOS AGREGADOS
+- [x] Criar schema para tabela calculos com 27 campos
+- [x] Criar router CRUD completo (listar, criar, editar, deletar, buscarPorChaveJ)
+- [x] Implementar página Calculo.tsx com tabela horizontal
+- [x] Implementar agrupamento por Chave J (uma linha por chave)
+- [x] Implementar soma de todos os 23 campos numéricos
+- [x] Implementar filtros em tempo real (Mês/Ano, Chave J, Nome Agente)
+- [x] Implementar mês anterior pré-preenchido dinamicamente
+- [x] Integrar busca automática em Consignado por Chave J e Mês/Ano
+- [x] Criar 6 testes unitários (listar, criar, buscar, editar, deletar, buscar inexistente)
+- [x] Validar fluxo completo via UI
+- [x] Sincronização bidirecional com Consignado
+
+## FASE 22: PÁGINA RELATÓRIOS COM FORMATAÇÃO EM MOEDA
+- [x] Criar página Relatórios.tsx com formatação em moeda brasileira (R$)
+- [x] Implementar agrupamento por Chave J (uma linha por chave)
+- [x] Implementar soma de Vr. Líquido, SRCC e Vr. Líquido-SRCC
+- [x] Implementar filtros em tempo real (Mês/Ano, Chave J, Nome Agente)
+- [x] Implementar mês anterior pré-preenchido dinamicamente
+- [x] Adicionar rota /relatorios ao App.tsx
+- [x] Adicionar link "Cálculo" em Relatórios no Home.tsx
+- [x] Testar com dados reais (17 Chaves J únicas, 151 operações)
+- [x] Validar formatação de moeda (R$ 133.854,57, etc.)
+- [ ] Implementar exportação para Excel
+- [ ] Implementar impressão de relatório

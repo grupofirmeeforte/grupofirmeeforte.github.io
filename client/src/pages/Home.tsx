@@ -90,7 +90,7 @@ export default function Home() {
       borderColor: 'border-red-200',
       bgColor: 'from-red-50 to-orange-50',
       subModules: [
-        { title: 'Cálculo', description: 'Cálculo de comissões e RBM', icon: DollarSign, color: 'bg-red-500', path: '/calculo' },
+        { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/relatorios' },
       ],
     },
     {
@@ -116,9 +116,7 @@ export default function Home() {
       color: 'bg-amber-600',
       borderColor: 'border-amber-200',
       bgColor: 'from-amber-50 to-yellow-50',
-      subModules: [
-        { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/relatorios' },
-      ],
+      subModules: [],
     },
   ];
 
