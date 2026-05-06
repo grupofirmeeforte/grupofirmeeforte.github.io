@@ -146,6 +146,34 @@ export const appRouter = router({
           },
         };
       }),
+    acceptLGPD: publicProcedure.mutation(async ({ ctx }) => {
+      if (!ctx.user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Usuário não autenticado",
+        });
+      }
+
+      const db = await getDb();
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Erro ao conectar ao banco de dados",
+        });
+      }
+
+      await db.update(users)
+        .set({
+          lgpdAceito: true,
+          lgpdAceitoEm: new Date(),
+        })
+        .where(eq(users.id, ctx.user.id));
+
+      return {
+        success: true,
+        message: "LGPD aceito com sucesso",
+      };
+    }),
   }),
   agentes: agentesRouter,
   auditoria: auditoriaRouter,

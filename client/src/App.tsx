@@ -15,6 +15,10 @@ import ContaCorrente from './pages/ContaCorrente';
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
 import { useDisconnectNotification } from "./hooks/useDisconnectNotification";
+import { LGPDModal } from "./components/LGPDModal";
+import { useState, useEffect } from "react";
+import { useAuth } from "./hooks/useAuth";
+import { trpc } from "./lib/trpc";
 // import { useCheckPasswordChange } from "./hooks/useCheckPasswordChange";
 
 function RouterWithInactivity() {
@@ -47,6 +51,38 @@ function RouterWithInactivity() {
   );
 }
 
+function LGPDGate() {
+  const { user, isAuthenticated } = useAuth();
+  const [showLGPD, setShowLGPD] = useState(false);
+  const [isAccepting, setIsAccepting] = useState(false);
+  const acceptLGPDMutation = trpc.auth.acceptLGPD.useMutation();
+
+  useEffect(() => {
+    if (isAuthenticated && user && !user.lgpdAceito) {
+      setShowLGPD(true);
+    }
+  }, [isAuthenticated, user]);
+
+  const handleAcceptLGPD = async () => {
+    setIsAccepting(true);
+    try {
+      await acceptLGPDMutation.mutateAsync();
+      setShowLGPD(false);
+    } catch (error) {
+      console.error('Erro ao aceitar LGPD:', error);
+    } finally {
+      setIsAccepting(false);
+    }
+  };
+
+  return (
+    <>
+      {showLGPD && <LGPDModal onAccept={handleAcceptLGPD} isLoading={isAccepting} />}
+      <RouterWithInactivity />
+    </>
+  );
+}
+
 // NOTE: About Theme
 // - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
 //   to keep consistent foreground/background color across components
@@ -61,7 +97,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
-          <RouterWithInactivity />
+          <LGPDGate />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
