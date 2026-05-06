@@ -246,9 +246,11 @@
 - [x] Criar tabela calculos no banco
 - [ ] Criar routers para CRUD
 - [x] Criar página Calculo em Financeiro com esqueleto completo
-- [ ] Implementar buscas automáticas em Consignado
-- [ ] Implementar buscas automáticas em Cadastro
-- [ ] Implementar cálculos de comissões
-- [ ] Implementar cálculos de RBM
+- [x] Implementar buscas automáticas em Consignado
+- [x] Implementar buscas automáticas em Cadastro
+- [x] Implementar cálculos de comissões
+- [x] Implementar cálculos de RBM
 - [x] Adicionar campo RBM Seguro
+- [x] Implementar fórmulas automáticas
+- [x] Adicionar botão de voltar
 - [ ] Testar fluxo completo

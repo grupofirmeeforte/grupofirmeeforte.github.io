@@ -1117,20 +1117,26 @@ export const appRouter = router({
         await db.delete(relatorioBB);
         
         // Inserir novos dados
+        let count = 0;
         for (const record of input) {
-          await db.insert(relatorioBB).values({
-            bmf: record.bmf,
-            mes: record.mes,
-            proposta: record.proposta,
-            linha: record.linha,
-            situacao: record.situacao,
-            operador: record.operador,
-            solicitacao: record.solicitacao instanceof Date ? record.solicitacao : null,
-            prazo: record.prazo,
-          });
+          try {
+            await db.insert(relatorioBB).values({
+              bmf: record.bmf || null,
+              mes: record.mes || null,
+              proposta: record.proposta || null,
+              linha: record.linha || null,
+              situacao: record.situacao || null,
+              operador: record.operador || null,
+              solicitacao: record.solicitacao ? (typeof record.solicitacao === 'string' ? new Date(record.solicitacao) : record.solicitacao instanceof Date ? record.solicitacao : null) : null,
+              prazo: record.prazo || null,
+            });
+            count++;
+          } catch (err) {
+            console.error('Erro ao inserir registro:', err, record);
+          }
         }
         
-        return { count: input.length };
+        return { count };
       }),
     listar: publicProcedure.query(async () => {
       const db = await getDb();
