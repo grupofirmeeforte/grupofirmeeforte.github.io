@@ -173,3 +173,19 @@
 - [x] Testar monitoramento em tempo real
 
 - [x] Aba Consignado: tabela com 23 colunas, filtros, importação de planilha, cálculos automáticos
+- [x] Modal de LGPD: aparecer na primeira vez que o usuário acessa após login, com registro de aceite
+
+## FASE 14: RESUMO/TOTALIZADOR DE CONSIGNADO
+- [x] Implementar filtro de Empresa (BMF ou Flex) na página Consignado
+- [x] Implementar filtro de Mês/Ano na página Consignado
+- [x] Criar procedure tRPC para calcular totais filtrados
+- [x] Exibir Total Vr. Líquido por empresa/período
+- [x] Exibir Total Comissão por empresa/período
+- [ ] Testar totalizador com dados reais
+
+## FASE 15: CÉLULAS EDITÁVEIS NA TABELA DE COMISSÃO
+- [x] Implementar componente EditableCell para edição inline
+- [x] Adicionar edição direta em todas as colunas da tabela
+- [x] Salvar automaticamente ao sair da célula
+- [x] Feedback visual com hover e validação
+- [ ] Testar edição inline com dados reais

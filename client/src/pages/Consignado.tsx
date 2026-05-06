@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -98,12 +98,34 @@ export default function Consignado() {
   const [filtroMes, setFiltroMes] = useState('');
   const [filtroEmpresa, setFiltroEmpresa] = useState('');
   const [filtroBusca, setFiltroBusca] = useState('');
+  const [mostrarTotalizador, setMostrarTotalizador] = useState(true);
+  const [mesAnoTotalizador, setMesAnoTotalizador] = useState('');
+  const [empresaTotalizador, setEmpresaTotalizador] = useState('');
   const [modalAberto, setModalAberto] = useState(false);
   const [editandoId, setEditandoId] = useState<number | null>(null);
+
+  // Função para obter o valor do ativo baseado no nível do agente
+  const getValorAtivo = (nivel?: string) => {
+    if (!nivel) return 0;
+    const chave = `Ativo${nivel.replace('Ativo', '').padStart(2, '0')}`;
+    return parseFloat(valoresAtivos[chave] || '0');
+  };
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [confirmandoExclusao, setConfirmandoExclusao] = useState<number | null>(null);
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set());
   const [modoSelecao, setModoSelecao] = useState(false);
+  const [valoresAtivos, setValoresAtivos] = useState<Record<string, string>>({
+    'Ativo01': '',
+    'Ativo02': '',
+    'Ativo03': '',
+    'Ativo04': '',
+    'Ativo05': '',
+    'Ativo06': '',
+    'Ativo07': '',
+    'Ativo08': '',
+    'Ativo09': '',
+    'Ativo10': '',
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Estado para controlar quando calcular fórmulas (só quando chaveJ tem 7+ chars)
   const [calcInput, setCalcInput] = useState<{chaveJ: string; convenio?: string; juros?: string; meses?: string; valorLiquido?: string; rbm?: string} | null>(null);
@@ -123,6 +145,15 @@ export default function Consignado() {
 
   const { data: meses = [] } = trpc.consignado.listarMeses.useQuery();
   const { data: empresas = [] } = trpc.consignado.listarEmpresas.useQuery();
+
+  // Query para totalizador
+  const { data: totalizador } = trpc.consignado.obterTotalizador.useQuery(
+    {
+      mes: mesAnoTotalizador || undefined,
+      empresa: empresaTotalizador || undefined,
+    },
+    { enabled: mostrarTotalizador && !!(mesAnoTotalizador || empresaTotalizador) }
+  );
 
   const criar = trpc.consignado.criar.useMutation({
     onSuccess: () => { utils.consignado.listar.invalidate(); utils.consignado.listarMeses.invalidate(); utils.consignado.listarEmpresas.invalidate(); toast.success('Registro criado!'); setModalAberto(false); },
@@ -177,9 +208,24 @@ export default function Consignado() {
       return updated;
     });
   }
+  // Salvar valores de ativos no localStorage
+  useEffect(() => {
+    localStorage.setItem('valoresAtivos', JSON.stringify(valoresAtivos));
+  }, [valoresAtivos]);
 
-  function toggleSelecionado(id: number) {
-    setSelecionados(prev => {
+  // Carregar valores de ativos do localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('valoresAtivos');
+    if (saved) {
+      try {
+        setValoresAtivos(JSON.parse(saved));
+      } catch (e) {
+        console.error('Erro ao carregar valores de ativos:', e);
+      }
+    }
+  }, []);
+
+  const toggleSelecionado = (id: number) => {   setSelecionados(prev => {
       const novo = new Set(prev);
       if (novo.has(id)) {
         novo.delete(id);
@@ -406,6 +452,95 @@ export default function Consignado() {
           </div>
         </div>
       </div>
+
+      {/* Valores de Ativos */}
+      <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b">
+        <div className="mb-3">
+          <label className="text-sm font-semibold text-blue-900 mb-2 block">Valores para Cálculo por Nível:</label>
+          <div className="grid grid-cols-5 gap-3">
+            {Object.keys(valoresAtivos).map((nivel) => (
+              <div key={nivel}>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">{nivel.replace('Ativo', 'Ativo ')}</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={valoresAtivos[nivel]}
+                  onChange={(e) => setValoresAtivos({...valoresAtivos, [nivel]: e.target.value})}
+                  placeholder="0,00"
+                  className="text-right"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Totalizador */}
+      {mostrarTotalizador && (
+        <div className="px-6 py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b">
+          <div className="mb-4">
+            <h2 className="text-sm font-semibold text-gray-700 mb-3">📊 Totalizador por Empresa e Mês/Ano</h2>
+            <div className="grid grid-cols-4 gap-3 items-end">
+              <div>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">Empresa</label>
+                <select
+                  value={empresaTotalizador}
+                  onChange={(e) => setEmpresaTotalizador(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                >
+                  <option value="">-- Selecione --</option>
+                  {empresas.map((e) => (
+                    <option key={e} value={e}>
+                      {e}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-gray-600 mb-1 block">Mês/Ano (MMYY)</label>
+                <select
+                  value={mesAnoTotalizador}
+                  onChange={(e) => setMesAnoTotalizador(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                >
+                  <option value="">-- Selecione --</option>
+                  {meses.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-span-2">
+                <Button
+                  onClick={() => { setMesAnoTotalizador(''); setEmpresaTotalizador(''); }}
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                >
+                  Limpar Filtros
+                </Button>
+              </div>
+            </div>
+          </div>
+          {totalizador && (mesAnoTotalizador || empresaTotalizador) && (
+            <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-green-200">
+              <div className="bg-white rounded-lg p-3 shadow-sm">
+                <p className="text-xs text-gray-600 mb-1">Total Vr. Líquido</p>
+                <p className="text-lg font-bold text-green-700">{moeda(String(totalizador.totalVrLiquido))}</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 shadow-sm">
+                <p className="text-xs text-gray-600 mb-1">Total Comissão</p>
+                <p className="text-lg font-bold text-blue-700">{moeda(String(totalizador.totalComissao))}</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 shadow-sm">
+                <p className="text-xs text-gray-600 mb-1">Registros</p>
+                <p className="text-lg font-bold text-gray-700">{totalizador.registros}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Filtros */}
       <div className="px-6 py-4 bg-white border-b">

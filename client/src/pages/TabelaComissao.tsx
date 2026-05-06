@@ -47,14 +47,75 @@ const EMPTY_FORM: FormData = {};
 
 function pct(val: string | null) {
   if (!val) return '-';
-  // Aceita vírgula como separador decimal
   const normalized = String(val).replace(',', '.');
   const n = parseFloat(normalized);
   if (isNaN(n)) return val;
-  // Se o valor já é maior que 1, é percentual direto (ex: 60 = 60,00%)
-  // Se menor ou igual a 1, é decimal (ex: 0.0065 = 0,65%)
   const pctVal = n > 1 ? n : n * 100;
   return pctVal.toFixed(2).replace('.', ',') + '%';
+}
+
+// Componente de célula editável
+function EditableCell({
+  value,
+  onSave,
+  isSaving,
+  format = 'text',
+}: {
+  value: string | null;
+  onSave: (newValue: string) => void;
+  isSaving: boolean;
+  format?: 'text' | 'number' | 'percent';
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempValue, setTempValue] = useState(value || '');
+
+  const handleSave = () => {
+    if (tempValue !== value) {
+      onSave(tempValue);
+    }
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setTempValue(value || '');
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      handleCancel();
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <input
+        autoFocus
+        type={format === 'number' ? 'number' : 'text'}
+        step={format === 'number' ? '0.01' : undefined}
+        value={tempValue}
+        onChange={(e) => setTempValue(e.target.value)}
+        onBlur={handleSave}
+        onKeyDown={handleKeyDown}
+        disabled={isSaving}
+        className="w-full px-2 py-1 border border-blue-400 rounded bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+      />
+    );
+  }
+
+  const displayValue = format === 'percent' ? pct(value) : (value || '-');
+
+  return (
+    <div
+      onClick={() => setIsEditing(true)}
+      className="cursor-pointer px-2 py-1 rounded hover:bg-blue-100 transition-colors"
+      title="Clique para editar"
+    >
+      {displayValue}
+    </div>
+  );
 }
 
 export default function TabelaComissao() {
@@ -67,6 +128,7 @@ export default function TabelaComissao() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [savingCell, setSavingCell] = useState<string | null>(null);
 
   const utils = trpc.useUtils();
 
@@ -92,10 +154,14 @@ export default function TabelaComissao() {
   const atualizarMutation = trpc.tabelaComissao.atualizar.useMutation({
     onSuccess: () => {
       utils.tabelaComissao.listar.invalidate();
+      setSavingCell(null);
       setModalOpen(false);
       toast.success('Registro atualizado com sucesso!');
     },
-    onError: (e) => toast.error('Erro ao atualizar: ' + e.message),
+    onError: (e) => {
+      toast.error('Erro ao atualizar: ' + e.message);
+      setSavingCell(null);
+    },
   });
 
   const excluirMutation = trpc.tabelaComissao.excluir.useMutation({
@@ -130,7 +196,6 @@ export default function TabelaComissao() {
   function openEditar(row: TabelaRow) {
     setEditingId(row.id);
     const f: FormData = {};
-    (Object.keys(EMPTY_FORM) as (keyof FormData)[]).forEach(() => {});
     Object.entries(row).forEach(([k, v]) => {
       if (k !== 'id') (f as Record<string, string>)[k] = v != null ? String(v) : '';
     });
@@ -152,6 +217,13 @@ export default function TabelaComissao() {
 
   function setField(key: keyof FormData, value: string) {
     setForm(prev => ({ ...prev, [key]: value }));
+  }
+
+  // Função para salvar célula individual
+  function handleCellSave(rowId: number, field: keyof TabelaRow, newValue: string) {
+    setSavingCell(`${rowId}-${field}`);
+    const cleanValue = newValue === '' ? undefined : newValue;
+    atualizarMutation.mutate({ id: rowId, [field]: cleanValue } as any);
   }
 
   const isSaving = criarMutation.isPending || atualizarMutation.isPending;
@@ -230,6 +302,11 @@ export default function TabelaComissao() {
         </div>
       </div>
 
+      {/* Info */}
+      <div className="px-6 py-2 bg-blue-50 border-b text-xs text-blue-700">
+        💡 Clique em qualquer célula para editar. Pressione Enter para salvar ou Escape para cancelar.
+      </div>
+
       {/* Tabela */}
       <div className="px-6 py-4">
         <Card className="overflow-hidden">
@@ -260,31 +337,145 @@ export default function TabelaComissao() {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={16} className="text-center py-8 text-gray-500">Carregando...</td>
+                    <td colSpan={18} className="text-center py-8 text-gray-500">Carregando...</td>
                   </tr>
                 ) : filteredRows.length === 0 ? (
                   <tr>
-                    <td colSpan={16} className="text-center py-8 text-gray-500">Nenhum registro encontrado</td>
+                    <td colSpan={18} className="text-center py-8 text-gray-500">Nenhum registro encontrado</td>
                   </tr>
                 ) : (
                   filteredRows.map((row, idx) => (
                     <tr key={row.id} className={idx % 2 === 0 ? 'bg-white hover:bg-blue-50/50 transition-colors' : 'bg-gradient-to-r from-blue-50/70 to-indigo-50/50 hover:from-blue-100/70 hover:to-indigo-100/50 transition-colors'}>
-                      <td className="px-3 py-1.5 font-medium text-gray-900 whitespace-nowrap">{row.empresa || '-'}</td>
-                      <td className="px-3 py-1.5 text-gray-700 whitespace-nowrap max-w-[180px] truncate" title={row.convenio || ''}>{row.convenio || '-'}</td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{pct(row.txJurosDe)}</td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{row.txJurosAte === 'acima' ? 'acima' : pct(row.txJurosAte)}</td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{row.valorMinimo || '-'}</td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">{row.mesesDe && row.mesesAte ? `${row.mesesDe} - ${row.mesesAte}` : row.mesesDe || row.mesesAte || '-'}</td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct(row.ativo01)}</td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct(row.ativo02)}</td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct(row.ativo03)}</td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct(row.ativo04)}</td>
-                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">{pct(row.ativo05)}</td>
-                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">{pct(row.ativo06)}</td>
-                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">{pct(row.ativo07)}</td>
-                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">{pct(row.ativo08)}</td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct((row as any).ativo09)}</td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">{pct((row as any).ativo10)}</td>
+                      <td className="px-3 py-1.5 font-medium text-gray-900 whitespace-nowrap">
+                        <EditableCell
+                          value={row.empresa}
+                          onSave={(v) => handleCellSave(row.id, 'empresa', v)}
+                          isSaving={savingCell === `${row.id}-empresa`}
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-gray-700 whitespace-nowrap max-w-[180px] truncate">
+                        <EditableCell
+                          value={row.convenio}
+                          onSave={(v) => handleCellSave(row.id, 'convenio', v)}
+                          isSaving={savingCell === `${row.id}-convenio`}
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
+                        <EditableCell
+                          value={row.txJurosDe}
+                          onSave={(v) => handleCellSave(row.id, 'txJurosDe', v)}
+                          isSaving={savingCell === `${row.id}-txJurosDe`}
+                          format="number"
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
+                        <EditableCell
+                          value={row.txJurosAte}
+                          onSave={(v) => handleCellSave(row.id, 'txJurosAte', v)}
+                          isSaving={savingCell === `${row.id}-txJurosAte`}
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
+                        <EditableCell
+                          value={row.valorMinimo}
+                          onSave={(v) => handleCellSave(row.id, 'valorMinimo', v)}
+                          isSaving={savingCell === `${row.id}-valorMinimo`}
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
+                        <EditableCell
+                          value={row.mesesDe}
+                          onSave={(v) => handleCellSave(row.id, 'mesesDe', v)}
+                          isSaving={savingCell === `${row.id}-mesesDe`}
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={row.mesesAte}
+                          onSave={(v) => handleCellSave(row.id, 'mesesAte', v)}
+                          isSaving={savingCell === `${row.id}-mesesAte`}
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={row.ativo01}
+                          onSave={(v) => handleCellSave(row.id, 'ativo01', v)}
+                          isSaving={savingCell === `${row.id}-ativo01`}
+                          format="percent"
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={row.ativo02}
+                          onSave={(v) => handleCellSave(row.id, 'ativo02', v)}
+                          isSaving={savingCell === `${row.id}-ativo02`}
+                          format="percent"
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={row.ativo03}
+                          onSave={(v) => handleCellSave(row.id, 'ativo03', v)}
+                          isSaving={savingCell === `${row.id}-ativo03`}
+                          format="percent"
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={row.ativo04}
+                          onSave={(v) => handleCellSave(row.id, 'ativo04', v)}
+                          isSaving={savingCell === `${row.id}-ativo04`}
+                          format="percent"
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={row.ativo05}
+                          onSave={(v) => handleCellSave(row.id, 'ativo05', v)}
+                          isSaving={savingCell === `${row.id}-ativo05`}
+                          format="percent"
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={row.ativo06}
+                          onSave={(v) => handleCellSave(row.id, 'ativo06', v)}
+                          isSaving={savingCell === `${row.id}-ativo06`}
+                          format="percent"
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={row.ativo07}
+                          onSave={(v) => handleCellSave(row.id, 'ativo07', v)}
+                          isSaving={savingCell === `${row.id}-ativo07`}
+                          format="percent"
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={row.ativo08}
+                          onSave={(v) => handleCellSave(row.id, 'ativo08', v)}
+                          isSaving={savingCell === `${row.id}-ativo08`}
+                          format="percent"
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={(row as any).ativo09}
+                          onSave={(v) => handleCellSave(row.id, 'ativo09' as any, v)}
+                          isSaving={savingCell === `${row.id}-ativo09`}
+                          format="percent"
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
+                        <EditableCell
+                          value={(row as any).ativo10}
+                          onSave={(v) => handleCellSave(row.id, 'ativo10' as any, v)}
+                          isSaving={savingCell === `${row.id}-ativo10`}
+                          format="percent"
+                        />
+                      </td>
                       <td className="px-3 py-1.5 text-center whitespace-nowrap">
                         <div className="flex items-center justify-center gap-1">
                           <Button
@@ -292,7 +483,7 @@ export default function TabelaComissao() {
                             variant="ghost"
                             className="h-7 w-7 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                             onClick={() => openEditar(row as TabelaRow)}
-                            title="Editar"
+                            title="Editar tudo"
                           >
                             <Pencil className="w-3.5 h-3.5" />
                           </Button>
@@ -347,45 +538,24 @@ export default function TabelaComissao() {
               <label className="text-sm font-medium text-gray-700 mb-1 block">Valor Mínimo</label>
               <Input value={form.valorMinimo || ''} onChange={e => setField('valorMinimo', e.target.value)} placeholder=">=$1.000,00" />
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Meses De</label>
-                <Input value={form.mesesDe || ''} onChange={e => setField('mesesDe', e.target.value)} placeholder="48" />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700 mb-1 block">Meses Até</label>
-                <Input value={form.mesesAte || ''} onChange={e => setField('mesesAte', e.target.value)} placeholder="60" />
-              </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Meses De</label>
+              <Input value={form.mesesDe || ''} onChange={e => setField('mesesDe', e.target.value)} placeholder="48" />
             </div>
 
-            <div className="col-span-2 border-t pt-3">
-              <p className="text-sm font-semibold text-gray-700 mb-2">Faixas de Comissão</p>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Meses Até</label>
+              <Input value={form.mesesAte || ''} onChange={e => setField('mesesAte', e.target.value)} placeholder="60" />
+            </div>
+
+            <div className="col-span-2">
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Valores dos Ativos</label>
               <div className="grid grid-cols-5 gap-2">
-                {(['faixa1','faixa2','faixa3','faixa4','faixa5'] as const).map((f, i) => (
-                  <div key={f}>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">Faixa {i+1}</label>
-                    <Input value={form[f] || ''} onChange={e => setField(f, e.target.value)} placeholder="0.0195" className="text-sm" />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Tabela Cálculo</label>
-              <Input value={form.tabelaCalculo || ''} onChange={e => setField('tabelaCalculo', e.target.value)} placeholder="0.0203" />
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Referência</label>
-              <Input value={form.referencia || ''} onChange={e => setField('referencia', e.target.value)} placeholder="0.02" />
-            </div>
-
-            <div className="col-span-2 border-t pt-3">
-              <p className="text-sm font-semibold text-gray-700 mb-2">Ativos (percentuais de comissão)</p>
-              <div className="grid grid-cols-4 gap-2">
-                {(['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'] as (keyof FormData)[]).map((a, i) => (
-                  <div key={a}>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">Ativo {String(i+1).padStart(2,'0')}</label>
-                    <Input value={form[a] || ''} onChange={e => setField(a, e.target.value)} placeholder="0.0065" className="text-sm" />
+                {['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10'].map((key) => (
+                  <div key={key}>
+                    <label className="text-xs font-medium text-gray-600 mb-1 block">{key.replace('ativo', 'Ativo ')}</label>
+                    <Input value={form[key as keyof FormData] || ''} onChange={e => setField(key as keyof FormData, e.target.value)} placeholder="0.0065" />
                   </div>
                 ))}
               </div>
@@ -394,18 +564,18 @@ export default function TabelaComissao() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setModalOpen(false)}>Cancelar</Button>
-            <Button onClick={handleSalvar} disabled={isSaving} style={{ backgroundColor: '#002776' }}>
+            <Button onClick={handleSalvar} disabled={isSaving} className="bg-blue-700 hover:bg-blue-800">
               {isSaving ? 'Salvando...' : 'Salvar'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Confirmação de exclusão */}
+      {/* Modal Confirmar Exclusão */}
       <AlertDialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
@@ -413,10 +583,11 @@ export default function TabelaComissao() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
+              onClick={() => deleteId && excluirMutation.mutate({ id: deleteId })}
+              disabled={excluirMutation.isPending}
               className="bg-red-600 hover:bg-red-700"
-              onClick={() => deleteId !== null && excluirMutation.mutate({ id: deleteId })}
             >
-              Excluir
+              {excluirMutation.isPending ? 'Excluindo...' : 'Excluir'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

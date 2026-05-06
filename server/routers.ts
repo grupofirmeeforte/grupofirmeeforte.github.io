@@ -585,6 +585,42 @@ export const appRouter = router({
       return rows.map(r => r.empresa).filter(Boolean) as string[];
     }),
 
+    obterTotalizador: publicProcedure
+      .input(z.object({
+        mes: z.string().optional(),
+        empresa: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return { totalVrLiquido: 0, totalComissao: 0 };
+        const { consignados } = await import('../drizzle/schema');
+        const { eq, and } = await import('drizzle-orm');
+        
+        const conditions: any[] = [];
+        if (input?.mes) conditions.push(eq(consignados.mes, input.mes));
+        if (input?.empresa) conditions.push(eq(consignados.empresa, input.empresa));
+        
+        const rows = conditions.length > 0
+          ? await db.select().from(consignados).where(and(...conditions))
+          : await db.select().from(consignados);
+        
+        const totalVrLiquido = rows.reduce((sum, r) => {
+          const val = parseFloat(r.valorLiquido || '0');
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
+        
+        const totalComissao = rows.reduce((sum, r) => {
+          const val = parseFloat(r.totalComissao || '0');
+          return sum + (isNaN(val) ? 0 : val);
+        }, 0);
+        
+        return {
+          totalVrLiquido,
+          totalComissao,
+          registros: rows.length,
+        };
+      }),
+
     importar: publicProcedure
       .input(z.array(z.object({
         empresa: z.string().optional(), mes: z.string().optional(),
