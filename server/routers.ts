@@ -494,6 +494,28 @@ export const appRouter = router({
         return await db.delete(consignados).where(eq(consignados.id, input.id));
       }),
 
+    // Procedure para buscar registros com filtros
+    buscarComFiltros: publicProcedure
+      .input(z.object({
+        mes: z.string().optional(),
+        chaveJ: z.string().optional(),
+        nomeAgente: z.string().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { consignados } = await import('../drizzle/schema');
+        const { eq, and, like } = await import('drizzle-orm');
+        const conditions: any[] = [];
+        if (input?.mes) conditions.push(eq(consignados.mes, input.mes));
+        if (input?.chaveJ) conditions.push(like(consignados.chaveJ, `%${input.chaveJ}%`));
+        if (input?.nomeAgente) conditions.push(like(consignados.nomeAgente, `%${input.nomeAgente}%`));
+        const { desc } = await import('drizzle-orm');
+        return conditions.length > 0
+          ? await db.select().from(consignados).where(and(...conditions)).orderBy(desc(consignados.createdAt), consignados.mes, consignados.nomeAgente)
+          : await db.select().from(consignados).orderBy(desc(consignados.createdAt), consignados.mes, consignados.nomeAgente);
+      }),
+
     // Procedure para calcular fórmulas automáticas dado chaveJ e convenio
     calcularFormulas: publicProcedure
       .input(z.object({

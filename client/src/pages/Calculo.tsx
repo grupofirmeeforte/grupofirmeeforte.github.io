@@ -4,70 +4,32 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export default function Calculo() {
   const [, navigate] = useLocation();
 
-  // Estado para todos os campos
-  const [formData, setFormData] = useState({
-    empresa: "",
-    mesAno: "426",
+  // Filtros
+  const [filtros, setFiltros] = useState({
     chaveJ: "",
+    mesAno: "426",
     nomeAgente: "",
-    cidade: "",
-    percentual: "",
-    comissaoTotal: "",
-    rbmTotal: "",
-    comissaoConsig: "",
-    comissaoConsorcio: "",
-    comissaoOurocap: "",
-    comissaoCC: "",
-    comissaoSeguros: "",
-    ajudaCusto: "",
-    creditosDebitos: "",
-    adiantamento: "",
-    reajuste: "",
-    comissaoSupervisor: "",
-    rbmCredito: "",
-    rbmCC: "",
-    rbmConsorcio: "",
-    rbmOurocap: "",
-    rbmSeguros: "",
-    qtdeContas: "",
-    vrLiquido: "",
-    srcc: "",
-    vrLiquidoSrcc: "",
   });
 
-  // Query para buscar Chaves J por Mês/Ano
-  useEffect(() => {
-    console.log('Buscando Chaves J para mês:', formData.mesAno);
-  }, [formData.mesAno]);
-
-  const { data: chavesJComDuplicatas = [], isLoading: loadingChavesJ } = trpc.consignado.buscarChavesJPorMes.useQuery(
-    { mes: formData.mesAno },
-    { enabled: !!formData.mesAno }
+  // Query para buscar todos os registros de Consignado com filtros
+  const { data: registros = [], isLoading } = trpc.consignado.buscarComFiltros.useQuery(
+    {
+      chaveJ: filtros.chaveJ || undefined,
+      mes: filtros.mesAno || undefined,
+      nomeAgente: filtros.nomeAgente || undefined,
+    },
+    { enabled: true }
   );
 
-  // Remover duplicatas - mostrar cada Chave J UMA VEZ só
-  const chavesJ = Array.from(new Set(chavesJComDuplicatas));
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+  const handleFiltroChange = (field: string, value: string) => {
+    setFiltros(prev => ({
       ...prev,
       [field]: value,
     }));
-  };
-
-  const handleSelectChaveJ = (value: string) => {
-    handleInputChange("chaveJ", value);
   };
 
   const handleCancel = () => {
@@ -75,39 +37,39 @@ export default function Calculo() {
   };
 
   const handleSalvar = () => {
-    console.log("Salvando cálculo:", formData);
+    console.log("Salvando cálculos");
     // TODO: Implementar salvamento
   };
 
   // Campos da tabela em ordem
   const campos = [
-    { label: "Empresa", key: "empresa", editavel: true },
-    { label: "Mês Ano", key: "mesAno", editavel: false },
-    { label: "Chave J", key: "chaveJ", editavel: true, isSelect: true },
-    { label: "Nome Agente", key: "nomeAgente", editavel: false },
-    { label: "Cidade", key: "cidade", editavel: false },
-    { label: "Percentual", key: "percentual", editavel: false },
-    { label: "Comissão Total", key: "comissaoTotal", editavel: false },
-    { label: "RBM Total", key: "rbmTotal", editavel: false },
-    { label: "Comissão Consig", key: "comissaoConsig", editavel: false },
-    { label: "Comissão Consórcio", key: "comissaoConsorcio", editavel: false },
-    { label: "Comissão Ourocap", key: "comissaoOurocap", editavel: false },
-    { label: "Comissão C/C", key: "comissaoCC", editavel: false },
-    { label: "Comissão Seguros", key: "comissaoSeguros", editavel: false },
-    { label: "Ajuda de Custo", key: "ajudaCusto", editavel: true },
-    { label: "Créditos/Débitos", key: "creditosDebitos", editavel: true },
-    { label: "Adiantamento", key: "adiantamento", editavel: true },
-    { label: "Reajuste", key: "reajuste", editavel: true },
-    { label: "Comissão Supervisor", key: "comissaoSupervisor", editavel: true },
-    { label: "RBM Crédito", key: "rbmCredito", editavel: false },
-    { label: "RBM C/C", key: "rbmCC", editavel: false },
-    { label: "RBM Consórcio", key: "rbmConsorcio", editavel: false },
-    { label: "RBM OuroCap", key: "rbmOurocap", editavel: false },
-    { label: "RBM Seguros", key: "rbmSeguros", editavel: false },
-    { label: "Qtde Contas", key: "qtdeContas", editavel: true },
-    { label: "Vr. Líquido", key: "vrLiquido", editavel: false },
-    { label: "SRCC", key: "srcc", editavel: true },
-    { label: "Vr. Líquido-SRCC", key: "vrLiquidoSrcc", editavel: false },
+    { label: "Empresa", key: "empresa" },
+    { label: "Mês Ano", key: "mesAno" },
+    { label: "Chave J", key: "chaveJ" },
+    { label: "Nome Agente", key: "nomeAgente" },
+    { label: "Cidade", key: "cidade" },
+    { label: "Percentual", key: "percentual" },
+    { label: "Comissão Total", key: "comissaoTotal" },
+    { label: "RBM Total", key: "rbmTotal" },
+    { label: "Comissão Consig", key: "comissaoConsig" },
+    { label: "Comissão Consórcio", key: "comissaoConsorcio" },
+    { label: "Comissão Ourocap", key: "comissaoOurocap" },
+    { label: "Comissão C/C", key: "comissaoCC" },
+    { label: "Comissão Seguros", key: "comissaoSeguros" },
+    { label: "Ajuda de Custo", key: "ajudaCusto" },
+    { label: "Créditos/Débitos", key: "creditosDebitos" },
+    { label: "Adiantamento", key: "adiantamento" },
+    { label: "Reajuste", key: "reajuste" },
+    { label: "Comissão Supervisor", key: "comissaoSupervisor" },
+    { label: "RBM Crédito", key: "rbmCredito" },
+    { label: "RBM C/C", key: "rbmCC" },
+    { label: "RBM Consórcio", key: "rbmConsorcio" },
+    { label: "RBM OuroCap", key: "rbmOurocap" },
+    { label: "RBM Seguros", key: "rbmSeguros" },
+    { label: "Qtde Contas", key: "qtdeContas" },
+    { label: "Vr. Líquido", key: "vrLiquido" },
+    { label: "SRCC", key: "srcc" },
+    { label: "Vr. Líquido-SRCC", key: "vrLiquidoSrcc" },
   ];
 
   return (
@@ -130,59 +92,76 @@ export default function Calculo() {
           </div>
         </div>
 
-        {/* Tabela horizontal */}
-        <div className="overflow-x-auto bg-white rounded-lg shadow">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gradient-to-r from-purple-400 to-pink-400">
-                {campos.map((campo) => (
-                  <th key={campo.key} className="px-3 py-2 text-left text-xs font-bold text-white whitespace-nowrap">
-                    {campo.label}
-                  </th>
+        {/* Filtros */}
+        <div className="bg-white rounded-lg shadow p-4 mb-6">
+          <h2 className="text-lg font-semibold mb-4">Filtros</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Mês/Ano</label>
+              <Input
+                type="text"
+                placeholder="426"
+                value={filtros.mesAno}
+                onChange={(e) => handleFiltroChange("mesAno", e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Chave J</label>
+              <Input
+                type="text"
+                placeholder="Ex: J9660864"
+                value={filtros.chaveJ}
+                onChange={(e) => handleFiltroChange("chaveJ", e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Nome Agente</label>
+              <Input
+                type="text"
+                placeholder="Ex: João Silva"
+                value={filtros.nomeAgente}
+                onChange={(e) => handleFiltroChange("nomeAgente", e.target.value)}
+                className="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Tabela com todos os registros */}
+        <div className="bg-white rounded-lg shadow overflow-x-auto">
+          {isLoading ? (
+            <div className="p-8 text-center text-slate-500">Carregando...</div>
+          ) : registros.length === 0 ? (
+            <div className="p-8 text-center text-slate-500">Nenhum registro encontrado</div>
+          ) : (
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gradient-to-r from-purple-400 to-pink-400">
+                  {campos.map((campo) => (
+                    <th key={campo.key} className="px-3 py-2 text-left text-xs font-bold text-white whitespace-nowrap">
+                      {campo.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {registros.map((registro: any, index: number) => (
+                  <tr key={index} className="border-b border-slate-200 hover:bg-slate-50">
+                    {campos.map((campo) => (
+                      <td key={campo.key} className="px-3 py-2 text-sm whitespace-nowrap">
+                        {registro[campo.key] || "-"}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {campos.map((campo) => (
-                  <td key={campo.key} className="px-3 py-2 border-b border-slate-200">
-                    {campo.isSelect ? (
-                      <Select value={formData[campo.key as keyof typeof formData]} onValueChange={(value) => handleSelectChaveJ(value)}>
-                        <SelectTrigger className="h-8 text-xs border-0 bg-white">
-                          <SelectValue placeholder="Selecione..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {loadingChavesJ ? (
-                            <div className="p-2 text-sm text-slate-500">Carregando...</div>
-                          ) : chavesJ.length === 0 ? (
-                            <div className="p-2 text-sm text-slate-500">Nenhuma Chave J encontrada</div>
-                          ) : (
-                            chavesJ.map((chave) => (
-                              <SelectItem key={chave} value={chave}>
-                                {chave}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <Input
-                        type={campo.key.includes("percentual") || campo.key.includes("Liquido") || campo.key.includes("Total") ? "number" : "text"}
-                        value={formData[campo.key as keyof typeof formData]}
-                        onChange={(e) => handleInputChange(campo.key, e.target.value)}
-                        disabled={!campo.editavel}
-                        placeholder="..."
-                        className="h-8 text-xs border-0 px-2"
-                        style={{
-                          backgroundColor: campo.editavel ? "white" : "#f1f5f9",
-                        }}
-                      />
-                    )}
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          )}
+          <div className="p-4 bg-slate-50 border-t border-slate-200 text-sm text-slate-600">
+            Total: {registros.length} registro(s)
+          </div>
         </div>
       </div>
     </div>
