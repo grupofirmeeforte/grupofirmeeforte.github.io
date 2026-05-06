@@ -267,12 +267,20 @@ export default function Consignado() {
               if (field === 'parcela') {
                 reg[field] = parseInt(String(val)) || undefined;
               } else if (field === 'dtContratacao') {
-                // Converter data do Excel
+                // Converter data do Excel ou texto
                 if (typeof val === 'number') {
                   const d = XLSX.SSF.parse_date_code(val);
                   reg[field] = `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;
                 } else {
-                  reg[field] = String(val);
+                  // Tentar normalizar data em texto (DD/MM/AAAA ou DD-MM-AAAA)
+                  const dateStr = String(val);
+                  const dateMatch = dateStr.match(/(\d{2})[\/\-](\d{2})[\/\-](\d{4})/);
+                  if (dateMatch) {
+                    const [, day, month, year] = dateMatch;
+                    reg[field] = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+                  } else {
+                    reg[field] = dateStr;
+                  }
                 }
               } else {
                 reg[field] = String(val);

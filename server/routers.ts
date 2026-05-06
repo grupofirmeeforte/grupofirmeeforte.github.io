@@ -599,9 +599,20 @@ export const appRouter = router({
                   if (!processed.supervisor) processed.supervisor = agente.supervisor || undefined;
                   
                   // 2. Determinar nível do agente
-                  const situacao = agente.situacao || '';
-                  const nivelMatch = situacao.match(/Ativo(\d{2})/i);
-                  const nivelNum = nivelMatch ? parseInt(nivelMatch[1]) : null;
+                  // Tentar primeiro usar o campo 'nivel', depois 'situacao' como fallback
+                  let nivelNum: number | null = null;
+                  
+                  if (agente.nivel) {
+                    const nivelMatch = agente.nivel.match(/\d{2}/);
+                    nivelNum = nivelMatch ? parseInt(nivelMatch[0]) : null;
+                  }
+                  
+                  if (!nivelNum) {
+                    const situacao = agente.situacao || '';
+                    const nivelMatch = situacao.match(/Ativo(\d{2})/i);
+                    nivelNum = nivelMatch ? parseInt(nivelMatch[1]) : null;
+                  }
+                  
                   const ativoCol = nivelNum ? `ativo${String(nivelNum).padStart(2, '0')}` : null;
                   
                   // 3. Buscar percentual na Tabela Comissão
