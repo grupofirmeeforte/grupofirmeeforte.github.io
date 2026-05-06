@@ -18,7 +18,7 @@ export default function Calculo() {
   // Estado para todos os campos
   const [formData, setFormData] = useState({
     empresa: "",
-    mesAno: "",
+    mesAno: "426",
     chaveJ: "",
     nomeAgente: "",
     cidade: "",
@@ -47,122 +47,105 @@ export default function Calculo() {
   });
 
   // Query para buscar Chaves J por Mês/Ano
-  const { data: chavesJ = [], isLoading: loadingChavesJ } = trpc.consignado.buscarChavesJPorMes.useQuery(
+  useEffect(() => {
+    console.log('Buscando Chaves J para mês:', formData.mesAno);
+  }, [formData.mesAno]);
+
+  const { data: chavesJComDuplicatas = [], isLoading: loadingChavesJ } = trpc.consignado.buscarChavesJPorMes.useQuery(
     { mes: formData.mesAno },
     { enabled: !!formData.mesAno }
   );
 
+  // Remover duplicatas - mostrar cada Chave J UMA VEZ só
+  const chavesJ = Array.from(new Set(chavesJComDuplicatas));
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const handleSelectChaveJ = (value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      chaveJ: value
-    }));
+    handleInputChange("chaveJ", value);
   };
 
-  const handleSave = () => {
-    console.log("Salvando cálculo:", formData);
-    // TODO: Implementar chamada ao router para salvar
-  };
-
-  const handleVoltar = () => {
+  const handleCancel = () => {
     navigate("/");
   };
 
-  // Definição dos campos da tabela
+  const handleSalvar = () => {
+    console.log("Salvando cálculo:", formData);
+    // TODO: Implementar salvamento
+  };
+
+  // Campos da tabela em ordem
   const campos = [
-    { key: "empresa", label: "Empresa", width: "100px", editable: true },
-    { key: "mesAno", label: "Mês Ano", width: "100px", editable: true },
-    { key: "chaveJ", label: "Chave J", width: "100px", editable: true, isSelect: true },
-    { key: "nomeAgente", label: "Nome Agente", width: "150px", editable: false },
-    { key: "cidade", label: "Cidade", width: "120px", editable: false },
-    { key: "percentual", label: "Percentual", width: "100px", editable: true },
-    { key: "comissaoTotal", label: "Comissão Total", width: "120px", editable: false },
-    { key: "rbmTotal", label: "RBM Total", width: "100px", editable: false },
-    { key: "comissaoConsig", label: "Comissão Consig", width: "130px", editable: false },
-    { key: "comissaoConsorcio", label: "Comissão Consórcio", width: "150px", editable: false },
-    { key: "comissaoOurocap", label: "Comissão Ourocap", width: "140px", editable: false },
-    { key: "comissaoCC", label: "Comissão C/C", width: "120px", editable: false },
-    { key: "comissaoSeguros", label: "Comissão Seguros", width: "140px", editable: false },
-    { key: "ajudaCusto", label: "Ajuda de Custo", width: "130px", editable: true },
-    { key: "creditosDebitos", label: "Créditos/Débitos", width: "140px", editable: true },
-    { key: "adiantamento", label: "Adiantamento", width: "120px", editable: true },
-    { key: "reajuste", label: "Reajuste", width: "100px", editable: true },
-    { key: "comissaoSupervisor", label: "Comissão Supervisor", width: "150px", editable: true },
-    { key: "rbmCredito", label: "RBM Crédito", width: "120px", editable: false },
-    { key: "rbmCC", label: "RBM C/C", width: "100px", editable: false },
-    { key: "rbmConsorcio", label: "RBM Consórcio", width: "130px", editable: false },
-    { key: "rbmOurocap", label: "RBM OuroCap", width: "120px", editable: false },
-    { key: "rbmSeguros", label: "RBM Seguros", width: "120px", editable: false },
-    { key: "qtdeContas", label: "Qtde Contas", width: "110px", editable: true },
-    { key: "vrLiquido", label: "Vr. Líquido", width: "120px", editable: false },
-    { key: "srcc", label: "SRCC", width: "100px", editable: true },
-    { key: "vrLiquidoSrcc", label: "Vr. Líquido-SRCC", width: "140px", editable: false },
+    { label: "Empresa", key: "empresa", editavel: true },
+    { label: "Mês Ano", key: "mesAno", editavel: false },
+    { label: "Chave J", key: "chaveJ", editavel: true, isSelect: true },
+    { label: "Nome Agente", key: "nomeAgente", editavel: false },
+    { label: "Cidade", key: "cidade", editavel: false },
+    { label: "Percentual", key: "percentual", editavel: false },
+    { label: "Comissão Total", key: "comissaoTotal", editavel: false },
+    { label: "RBM Total", key: "rbmTotal", editavel: false },
+    { label: "Comissão Consig", key: "comissaoConsig", editavel: false },
+    { label: "Comissão Consórcio", key: "comissaoConsorcio", editavel: false },
+    { label: "Comissão Ourocap", key: "comissaoOurocap", editavel: false },
+    { label: "Comissão C/C", key: "comissaoCC", editavel: false },
+    { label: "Comissão Seguros", key: "comissaoSeguros", editavel: false },
+    { label: "Ajuda de Custo", key: "ajudaCusto", editavel: true },
+    { label: "Créditos/Débitos", key: "creditosDebitos", editavel: true },
+    { label: "Adiantamento", key: "adiantamento", editavel: true },
+    { label: "Reajuste", key: "reajuste", editavel: true },
+    { label: "Comissão Supervisor", key: "comissaoSupervisor", editavel: true },
+    { label: "RBM Crédito", key: "rbmCredito", editavel: false },
+    { label: "RBM C/C", key: "rbmCC", editavel: false },
+    { label: "RBM Consórcio", key: "rbmConsorcio", editavel: false },
+    { label: "RBM OuroCap", key: "rbmOurocap", editavel: false },
+    { label: "RBM Seguros", key: "rbmSeguros", editavel: false },
+    { label: "Qtde Contas", key: "qtdeContas", editavel: true },
+    { label: "Vr. Líquido", key: "vrLiquido", editavel: false },
+    { label: "SRCC", key: "srcc", editavel: true },
+    { label: "Vr. Líquido-SRCC", key: "vrLiquidoSrcc", editavel: false },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Header */}
-      <div className="bg-white shadow sticky top-0 z-10">
-        <div className="max-w-full px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleVoltar}
-              className="rounded-full"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
+    <div className="min-h-screen bg-slate-50 p-4">
+      <div className="max-w-full">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <button onClick={handleCancel} className="p-2 hover:bg-slate-200 rounded">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Cálculo</h1>
+              <h1 className="text-2xl font-bold">Cálculo</h1>
               <p className="text-sm text-slate-600">Comissões, Pagamentos e Relatórios</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleVoltar}>
-              Cancelar
-            </Button>
-            <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-              Salvar Cálculo
-            </Button>
+            <Button variant="outline" onClick={handleCancel}>Cancelar</Button>
+            <Button onClick={handleSalvar} className="bg-blue-600 hover:bg-blue-700">Salvar Cálculo</Button>
           </div>
         </div>
-      </div>
 
-      {/* Tabela Horizontal Rolável */}
-      <div className="p-6">
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
+        {/* Tabela horizontal */}
+        <div className="overflow-x-auto bg-white rounded-lg shadow">
           <table className="w-full border-collapse">
-            {/* Cabeçalho */}
             <thead>
-              <tr className="bg-gradient-to-r from-purple-500 to-pink-500">
+              <tr className="bg-gradient-to-r from-purple-400 to-pink-400">
                 {campos.map((campo) => (
-                  <th
-                    key={campo.key}
-                    style={{ width: campo.width, minWidth: campo.width }}
-                    className="px-3 py-3 text-left text-xs font-bold text-white border border-purple-600 whitespace-nowrap"
-                  >
+                  <th key={campo.key} className="px-3 py-2 text-left text-xs font-bold text-white whitespace-nowrap">
                     {campo.label}
                   </th>
                 ))}
               </tr>
             </thead>
-            {/* Corpo */}
             <tbody>
-              <tr className="hover:bg-slate-50">
+              <tr>
                 {campos.map((campo) => (
-                  <td
-                    key={campo.key}
-                    style={{ width: campo.width, minWidth: campo.width }}
-                    className="px-2 py-2 border border-slate-200"
-                  >
+                  <td key={campo.key} className="px-3 py-2 border-b border-slate-200">
                     {campo.isSelect ? (
                       <Select value={formData[campo.key as keyof typeof formData]} onValueChange={(value) => handleSelectChaveJ(value)}>
                         <SelectTrigger className="h-8 text-xs border-0 bg-white">
@@ -174,8 +157,8 @@ export default function Calculo() {
                           ) : chavesJ.length === 0 ? (
                             <div className="p-2 text-sm text-slate-500">Nenhuma Chave J encontrada</div>
                           ) : (
-                            chavesJ.map((chave, index) => (
-                              <SelectItem key={`${chave}-${index}`} value={chave}>
+                            chavesJ.map((chave) => (
+                              <SelectItem key={chave} value={chave}>
                                 {chave}
                               </SelectItem>
                             ))
@@ -185,15 +168,14 @@ export default function Calculo() {
                     ) : (
                       <Input
                         type={campo.key.includes("percentual") || campo.key.includes("Liquido") || campo.key.includes("Total") ? "number" : "text"}
-                        placeholder={campo.editable ? "..." : ""}
                         value={formData[campo.key as keyof typeof formData]}
                         onChange={(e) => handleInputChange(campo.key, e.target.value)}
-                        readOnly={!campo.editable}
-                        className={`h-8 text-xs border-0 ${
-                          campo.editable 
-                            ? "bg-white" 
-                            : "bg-slate-100 text-slate-500"
-                        }`}
+                        disabled={!campo.editavel}
+                        placeholder="..."
+                        className="h-8 text-xs border-0 px-2"
+                        style={{
+                          backgroundColor: campo.editavel ? "white" : "#f1f5f9",
+                        }}
                       />
                     )}
                   </td>
