@@ -79,19 +79,7 @@ export default function Home() {
         { title: 'Tabela Comissão', description: 'Faixas e percentuais de comissão por convênio', icon: TableProperties, color: 'bg-indigo-500', path: '/tabela-comissao' },
       ],
     },
-    {
-      type: 'group',
-      key: 'febraban',
-      title: 'Febraban',
-      description: 'Regulamentações e conformidade Febraban',
-      icon: Landmark,
-      color: 'bg-amber-600',
-      borderColor: 'border-amber-200',
-      bgColor: 'from-amber-50 to-yellow-50',
-      subModules: [
-        { title: 'Relatório BB', description: 'Importar e visualizar relatório de produção BB', icon: Factory, color: 'bg-amber-500', path: '/febraban' },
-      ],
-    },
+
     {
       type: 'group',
       key: 'financeiro',
@@ -102,7 +90,7 @@ export default function Home() {
       borderColor: 'border-red-200',
       bgColor: 'from-red-50 to-orange-50',
       subModules: [
-        // Abas serão adicionadas aqui futuramente
+        { title: 'Cálculo', description: 'Cálculo de comissões e RBM', icon: DollarSign, color: 'bg-red-500', path: '/calculo' },
       ],
     },
     {

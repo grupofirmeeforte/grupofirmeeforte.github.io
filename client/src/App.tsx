@@ -12,7 +12,8 @@ import AuditoriaPage from "./pages/auditoria";
 import TabelaComissao from './pages/TabelaComissao';
 import Consignado from './pages/Consignado';
 import ContaCorrente from './pages/ContaCorrente';
-import Febraban from './pages/Febraban';
+import Calculo from './pages/Calculo';
+
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
 import { useDisconnectNotification } from "./hooks/useDisconnectNotification";
@@ -44,7 +45,8 @@ function RouterWithInactivity() {
       <Route path={"/tabela-comissao"} component={TabelaComissao} />
       <Route path={"/consignado"} component={Consignado} />
       <Route path={"/conta-corrente"} component={ContaCorrente} />
-      <Route path={"/febraban"} component={Febraban} />
+      <Route path={"/calculo"} component={Calculo} />
+
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
