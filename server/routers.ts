@@ -597,11 +597,10 @@ export const appRouter = router({
           input.map(async (record) => {
             const processed = { ...record };
             
-            // Normalizar campos de percentual/taxa
-            if (processed.juros) {
-              const normalized = normalizePercentage(processed.juros);
-              processed.juros = normalized !== undefined ? String(normalized) : undefined;
-            }
+            // Juros já vem como percentual (ex: 2.40 = 2,40%), não normalizar
+            // Manter como está
+            
+            // Normalizar Perc. A Vista
             if (processed.percAVista) {
               const normalized = normalizePercentage(processed.percAVista);
               processed.percAVista = normalized !== undefined ? String(normalized) : undefined;
