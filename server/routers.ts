@@ -1062,6 +1062,157 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+  calculo: router({
+    listar: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return [];
+      
+      const { calculos } = await import('../drizzle/schema');
+      return await db.select().from(calculos);
+    }),
+    
+    criar: publicProcedure
+      .input(z.object({
+        empresa: z.string(),
+        mesRef: z.string(),
+        chaveJ: z.string(),
+        nomeAgente: z.string().optional(),
+        cidade: z.string().optional(),
+        situacao: z.string().optional(),
+        percentual: z.number().optional(),
+        comissaoTotal: z.number().optional(),
+        rbmTotal: z.number().optional(),
+        comissaoConsig: z.number().optional(),
+        comissaoConsorcio: z.number().optional(),
+        comissaoOurocap: z.number().optional(),
+        comissaoCc: z.number().optional(),
+        ajudaCusto: z.number().optional(),
+        creditosDebitos: z.number().optional(),
+        adiantamento: z.number().optional(),
+        reajuste: z.number().optional(),
+        comissaoSupervisor: z.number().optional(),
+        rbmCreditoC2: z.number().optional(),
+        rbmContaCorrente: z.number().optional(),
+        rbmConsorcioC2: z.number().optional(),
+        rbmOurocap: z.number().optional(),
+        qtdeContas: z.number().optional(),
+        vrLiquidoC2: z.number().optional(),
+        srccC2: z.number().optional(),
+        vrLiquidoSrcc: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        
+        const { calculos } = await import('../drizzle/schema');
+        
+        const result = await db.insert(calculos).values({
+          empresa: input.empresa,
+          mesRef: input.mesRef,
+          chaveJ: input.chaveJ,
+          nomeAgente: input.nomeAgente || null,
+          cidade: input.cidade || null,
+          situacao: input.situacao || null,
+          percentual: input.percentual || 0,
+          comissaoTotal: input.comissaoTotal || 0,
+          rbmTotal: input.rbmTotal || 0,
+          comissaoConsig: input.comissaoConsig || 0,
+          comissaoConsorcio: input.comissaoConsorcio || 0,
+          comissaoOurocap: input.comissaoOurocap || 0,
+          comissaoCc: input.comissaoCc || 0,
+          ajudaCusto: input.ajudaCusto || 0,
+          creditosDebitos: input.creditosDebitos || 0,
+          adiantamento: input.adiantamento || 0,
+          reajuste: input.reajuste || 0,
+          comissaoSupervisor: input.comissaoSupervisor || 0,
+          rbmCreditoC2: input.rbmCreditoC2 || 0,
+          rbmContaCorrente: input.rbmContaCorrente || 0,
+          rbmConsorcioC2: input.rbmConsorcioC2 || 0,
+          rbmOurocap: input.rbmOurocap || 0,
+          qtdeContas: input.qtdeContas || 0,
+          vrLiquidoC2: input.vrLiquidoC2 || 0,
+          srccC2: input.srccC2 || 0,
+          vrLiquidoSrcc: input.vrLiquidoSrcc || 0,
+        });
+        
+        const insertId = (result as any).insertId || (result as any)[0]?.insertId;
+        return { success: true, id: insertId };
+      }),
+    
+    editar: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        empresa: z.string().optional(),
+        mesRef: z.string().optional(),
+        chaveJ: z.string().optional(),
+        nomeAgente: z.string().optional(),
+        cidade: z.string().optional(),
+        situacao: z.string().optional(),
+        percentual: z.number().optional(),
+        comissaoTotal: z.number().optional(),
+        rbmTotal: z.number().optional(),
+        comissaoConsig: z.number().optional(),
+        comissaoConsorcio: z.number().optional(),
+        comissaoOurocap: z.number().optional(),
+        comissaoCc: z.number().optional(),
+        ajudaCusto: z.number().optional(),
+        creditosDebitos: z.number().optional(),
+        adiantamento: z.number().optional(),
+        reajuste: z.number().optional(),
+        comissaoSupervisor: z.number().optional(),
+        rbmCreditoC2: z.number().optional(),
+        rbmContaCorrente: z.number().optional(),
+        rbmConsorcioC2: z.number().optional(),
+        rbmOurocap: z.number().optional(),
+        qtdeContas: z.number().optional(),
+        vrLiquidoC2: z.number().optional(),
+        srccC2: z.number().optional(),
+        vrLiquidoSrcc: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        
+        const { calculos } = await import('../drizzle/schema');
+        const { id, ...dados } = input;
+        
+        await db.update(calculos).set(dados as any).where(eq(calculos.id, id));
+        return { success: true };
+      }),
+    
+    deletar: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        
+        const { calculos } = await import('../drizzle/schema');
+        await db.delete(calculos).where(eq(calculos.id, input.id));
+        return { success: true };
+      }),
+    
+    buscarPorChaveJ: publicProcedure
+      .input(z.object({
+        chaveJ: z.string(),
+        mesRef: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        
+        const { calculos } = await import('../drizzle/schema');
+        const { eq, and } = await import('drizzle-orm');
+        
+        const [result] = await db.select().from(calculos)
+          .where(and(
+            eq(calculos.chaveJ, input.chaveJ),
+            eq(calculos.mesRef, input.mesRef)
+          ))
+          .limit(1);
+        
+        return result || null;
+      }),
+  }),
   relatorioBB: router({
     criarTabela: publicProcedure
       .mutation(async () => {

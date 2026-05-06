@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
@@ -10,66 +12,68 @@ export default function Calculo() {
   const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
     empresa: '',
-    mesAno: '',
+    mesRef: '',
     chaveJ: '',
     nomeAgente: '',
     cidade: '',
+    situacao: '',
     percentual: 0,
     comissaoTotal: 0,
     rbmTotal: 0,
     comissaoConsig: 0,
     comissaoConsorcio: 0,
     comissaoOurocap: 0,
-    comissaoCC: 0,
-    comissaoSeguros: 0,
+    comissaoCc: 0,
     ajudaCusto: 0,
     creditosDebitos: 0,
     adiantamento: 0,
     reajuste: 0,
     comissaoSupervisor: 0,
-    rbmCredito: 0,
-    rbmCC: 0,
-    rbmConsorcio: 0,
+    rbmCreditoC2: 0,
+    rbmContaCorrente: 0,
+    rbmConsorcioC2: 0,
     rbmOurocap: 0,
-    rbmSeguros: 0,
     qtdeContas: 0,
-    vrLiquido: 0,
-    srcc: 0,
+    vrLiquidoC2: 0,
+    srccC2: 0,
     vrLiquidoSrcc: 0,
   });
 
   const { data: consignados = [] } = trpc.consignado.listar.useQuery();
+  const criarCalculo = trpc.calculo.criar.useMutation();
+  const buscarCalculo = trpc.calculo.buscarPorChaveJ.useQuery(
+    { chaveJ: formData.chaveJ, mesRef: formData.mesRef },
+    { enabled: !!formData.chaveJ && !!formData.mesRef }
+  );
 
-  // Buscar dados ao mudar Chave J
+  // Buscar dados ao mudar Chave J e Mês Ref
   useEffect(() => {
-    if (formData.chaveJ && formData.mesAno) {
-      const mesAnoBusca = parseInt(formData.mesAno);
+    if (formData.chaveJ && formData.mesRef) {
+      const mesRefNum = parseInt(formData.mesRef);
       const registros = consignados.filter((c: any) => 
         c.chaveJ === formData.chaveJ && 
-        parseInt(c.tabelaMes || '0') === mesAnoBusca
+        parseInt(c.tabelaMes || '0') === mesRefNum
       );
 
       if (registros.length > 0) {
         // Somar valores por modalidade
-        const rbmCredito = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.rbmcreditoC2 || '0') || 0), 0);
-        const rbmCC = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.rbmContaCorrente || '0') || 0), 0);
-        const rbmConsorcio = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.rbmConsorcioC2 || '0') || 0), 0);
+        const rbmCreditoC2 = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.rbmcreditoC2 || '0') || 0), 0);
+        const rbmContaCorrente = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.rbmContaCorrente || '0') || 0), 0);
+        const rbmConsorcioC2 = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.rbmConsorcioC2 || '0') || 0), 0);
         const rbmOurocap = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.rbmOurocap || '0') || 0), 0);
-        const rbmSeguros = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.rbmSeguro || '0') || 0), 0);
-        const rbmTotal = rbmCredito + rbmCC + rbmConsorcio + rbmOurocap + rbmSeguros;
-        const vrLiquido = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.vrLiquido || '0') || 0), 0);
-        const srcc = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.srcc || '0') || 0), 0);
+        const rbmTotal = rbmCreditoC2 + rbmContaCorrente + rbmConsorcioC2 + rbmOurocap;
+        const vrLiquidoC2 = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.vrLiquido || '0') || 0), 0);
+        const srccC2 = registros.reduce((sum: number, r: any) => sum + (parseFloat(r.srcc || '0') || 0), 0);
 
         setFormData(prev => ({
           ...prev,
-          rbmCredito,
-          rbmCC,
-          rbmConsorcio,
+          rbmCreditoC2,
+          rbmContaCorrente,
+          rbmConsorcioC2,
           rbmOurocap,
-          rbmSeguros,
           rbmTotal,
-          vrLiquido,
-          srcc,
+          vrLiquidoC2,
+          srccC2,
           qtdeContas: registros.length,
           nomeAgente: registros[0]?.nomeAgente || '',
         }));
@@ -77,7 +81,7 @@ export default function Calculo() {
         toast.success(`${registros.length} registros encontrados`);
       }
     }
-  }, [formData.chaveJ, formData.mesAno, consignados]);
+  }, [formData.chaveJ, formData.mesRef, consignados]);
 
   // Calcular Percentual = Total RBM / Comissão Total
   useEffect(() => {
@@ -89,9 +93,9 @@ export default function Calculo() {
 
   // Calcular Vr. Líquido - SRCC
   useEffect(() => {
-    const vrLiquidoSrcc = formData.vrLiquido - formData.srcc;
+    const vrLiquidoSrcc = formData.vrLiquidoC2 - formData.srccC2;
     setFormData(prev => ({ ...prev, vrLiquidoSrcc: parseFloat(vrLiquidoSrcc.toFixed(2)) }));
-  }, [formData.vrLiquido, formData.srcc]);
+  }, [formData.vrLiquidoC2, formData.srccC2]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -104,42 +108,75 @@ export default function Calculo() {
   const handleLimpar = () => {
     setFormData({
       empresa: '',
-      mesAno: '',
+      mesRef: '',
       chaveJ: '',
       nomeAgente: '',
       cidade: '',
+      situacao: '',
       percentual: 0,
       comissaoTotal: 0,
       rbmTotal: 0,
       comissaoConsig: 0,
       comissaoConsorcio: 0,
       comissaoOurocap: 0,
-      comissaoCC: 0,
-      comissaoSeguros: 0,
+      comissaoCc: 0,
       ajudaCusto: 0,
       creditosDebitos: 0,
       adiantamento: 0,
       reajuste: 0,
       comissaoSupervisor: 0,
-      rbmCredito: 0,
-      rbmCC: 0,
-      rbmConsorcio: 0,
+      rbmCreditoC2: 0,
+      rbmContaCorrente: 0,
+      rbmConsorcioC2: 0,
       rbmOurocap: 0,
-      rbmSeguros: 0,
       qtdeContas: 0,
-      vrLiquido: 0,
-      srcc: 0,
+      vrLiquidoC2: 0,
+      srccC2: 0,
       vrLiquidoSrcc: 0,
     });
     toast.success('Formulário limpo!');
   };
 
-  const handleSalvar = () => {
-    if (!formData.empresa || !formData.mesAno || !formData.chaveJ) {
+  const handleSalvar = async () => {
+    if (!formData.empresa || !formData.mesRef || !formData.chaveJ) {
       toast.error('Preencha Empresa, Mês/Ano e Chave J');
       return;
     }
-    toast.success('Cálculo salvo com sucesso!');
+
+    try {
+      await criarCalculo.mutateAsync({
+        empresa: formData.empresa,
+        mesRef: formData.mesRef,
+        chaveJ: formData.chaveJ,
+        nomeAgente: formData.nomeAgente || undefined,
+        cidade: formData.cidade || undefined,
+        situacao: formData.situacao || undefined,
+        percentual: formData.percentual || 0,
+        comissaoTotal: formData.comissaoTotal || 0,
+        rbmTotal: formData.rbmTotal || 0,
+        comissaoConsig: formData.comissaoConsig || 0,
+        comissaoConsorcio: formData.comissaoConsorcio || 0,
+        comissaoOurocap: formData.comissaoOurocap || 0,
+        comissaoCc: formData.comissaoCc || 0,
+        ajudaCusto: formData.ajudaCusto || 0,
+        creditosDebitos: formData.creditosDebitos || 0,
+        adiantamento: formData.adiantamento || 0,
+        reajuste: formData.reajuste || 0,
+        comissaoSupervisor: formData.comissaoSupervisor || 0,
+        rbmCreditoC2: formData.rbmCreditoC2 || 0,
+        rbmContaCorrente: formData.rbmContaCorrente || 0,
+        rbmConsorcioC2: formData.rbmConsorcioC2 || 0,
+        rbmOurocap: formData.rbmOurocap || 0,
+        qtdeContas: formData.qtdeContas || 0,
+        vrLiquidoC2: formData.vrLiquidoC2 || 0,
+        srccC2: formData.srccC2 || 0,
+        vrLiquidoSrcc: formData.vrLiquidoSrcc || 0,
+      });
+      toast.success('Cálculo salvo com sucesso!');
+      handleLimpar();
+    } catch (error: any) {
+      toast.error(error.message || 'Erro ao salvar cálculo');
+    }
   };
 
   const formatCurrency = (value: number) => {
@@ -185,16 +222,16 @@ export default function Calculo() {
                   name="empresa"
                   value={formData.empresa}
                   onChange={handleInputChange}
-                  placeholder="Buscar no cadastro"
+                  placeholder="Ex: BMF"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Mês/Ano</label>
                 <Input
-                  name="mesAno"
-                  value={formData.mesAno}
+                  name="mesRef"
+                  value={formData.mesRef}
                   onChange={handleInputChange}
-                  placeholder="MM/AAAA"
+                  placeholder="Ex: 426"
                 />
                 <p className="text-xs text-gray-500 mt-1">Mês anterior (ex: 426)</p>
               </div>
@@ -223,7 +260,7 @@ export default function Calculo() {
                   name="cidade"
                   value={formData.cidade}
                   onChange={handleInputChange}
-                  placeholder="Buscar em Cadastro Agente"
+                  placeholder="Buscar em Cadastro"
                   disabled
                 />
               </div>
@@ -274,7 +311,6 @@ export default function Calculo() {
                   value={formData.comissaoConsig}
                   onChange={handleInputChange}
                   placeholder="0.00"
-                  disabled
                 />
                 <p className="text-xs text-gray-500 mt-1">Buscar em Consignado</p>
               </div>
@@ -285,16 +321,6 @@ export default function Calculo() {
           <div className="p-6 border-b border-gray-200">
             <h3 className="text-base font-semibold text-gray-900 mb-4">Outros Valores</h3>
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Seguros</label>
-                <Input
-                  name="comissaoSeguros"
-                  type="number"
-                  value={formData.comissaoSeguros}
-                  onChange={handleInputChange}
-                  placeholder="0.00"
-                />
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Ajuda de Custo</label>
                 <Input
@@ -335,6 +361,16 @@ export default function Calculo() {
                   placeholder="0.00"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Comissão Supervisor</label>
+                <Input
+                  name="comissaoSupervisor"
+                  type="number"
+                  value={formData.comissaoSupervisor}
+                  onChange={handleInputChange}
+                  placeholder="0.00"
+                />
+              </div>
             </div>
           </div>
 
@@ -345,9 +381,9 @@ export default function Calculo() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">RBM Crédito C2</label>
                 <Input
-                  name="rbmCredito"
+                  name="rbmCreditoC2"
                   type="number"
-                  value={formData.rbmCredito}
+                  value={formData.rbmCreditoC2}
                   onChange={handleInputChange}
                   placeholder="0.00"
                   disabled
@@ -357,21 +393,23 @@ export default function Calculo() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">RBM Conta Corrente</label>
                 <Input
-                  name="rbmCC"
+                  name="rbmContaCorrente"
                   type="number"
-                  value={formData.rbmCC}
+                  value={formData.rbmContaCorrente}
                   onChange={handleInputChange}
                   placeholder="0.00"
+                  disabled
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">RBM Consórcio C2</label>
                 <Input
-                  name="rbmConsorcio"
+                  name="rbmConsorcioC2"
                   type="number"
-                  value={formData.rbmConsorcio}
+                  value={formData.rbmConsorcioC2}
                   onChange={handleInputChange}
                   placeholder="0.00"
+                  disabled
                 />
               </div>
               <div>
@@ -382,16 +420,18 @@ export default function Calculo() {
                   value={formData.rbmOurocap}
                   onChange={handleInputChange}
                   placeholder="0.00"
+                  disabled
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">RBM Seguros</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">RBM Total</label>
                 <Input
-                  name="rbmSeguros"
+                  name="rbmTotal"
                   type="number"
-                  value={formData.rbmSeguros}
+                  value={formData.rbmTotal}
                   onChange={handleInputChange}
                   placeholder="0.00"
+                  disabled
                 />
               </div>
             </div>
@@ -416,9 +456,9 @@ export default function Calculo() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Vr. Líquido C2</label>
                 <Input
-                  name="vrLiquido"
+                  name="vrLiquidoC2"
                   type="number"
-                  value={formData.vrLiquido}
+                  value={formData.vrLiquidoC2}
                   onChange={handleInputChange}
                   placeholder="0.00"
                   disabled
@@ -428,9 +468,9 @@ export default function Calculo() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">SRCC C2</label>
                 <Input
-                  name="srcc"
+                  name="srccC2"
                   type="number"
-                  value={formData.srcc}
+                  value={formData.srccC2}
                   onChange={handleInputChange}
                   placeholder="0.00"
                   disabled
@@ -457,8 +497,9 @@ export default function Calculo() {
             <Button
               className="bg-blue-600 hover:bg-blue-700 text-white"
               onClick={handleSalvar}
+              disabled={criarCalculo.isPending}
             >
-              Salvar Cálculo
+              {criarCalculo.isPending ? 'Salvando...' : 'Salvar Cálculo'}
             </Button>
             <Button
               variant="outline"

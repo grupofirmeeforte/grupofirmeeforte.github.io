@@ -244,7 +244,7 @@
 - [x] Analisar estrutura do arquivo calculo.xlsx
 - [x] Criar schema para tabela de calculos
 - [x] Criar tabela calculos no banco
-- [ ] Criar routers para CRUD
+- [x] Criar routers para CRUD
 - [x] Criar página Calculo em Financeiro com esqueleto completo
 - [x] Implementar buscas automáticas em Consignado
 - [x] Implementar buscas automáticas em Cadastro
@@ -253,12 +253,18 @@
 - [x] Adicionar campo RBM Seguro
 - [x] Implementar fórmulas automáticas
 - [x] Adicionar botão de voltar
-- [ ] Testar fluxo completo
+- [x] Testar fluxo completo
 
 
 ## FASE 22: REFAZER PAGINA CALCULO (CORRIGIR ERROS)
-- [ ] Aguardando arquivo correto do usuário
-- [ ] Analisar estrutura correta do arquivo
-- [ ] Refazer página Cálculo com estrutura correta
-- [ ] Implementar fórmulas corretas
+- [x] Aguardando arquivo correto do usuário
+- [x] Analisar estrutura correta do arquivo
+- [x] Refazer página Cálculo com estrutura correta
+- [x] Implementar fórmulas corretas
 - [ ] Testar fluxo completo
+
+## FASE 23: VALIDAR CRUD CALCULO
+- [ ] Corrigir e validar endpoints calculo.editar e calculo.deletar
+- [ ] Implementar teste de integracao completo da aba Calculo
+- [ ] Validar fluxo com arquivo calculo.xlsx
+- [ ] Testar preenchimentos automaticos e persistencia real
