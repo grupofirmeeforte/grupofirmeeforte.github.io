@@ -581,15 +581,15 @@ export const appRouter = router({
         if (input.length === 0) return { count: 0 };
         
         // Normalizar campos numéricos: dividir por 100 se valor > 100 (converter de percentual inteiro para decimal)
-        const normalizePercentage = (val: any): string | undefined => {
+        const normalizePercentage = (val: any): number | undefined => {
           if (!val) return undefined;
           const num = parseFloat(String(val).replace(',', '.').replace(/[^0-9.]/g, ''));
           if (isNaN(num)) return undefined;
           // Se valor >= 100, é percentual inteiro (ex: 185 = 1.85%)
           if (num >= 100) {
-            return (num / 100).toFixed(4);
+            return parseFloat((num / 100).toFixed(4));
           }
-          return num.toFixed(4);
+          return parseFloat(num.toFixed(4));
         };
         
         // Processar cada registro para calcular as 5 colunas finais
@@ -598,8 +598,14 @@ export const appRouter = router({
             const processed = { ...record };
             
             // Normalizar campos de percentual/taxa
-            if (processed.juros) processed.juros = normalizePercentage(processed.juros);
-            if (processed.percAVista) processed.percAVista = normalizePercentage(processed.percAVista);
+            if (processed.juros) {
+              const normalized = normalizePercentage(processed.juros);
+              processed.juros = normalized !== undefined ? String(normalized) : undefined;
+            }
+            if (processed.percAVista) {
+              const normalized = normalizePercentage(processed.percAVista);
+              processed.percAVista = normalized !== undefined ? String(normalized) : undefined;
+            }
             
             // Normalizar tabelaMes para 4 casas decimais
             if (processed.tabelaMes) {
