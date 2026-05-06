@@ -174,8 +174,8 @@ export default function Calculo() {
                           ) : chavesJ.length === 0 ? (
                             <div className="p-2 text-sm text-slate-500">Nenhuma Chave J encontrada</div>
                           ) : (
-                            chavesJ.map((chave) => (
-                              <SelectItem key={chave} value={chave}>
+                            chavesJ.map((chave, index) => (
+                              <SelectItem key={`${chave}-${index}`} value={chave}>
                                 {chave}
                               </SelectItem>
                             ))
