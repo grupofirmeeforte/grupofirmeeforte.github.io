@@ -205,19 +205,8 @@ export const consignados = mysqlTable("consignados", {
   percAVista: decimal("percAVista", { precision: 10, scale: 4 }),
   restricaoSRCC: varchar("restricaoSRCC", { length: 100 }),
   srcc: decimal("srcc", { precision: 15, scale: 2 }),
-  // Colunas calculadas por fórmula
-  mesAno: varchar("mesAno", { length: 10 }),
-  percPago: decimal("percPago", { precision: 10, scale: 4 }),
-  totalComissao: decimal("totalComissao", { precision: 15, scale: 2 }),
-  difEmpresa: decimal("difEmpresa", { precision: 15, scale: 2 }),
-  tabela: varchar("tabela", { length: 100 }),
-  supervisor: varchar("supervisor", { length: 255 }),
   // Sinalização de duplicatas
   isDuplicate: boolean("isDuplicate").default(false).notNull(),
-  // Legado
-  parcelas: int("parcelas"),
-  percentual: decimal("percentual", { precision: 10, scale: 4 }),
-  comissao: decimal("comissao", { precision: 15, scale: 2 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
