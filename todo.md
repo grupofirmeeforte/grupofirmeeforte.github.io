@@ -254,3 +254,11 @@
 - [x] Implementar fórmulas automáticas
 - [x] Adicionar botão de voltar
 - [ ] Testar fluxo completo
+
+
+## FASE 22: REFAZER PAGINA CALCULO (CORRIGIR ERROS)
+- [ ] Aguardando arquivo correto do usuário
+- [ ] Analisar estrutura correta do arquivo
+- [ ] Refazer página Cálculo com estrutura correta
+- [ ] Implementar fórmulas corretas
+- [ ] Testar fluxo completo
