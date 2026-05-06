@@ -257,14 +257,14 @@
 
 
 ## FASE 22: REFAZER PAGINA CALCULO (CORRIGIR ERROS)
-- [x] Aguardando arquivo correto do usuário
+- [x] Aguardando arquivo correto do usuario
 - [x] Analisar estrutura correta do arquivo
-- [x] Refazer página Cálculo com estrutura correta
-- [x] Implementar fórmulas corretas
-- [ ] Testar fluxo completo
+- [x] Refazer pagina Calculo com estrutura correta
+- [x] Implementar formulas corretas
+- [x] Testar fluxo completo
 
 ## FASE 23: VALIDAR CRUD CALCULO
-- [ ] Corrigir e validar endpoints calculo.editar e calculo.deletar
-- [ ] Implementar teste de integracao completo da aba Calculo
-- [ ] Validar fluxo com arquivo calculo.xlsx
-- [ ] Testar preenchimentos automaticos e persistencia real
+- [x] Corrigir e validar endpoints calculo.editar e calculo.deletar
+- [x] Implementar teste de integracao completo da aba Calculo
+- [x] Validar fluxo com arquivo calculo.xlsx
+- [x] Testar preenchimentos automaticos e persistencia real

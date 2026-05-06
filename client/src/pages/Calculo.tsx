@@ -99,10 +99,18 @@ export default function Calculo() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: isNaN(parseFloat(value)) ? value : parseFloat(value),
-    }));
+    // mesRef e chaveJ devem ser sempre strings
+    if (name === 'mesRef' || name === 'chaveJ' || name === 'empresa' || name === 'nomeAgente' || name === 'cidade' || name === 'situacao') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: isNaN(parseFloat(value)) ? value : parseFloat(value),
+      }));
+    }
   };
 
   const handleLimpar = () => {
