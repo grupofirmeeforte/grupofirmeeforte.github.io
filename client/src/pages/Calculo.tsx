@@ -1,8 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
+import { trpc } from "@/lib/trpc";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Calculo() {
   const [, navigate] = useLocation();
@@ -38,10 +46,23 @@ export default function Calculo() {
     vrLiquidoSrcc: "",
   });
 
+  // Query para buscar Chaves J por Mês/Ano
+  const { data: chavesJ = [], isLoading: loadingChavesJ } = trpc.consignado.buscarChavesJPorMes.useQuery(
+    { mes: formData.mesAno },
+    { enabled: !!formData.mesAno }
+  );
+
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  const handleSelectChaveJ = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      chaveJ: value
     }));
   };
 
@@ -58,7 +79,7 @@ export default function Calculo() {
   const campos = [
     { key: "empresa", label: "Empresa", width: "100px", editable: true },
     { key: "mesAno", label: "Mês Ano", width: "100px", editable: true },
-    { key: "chaveJ", label: "Chave J", width: "100px", editable: true },
+    { key: "chaveJ", label: "Chave J", width: "100px", editable: true, isSelect: true },
     { key: "nomeAgente", label: "Nome Agente", width: "150px", editable: false },
     { key: "cidade", label: "Cidade", width: "120px", editable: false },
     { key: "percentual", label: "Percentual", width: "100px", editable: true },
@@ -142,18 +163,39 @@ export default function Calculo() {
                     style={{ width: campo.width, minWidth: campo.width }}
                     className="px-2 py-2 border border-slate-200"
                   >
-                    <Input
-                      type={campo.key.includes("percentual") || campo.key.includes("Liquido") || campo.key.includes("Total") ? "number" : "text"}
-                      placeholder={campo.editable ? "..." : ""}
-                      value={formData[campo.key as keyof typeof formData]}
-                      onChange={(e) => handleInputChange(campo.key, e.target.value)}
-                      readOnly={!campo.editable}
-                      className={`h-8 text-xs border-0 ${
-                        campo.editable 
-                          ? "bg-white" 
-                          : "bg-slate-100 text-slate-500"
-                      }`}
-                    />
+                    {campo.isSelect ? (
+                      <Select value={formData[campo.key as keyof typeof formData]} onValueChange={(value) => handleSelectChaveJ(value)}>
+                        <SelectTrigger className="h-8 text-xs border-0 bg-white">
+                          <SelectValue placeholder="Selecione..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {loadingChavesJ ? (
+                            <div className="p-2 text-sm text-slate-500">Carregando...</div>
+                          ) : chavesJ.length === 0 ? (
+                            <div className="p-2 text-sm text-slate-500">Nenhuma Chave J encontrada</div>
+                          ) : (
+                            chavesJ.map((chave) => (
+                              <SelectItem key={chave} value={chave}>
+                                {chave}
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <Input
+                        type={campo.key.includes("percentual") || campo.key.includes("Liquido") || campo.key.includes("Total") ? "number" : "text"}
+                        placeholder={campo.editable ? "..." : ""}
+                        value={formData[campo.key as keyof typeof formData]}
+                        onChange={(e) => handleInputChange(campo.key, e.target.value)}
+                        readOnly={!campo.editable}
+                        className={`h-8 text-xs border-0 ${
+                          campo.editable 
+                            ? "bg-white" 
+                            : "bg-slate-100 text-slate-500"
+                        }`}
+                      />
+                    )}
                   </td>
                 ))}
               </tr>

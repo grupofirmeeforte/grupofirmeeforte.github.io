@@ -832,6 +832,21 @@ export const appRouter = router({
 
       return { duplicatasEncontradas: duplicatas.length };
     }),
+
+    // Buscar todas as Chaves J de um mês/ano (com duplicatas)
+    buscarChavesJPorMes: publicProcedure
+      .input(z.object({
+        mes: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { consignados } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        
+        const rows = await db.select({ chaveJ: consignados.chaveJ }).from(consignados).where(eq(consignados.mes, input.mes));
+        return rows.map(r => r.chaveJ).filter(Boolean) as string[];
+      }),
   }),
 
   contaCorrente: router({
