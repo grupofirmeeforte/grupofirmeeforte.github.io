@@ -54,6 +54,19 @@ function pct(val: string | null) {
   return pctVal.toFixed(2).replace('.', ',') + '%';
 }
 
+function moeda(val: string | null | undefined) {
+  if (!val) return 'R$ 0,00';
+  const normalized = String(val).replace(',', '.');
+  const n = parseFloat(normalized);
+  if (isNaN(n)) return val;
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
+}
+
 // Componente de célula editável
 function EditableCell({
   value,
@@ -314,7 +327,7 @@ export default function TabelaComissao() {
                       className="px-2 py-1.5 border border-gray-300 rounded bg-white text-right text-sm cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all"
                       title="Clique para editar"
                     >
-                      {valoresAtivos[nivel] || '0,00'}
+                      {moeda(valoresAtivos[nivel])}
                     </div>
                   )}
                 </div>

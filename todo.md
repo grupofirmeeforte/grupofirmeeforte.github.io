@@ -194,5 +194,6 @@
 - [x] Implementar edição inline na seção "Valores para Cálculo por Nível"
 - [x] Clique para editar, Enter para salvar, Escape para cancelar
 - [x] Feedback visual com hover e toast de sucesso
+- [x] Mover seção de Consignado para Tabela de Comissão
 - [ ] Adicionar persistência em banco de dados
 - [ ] Adicionar validação de valores (mínimo/máximo)
