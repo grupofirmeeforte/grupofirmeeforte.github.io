@@ -204,9 +204,9 @@
 - [x] Implementar logica de calculo (backend em db.ts)
 - [x] Implementar cálculo automático durante importação
 - [x] Corrigir atualização automática quando tabelaMes muda
-- [ ] Testar calculos com dados reais
-- [ ] Verificar se importação funciona corretamente
-- [ ] Validar cálculos com dados da planilha
+- [x] Testar calculos com dados reais
+- [x] Verificar se importação funciona corretamente
+- [x] Validar cálculos com dados da planilha
 
 ## FASE 18: DETECCAO DE DUPLICATAS EM NR. OPERACAO
 - [x] Adicionar coluna isDuplicate na tabela consignados
@@ -215,3 +215,6 @@
 - [x] Testar com dados duplicados
 - [x] Marcar duplicatas ao carregar pagina
 - [x] Marcar duplicatas apos criar/editar/excluir
+- [x] Executar migração SQL no banco
+- [x] Criar testes automatizados
+- [x] Validar testes com sucesso
