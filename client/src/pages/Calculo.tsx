@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -11,40 +9,29 @@ export default function Calculo() {
 
   // Estado para todos os campos
   const [formData, setFormData] = useState({
-    // Identificação
     empresa: "",
     mesAno: "",
     chaveJ: "",
     nomeAgente: "",
     cidade: "",
-    
-    // Percentual
     percentual: "",
     comissaoTotal: "",
     rbmTotal: "",
-    
-    // Comissões
     comissaoConsig: "",
     comissaoConsorcio: "",
     comissaoOurocap: "",
     comissaoCC: "",
     comissaoSeguros: "",
-    
-    // Deduções
     ajudaCusto: "",
     creditosDebitos: "",
     adiantamento: "",
     reajuste: "",
     comissaoSupervisor: "",
-    
-    // RBM
     rbmCredito: "",
     rbmCC: "",
     rbmConsorcio: "",
     rbmOurocap: "",
     rbmSeguros: "",
-    
-    // Totais
     qtdeContas: "",
     vrLiquido: "",
     srcc: "",
@@ -67,11 +54,42 @@ export default function Calculo() {
     navigate("/");
   };
 
+  // Definição dos campos da tabela
+  const campos = [
+    { key: "empresa", label: "Empresa", width: "100px", editable: true },
+    { key: "mesAno", label: "Mês Ano", width: "100px", editable: true },
+    { key: "chaveJ", label: "Chave J", width: "100px", editable: true },
+    { key: "nomeAgente", label: "Nome Agente", width: "150px", editable: false },
+    { key: "cidade", label: "Cidade", width: "120px", editable: false },
+    { key: "percentual", label: "Percentual", width: "100px", editable: true },
+    { key: "comissaoTotal", label: "Comissão Total", width: "120px", editable: false },
+    { key: "rbmTotal", label: "RBM Total", width: "100px", editable: false },
+    { key: "comissaoConsig", label: "Comissão Consig", width: "130px", editable: false },
+    { key: "comissaoConsorcio", label: "Comissão Consórcio", width: "150px", editable: false },
+    { key: "comissaoOurocap", label: "Comissão Ourocap", width: "140px", editable: false },
+    { key: "comissaoCC", label: "Comissão C/C", width: "120px", editable: false },
+    { key: "comissaoSeguros", label: "Comissão Seguros", width: "140px", editable: false },
+    { key: "ajudaCusto", label: "Ajuda de Custo", width: "130px", editable: true },
+    { key: "creditosDebitos", label: "Créditos/Débitos", width: "140px", editable: true },
+    { key: "adiantamento", label: "Adiantamento", width: "120px", editable: true },
+    { key: "reajuste", label: "Reajuste", width: "100px", editable: true },
+    { key: "comissaoSupervisor", label: "Comissão Supervisor", width: "150px", editable: true },
+    { key: "rbmCredito", label: "RBM Crédito", width: "120px", editable: false },
+    { key: "rbmCC", label: "RBM C/C", width: "100px", editable: false },
+    { key: "rbmConsorcio", label: "RBM Consórcio", width: "130px", editable: false },
+    { key: "rbmOurocap", label: "RBM OuroCap", width: "120px", editable: false },
+    { key: "rbmSeguros", label: "RBM Seguros", width: "120px", editable: false },
+    { key: "qtdeContas", label: "Qtde Contas", width: "110px", editable: true },
+    { key: "vrLiquido", label: "Vr. Líquido", width: "120px", editable: false },
+    { key: "srcc", label: "SRCC", width: "100px", editable: true },
+    { key: "vrLiquidoSrcc", label: "Vr. Líquido-SRCC", width: "140px", editable: false },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="max-w-7xl mx-auto mb-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="bg-white shadow sticky top-0 z-10">
+        <div className="max-w-full px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
@@ -82,354 +100,65 @@ export default function Calculo() {
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Cálculo</h1>
-              <p className="text-sm text-slate-600 mt-1">Comissões, Pagamentos e Relatórios</p>
+              <h1 className="text-2xl font-bold text-slate-900">Cálculo</h1>
+              <p className="text-sm text-slate-600">Comissões, Pagamentos e Relatórios</p>
             </div>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleVoltar}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
+              Salvar Cálculo
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* Formulário em Linha */}
-      <div className="max-w-7xl mx-auto space-y-4">
-        {/* Linha 1: Identificação */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Identificação</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-5 gap-4">
-              <div>
-                <Label className="text-xs">Empresa</Label>
-                <Input
-                  placeholder="BMF"
-                  value={formData.empresa}
-                  onChange={(e) => handleInputChange("empresa", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Mês/Ano</Label>
-                <Input
-                  placeholder="426"
-                  value={formData.mesAno}
-                  onChange={(e) => handleInputChange("mesAno", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Chave J</Label>
-                <Input
-                  placeholder="TEST001"
-                  value={formData.chaveJ}
-                  onChange={(e) => handleInputChange("chaveJ", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Nome Agente</Label>
-                <Input
-                  placeholder="Auto-preenchido"
-                  value={formData.nomeAgente}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Cidade</Label>
-                <Input
-                  placeholder="Auto-preenchido"
-                  value={formData.cidade}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Linha 2: Percentual e Totais */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Percentual e Totais</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label className="text-xs">Percentual (%)</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.percentual}
-                  onChange={(e) => handleInputChange("percentual", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Comissão Total</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.comissaoTotal}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">RBM Total</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.rbmTotal}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Linha 3: Comissões */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Comissões por Tipo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-5 gap-4">
-              <div>
-                <Label className="text-xs">Consig</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.comissaoConsig}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Consórcio</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.comissaoConsorcio}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">OuroCap</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.comissaoOurocap}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">C/C</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.comissaoCC}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Seguros</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.comissaoSeguros}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Linha 4: Deduções */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Deduções</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-5 gap-4">
-              <div>
-                <Label className="text-xs">Ajuda de Custo</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.ajudaCusto}
-                  onChange={(e) => handleInputChange("ajudaCusto", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Créditos/Débitos</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.creditosDebitos}
-                  onChange={(e) => handleInputChange("creditosDebitos", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Adiantamento</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.adiantamento}
-                  onChange={(e) => handleInputChange("adiantamento", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Reajuste</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.reajuste}
-                  onChange={(e) => handleInputChange("reajuste", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Comissão Supervisor</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.comissaoSupervisor}
-                  onChange={(e) => handleInputChange("comissaoSupervisor", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Linha 5: RBM */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">RBM por Tipo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-5 gap-4">
-              <div>
-                <Label className="text-xs">RBM Crédito</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.rbmCredito}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">RBM C/C</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.rbmCC}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">RBM Consórcio</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.rbmConsorcio}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">RBM OuroCap</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.rbmOurocap}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">RBM Seguros</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.rbmSeguros}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Linha 6: Totais Finais */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Totais Finais</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-4 gap-4">
-              <div>
-                <Label className="text-xs">Qtde Contas</Label>
-                <Input
-                  type="number"
-                  placeholder="0"
-                  value={formData.qtdeContas}
-                  onChange={(e) => handleInputChange("qtdeContas", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Vr. Líquido</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.vrLiquido}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">SRCC</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.srcc}
-                  onChange={(e) => handleInputChange("srcc", e.target.value)}
-                  className="h-8 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Vr. Líquido - SRCC</Label>
-                <Input
-                  type="number"
-                  placeholder="0.00"
-                  value={formData.vrLiquidoSrcc}
-                  readOnly
-                  className="h-8 text-sm bg-slate-50"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Botões de Ação */}
-        <div className="flex gap-4 justify-end">
-          <Button variant="outline" onClick={handleVoltar}>
-            Cancelar
-          </Button>
-          <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-            Salvar Cálculo
-          </Button>
+      {/* Tabela Horizontal Rolável */}
+      <div className="p-6">
+        <div className="bg-white rounded-lg shadow overflow-x-auto">
+          <table className="w-full border-collapse">
+            {/* Cabeçalho */}
+            <thead>
+              <tr className="bg-gradient-to-r from-purple-500 to-pink-500">
+                {campos.map((campo) => (
+                  <th
+                    key={campo.key}
+                    style={{ width: campo.width, minWidth: campo.width }}
+                    className="px-3 py-3 text-left text-xs font-bold text-white border border-purple-600 whitespace-nowrap"
+                  >
+                    {campo.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            {/* Corpo */}
+            <tbody>
+              <tr className="hover:bg-slate-50">
+                {campos.map((campo) => (
+                  <td
+                    key={campo.key}
+                    style={{ width: campo.width, minWidth: campo.width }}
+                    className="px-2 py-2 border border-slate-200"
+                  >
+                    <Input
+                      type={campo.key.includes("percentual") || campo.key.includes("Liquido") || campo.key.includes("Total") ? "number" : "text"}
+                      placeholder={campo.editable ? "..." : ""}
+                      value={formData[campo.key as keyof typeof formData]}
+                      onChange={(e) => handleInputChange(campo.key, e.target.value)}
+                      readOnly={!campo.editable}
+                      className={`h-8 text-xs border-0 ${
+                        campo.editable 
+                          ? "bg-white" 
+                          : "bg-slate-100 text-slate-500"
+                      }`}
+                    />
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
