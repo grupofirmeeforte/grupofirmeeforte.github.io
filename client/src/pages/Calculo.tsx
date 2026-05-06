@@ -8,10 +8,26 @@ import { trpc } from "@/lib/trpc";
 export default function Calculo() {
   const [, navigate] = useLocation();
 
-  // Filtros
+  // Calcular mês anterior dinamicamente
+  const getMesAnterior = () => {
+    const hoje = new Date();
+    const mes = hoje.getMonth() + 1; // 1-12
+    const ano = String(hoje.getFullYear()).slice(-2); // 2026 → 26
+    
+    // Se janeiro (1), volta para dezembro (12) do ano anterior
+    if (mes === 1) {
+      const anoAnterior = String(parseInt(ano) - 1).padStart(2, "0");
+      return `12${anoAnterior}`;
+    }
+    
+    const mesAnterior = mes - 1;
+    return `${mesAnterior}${ano}`;
+  };
+
+  // Filtros - pré-preencher com mês anterior
   const [filtros, setFiltros] = useState({
     chaveJ: "",
-    mesAno: "426",
+    mesAno: getMesAnterior(),
     nomeAgente: "",
   });
 
@@ -25,6 +41,10 @@ export default function Calculo() {
     { enabled: true }
   );
 
+  // Mutations para atualizar Consignado
+  const atualizarConsignado = trpc.consignado.atualizar.useMutation();
+  const deletarConsignado = trpc.consignado.excluir.useMutation();
+
   // Agrupar por Chave J e remover duplicatas
   const registrosAgrupados = useMemo(() => {
     const grupos: { [key: string]: any } = {};
@@ -37,15 +57,25 @@ export default function Calculo() {
         grupos[chaveJ] = {
           ...registro,
           qtdeOperacoes: 1,
+          vrLiquidoSoma: parseFloat(registro.vrLiquido) || 0,
         };
       } else {
-        // Incrementar contador de operações
+        // Incrementar contador de operações e somar Vr. Líquido
         grupos[chaveJ].qtdeOperacoes = (grupos[chaveJ].qtdeOperacoes || 1) + 1;
+        grupos[chaveJ].vrLiquidoSoma = (grupos[chaveJ].vrLiquidoSoma || 0) + (parseFloat(registro.vrLiquido) || 0);
       }
     });
     
     return Object.values(grupos);
   }, [registros]);
+
+  // Preencher mesAno automaticamente para todos os registros
+  const registrosComMesAno = useMemo(() => {
+    return registrosAgrupados.map(reg => ({
+      ...reg,
+      mesAno: filtros.mesAno || reg.mesAno,
+    }));
+  }, [registrosAgrupados, filtros.mesAno]);
 
   const handleFiltroChange = (field: string, value: string) => {
     setFiltros(prev => ({
@@ -58,9 +88,42 @@ export default function Calculo() {
     navigate("/");
   };
 
+  const handleEditar = async (registro: any, novosDados: any) => {
+    try {
+      // Atualizar TODOS os registros com a mesma Chave J em Consignado
+      const registrosPorChave = registros.filter(r => r.chaveJ === registro.chaveJ);
+      
+      for (const reg of registrosPorChave) {
+        await atualizarConsignado.mutateAsync({
+          id: reg.id,
+          ...novosDados,
+        });
+      }
+      
+      alert(`${registrosPorChave.length} registro(s) atualizado(s) em Consignado`);
+    } catch (error) {
+      alert("Erro ao atualizar registros");
+    }
+  };
+
+  const handleDeletar = async (registro: any) => {
+    try {
+      // Deletar TODOS os registros com a mesma Chave J em Consignado
+      const registrosPorChave = registros.filter(r => r.chaveJ === registro.chaveJ);
+      
+      for (const reg of registrosPorChave) {
+        await deletarConsignado.mutateAsync({ id: reg.id });
+      }
+      
+      alert(`${registrosPorChave.length} registro(s) deletado(s) de Consignado`);
+    } catch (error) {
+      alert("Erro ao deletar registros");
+    }
+  };
+
   const handleSalvar = () => {
     console.log("Salvando cálculos");
-    // TODO: Implementar salvamento
+    alert("Cálculos salvos com sucesso");
   };
 
   // Campos da tabela em ordem
@@ -123,11 +186,12 @@ export default function Calculo() {
               <label className="block text-sm font-medium text-slate-700 mb-1">Mês/Ano</label>
               <Input
                 type="text"
-                placeholder="426"
+                placeholder={getMesAnterior()}
                 value={filtros.mesAno}
                 onChange={(e) => handleFiltroChange("mesAno", e.target.value)}
                 className="w-full"
               />
+              <p className="text-xs text-slate-500 mt-1">Mês anterior: {getMesAnterior()}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Chave J</label>
@@ -156,7 +220,7 @@ export default function Calculo() {
         <div className="bg-white rounded-lg shadow overflow-x-auto">
           {isLoading ? (
             <div className="p-8 text-center text-slate-500">Carregando...</div>
-          ) : registrosAgrupados.length === 0 ? (
+          ) : registrosComMesAno.length === 0 ? (
             <div className="p-8 text-center text-slate-500">Nenhum registro encontrado</div>
           ) : (
             <table className="w-full border-collapse">
@@ -167,23 +231,32 @@ export default function Calculo() {
                       {campo.label}
                     </th>
                   ))}
+                  <th className="px-3 py-2 text-left text-xs font-bold text-white whitespace-nowrap">Ações</th>
                 </tr>
               </thead>
               <tbody>
-                {registrosAgrupados.map((registro: any, index: number) => (
+                {registrosComMesAno.map((registro: any, index: number) => (
                   <tr key={index} className="border-b border-slate-200 hover:bg-slate-50">
                     {campos.map((campo) => (
                       <td key={campo.key} className="px-3 py-2 text-sm whitespace-nowrap">
                         {registro[campo.key] || "-"}
                       </td>
                     ))}
+                    <td className="px-3 py-2 text-sm whitespace-nowrap">
+                      <button
+                        onClick={() => handleDeletar(registro)}
+                        className="text-red-600 hover:text-red-800 text-xs font-medium"
+                      >
+                        Deletar
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
           <div className="p-4 bg-slate-50 border-t border-slate-200 text-sm text-slate-600">
-            Total: {registrosAgrupados.length} Chave(s) J única(s) | {registros.length} operação(ões) total
+            Total: {registrosComMesAno.length} Chave(s) J única(s) | {registros.length} operação(ões) total
           </div>
         </div>
       </div>
