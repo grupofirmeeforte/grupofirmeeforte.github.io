@@ -75,7 +75,9 @@ function pct(val: string | null | undefined) {
   if (!val) return '-';
   const n = parseFloat(val);
   if (isNaN(n)) return val;
-  return (n * 100).toFixed(2).replace('.', ',') + '%';
+  // Se valor já é decimal (< 10), não multiplicar por 100
+  const displayVal = n < 10 ? n : (n * 100);
+  return displayVal.toFixed(2).replace('.', ',') + '%';
 }
 
 function strVal(val: string | Date | null | undefined) {
