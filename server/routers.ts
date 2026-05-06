@@ -600,6 +600,14 @@ export const appRouter = router({
             if (processed.juros) processed.juros = normalizePercentage(processed.juros);
             if (processed.percAVista) processed.percAVista = normalizePercentage(processed.percAVista);
             
+            // Normalizar tabelaMes para 4 casas decimais
+            if (processed.tabelaMes) {
+              const tabelaNum = parseFloat(String(processed.tabelaMes).replace(',', '.').replace(/[^0-9.]/g, ''));
+              if (!isNaN(tabelaNum)) {
+                processed.tabelaMes = tabelaNum.toFixed(4);
+              }
+            }
+            
             // Se chaveJ está preenchido, buscar dados do agente e calcular fórmulas
             if (record.chaveJ) {
               try {
