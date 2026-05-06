@@ -489,7 +489,7 @@ export default function TabelaComissao() {
                           value={row.txJurosDe}
                           onSave={(v) => handleCellSave(row.id, 'txJurosDe', v)}
                           isSaving={savingCell === `${row.id}-txJurosDe`}
-                          format="number"
+                          format="percent"
                         />
                       </td>
                       <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
@@ -497,6 +497,7 @@ export default function TabelaComissao() {
                           value={row.txJurosAte}
                           onSave={(v) => handleCellSave(row.id, 'txJurosAte', v)}
                           isSaving={savingCell === `${row.id}-txJurosAte`}
+                          format="percent"
                         />
                       </td>
                       <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
