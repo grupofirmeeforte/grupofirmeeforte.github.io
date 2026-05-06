@@ -136,7 +136,7 @@ export default function Login() {
           {/* Logo/Título */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Grupo Firme e Forte
+              Grupo Firme & Forte
             </h1>
             <p className="text-gray-600">Sistema de Gestão</p>
           </div>

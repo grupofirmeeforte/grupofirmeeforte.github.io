@@ -36,7 +36,7 @@ export function LGPDModal({ onAccept, isLoading = false }: LGPDModalProps) {
             <section>
               <h3 className="font-bold text-gray-900 mb-2">1. Introdução</h3>
               <p>
-                A Grupo Firme e Forte ("Empresa") respeita sua privacidade e está comprometida em proteger seus dados pessoais de acordo com a Lei Geral de Proteção de Dados (LGPD) - Lei nº 13.709/2018.
+                A Grupo Firme & Forte ("Empresa") respeita sua privacidade e está comprometida em proteger seus dados pessoais de acordo com a Lei Geral de Proteção de Dados (LGPD) - Lei nº 13.709/2018.
               </p>
             </section>
 

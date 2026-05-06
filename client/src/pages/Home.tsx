@@ -52,7 +52,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
         <div className="text-center text-white">
-          <h1 className="text-3xl font-bold mb-4">Grupo Firme e Forte</h1>
+          <h1 className="text-3xl font-bold mb-4">Grupo Firme & Forte</h1>
           <p className="text-slate-300 mb-8">Sistema de Gestão</p>
           <Button onClick={() => window.location.href = getLoginUrl()} className="bg-blue-600 hover:bg-blue-700">
             Entrar no Sistema
@@ -129,7 +129,7 @@ export default function Home() {
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Grupo Firme e Forte</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Grupo Firme & Forte</h1>
             <p className="text-sm text-slate-600 mt-1">Bem-vindo, {user?.name || "Usuário"}</p>
           </div>
           <Button
