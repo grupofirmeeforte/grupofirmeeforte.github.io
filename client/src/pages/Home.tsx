@@ -164,7 +164,7 @@ export default function Home() {
                       <div className={`${grupo.color} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
                         <Icon className="w-6 h-6 text-white" />
                       </div>
-                      <CardTitle className="text-lg flex items-center justify-between">
+                      <CardTitle className="text-2xl font-bold flex items-center justify-between">
                         {grupo.title}
                         <ChevronRight className="w-5 h-5 text-slate-400" />
                       </CardTitle>
