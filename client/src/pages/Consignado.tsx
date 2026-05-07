@@ -718,7 +718,7 @@ export default function Consignado() {
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.dtContratacao)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.produto)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 max-w-32 truncate" title={r.descricaoProduto || ''}>{strVal(r.descricaoProduto)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pctDirect(r.juros)}</td>
+                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.juros)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.tabelaMes)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.percAVista)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.restricaoSRCC)}</td>
