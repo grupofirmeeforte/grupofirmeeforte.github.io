@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -116,6 +116,50 @@ export default function Home() {
       color: 'bg-amber-600',
       borderColor: 'border-amber-200',
       bgColor: 'from-amber-50 to-yellow-50',
+      subModules: [],
+    },
+    {
+      type: 'group',
+      key: 'febraban',
+      title: 'Febraban',
+      description: 'Gestão de arquivos e conformidade Febraban',
+      icon: ShieldCheck,
+      color: 'bg-violet-600',
+      borderColor: 'border-violet-200',
+      bgColor: 'from-violet-50 to-purple-50',
+      subModules: [],
+    },
+    {
+      type: 'group',
+      key: 'crm',
+      title: 'CRM',
+      description: 'Gestão de relacionamento com clientes',
+      icon: UserRound,
+      color: 'bg-sky-600',
+      borderColor: 'border-sky-200',
+      bgColor: 'from-sky-50 to-cyan-50',
+      subModules: [],
+    },
+    {
+      type: 'group',
+      key: 'extratos',
+      title: 'Extratos',
+      description: 'Extratos bancários e financeiros',
+      icon: FileText,
+      color: 'bg-emerald-600',
+      borderColor: 'border-emerald-200',
+      bgColor: 'from-emerald-50 to-green-50',
+      subModules: [],
+    },
+    {
+      type: 'group',
+      key: 'mailing',
+      title: 'Mailing',
+      description: 'Gestão de listas de contatos e campanhas',
+      icon: Mail,
+      color: 'bg-rose-600',
+      borderColor: 'border-rose-200',
+      bgColor: 'from-rose-50 to-pink-50',
       subModules: [],
     },
   ];
