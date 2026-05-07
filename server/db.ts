@@ -398,6 +398,9 @@ export async function calcularPercPago(
   }
 
   try {
+    // Regra 1: Se RBM é zero ou vazio, Perc. Pago = 0%
+    if (!rbm || rbm === 0) return 0;
+
     // Buscar valores de cálculo salvos
     const valoresResult = await db.select().from(valoresCalculo).where(eq(valoresCalculo.id, 1)).limit(1);
     const valores = valoresResult.length > 0 ? valoresResult[0] : null;

@@ -531,6 +531,21 @@ export const appRouter = router({
         const { agentes, tabelasComissao } = await import('../drizzle/schema');
         const { eq, and, lte, gte, or, isNull } = await import('drizzle-orm');
 
+        // Regra 1: Se RBM é zero ou vazio, Perc. Pago = 0%
+        const rbmValCheck = input.rbm ? parseFloat(input.rbm.replace(',', '.').replace(/[^0-9.]/g, '')) : 0;
+        if (!input.rbm || rbmValCheck === 0) {
+          // Ainda busca dados do agente para preencher empresa/nome
+          const [agenteBasico] = await db.select().from(agentes).where(eq(agentes.chaveJ, input.chaveJ)).limit(1);
+          return {
+            empresa: agenteBasico?.empresa || null,
+            nomeAgente: agenteBasico?.nomeAgente || null,
+            supervisor: agenteBasico?.supervisor || null,
+            percPago: '0',
+            totalComissao: '0',
+            difEmpresa: input.rbm ? '0' : null,
+          };
+        }
+
         // 1. Buscar agente pelo chaveJ
         const [agente] = await db.select().from(agentes).where(eq(agentes.chaveJ, input.chaveJ)).limit(1);
         if (!agente) return { erro: 'Agente não encontrado' };
@@ -730,8 +745,15 @@ export const appRouter = router({
                   
                   const ativoCol = nivelNum ? `ativo${String(nivelNum).padStart(2, '0')}` : null;
                   
-                  // 3. Buscar percentual na Tabela Comissão
-                  if (record.convenio && ativoCol) {
+                  // Regra 1: Se RBM é zero ou vazio, Perc. Pago = 0%
+                  const rbmImportCheck = record.rbm ? parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, '')) : 0;
+                  if (!record.rbm || rbmImportCheck === 0) {
+                    processed.percPago = '0';
+                    processed.totalComissao = '0';
+                  }
+
+                  // 3. Buscar percentual na Tabela Comissão (apenas se RBM > 0)
+                  if (record.rbm && rbmImportCheck > 0 && record.convenio && ativoCol) {
                     const tabelas = await db.select().from(tabelasComissao)
                       .where(eq(tabelasComissao.convenio, record.convenio))
                       .limit(20);
@@ -773,7 +795,7 @@ export const appRouter = router({
                         }
                       }
                     }
-                  } else if (ativoCol && record.rbm) {
+                  } else if (ativoCol && record.rbm && rbmImportCheck > 0) {
                     // Se não tem convenio, usar calcularPercPago com RBM
                     const rbmNum = parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, '')) || 0;
                     const situacao = agente.situacao || '';
