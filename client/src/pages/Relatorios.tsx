@@ -125,8 +125,9 @@ export default function Relatorios() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <button onClick={handleCancel} className="p-2 hover:bg-slate-200 rounded">
-              <ArrowLeft className="w-5 h-5" />
+            <button onClick={handleCancel} className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 hover:bg-slate-100 rounded-lg text-sm font-medium text-slate-700 shadow-sm">
+              <ArrowLeft className="w-4 h-4" />
+              Voltar
             </button>
             <div>
               <h1 className="text-2xl font-bold text-slate-900">Relatórios</h1>
