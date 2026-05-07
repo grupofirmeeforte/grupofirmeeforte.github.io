@@ -11,6 +11,7 @@ import * as XLSX from 'xlsx';
 
 type Cert = {
   id: number;
+  empresa?: string | null;
   chaveJ?: string | null;
   nomeAgente?: string | null;
   cpf?: string | null;
@@ -28,6 +29,7 @@ type Cert = {
 };
 
 type FormData = {
+  empresa?: string;
   chaveJ?: string;
   nomeAgente?: string;
   cpf?: string;
@@ -102,6 +104,7 @@ export default function Certificacoes() {
   function abrirEditar(c: Cert) {
     setEditandoId(c.id);
     setForm({
+      empresa: c.empresa || '',
       chaveJ: c.chaveJ || '',
       nomeAgente: c.nomeAgente || '',
       cpf: c.cpf || '',
@@ -148,6 +151,7 @@ export default function Certificacoes() {
 
         const headers: string[] = rows[headerIdx].map((h: any) => String(h || '').toLowerCase().trim());
         const colMap: Record<string, string> = {
+          'empresa': 'empresa',
           'chave j': 'chaveJ', 'chavej': 'chaveJ', 'chave_j': 'chaveJ',
           'nome agente': 'nomeAgente', 'nomeagente': 'nomeAgente', 'nome_agente': 'nomeAgente',
           'cpf': 'cpf',
@@ -235,6 +239,7 @@ export default function Certificacoes() {
           <Table>
             <TableHeader>
               <TableRow className="bg-blue-700 hover:bg-blue-700">
+                <TableHead className="text-white font-semibold">Empresa</TableHead>
                 <TableHead className="text-white font-semibold">ChaveJ</TableHead>
                 <TableHead className="text-white font-semibold">Nome Agente</TableHead>
                 <TableHead className="text-white font-semibold">CPF</TableHead>
@@ -244,6 +249,7 @@ export default function Certificacoes() {
                 <TableHead className="text-white font-semibold">Ações</TableHead>
               </TableRow>
               <TableRow className="bg-blue-600 hover:bg-blue-600">
+                <TableHead className="text-white text-xs"></TableHead>
                 <TableHead className="text-white text-xs"></TableHead>
                 <TableHead className="text-white text-xs"></TableHead>
                 <TableHead className="text-white text-xs"></TableHead>
@@ -262,16 +268,17 @@ export default function Certificacoes() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={13} className="text-center py-8">Carregando...</TableCell>
+                  <TableCell colSpan={14} className="text-center py-8">Carregando...</TableCell>
                 </TableRow>
               ) : registros.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={13} className="text-center py-8 text-slate-400">
+                  <TableCell colSpan={14} className="text-center py-8 text-slate-400">
                     Nenhum registro encontrado. Importe um arquivo ou cadastre manualmente.
                   </TableCell>
                 </TableRow>
               ) : registros.map((c) => (
                 <TableRow key={c.id} className="hover:bg-slate-50">
+                  <TableCell>{(c as any).empresa || '-'}</TableCell>
                   <TableCell className="font-mono text-sm">{c.chaveJ || '-'}</TableCell>
                   <TableCell>{c.nomeAgente || '-'}</TableCell>
                   <TableCell className="font-mono text-sm">{c.cpf || '-'}</TableCell>
@@ -311,6 +318,10 @@ export default function Certificacoes() {
             <DialogTitle>{editandoId ? 'Editar Certificação' : 'Nova Certificação'}</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-4 py-2">
+            <div>
+              <label className="text-xs font-medium text-slate-600">Empresa</label>
+              <Input value={form.empresa || ''} onChange={e => setForm(p => ({ ...p, empresa: e.target.value }))} />
+            </div>
             <div>
               <label className="text-xs font-medium text-slate-600">ChaveJ</label>
               <Input value={form.chaveJ || ''} onChange={e => setForm(p => ({ ...p, chaveJ: e.target.value }))} />

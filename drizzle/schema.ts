@@ -93,6 +93,7 @@ export type InsertAgente = typeof agentes.$inferInsert;
 export const certificacoes = mysqlTable("certificacoes", {
   id: int("id").autoincrement().primaryKey(),
   agenteId: int("agenteId"),
+  empresa: varchar("empresa", { length: 100 }),
   cadastro: varchar("cadastro", { length: 50 }),
   chaveJ: varchar("chaveJ", { length: 50 }),
   nomeAgente: varchar("nomeAgente", { length: 255 }),
