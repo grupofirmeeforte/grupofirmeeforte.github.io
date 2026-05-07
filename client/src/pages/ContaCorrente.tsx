@@ -301,7 +301,7 @@ export default function ContaCorrente() {
       <div className="px-6 py-4 border-b" style={{ background: 'linear-gradient(90deg, #002776 0%, #1a6ed8 60%, #003399 100%)' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Conta Corrente</h1>
+            <h1 className="text-4xl font-bold text-white">Conta Corrente</h1>
             <p className="text-blue-200 text-sm">Operações de conta corrente</p>
           </div>
           <div className="flex gap-2">

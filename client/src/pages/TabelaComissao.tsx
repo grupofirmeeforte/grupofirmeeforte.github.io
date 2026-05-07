@@ -278,7 +278,7 @@ export default function TabelaComissao() {
       <div className="bg-white border-b shadow-sm px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-gray-900">Tabela de Comissão</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Tabela de Comissão</h1>
             <span className="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
               {filteredRows.length} registros
             </span>

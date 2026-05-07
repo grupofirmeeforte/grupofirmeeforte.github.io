@@ -470,7 +470,7 @@ export default function Consignado() {
       <div className="bg-white border-b shadow-sm px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Consignado</h1>
+            <h1 className="text-4xl font-bold text-gray-800">Consignado</h1>
             <p className="text-sm text-gray-500">Operações de crédito consignado</p>
           </div>
           <div className="flex gap-2">

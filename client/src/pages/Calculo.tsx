@@ -222,7 +222,7 @@ export default function Calculo() {
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold">Cálculo</h1>
+              <h1 className="text-4xl font-bold">Cálculo</h1>
               <p className="text-sm text-slate-600">Comissões, Pagamentos e Relatórios</p>
             </div>
           </div>
