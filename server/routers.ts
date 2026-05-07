@@ -510,10 +510,9 @@ export const appRouter = router({
         if (input?.mes) conditions.push(eq(consignados.mes, input.mes));
         if (input?.chaveJ) conditions.push(like(consignados.chaveJ, `%${input.chaveJ}%`));
         if (input?.nomeAgente) conditions.push(like(consignados.nomeAgente, `%${input.nomeAgente}%`));
-        const { desc } = await import('drizzle-orm');
         return conditions.length > 0
-          ? await db.select().from(consignados).where(and(...conditions)).orderBy(desc(consignados.createdAt), consignados.mes, consignados.nomeAgente)
-          : await db.select().from(consignados).orderBy(desc(consignados.createdAt), consignados.mes, consignados.nomeAgente);
+          ? await db.select().from(consignados).where(and(...conditions)).orderBy(consignados.empresa, consignados.nomeAgente)
+          : await db.select().from(consignados).orderBy(consignados.empresa, consignados.nomeAgente);
       }),
 
     // Procedure para calcular fórmulas automáticas dado chaveJ e convenio
