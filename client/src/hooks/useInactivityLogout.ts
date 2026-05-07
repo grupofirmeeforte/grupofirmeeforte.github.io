@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
-import { useAuth } from "./useAuth";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutos em ms
 
 export function useInactivityLogout() {
-  const { logout, isAuthenticated } = useAuth({ redirectOnUnauthenticated: false });
+  const { logout, isAuthenticated } = useAuth();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -21,14 +21,9 @@ export function useInactivityLogout() {
         clearTimeout(timerRef.current);
       }
 
-      timerRef.current = setTimeout(async () => {
+      timerRef.current = setTimeout(() => {
         console.log("Desconectando por inatividade...");
-        try {
-          await logout();
-          window.location.href = "/login";
-        } catch (error) {
-          console.error("Erro ao desconectar:", error);
-        }
+        logout();
       }, INACTIVITY_TIMEOUT);
     };
 

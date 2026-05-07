@@ -118,17 +118,6 @@ export default function Home() {
       bgColor: 'from-amber-50 to-yellow-50',
       subModules: [],
     },
-    {
-      type: 'group',
-      key: 'febraban',
-      title: 'Febraban',
-      description: 'Gestão de arquivos e conformidade Febraban',
-      icon: Landmark,
-      color: 'bg-purple-600',
-      borderColor: 'border-purple-200',
-      bgColor: 'from-purple-50 to-pink-50',
-      subModules: [],
-    },
   ];
 
   const grupoAtual = grupos.find(g => g.key === grupoAberto);
@@ -175,7 +164,7 @@ export default function Home() {
                       <div className={`${grupo.color} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
                         <Icon className="w-6 h-6 text-white" />
                       </div>
-                      <CardTitle className="text-2xl font-bold flex items-center justify-between">
+                      <CardTitle className="text-lg flex items-center justify-between">
                         {grupo.title}
                         <ChevronRight className="w-5 h-5 text-slate-400" />
                       </CardTitle>
