@@ -138,7 +138,7 @@ export default function Consignado() {
   // Hook de cálculo automático
   const { data: formulasData } = trpc.consignado.calcularFormulas.useQuery(
     calcInput || { chaveJ: '' },
-    { enabled: !!(calcInput && calcInput.chaveJ.length >= 5) }
+    { enabled: !!(calcInput && calcInput.chaveJ.length >= 5), refetchInterval: 10000, refetchOnWindowFocus: true }
   );
 
   const utils = trpc.useUtils();
@@ -148,8 +148,8 @@ export default function Consignado() {
     empresa: filtroEmpresa || undefined,
   }, { refetchInterval: 10000, refetchOnWindowFocus: true });
 
-  const { data: meses = [] } = trpc.consignado.listarMeses.useQuery();
-  const { data: empresas = [] } = trpc.consignado.listarEmpresas.useQuery();
+  const { data: meses = [] } = trpc.consignado.listarMeses.useQuery(undefined, { refetchInterval: 10000, refetchOnWindowFocus: true });
+  const { data: empresas = [] } = trpc.consignado.listarEmpresas.useQuery(undefined, { refetchInterval: 10000, refetchOnWindowFocus: true });
 
   // Query para totalizador
   const { data: totalizador } = trpc.consignado.obterTotalizador.useQuery(
@@ -157,7 +157,7 @@ export default function Consignado() {
       mes: mesAnoTotalizador || undefined,
       empresa: empresaTotalizador || undefined,
     },
-    { enabled: mostrarTotalizador && !!(mesAnoTotalizador || empresaTotalizador) }
+    { enabled: mostrarTotalizador && !!(mesAnoTotalizador || empresaTotalizador), refetchInterval: 10000, refetchOnWindowFocus: true }
   );
 
   const criar = trpc.consignado.criar.useMutation({

@@ -87,15 +87,15 @@ export default function ContaCorrente() {
   const { data: registros = [], isLoading } = trpc.contaCorrente.listar.useQuery({
     mesAno: filtroMes || undefined,
     empresa: filtroEmpresa || undefined,
-  });
+  }, { refetchInterval: 10000, refetchOnWindowFocus: true });
 
-  const { data: meses = [] } = trpc.contaCorrente.listarMeses.useQuery();
-  const { data: empresas = [] } = trpc.contaCorrente.listarEmpresas.useQuery();
+  const { data: meses = [] } = trpc.contaCorrente.listarMeses.useQuery(undefined, { refetchInterval: 10000, refetchOnWindowFocus: true });
+  const { data: empresas = [] } = trpc.contaCorrente.listarEmpresas.useQuery(undefined, { refetchInterval: 10000, refetchOnWindowFocus: true });
 
   // Cálculo automático ao digitar ChaveJ
   const { data: formulasData } = trpc.contaCorrente.calcularFormulas.useQuery(
     calcInput || { chaveJ: '' },
-    { enabled: !!(calcInput && calcInput.chaveJ.length >= 5) }
+    { enabled: !!(calcInput && calcInput.chaveJ.length >= 5), refetchInterval: 10000, refetchOnWindowFocus: true }
   );
 
   useEffect(() => {
