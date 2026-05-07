@@ -433,8 +433,8 @@ export const appRouter = router({
         if (input?.convenio) conditions.push(eq(consignados.convenio, input.convenio));
         const { desc } = await import('drizzle-orm');
         return conditions.length > 0
-          ? await db.select().from(consignados).where(and(...conditions)).orderBy(desc(consignados.createdAt), consignados.mes, consignados.nomeAgente)
-          : await db.select().from(consignados).orderBy(desc(consignados.createdAt), consignados.mes, consignados.nomeAgente);
+          ? await db.select().from(consignados).where(and(...conditions)).orderBy(consignados.empresa, consignados.nomeAgente)
+          : await db.select().from(consignados).orderBy(consignados.empresa, consignados.nomeAgente);
       }),
 
     criar: publicProcedure
