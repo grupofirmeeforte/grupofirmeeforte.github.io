@@ -79,56 +79,6 @@ export default function Home() {
         { title: 'Tabela Comissão', description: 'Faixas e percentuais de comissão por convênio', icon: TableProperties, color: 'bg-indigo-500', path: '/tabela-comissao' },
       ],
     },
-
-    {
-      type: 'group',
-      key: 'financeiro',
-      title: 'Financeiro',
-      description: 'Comissões, Pagamentos e Relatórios',
-      icon: DollarSign,
-      color: 'bg-red-600',
-      borderColor: 'border-red-200',
-      bgColor: 'from-red-50 to-orange-50',
-      subModules: [
-        { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/relatorios' },
-      ],
-    },
-    {
-      type: 'group',
-      key: 'producao',
-      title: 'Produção',
-      description: 'Consignado e demais operações de produção',
-      icon: Factory,
-      color: 'bg-teal-600',
-      borderColor: 'border-teal-200',
-      bgColor: 'from-teal-50 to-cyan-50',
-      subModules: [
-        { title: 'Consignado', description: 'Operações de crédito consignado', icon: Briefcase, color: 'bg-teal-600', path: '/consignado' },
-        { title: 'Conta Corrente', description: 'Operações de conta corrente', icon: DollarSign, color: 'bg-teal-500', path: '/conta-corrente' },
-      ],
-    },
-    {
-      type: 'group',
-      key: 'relatorios',
-      title: 'Relatórios',
-      description: 'Cálculo de comissões e relatórios',
-      icon: Landmark,
-      color: 'bg-amber-600',
-      borderColor: 'border-amber-200',
-      bgColor: 'from-amber-50 to-yellow-50',
-      subModules: [],
-    },
-    {
-      type: 'group',
-      key: 'febraban',
-      title: 'Febraban',
-      description: 'Gestão de arquivos e conformidade Febraban',
-      icon: ShieldCheck,
-      color: 'bg-violet-600',
-      borderColor: 'border-violet-200',
-      bgColor: 'from-violet-50 to-purple-50',
-      subModules: [],
-    },
     {
       type: 'group',
       key: 'crm',
@@ -153,6 +103,30 @@ export default function Home() {
     },
     {
       type: 'group',
+      key: 'febraban',
+      title: 'Febraban',
+      description: 'Gestão de arquivos e conformidade Febraban',
+      icon: ShieldCheck,
+      color: 'bg-violet-600',
+      borderColor: 'border-violet-200',
+      bgColor: 'from-violet-50 to-purple-50',
+      subModules: [],
+    },
+    {
+      type: 'group',
+      key: 'financeiro',
+      title: 'Financeiro',
+      description: 'Comissões, Pagamentos e Relatórios',
+      icon: DollarSign,
+      color: 'bg-red-600',
+      borderColor: 'border-red-200',
+      bgColor: 'from-red-50 to-orange-50',
+      subModules: [
+        { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/relatorios' },
+      ],
+    },
+    {
+      type: 'group',
       key: 'mailing',
       title: 'Mailing',
       description: 'Gestão de listas de contatos e campanhas',
@@ -160,6 +134,31 @@ export default function Home() {
       color: 'bg-rose-600',
       borderColor: 'border-rose-200',
       bgColor: 'from-rose-50 to-pink-50',
+      subModules: [],
+    },
+    {
+      type: 'group',
+      key: 'producao',
+      title: 'Produção',
+      description: 'Consignado e demais operações de produção',
+      icon: Factory,
+      color: 'bg-teal-600',
+      borderColor: 'border-teal-200',
+      bgColor: 'from-teal-50 to-cyan-50',
+      subModules: [
+        { title: 'Consignado', description: 'Operações de crédito consignado', icon: Briefcase, color: 'bg-teal-600', path: '/consignado' },
+        { title: 'Conta Corrente', description: 'Operações de conta corrente', icon: DollarSign, color: 'bg-teal-500', path: '/conta-corrente' },
+      ],
+    },
+    {
+      type: 'group',
+      key: 'relatorios',
+      title: 'Relatórios',
+      description: 'Cálculo de comissões e relatórios',
+      icon: Landmark,
+      color: 'bg-amber-600',
+      borderColor: 'border-amber-200',
+      bgColor: 'from-amber-50 to-yellow-50',
       subModules: [],
     },
   ];
@@ -208,7 +207,7 @@ export default function Home() {
                       <div className={`${grupo.color} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
                         <Icon className="w-6 h-6 text-white" />
                       </div>
-                      <CardTitle className="text-lg flex items-center justify-between">
+                      <CardTitle className="text-2xl font-bold flex items-center justify-between">
                         {grupo.title}
                         <ChevronRight className="w-5 h-5 text-slate-400" />
                       </CardTitle>
