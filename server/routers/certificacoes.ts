@@ -40,7 +40,7 @@ export const certificacoesRouter = router({
       busca: z.string().optional(),
     }).optional())
     .query(async ({ input }) => {
-      const db = getDb();
+      const db = await getDb();
       if (!db) return [];
       let rows = await db.select().from(certificacoes).orderBy(asc(certificacoes.empresa), asc(certificacoes.nomeAgente));
       if (input?.busca) {
@@ -81,7 +81,7 @@ export const certificacoesRouter = router({
       nrCertificadoPldft: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
-      const db = getDb();
+      const db = await getDb();
       if (!db) throw new Error("DB indisponível");
       // Enriquecer com dados do agente se empresa ou nome estiverem vazios
       let empresa = input.empresa || null;
@@ -121,7 +121,7 @@ export const certificacoesRouter = router({
       nrCertificadoPldft: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
-      const db = getDb();
+      const db = await getDb();
       if (!db) throw new Error("DB indisponível");
       const { id, ...dados } = input;
       // Enriquecer com dados do agente se empresa ou nome estiverem vazios
@@ -149,7 +149,7 @@ export const certificacoesRouter = router({
   excluir: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
-      const db = getDb();
+      const db = await getDb();
       if (!db) throw new Error("DB indisponível");
       await db.delete(certificacoes).where(eq(certificacoes.id, input.id));
       return { success: true };
@@ -170,7 +170,7 @@ export const certificacoesRouter = router({
       nrCertificadoPldft: z.string().optional(),
     })))
     .mutation(async ({ input }) => {
-      const db = getDb();
+      const db = await getDb();
       if (!db) throw new Error("DB indisponível");
       if (input.length === 0) return { count: 0 };
 
