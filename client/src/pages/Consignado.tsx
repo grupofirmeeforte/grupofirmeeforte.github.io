@@ -661,8 +661,6 @@ export default function Consignado() {
                 <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Tabela Mês</th>
                 <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Perc. À Vista</th>
                 <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Restrição SRCC</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">SRCC</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Vr. Líquido - SRCC</th>
                 <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Perc. Pago</th>
                 <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Total Comissão</th>
                 <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Dif. Empresa</th>
@@ -722,8 +720,6 @@ export default function Consignado() {
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.tabelaMes)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.percAVista)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.restricaoSRCC)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{moeda(r.srcc)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{moeda(r.vrLiquidoSrcc)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.percPago)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right font-semibold text-green-700">{moeda(r.totalComissao)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{moeda(r.difEmpresa)}</td>
