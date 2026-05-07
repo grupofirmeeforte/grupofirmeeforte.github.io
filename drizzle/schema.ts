@@ -92,28 +92,25 @@ export type InsertAgente = typeof agentes.$inferInsert;
  */
 export const certificacoes = mysqlTable("certificacoes", {
   id: int("id").autoincrement().primaryKey(),
-  agenteId: int("agenteId").notNull(),
+  agenteId: int("agenteId"),
   cadastro: varchar("cadastro", { length: 50 }),
   chaveJ: varchar("chaveJ", { length: 50 }),
   nomeAgente: varchar("nomeAgente", { length: 255 }),
-  cpf: varchar("cpf", { length: 14 }),
-  situacao: varchar("situacao", { length: 50 }),
-  dataCertif: date("dataCertif"),
-  ventoCertif: date("ventoCertif"),
+  cpf: varchar("cpf", { length: 20 }),
+  situacao: varchar("situacao", { length: 100 }),
+  dataCertif: varchar("dataCertif", { length: 10 }),
+  ventoCertif: varchar("ventoCertif", { length: 10 }),
   diasFaltando: int("diasFaltando"),
   situacaoCertif: varchar("situacaoCertif", { length: 50 }),
   nrCertificadoConsig: varchar("nrCertificadoConsig", { length: 100 }),
-  dataCertif2: date("dataCertif2"),
-  ventoCertif3: date("ventoCertif3"),
+  dataCertif2: varchar("dataCertif2", { length: 10 }),
+  ventoCertif3: varchar("ventoCertif3", { length: 10 }),
   diasFaltando2: int("diasFaltando2"),
   situacaoCertif3: varchar("situacaoCertif3", { length: 50 }),
   nrCertificadoPldft: varchar("nrCertificadoPldft", { length: 100 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-}, (table) => ({
-  agenteIdx: index("idx_certificacoes_agente").on(table.agenteId),
-  ventIdx: index("idx_certificacoes_vencto").on(table.ventoCertif),
-}));
+});
 
 export type Certificacao = typeof certificacoes.$inferSelect;
 export type InsertCertificacao = typeof certificacoes.$inferInsert;

@@ -392,7 +392,6 @@ export default function Consignado() {
           'tabela mes': 'tabelaMes', 'tabelames': 'tabelaMes', 'tabela_mes': 'tabelaMes',
           'perc a vista': 'percAVista', 'percavista': 'percAVista',
           'restricao srcc': 'restricaoSRCC', 'restricaosrcc': 'restricaoSRCC',
-          'restricao srcc': 'restricaoSRCC',
         };
 
         console.log('Headers detectados:', headers);

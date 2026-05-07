@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, adminProcedure } from "./_core/trpc";
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
+import { certificacoesRouter } from "./routers/certificacoes";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
 import { users, agentes } from "../drizzle/schema";
@@ -14,6 +15,7 @@ import { TRPCError } from "@trpc/server";
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
+  certificacoes: certificacoesRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
