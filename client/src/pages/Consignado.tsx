@@ -146,7 +146,7 @@ export default function Consignado() {
   const { data: registros = [], isLoading } = trpc.consignado.listar.useQuery({
     mes: filtroMes || undefined,
     empresa: filtroEmpresa || undefined,
-  });
+  }, { refetchInterval: 10000, refetchOnWindowFocus: true });
 
   const { data: meses = [] } = trpc.consignado.listarMeses.useQuery();
   const { data: empresas = [] } = trpc.consignado.listarEmpresas.useQuery();
