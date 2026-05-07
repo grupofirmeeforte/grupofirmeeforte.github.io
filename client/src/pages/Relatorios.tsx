@@ -41,13 +41,14 @@ export default function Relatorios() {
   });
 
   // Query para buscar todos os registros de Consignado com filtros
+  // Atualiza automaticamente a cada 10 segundos para refletir mudanças em Consignado
   const { data: registros = [], isLoading } = trpc.consignado.buscarComFiltros.useQuery(
     {
       chaveJ: filtros.chaveJ || undefined,
       mes: filtros.mesAno || undefined,
       nomeAgente: filtros.nomeAgente || undefined,
     },
-    { enabled: true }
+    { enabled: true, refetchInterval: 10000, refetchOnWindowFocus: true }
   );
 
   // Agrupar por Chave J
