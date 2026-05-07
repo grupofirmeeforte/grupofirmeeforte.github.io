@@ -70,10 +70,21 @@ export default function Relatorios() {
         };
       }
       
-      grupos[reg.chaveJ].vrLiquidoSoma += parseFloat(reg.valorLiquido) || 0;
-      grupos[reg.chaveJ].srccSoma += parseFloat(reg.srcc) || 0;
-      grupos[reg.chaveJ].vrLiquidoSrccSoma += (parseFloat(reg.valorLiquido) - parseFloat(reg.srcc)) || 0;
+      const vl = parseFloat(reg.valorLiquido) || 0;
+      const restricao = (reg.restricaoSRCC || '').toLowerCase().trim();
+      const temRestricao = restricao === 'sim' || restricao === 's';
+      
+      grupos[reg.chaveJ].vrLiquidoSoma += vl;
+      // SRCC = soma dos Vr. Líquido dos registros com Restrição SRCC = Sim
+      if (temRestricao) {
+        grupos[reg.chaveJ].srccSoma += vl;
+      }
       grupos[reg.chaveJ].qtdeOperacoes += 1;
+    });
+    
+    // Calcular Vr. Líquido - SRCC para cada grupo
+    Object.values(grupos).forEach((g: any) => {
+      g.vrLiquidoSrccSoma = g.vrLiquidoSoma - g.srccSoma;
     });
     
     return Object.values(grupos);
