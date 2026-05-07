@@ -204,7 +204,6 @@ export const consignados = mysqlTable("consignados", {
   tabelaMes: varchar("tabelaMes", { length: 50 }),
   percAVista: decimal("percAVista", { precision: 10, scale: 4 }),
   restricaoSRCC: varchar("restricaoSRCC", { length: 100 }),
-  srcc: decimal("srcc", { precision: 15, scale: 2 }),
   // Colunas calculadas por fórmula
   mesAno: varchar("mesAno", { length: 10 }),
   percPago: decimal("percPago", { precision: 10, scale: 4 }),

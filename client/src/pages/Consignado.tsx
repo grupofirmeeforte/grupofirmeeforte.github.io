@@ -368,8 +368,10 @@ export default function Consignado() {
         }
         if (headerRow === -1) { toast.error('Cabeçalho não encontrado na planilha'); return; }
 
-        const headers: string[] = data[headerRow].map((h: any) => String(h).trim().toLowerCase()
-          .replace('ê', 'e').replace('ã', 'a').replace('ç', 'c').replace('é', 'e').replace('á', 'a').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('_', ' ').replace('.', ' '));
+        const normalizeHeader = (h: any) => String(h).trim().toLowerCase()
+          .replace(/ê/g, 'e').replace(/ã/g, 'a').replace(/ç/g, 'c').replace(/é/g, 'e').replace(/á/g, 'a').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u')
+          .replace(/[_\.]/g, ' ').replace(/\s+/g, ' ').trim();
+        const headers: string[] = data[headerRow].map(normalizeHeader);
 
         const colMap: Record<string, keyof FormData> = {
           'empresa': 'empresa',
@@ -377,9 +379,9 @@ export default function Consignado() {
           'chave j': 'chaveJ', 'chave_j': 'chaveJ', 'chavej': 'chaveJ',
           'nome agente': 'nomeAgente', 'nomeagente': 'nomeAgente',
           'convenio': 'convenio', 'convênio': 'convenio',
-          'nr operacao': 'nrOperacao', 'nr  operacao': 'nrOperacao', 'nroperacao': 'nrOperacao', 'nr. operacao': 'nrOperacao',
+          'nr operacao': 'nrOperacao', 'nroperacao': 'nrOperacao',
           'valor bruto': 'valorBruto', 'valorbruto': 'valorBruto',
-          'vr liquido': 'valorLiquido', 'valor liquido': 'valorLiquido', 'valorliquido': 'valorLiquido', 'vr. liquido': 'valorLiquido',
+          'vr liquido': 'valorLiquido', 'valor liquido': 'valorLiquido', 'valorliquido': 'valorLiquido',
           'rbm': 'rbm',
           'parcela': 'parcela',
           'prefixo bb': 'prefixoBB', 'prefixobb': 'prefixoBB', 'prefixo_bb': 'prefixoBB',
@@ -388,14 +390,13 @@ export default function Consignado() {
           'descricao produto': 'descricaoProduto', 'descricaoproduto': 'descricaoProduto', 'descricao_produto': 'descricaoProduto',
           'juros': 'juros',
           'tabela mes': 'tabelaMes', 'tabelames': 'tabelaMes', 'tabela_mes': 'tabelaMes',
-          'perc  a vista': 'percAVista', 'perc a vista': 'percAVista', 'percavista': 'percAVista', 'perc_a_vista': 'percAVista',
-          'restricao srcc': 'restricaoSRCC', 'restricaosrcc': 'restricaoSRCC', 'restricao_srcc': 'restricaoSRCC',
-          'perc  pago': 'percPago', 'perc pago': 'percPago', 'percpago': 'percPago', 'perc_pago': 'percPago',
-          'total comissao': 'totalComissao', 'totalcomissao': 'totalComissao', 'total_comissao': 'totalComissao',
-          'dif  empresa': 'difEmpresa', 'dif empresa': 'difEmpresa', 'difempresa': 'difEmpresa', 'dif_empresa': 'difEmpresa',
-          'tabela': 'tabela',
-          'supervisor': 'supervisor',
+          'perc a vista': 'percAVista', 'percavista': 'percAVista',
+          'restricao srcc': 'restricaoSRCC', 'restricaosrcc': 'restricaoSRCC',
+          'restricao srcc': 'restricaoSRCC',
         };
+
+        console.log('Headers detectados:', headers);
+        console.log('Mapeamento:', headers.map(h => `${h} => ${colMap[h] || 'NAO MAPEADO'}`));
 
         const registros: FormData[] = [];
         for (let i = headerRow + 1; i < data.length; i++) {

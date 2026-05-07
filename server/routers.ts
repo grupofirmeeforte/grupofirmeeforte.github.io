@@ -819,8 +819,16 @@ export const appRouter = router({
         );
         
         // Inserir registros processados
-        await db.insert(consignados).values(processedRecords as any[]);
-        return { count: processedRecords.length };
+        try {
+          await db.insert(consignados).values(processedRecords as any[]);
+          return { count: processedRecords.length };
+        } catch (err: any) {
+          console.error('Erro ao inserir registros:', err);
+          throw new TRPCError({ 
+            code: 'INTERNAL_SERVER_ERROR', 
+            message: `Erro ao importar: ${err?.message || 'Erro desconhecido'}` 
+          });
+        }
       }),
 
     marcarDuplicatas: publicProcedure.mutation(async () => {
