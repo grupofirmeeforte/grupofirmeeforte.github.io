@@ -194,6 +194,7 @@ export default function AgentesPage() {
                   <TableHead>Cargo</TableHead>
                   <TableHead>Área</TableHead>
                   <TableHead>Vínculo</TableHead>
+                  <TableHead>Certificação</TableHead>
                   <TableHead>Situação</TableHead>
                   <TableHead>Supervisor</TableHead>
                   <TableHead>Cidade</TableHead>
@@ -212,7 +213,7 @@ export default function AgentesPage() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={22} className="text-center py-8">
+                    <TableCell colSpan={23} className="text-center py-8">
                       Carregando...
                     </TableCell>
                   </TableRow>
@@ -236,6 +237,9 @@ export default function AgentesPage() {
                       <TableCell>{agente.cargo}</TableCell>
                       <TableCell>{agente.area}</TableCell>
                       <TableCell>{agente.vinculo}</TableCell>
+                      <TableCell>
+                        <span className="text-sm text-slate-400">-</span>
+                      </TableCell>
                       <TableCell>
                         <span
                           className={`px-2 py-1 rounded text-xs font-semibold ${
