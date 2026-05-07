@@ -130,8 +130,8 @@ export default function Relatorios() {
               Voltar
             </button>
             <div>
-              <h1 className="text-4xl font-bold text-slate-900">Relatórios</h1>
-              <p className="text-sm text-slate-600">Comissões, Pagamentos e Relatórios</p>
+              <h1 className="text-4xl font-bold text-slate-900">Cálculo</h1>
+              <p className="text-sm text-slate-600">Cálculo de comissões por Chave J</p>
             </div>
           </div>
         </div>
