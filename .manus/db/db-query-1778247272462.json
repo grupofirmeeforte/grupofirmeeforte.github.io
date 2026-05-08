@@ -1,0 +1,9 @@
+{
+  "query": "\nUPDATE certificacoes c\nINNER JOIN agentes a ON UPPER(TRIM(c.chaveJ)) = UPPER(TRIM(a.chaveJ))\nSET \n  c.empresa = COALESCE(a.empresa, c.empresa),\n  c.nomeAgente = COALESCE(a.nomeAgente, c.nomeAgente),\n  c.situacao = COALESCE(a.situacao, c.situacao)\nWHERE c.chaveJ IS NOT NULL AND c.chaveJ != 'chaveJ';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nUPDATE certificacoes c\nINNER JOIN agentes a ON UPPER(TRIM(c.chaveJ)) = UPPER(TRIM(a.chaveJ))\nSET \n  c.empresa = COALESCE(a.empresa, c.empresa),\n  c.nomeAgente = COALESCE(a.nomeAgente, c.nomeAgente),\n  c.situacao = COALESCE(a.situacao, c.situacao)\nWHERE c.chaveJ IS NOT NULL AND c.chaveJ != 'chaveJ';\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 287
+}

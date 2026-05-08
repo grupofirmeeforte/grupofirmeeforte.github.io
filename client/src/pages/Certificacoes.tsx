@@ -47,8 +47,17 @@ const EMPTY: FormData = {};
 function fmtDate(val: string | null | undefined) {
   if (!val) return '-';
   // YYYY-MM-DD → DD/MM/YYYY
-  const parts = val.split('-');
-  if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  const isoMatch = val.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) return `${isoMatch[3]}/${isoMatch[2]}/${isoMatch[1]}`;
+  // M/D/YY ou M/D/YYYY (formato americano do Excel) → DD/MM/AAAA
+  const usMatch = val.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (usMatch) {
+    const dd = usMatch[2].padStart(2, '0');
+    const mm = usMatch[1].padStart(2, '0');
+    let yyyy = usMatch[3];
+    if (yyyy.length === 2) yyyy = parseInt(yyyy) >= 50 ? `19${yyyy}` : `20${yyyy}`;
+    return `${dd}/${mm}/${yyyy}`;
+  }
   return val;
 }
 
