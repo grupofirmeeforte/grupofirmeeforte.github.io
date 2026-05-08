@@ -154,102 +154,96 @@ export default function FebrabanPage() {
 
   const totalPages = total ? Math.ceil(total / LIMIT) : 0;
 
-  // Parse Excel file
+  // Parse Excel file — parser definitivo
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setImportFileName(file.name);
     setImportResult(null);
+    setImportData([]);
 
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const data = new Uint8Array(ev.target?.result as ArrayBuffer);
-      const wb = XLSX.read(data, { type: "array", cellDates: true });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      // raw: true para preservar tipos nativos (number, Date)
-      const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true });
+      try {
+        const data = new Uint8Array(ev.target?.result as ArrayBuffer);
+        // cellDates:true faz XLSX.js converter datas para objetos Date do JS
+        const wb = XLSX.read(data, { type: "array", cellDates: true });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        // header:1 retorna array de arrays; raw:true preserva tipos nativos
+        const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true });
+        if (!json || json.length < 2) { alert("Arquivo vazio ou sem dados."); return; }
 
-      // Normaliza header: remove acentos, trim, uppercase
-      const normalizeHeader = (h: any) => String(h)
-        .trim()
-        .toUpperCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
+        // Normaliza header removendo acentos
+        const norm = (h: any) => String(h ?? "").trim().toUpperCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-      const headers = (json[0] || []).map(normalizeHeader);
-      const colMap: Record<string, number> = {};
-      headers.forEach((h: string, i: number) => { colMap[h] = i; });
+        const rawHeaders = json[0] || [];
+        const colMap: Record<string, number> = {};
+        rawHeaders.forEach((h: any, i: number) => { colMap[norm(h)] = i; });
 
-      // Helper: parse number safely (aceita number nativo ou string)
-      const parseNum = (v: any): number | undefined => {
-        if (v === undefined || v === null || v === "") return undefined;
-        if (typeof v === "number") return isNaN(v) ? undefined : v;
-        // string: remove R$, espaços, pontos de milhar, troca vírgula por ponto
-        const s = String(v).replace(/R\$\s*/g, "").replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
-        const n = parseFloat(s);
-        return isNaN(n) ? undefined : n;
-      };
-
-      // Converte serial date do Excel para string DD/MM/YYYY
-      const parseDate = (v: any): string | undefined => {
-        if (!v) return undefined;
-        if (v instanceof Date) return v.toLocaleDateString("pt-BR");
-        if (typeof v === "number") {
-          // Excel serial date
-          const d = XLSX.SSF.parse_date_code(v);
-          if (d) return `${String(d.d).padStart(2,"0")}/${String(d.m).padStart(2,"0")}/${d.y}`;
-        }
-        return String(v).trim() || undefined;
-      };
-
-      const registros: any[] = [];
-      for (let i = 1; i < json.length; i++) {
-        const row = json[i];
-        if (!row || row.length === 0) continue;
-
-        const get = (col: string) => {
-          const idx = colMap[normalizeHeader(col)];
+        const col = (row: any[], name: string) => {
+          const idx = colMap[norm(name)];
           return idx !== undefined ? row[idx] : undefined;
         };
 
-        const propostaRaw = get("PROPOSTA");
-        if (propostaRaw === undefined || propostaRaw === null || propostaRaw === "") continue;
-        const proposta = String(propostaRaw).trim();
+        // Número: aceita number nativo ou string com vírgula/ponto
+        const toNum = (v: any): number | undefined => {
+          if (v === null || v === undefined || v === "") return undefined;
+          if (typeof v === "number") return isNaN(v) ? undefined : v;
+          const s = String(v).replace(/[R$\s]/g, "").replace(/\./g, "").replace(",", ".");
+          const n = parseFloat(s);
+          return isNaN(n) ? undefined : n;
+        };
 
-        const solicitacao = parseDate(get("SOLICITACAO") ?? get("SOLICITAÇÃO"));
+        // Data: cellDates:true entrega Date do JS → formata DD/MM/AAAA
+        const toDate = (v: any): string | undefined => {
+          if (!v) return undefined;
+          if (v instanceof Date && !isNaN(v.getTime())) {
+            const d = String(v.getDate()).padStart(2, "0");
+            const m = String(v.getMonth() + 1).padStart(2, "0");
+            const y = v.getFullYear();
+            return `${d}/${m}/${y}`;
+          }
+          // fallback: string já formatada
+          return String(v).trim() || undefined;
+        };
 
-        const mesanoRaw = get("MESANO");
-        const mesanoNum = mesanoRaw !== undefined && mesanoRaw !== "" ? parseInt(String(mesanoRaw)) : undefined;
+        const registros: any[] = [];
+        for (let i = 1; i < json.length; i++) {
+          const row = json[i];
+          if (!row || row.every((c: any) => c === null || c === undefined || c === "")) continue;
 
-        const financiado = parseNum(get("FINANCIADO"));
-        const trocoRaw = parseNum(get("TROCO"));
-        // Quando TROCO é 0 ou vazio, usar valor de FINANCIADO (bruto)
-        const troco = (!trocoRaw && financiado) ? financiado : trocoRaw;
+          const propostaRaw = col(row, "PROPOSTA");
+          if (propostaRaw === undefined || propostaRaw === null || propostaRaw === "") continue;
+          const proposta = String(typeof propostaRaw === "number" ? Math.round(propostaRaw) : propostaRaw).trim();
 
-        // Situação principal (col 4) — normalizada
-        const situacaoRaw = get("SITUACAO") ?? get("SITUAÇÃO");
-        const situacao = situacaoRaw ? String(situacaoRaw).trim() || undefined : undefined;
+          const financiado = toNum(col(row, "FINANCIADO"));
+          const trocoRaw   = toNum(col(row, "TROCO"));
+          // TROCO=0 → usar FINANCIADO como bruto
+          const troco = (!trocoRaw || trocoRaw === 0) ? financiado : trocoRaw;
 
-        // Situação2 é a última coluna
-        const sit2Raw = headers.length >= 11 ? row[10] : undefined;
-        const situacao2 = sit2Raw ? String(sit2Raw).trim() || undefined : undefined;
+          const mesanoRaw = col(row, "MESANO");
+          const mesano = mesanoRaw !== undefined && mesanoRaw !== "" ? (parseInt(String(mesanoRaw)) || undefined) : undefined;
 
-        registros.push({
-          empresa: get("EMPRESA") ? String(get("EMPRESA")).trim() : undefined,
-          mesano: mesanoNum !== undefined && !isNaN(mesanoNum) ? mesanoNum : undefined,
-          proposta,
-          linha: get("LINHA") ? parseInt(String(get("LINHA"))) || undefined : undefined,
-          situacao,
-          operador: get("OPERADOR") ? String(get("OPERADOR")).trim() : undefined,
-          solicitacao,
-          prazo: get("PRAZO") ? String(get("PRAZO")).trim() : undefined,
-          troco,
-          financiado,
-          situacao2,
-        });
+          registros.push({
+            empresa:    col(row, "EMPRESA")  ? String(col(row, "EMPRESA")).trim()  : undefined,
+            mesano,
+            proposta,
+            linha:      col(row, "LINHA")    ? (parseInt(String(col(row, "LINHA"))) || undefined) : undefined,
+            situacao:   (() => { const v = col(row, "SITUACAO"); return v != null && v !== "" ? String(v).trim() : undefined; })(),
+            operador:   col(row, "OPERADOR") ? String(col(row, "OPERADOR")).trim() : undefined,
+            solicitacao: toDate(col(row, "SOLICITACAO") ?? col(row, "SOLICITAÇÃO")),
+            prazo:      col(row, "PRAZO")    ? String(col(row, "PRAZO")).trim()    : undefined,
+            troco,
+            financiado,
+            situacao2:  undefined,
+          });
+        }
+
+        setImportData(registros);
+      } catch (err: any) {
+        alert(`Erro ao ler arquivo: ${err?.message || err}`);
       }
-
-      setImportData(registros);
     };
     reader.readAsArrayBuffer(file);
   }
@@ -270,7 +264,7 @@ export default function FebrabanPage() {
     try {
       for (let i = 0; i < total; i += BATCH) {
         const lote = importData.slice(i, i + BATCH);
-        const res = await utils.client.febraban.importar.mutate({ modo: importModo, registros: lote });
+        const res = await utils.client.febraban.importar.mutate({ modo: importModo, offsetInicial: i, registros: lote });
         adicionados += res.adicionados;
         atualizados += res.atualizados;
         ignorados += res.ignorados;

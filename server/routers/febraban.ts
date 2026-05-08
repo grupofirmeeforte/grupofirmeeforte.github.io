@@ -56,7 +56,7 @@ export const febrabanRouter = {
         .select()
         .from(febraban)
         .where(where)
-        .orderBy(desc(febraban.mesano), asc(febraban.proposta))
+        .orderBy(asc(febraban.ordemExcel), asc(febraban.id))
         .limit(input.limit)
         .offset(offset);
 
@@ -111,6 +111,7 @@ export const febrabanRouter = {
   importar: protectedProcedure
     .input(z.object({
       modo: z.enum(["novo", "subscrever"]),
+      offsetInicial: z.number().default(0), // offset para ordemExcel quando enviado em lotes
       registros: z.array(z.object({
         empresa: z.string().optional(),
         mesano: z.number().optional(),
@@ -133,8 +134,26 @@ export const febrabanRouter = {
       let atualizados = 0;
       let ignorados = 0;
 
-      for (const reg of input.registros) {
-        if (!reg.proposta) { ignorados++; continue; }
+      for (let idx = 0; idx < input.registros.length; idx++) {
+        const reg = input.registros[idx];
+        if (!reg.proposta || reg.proposta.trim() === "") { ignorados++; continue; }
+
+        const ordemExcel = input.offsetInicial + idx;
+        const toStr = (v: number | undefined | null) => v != null ? String(v) : undefined;
+
+        const values = {
+          empresa: reg.empresa,
+          mesano: reg.mesano,
+          linha: reg.linha,
+          situacao: reg.situacao,
+          operador: reg.operador,
+          solicitacao: reg.solicitacao,
+          prazo: reg.prazo,
+          troco: toStr(reg.troco),
+          financiado: toStr(reg.financiado),
+          situacao2: reg.situacao2,
+          ordemExcel,
+        };
 
         // Verificar se já existe
         const existing = await db
@@ -145,36 +164,13 @@ export const febrabanRouter = {
 
         if (existing.length > 0) {
           if (input.modo === "subscrever") {
-            await db.update(febraban).set({
-              empresa: reg.empresa,
-              mesano: reg.mesano,
-              linha: reg.linha,
-              situacao: reg.situacao,
-              operador: reg.operador,
-              solicitacao: reg.solicitacao,
-              prazo: reg.prazo,
-              troco: reg.troco != null ? String(reg.troco) : undefined,
-              financiado: reg.financiado != null ? String(reg.financiado) : undefined,
-              situacao2: reg.situacao2,
-            }).where(eq(febraban.proposta, reg.proposta));
+            await db.update(febraban).set(values).where(eq(febraban.proposta, reg.proposta));
             atualizados++;
           } else {
             ignorados++;
           }
         } else {
-          await db.insert(febraban).values({
-            empresa: reg.empresa,
-            mesano: reg.mesano,
-            proposta: reg.proposta,
-            linha: reg.linha,
-            situacao: reg.situacao,
-            operador: reg.operador,
-            solicitacao: reg.solicitacao,
-            prazo: reg.prazo,
-            troco: reg.troco != null ? String(reg.troco) : undefined,
-            financiado: reg.financiado != null ? String(reg.financiado) : undefined,
-            situacao2: reg.situacao2,
-          });
+          await db.insert(febraban).values({ ...values, proposta: reg.proposta });
           adicionados++;
         }
       }

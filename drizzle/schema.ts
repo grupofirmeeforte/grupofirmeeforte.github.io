@@ -683,6 +683,7 @@ export const febraban = mysqlTable("febraban", {
   financNovo: decimal("financNovo", { precision: 15, scale: 2 }),   // bruto quando troco=0 (financiamento novo)
   trocoRefin: decimal("trocoRefin", { precision: 15, scale: 2 }),   // troco quando troco>0 (refinanciamento)
   situacao2: varchar("situacao2", { length: 100 }),  // coluna "Situação" (11ª coluna do Excel)
+  ordemExcel: int("ordemExcel"),                      // posição original no Excel para ordenar
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
