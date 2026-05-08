@@ -164,18 +164,40 @@ export default function FebrabanPage() {
       const data = new Uint8Array(ev.target?.result as ArrayBuffer);
       const wb = XLSX.read(data, { type: "array", cellDates: true });
       const ws = wb.Sheets[wb.SheetNames[0]];
-      const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, dateNF: "DD/MM/YYYY" });
+      // raw: true para preservar tipos nativos (number, Date)
+      const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true });
 
-      // First row is header
-      const headers = (json[0] || []).map((h: any) => String(h).trim().toUpperCase());
+      // Normaliza header: remove acentos, trim, uppercase
+      const normalizeHeader = (h: any) => String(h)
+        .trim()
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+      const headers = (json[0] || []).map(normalizeHeader);
       const colMap: Record<string, number> = {};
       headers.forEach((h: string, i: number) => { colMap[h] = i; });
 
-      // Helper: parse number safely
+      // Helper: parse number safely (aceita number nativo ou string)
       const parseNum = (v: any): number | undefined => {
         if (v === undefined || v === null || v === "") return undefined;
-        const n = typeof v === "number" ? v : parseFloat(String(v).replace(/\./g, "").replace(",", "."));
+        if (typeof v === "number") return isNaN(v) ? undefined : v;
+        // string: remove R$, espaços, pontos de milhar, troca vírgula por ponto
+        const s = String(v).replace(/R\$\s*/g, "").replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
+        const n = parseFloat(s);
         return isNaN(n) ? undefined : n;
+      };
+
+      // Converte serial date do Excel para string DD/MM/YYYY
+      const parseDate = (v: any): string | undefined => {
+        if (!v) return undefined;
+        if (v instanceof Date) return v.toLocaleDateString("pt-BR");
+        if (typeof v === "number") {
+          // Excel serial date
+          const d = XLSX.SSF.parse_date_code(v);
+          if (d) return `${String(d.d).padStart(2,"0")}/${String(d.m).padStart(2,"0")}/${d.y}`;
+        }
+        return String(v).trim() || undefined;
       };
 
       const registros: any[] = [];
@@ -184,41 +206,30 @@ export default function FebrabanPage() {
         if (!row || row.length === 0) continue;
 
         const get = (col: string) => {
-          const idx = colMap[col];
+          const idx = colMap[normalizeHeader(col)];
           return idx !== undefined ? row[idx] : undefined;
         };
 
         const propostaRaw = get("PROPOSTA");
         if (propostaRaw === undefined || propostaRaw === null || propostaRaw === "") continue;
-        // Proposta pode ser número inteiro no Excel — converter para string
         const proposta = String(propostaRaw).trim();
 
-        // Parse date: xlsx com cellDates=true retorna Date object
-        let solicitacao: string | undefined;
-        const solRaw = get("SOLICITAÇÃO") || get("SOLICITACAO");
-        if (solRaw) {
-          if (solRaw instanceof Date) {
-            solicitacao = solRaw.toLocaleDateString("pt-BR");
-          } else {
-            solicitacao = String(solRaw).trim() || undefined;
-          }
-        }
+        const solicitacao = parseDate(get("SOLICITACAO") ?? get("SOLICITAÇÃO"));
 
         const mesanoRaw = get("MESANO");
         const mesanoNum = mesanoRaw !== undefined && mesanoRaw !== "" ? parseInt(String(mesanoRaw)) : undefined;
 
-        const finRaw = get("FINANCIADO");
-        const financiado = parseNum(finRaw);
-
-        const trocoRaw = get("TROCO");
-        let troco = parseNum(trocoRaw);
+        const financiado = parseNum(get("FINANCIADO"));
+        const trocoRaw = parseNum(get("TROCO"));
         // Quando TROCO é 0 ou vazio, usar valor de FINANCIADO (bruto)
-        if (!troco && financiado) {
-          troco = financiado;
-        }
+        const troco = (!trocoRaw && financiado) ? financiado : trocoRaw;
 
-        // Situação2 é a 11ª coluna (índice 10) com header 'Situação'
-        const sit2Raw = get("SITUAÇÃO2") || get("SITUACAO2") || get("SITUAÇÃO2") || (headers.length >= 11 ? row[10] : undefined);
+        // Situação principal (col 4) — normalizada
+        const situacaoRaw = get("SITUACAO") ?? get("SITUAÇÃO");
+        const situacao = situacaoRaw ? String(situacaoRaw).trim() || undefined : undefined;
+
+        // Situação2 é a última coluna
+        const sit2Raw = headers.length >= 11 ? row[10] : undefined;
         const situacao2 = sit2Raw ? String(sit2Raw).trim() || undefined : undefined;
 
         registros.push({
@@ -226,7 +237,7 @@ export default function FebrabanPage() {
           mesano: mesanoNum !== undefined && !isNaN(mesanoNum) ? mesanoNum : undefined,
           proposta,
           linha: get("LINHA") ? parseInt(String(get("LINHA"))) || undefined : undefined,
-          situacao: (get("SITUAÇÃO") || get("SITUACAO")) ? String(get("SITUAÇÃO") || get("SITUACAO")).trim() : undefined,
+          situacao,
           operador: get("OPERADOR") ? String(get("OPERADOR")).trim() : undefined,
           solicitacao,
           prazo: get("PRAZO") ? String(get("PRAZO")).trim() : undefined,
