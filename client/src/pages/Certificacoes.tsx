@@ -246,8 +246,8 @@ export default function Certificacoes() {
                 <TableHead className="text-white font-semibold">Nome Agente</TableHead>
                 <TableHead className="text-white font-semibold">CPF</TableHead>
                 <TableHead className="text-white font-semibold">Situação</TableHead>
-                <TableHead className="text-white font-semibold text-center" colSpan={4}>Certificação CONSIG</TableHead>
-                <TableHead className="text-white font-semibold text-center" colSpan={4}>Certificação PLDFT</TableHead>
+                <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação CONSIG</TableHead>
+                <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação PLDFT</TableHead>
                 <TableHead className="text-white font-semibold">Ações</TableHead>
               </TableRow>
               <TableRow className="bg-blue-600 hover:bg-blue-600">
@@ -260,21 +260,23 @@ export default function Certificacoes() {
                 <TableHead className="text-white text-xs">Vencto</TableHead>
                 <TableHead className="text-white text-xs">Dias Faltando</TableHead>
                 <TableHead className="text-white text-xs">Situação</TableHead>
+                <TableHead className="text-white text-xs">Nr. Certif</TableHead>
                 <TableHead className="text-white text-xs">Data Certif</TableHead>
                 <TableHead className="text-white text-xs">Vencto</TableHead>
                 <TableHead className="text-white text-xs">Dias Faltando</TableHead>
                 <TableHead className="text-white text-xs">Situação</TableHead>
+                <TableHead className="text-white text-xs">Nr. Certif</TableHead>
                 <TableHead className="text-white text-xs"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={14} className="text-center py-8">Carregando...</TableCell>
+                  <TableCell colSpan={16} className="text-center py-8">Carregando...</TableCell>
                 </TableRow>
               ) : registros.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={14} className="text-center py-8 text-slate-400">
+                  <TableCell colSpan={16} className="text-center py-8 text-slate-400">
                     Nenhum registro encontrado. Importe um arquivo ou cadastre manualmente.
                   </TableCell>
                 </TableRow>
@@ -290,11 +292,13 @@ export default function Certificacoes() {
                   <TableCell>{fmtDate(c.ventoCertif)}</TableCell>
                   <TableCell className="text-center">{c.diasFaltando ?? '-'}</TableCell>
                   <TableCell className={situacaoColor(c.situacaoCertif)}>{c.situacaoCertif || '-'}</TableCell>
+                  <TableCell className="font-mono text-xs">{c.nrCertificadoConsig || '-'}</TableCell>
                   {/* PLDFT */}
                   <TableCell>{fmtDate(c.dataCertif2)}</TableCell>
                   <TableCell>{fmtDate(c.ventoCertif3)}</TableCell>
                   <TableCell className="text-center">{c.diasFaltando2 ?? '-'}</TableCell>
                   <TableCell className={situacaoColor(c.situacaoCertif3)}>{c.situacaoCertif3 || '-'}</TableCell>
+                  <TableCell className="font-mono text-xs">{c.nrCertificadoPldft || '-'}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       <Button variant="ghost" size="sm" onClick={() => abrirEditar(c as Cert)}>
