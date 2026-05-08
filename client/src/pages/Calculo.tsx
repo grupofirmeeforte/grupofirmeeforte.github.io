@@ -91,6 +91,7 @@ export default function Calculo() {
           vrLiquidoSoma: parseFloat(registro.valorLiquido) || 0,
           srccSoma: parseFloat(registro.restricaoSRCC) || 0,
           vrLiquidoSrccSoma: 0, // Calcular depois
+          valorAPagar: 0, // Calcular depois com fórmula
         };
       } else {
         // Incrementar contador de operações e somar TODOS os campos
@@ -210,6 +211,7 @@ export default function Calculo() {
     { label: "SRCC", key: "srccSoma", moeda: true },
     { label: "Vr. Líquido-SRCC", key: "vrLiquidoSrccSoma", moeda: true },
     { label: "Qtde Operações", key: "qtdeOperacoes", moeda: false },
+    { label: "Valor a Pagar", key: "valorAPagar", moeda: true },
   ];
 
   return (
