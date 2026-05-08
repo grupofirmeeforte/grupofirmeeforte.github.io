@@ -158,10 +158,10 @@ export default function Certificacoes() {
           'situação': 'situacao', 'situacao': 'situacao',
           'data certif': 'dataCertif', 'datacertif': 'dataCertif', 'data certif1': 'dataCertif',
           'vencto certif': 'ventoCertif', 'venctocertif': 'ventoCertif', 'vencto certif1': 'ventoCertif',
-          'nr certifficado consig': 'nrCertificadoConsig', 'nr certificado consig': 'nrCertificadoConsig',
+          'nr certifficado consig': 'nrCertificadoConsig', 'nr certificado consig': 'nrCertificadoConsig', 'nrcertificadoconsig': 'nrCertificadoConsig', 'nrcertifficadoconsig': 'nrCertificadoConsig',
           'data certif2': 'dataCertif2', 'datacertif2': 'dataCertif2',
           'vencto certif3': 'ventoCertif3', 'venctocertif3': 'ventoCertif3', 'vencto certif2': 'ventoCertif3',
-          'nr certifficado pldft': 'nrCertificadoPldft', 'nr certificado pldft': 'nrCertificadoPldft',
+          'nr certifficado pldft': 'nrCertificadoPldft', 'nr certificado pldft': 'nrCertificadoPldft', 'nrcertificadopldft': 'nrCertificadoPldft', 'nrcertifficadopldft': 'nrCertificadoPldft',
         };
 
         function toISODate(val: any): string | undefined {
@@ -184,11 +184,13 @@ export default function Certificacoes() {
             const field = colMap[h];
             if (field) obj[field] = row[i] != null ? String(row[i]).trim() : undefined;
           });
-          // Converter datas
+          // Converter datas para ISO (YYYY-MM-DD) para envio ao servidor
           if (obj.dataCertif) obj.dataCertif = toISODate(obj.dataCertif);
           if (obj.ventoCertif) obj.ventoCertif = toISODate(obj.ventoCertif);
           if (obj.dataCertif2) obj.dataCertif2 = toISODate(obj.dataCertif2);
           if (obj.ventoCertif3) obj.ventoCertif3 = toISODate(obj.ventoCertif3);
+          // Limpar situacao do CSV — será buscada do cadastro do agente
+          obj.situacao = undefined;
           return obj;
         }).filter((r: any) => r.chaveJ || r.nomeAgente);
 

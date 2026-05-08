@@ -18,20 +18,22 @@ function calcSituacaoCertif(dias: number | null): string {
   return dias > 0 ? 'A VENCER' : 'VENCIDO';
 }
 
-/** Busca empresa e nome do agente pela ChaveJ na tabela de agentes */
-async function enriquecerComAgente(db: any, chaveJ: string | null | undefined): Promise<{ empresa: string | null; nomeAgente: string | null }> {
-  if (!chaveJ) return { empresa: null, nomeAgente: null };
+/** Busca empresa, nome e situação do agente pela ChaveJ na tabela de agentes */
+async function enriquecerComAgente(db: any, chaveJ: string | null | undefined): Promise<{ empresa: string | null; nomeAgente: string | null; situacao: string | null }> {
+  if (!chaveJ) return { empresa: null, nomeAgente: null, situacao: null };
   const found = await db.select({
     nomeAgente: agentes.nomeAgente,
     empresa: agentes.empresa,
+    situacao: agentes.situacao,
   }).from(agentes).where(eq(agentes.chaveJ, chaveJ)).limit(1);
   if (found.length > 0) {
     return {
       empresa: found[0].empresa || null,
       nomeAgente: found[0].nomeAgente || null,
+      situacao: found[0].situacao || null,
     };
   }
-  return { empresa: null, nomeAgente: null };
+  return { empresa: null, nomeAgente: null, situacao: null };
 }
 
 export const certificacoesRouter = router({
@@ -83,13 +85,15 @@ export const certificacoesRouter = router({
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error("DB indisponível");
-      // Enriquecer com dados do agente se empresa ou nome estiverem vazios
+      // Enriquecer com dados do agente se empresa, nome ou situação estiverem vazios
       let empresa = input.empresa || null;
       let nomeAgente = input.nomeAgente || null;
-      if ((!empresa || !nomeAgente) && input.chaveJ) {
+      let situacao = input.situacao || null;
+      if ((!empresa || !nomeAgente || !situacao) && input.chaveJ) {
         const dados = await enriquecerComAgente(db, input.chaveJ);
         if (!empresa) empresa = dados.empresa;
         if (!nomeAgente) nomeAgente = dados.nomeAgente;
+        if (!situacao) situacao = dados.situacao;
       }
       const dias1 = calcDiasFaltando(input.ventoCertif);
       const dias2 = calcDiasFaltando(input.ventoCertif3);
@@ -97,6 +101,7 @@ export const certificacoesRouter = router({
         ...input,
         empresa,
         nomeAgente,
+        situacao,
         diasFaltando: dias1,
         situacaoCertif: calcSituacaoCertif(dias1),
         diasFaltando2: dias2,
@@ -124,13 +129,15 @@ export const certificacoesRouter = router({
       const db = await getDb();
       if (!db) throw new Error("DB indisponível");
       const { id, ...dados } = input;
-      // Enriquecer com dados do agente se empresa ou nome estiverem vazios
+      // Enriquecer com dados do agente se empresa, nome ou situação estiverem vazios
       let empresa = dados.empresa || null;
       let nomeAgente = dados.nomeAgente || null;
-      if ((!empresa || !nomeAgente) && dados.chaveJ) {
+      let situacao = dados.situacao || null;
+      if ((!empresa || !nomeAgente || !situacao) && dados.chaveJ) {
         const agenteDados = await enriquecerComAgente(db, dados.chaveJ);
         if (!empresa) empresa = agenteDados.empresa;
         if (!nomeAgente) nomeAgente = agenteDados.nomeAgente;
+        if (!situacao) situacao = agenteDados.situacao;
       }
       const dias1 = calcDiasFaltando(dados.ventoCertif);
       const dias2 = calcDiasFaltando(dados.ventoCertif3);
@@ -138,6 +145,7 @@ export const certificacoesRouter = router({
         ...dados,
         empresa,
         nomeAgente,
+        situacao,
         diasFaltando: dias1,
         situacaoCertif: calcSituacaoCertif(dias1),
         diasFaltando2: dias2,
@@ -179,11 +187,12 @@ export const certificacoesRouter = router({
         chaveJ: agentes.chaveJ,
         nomeAgente: agentes.nomeAgente,
         empresa: agentes.empresa,
+        situacao: agentes.situacao,
       }).from(agentes);
 
-      const agenteMap = new Map<string, { nomeAgente: string | null; empresa: string | null }>();
+      const agenteMap = new Map<string, { nomeAgente: string | null; empresa: string | null; situacao: string | null }>();
       for (const a of todosAgentes) {
-        if (a.chaveJ) agenteMap.set(a.chaveJ.toUpperCase(), { nomeAgente: a.nomeAgente, empresa: a.empresa });
+        if (a.chaveJ) agenteMap.set(a.chaveJ.toUpperCase(), { nomeAgente: a.nomeAgente, empresa: a.empresa, situacao: a.situacao || null });
       }
 
       const rows = input.map(r => {
@@ -199,12 +208,19 @@ export const certificacoesRouter = router({
           }
         }
 
+        // Buscar situação do agente
+        let situacao = r.situacao && r.situacao.trim() ? r.situacao.trim() : null;
+        if (!situacao && r.chaveJ) {
+          const agenteDados2 = agenteMap.get(r.chaveJ.toUpperCase());
+          if (agenteDados2) situacao = (agenteDados2 as any).situacao || null;
+        }
         const dias1 = calcDiasFaltando(r.ventoCertif);
         const dias2 = calcDiasFaltando(r.ventoCertif3);
         return {
           ...r,
           empresa,
           nomeAgente,
+          situacao,
           diasFaltando: dias1,
           situacaoCertif: calcSituacaoCertif(dias1),
           diasFaltando2: dias2,
