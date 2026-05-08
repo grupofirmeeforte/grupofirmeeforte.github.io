@@ -215,10 +215,6 @@ export default function PagamentosPage() {
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" onClick={() => navigate("/")}
-            className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700">
-            ← Voltar
-          </Button>
           <h1 className="text-xl font-bold text-white">Pagamentos</h1>
           <span className="text-sm text-gray-400">{total} registro{total !== 1 ? "s" : ""}</span>
         </div>
@@ -230,6 +226,10 @@ export default function PagamentosPage() {
           <Button onClick={abrirNovo} size="sm"
             className="bg-blue-700 hover:bg-blue-600 text-white">
             + Novo Lançamento
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => navigate("/")}
+            className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700 flex items-center gap-1">
+            ← Voltar
           </Button>
         </div>
       </div>

@@ -182,34 +182,34 @@ export default function Calculo() {
 
   // Campos da tabela em ordem
   const campos = [
-    { label: "Empresa", key: "empresa" },
-    { label: "Mês Ano", key: "mesAno" },
-    { label: "Chave J", key: "chaveJ" },
-    { label: "Nome Agente", key: "nomeAgente" },
-    { label: "Cidade", key: "cidade" },
-    { label: "Percentual", key: "percentual" },
-    { label: "Comissão Total", key: "comissaoTotal" },
-    { label: "RBM Total", key: "rbmTotal" },
-    { label: "Comissão Consig", key: "comissaoConsig" },
-    { label: "Comissão Consórcio", key: "comissaoConsorcio" },
-    { label: "Comissão Ourocap", key: "comissaoOurocap" },
-    { label: "Comissão C/C", key: "comissaoCC" },
-    { label: "Comissão Seguros", key: "comissaoSeguros" },
-    { label: "Ajuda de Custo", key: "ajudaCusto" },
-    { label: "Créditos/Débitos", key: "creditosDebitos" },
-    { label: "Adiantamento", key: "adiantamento" },
-    { label: "Reajuste", key: "reajuste" },
-    { label: "Comissão Supervisor", key: "comissaoSupervisor" },
-    { label: "RBM Crédito", key: "rbmCredito" },
-    { label: "RBM C/C", key: "rbmCC" },
-    { label: "RBM Consórcio", key: "rbmConsorcio" },
-    { label: "RBM OuroCap", key: "rbmOurocap" },
-    { label: "RBM Seguros", key: "rbmSeguros" },
-    { label: "Qtde Contas", key: "qtdeContas" },
-    { label: "Vr. Líquido", key: "vrLiquidoSoma" },
-    { label: "SRCC", key: "srccSoma" },
-    { label: "Vr. Líquido-SRCC", key: "vrLiquidoSrccSoma" },
-    { label: "Qtde Operações", key: "qtdeOperacoes" },
+    { label: "Empresa", key: "empresa", moeda: false },
+    { label: "Mês Ano", key: "mesAno", moeda: false },
+    { label: "Chave J", key: "chaveJ", moeda: false },
+    { label: "Nome Agente", key: "nomeAgente", moeda: false },
+    { label: "Cidade", key: "cidade", moeda: false },
+    { label: "Percentual", key: "percentualSoma", moeda: false },
+    { label: "Comissão Total", key: "comissaoTotalSoma", moeda: true },
+    { label: "RBM Total", key: "rbmTotalSoma", moeda: true },
+    { label: "Comissão Consig", key: "comissaoConsigSoma", moeda: true },
+    { label: "Comissão Consórcio", key: "comissaoConsorcioSoma", moeda: true },
+    { label: "Comissão Ourocap", key: "comissaoOurocapSoma", moeda: true },
+    { label: "Comissão C/C", key: "comissaoCcSoma", moeda: true },
+    { label: "Comissão Seguros", key: "comissaoSegurosSoma", moeda: true },
+    { label: "Ajuda de Custo", key: "ajudaCustoSoma", moeda: true },
+    { label: "Créditos/Débitos", key: "creditosDebitosSoma", moeda: true },
+    { label: "Adiantamento", key: "adiantamentoSoma", moeda: true },
+    { label: "Reajuste", key: "reajusteSoma", moeda: true },
+    { label: "Comissão Supervisor", key: "comissaoSupervisorSoma", moeda: true },
+    { label: "RBM Crédito", key: "rbmCreditoSoma", moeda: true },
+    { label: "RBM C/C", key: "rbmCcSoma", moeda: true },
+    { label: "RBM Consórcio", key: "rbmConsorcioSoma", moeda: true },
+    { label: "RBM OuroCap", key: "rbmOurocapSoma", moeda: true },
+    { label: "RBM Seguros", key: "rbmSegurosSoma", moeda: true },
+    { label: "Qtde Contas", key: "qtdeContasSoma", moeda: false },
+    { label: "Vr. Líquido", key: "vrLiquidoSoma", moeda: true },
+    { label: "SRCC", key: "srccSoma", moeda: true },
+    { label: "Vr. Líquido-SRCC", key: "vrLiquidoSrccSoma", moeda: true },
+    { label: "Qtde Operações", key: "qtdeOperacoes", moeda: false },
   ];
 
   return (
@@ -217,18 +217,15 @@ export default function Calculo() {
       <div className="max-w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-4xl font-bold">Cálculo</h1>
+            <p className="text-sm text-slate-600">Comissões, Pagamentos e Relatórios</p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleSalvar} className="bg-blue-600 hover:bg-blue-700">Salvar Cálculo</Button>
             <Button onClick={handleCancel} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
               <ArrowLeft className="w-4 h-4" /> Voltar
             </Button>
-            <div>
-              <h1 className="text-4xl font-bold">Cálculo</h1>
-              <p className="text-sm text-slate-600">Comissões, Pagamentos e Relatórios</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handleCancel}>Cancelar</Button>
-            <Button onClick={handleSalvar} className="bg-blue-600 hover:bg-blue-700">Salvar Cálculo</Button>
           </div>
         </div>
 
@@ -292,10 +289,8 @@ export default function Calculo() {
                 {registrosComMesAno.map((registro: any, index: number) => (
                   <tr key={index} className="border-b border-slate-200 hover:bg-slate-50">
                     {campos.map((campo) => {
-                      // Campos que devem ser formatados como moeda
-                      const camposMoeda = ['vrLiquidoSoma', 'srccSoma', 'vrLiquidoSrccSoma'];
                       const valor = registro[campo.key];
-                      const exibicao = camposMoeda.includes(campo.key) ? formatarMoeda(valor) : (valor || "-");
+                      const exibicao = campo.moeda ? formatarMoeda(valor) : (valor != null && valor !== '' ? String(valor) : "-");
                       return (
                         <td key={campo.key} className="px-3 py-2 text-sm whitespace-nowrap">
                           {exibicao}
