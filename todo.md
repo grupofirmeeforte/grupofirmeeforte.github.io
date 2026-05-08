@@ -287,3 +287,7 @@
 - [x] Adicionar botão "Exportar Não Pagos" que gera Excel com abas por empresa (ordem alfabética)
 - [x] Excel exportado inclui aba RESUMO com total de não pagos por empresa
 - [x] Botão Voltar padronizado em todas as subabas (bg-gray-800 text-white)
+
+## FASE 24: AJUSTES NA COLUNA PAGO DO FEBRABAN
+- [x] Coluna PAGO: quando não pago → badge "Não" vermelho (em vez de ficar em branco)
+- [x] Coluna PAGO: quando situação é Cancelada → badge "Cancelado" cinza (em vez de ficar em branco)
