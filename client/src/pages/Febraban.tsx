@@ -95,6 +95,8 @@ export default function FebrabanPage() {
   const [importData, setImportData] = useState<any[]>([]);
   const [importFileName, setImportFileName] = useState("");
   const [importResult, setImportResult] = useState<{ adicionados: number; atualizados: number; ignorados: number; total: number } | null>(null);
+  const [importProgress, setImportProgress] = useState<{ current: number; total: number } | null>(null);
+  const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Edit state
@@ -252,12 +254,43 @@ export default function FebrabanPage() {
     reader.readAsArrayBuffer(file);
   }
 
-  function handleImport() {
+  async function handleImport() {
     if (importData.length === 0) {
       alert("Nenhum registro válido encontrado no arquivo.");
       return;
     }
-    importarMutation.mutate({ modo: importModo, registros: importData });
+    const BATCH = 200;
+    const total = importData.length;
+    let adicionados = 0;
+    let atualizados = 0;
+    let ignorados = 0;
+    setImporting(true);
+    setImportProgress({ current: 0, total });
+    setImportResult(null);
+    try {
+      for (let i = 0; i < total; i += BATCH) {
+        const lote = importData.slice(i, i + BATCH);
+        const res = await utils.client.febraban.importar.mutate({ modo: importModo, registros: lote });
+        adicionados += res.adicionados;
+        atualizados += res.atualizados;
+        ignorados += res.ignorados;
+        setImportProgress({ current: Math.min(i + BATCH, total), total });
+      }
+      setImportResult({ adicionados, atualizados, ignorados, total });
+      utils.febraban.list.invalidate();
+      utils.febraban.count.invalidate();
+      utils.febraban.filtros.invalidate();
+    } catch (err: any) {
+      const msg = err?.message || String(err);
+      if (msg.includes("UNAUTHORIZED") || msg.includes("UNAUTHED")) {
+        alert("Sessão expirada. Por favor, faça login novamente e tente importar de novo.");
+      } else {
+        alert(`Erro ao importar: ${msg}`);
+      }
+    } finally {
+      setImporting(false);
+      setImportProgress(null);
+    }
   }
 
   function openEdit(row: FebRow) {
@@ -528,6 +561,22 @@ export default function FebrabanPage() {
               />
             </div>
 
+            {/* Progresso */}
+            {importProgress && (
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span>Importando em lotes...</span>
+                  <span>{importProgress.current} / {importProgress.total}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-500 h-2 rounded-full transition-all"
+                    style={{ width: `${Math.round((importProgress.current / importProgress.total) * 100)}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Resultado */}
             {importResult && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm">
@@ -546,11 +595,11 @@ export default function FebrabanPage() {
             <Button variant="outline" onClick={() => setImportModal(false)}>Fechar</Button>
             <Button
               onClick={handleImport}
-              disabled={importData.length === 0 || importarMutation.isPending}
+              disabled={importData.length === 0 || importing}
               className="gap-2"
             >
               <Upload className="w-4 h-4" />
-              {importarMutation.isPending ? "Importando..." : `Importar ${importData.length} registros`}
+              {importing ? `Importando... ${importProgress ? Math.round((importProgress.current / importProgress.total) * 100) : 0}%` : `Importar ${importData.length} registros`}
             </Button>
           </DialogFooter>
         </DialogContent>
