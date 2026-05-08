@@ -373,15 +373,16 @@ export default function FebrabanPage() {
                   <th className="px-3 py-2 text-left font-semibold text-gray-700">PRAZO</th>
                   <th className="px-3 py-2 text-right font-semibold text-gray-700">TROCO</th>
                   <th className="px-3 py-2 text-right font-semibold text-gray-700">FINANCIADO</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-700">SITUAÇÃO</th>
                   <th className="px-3 py-2 text-center font-semibold text-gray-700">TIPO</th>
                   <th className="px-3 py-2 text-center font-semibold text-gray-700">AÇÕES</th>
                 </tr>
               </thead>
               <tbody>
                 {!rows ? (
-                  <tr><td colSpan={11} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                  <tr><td colSpan={12} className="text-center py-8 text-gray-400">Carregando...</td></tr>
                 ) : rows.length === 0 ? (
-                  <tr><td colSpan={11} className="text-center py-8 text-gray-400">Nenhum registro encontrado.</td></tr>
+                  <tr><td colSpan={12} className="text-center py-8 text-gray-400">Nenhum registro encontrado.</td></tr>
                 ) : (
                   rows.map((row) => (
                     <tr key={row.id} className="border-b hover:bg-gray-50 transition-colors">
@@ -395,6 +396,7 @@ export default function FebrabanPage() {
                       <td className="px-3 py-2">{row.prazo || "-"}</td>
                       <td className="px-3 py-2 text-right">{formatCurrency(row.troco)}</td>
                       <td className="px-3 py-2 text-right font-medium">{formatCurrency(row.financiado)}</td>
+                      <td className="px-3 py-2">{situacaoBadge(row.situacao)}</td>
                       <td className="px-3 py-2 text-center">{tipoBadge(row.situacao, row.troco)}</td>
                       <td className="px-3 py-2">
                         <div className="flex gap-1 justify-center">
