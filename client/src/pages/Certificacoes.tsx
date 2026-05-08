@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -69,6 +69,24 @@ export default function Certificacoes() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const utils = trpc.useUtils();
+
+  const sincronizar = trpc.certificacoes.sincronizarAgentes.useMutation({
+    onSuccess: (r) => {
+      if (r.atualizados > 0) utils.certificacoes.listar.invalidate();
+    },
+  });
+
+  // Sincroniza uma vez por dia na primeira abertura
+  useEffect(() => {
+    const CHAVE = 'cert_sync_date';
+    const hoje = new Date().toISOString().split('T')[0];
+    const ultima = localStorage.getItem(CHAVE);
+    if (ultima !== hoje) {
+      localStorage.setItem(CHAVE, hoje);
+      sincronizar.mutate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { data: registros = [], isLoading } = trpc.certificacoes.listar.useQuery(
     { busca: busca || undefined },

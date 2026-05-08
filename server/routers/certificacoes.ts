@@ -163,6 +163,47 @@ export const certificacoesRouter = router({
       return { success: true };
     }),
 
+  sincronizarAgentes: protectedProcedure
+    .mutation(async () => {
+      const db = await getDb();
+      if (!db) throw new Error("DB indisponível");
+
+      // Carregar todos os agentes
+      const todosAgentes = await db.select({
+        chaveJ: agentes.chaveJ,
+        nomeAgente: agentes.nomeAgente,
+        empresa: agentes.empresa,
+        situacao: agentes.situacao,
+      }).from(agentes);
+
+      const agenteMap = new Map<string, { nomeAgente: string | null; empresa: string | null; situacao: string | null }>();
+      for (const a of todosAgentes) {
+        if (a.chaveJ) agenteMap.set(a.chaveJ.toUpperCase(), {
+          nomeAgente: a.nomeAgente || null,
+          empresa: a.empresa || null,
+          situacao: a.situacao || null,
+        });
+      }
+
+      // Buscar todas as certificações
+      const certs = await db.select({ id: certificacoes.id, chaveJ: certificacoes.chaveJ }).from(certificacoes);
+      let atualizados = 0;
+
+      for (const cert of certs) {
+        if (!cert.chaveJ) continue;
+        const agente = agenteMap.get(cert.chaveJ.toUpperCase());
+        if (!agente) continue;
+        await db.update(certificacoes).set({
+          empresa: agente.empresa,
+          nomeAgente: agente.nomeAgente,
+          situacao: agente.situacao,
+        } as any).where(eq(certificacoes.id, cert.id));
+        atualizados++;
+      }
+
+      return { atualizados };
+    }),
+
   importar: protectedProcedure
     .input(z.array(z.object({
       empresa: z.string().optional(),
