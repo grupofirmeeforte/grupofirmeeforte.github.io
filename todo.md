@@ -276,3 +276,14 @@
 - [x] Botão Excluir com confirmação
 - [x] Paginação (100 registros por página)
 - [x] Adicionar link para /febraban no card do módulo Febraban na Home
+
+## FASE 23: FILTRO NÃO PAGOS E EXPORTAÇÃO EXCEL NO FEBRABAN
+- [x] Adicionar coluna PAGO na tabela Febraban (badge verde "Pago" quando proposta existe em consignados.nrOperacao)
+- [x] Adicionar procedure `naoPagos` no router febraban (retorna todos não pagos sem paginação)
+- [x] Adicionar filtro `pago` (todos/sim/nao) nas procedures list e count do router febraban
+- [x] Adicionar coluna ordemExcel na tabela febraban para preservar ordem original do Excel
+- [x] Inserir 2.068 números de operação na tabela consignados (lotes 1-4)
+- [x] Adicionar toggle "Todos / Pagos / Não Pagos" nos filtros da tela Febraban
+- [x] Adicionar botão "Exportar Não Pagos" que gera Excel com abas por empresa (ordem alfabética)
+- [x] Excel exportado inclui aba RESUMO com total de não pagos por empresa
+- [x] Botão Voltar padronizado em todas as subabas (bg-gray-800 text-white)

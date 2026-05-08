@@ -2,7 +2,7 @@ import { z } from "zod";
 import { protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { febraban, consignados } from "../../drizzle/schema";
-import { eq, and, like, or, desc, asc, sql, isNotNull } from "drizzle-orm";
+import { eq, and, like, or, desc, asc, sql, isNotNull, isNull, ne } from "drizzle-orm";
 
 // Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
 export function mesanoToStr(mesano: number): string {
@@ -22,6 +22,7 @@ export const febrabanRouter = {
       mesano: z.number().optional(),
       situacao: z.string().optional(),
       operador: z.string().optional(),
+      pago: z.enum(["todos", "sim", "nao"]).default("todos"),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -48,6 +49,12 @@ export const febrabanRouter = {
       }
       if (input.operador && input.operador !== "__all__") {
         conditions.push(eq(febraban.operador, input.operador));
+      }
+      // Filtro pago: "nao" = apenas não pagos, "sim" = apenas pagos
+      if (input.pago === "nao") {
+        conditions.push(sql`NOT EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
+      } else if (input.pago === "sim") {
+        conditions.push(sql`EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
       }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;
@@ -90,6 +97,7 @@ export const febrabanRouter = {
       mesano: z.number().optional(),
       situacao: z.string().optional(),
       operador: z.string().optional(),
+      pago: z.enum(["todos", "sim", "nao"]).default("todos"),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -116,6 +124,11 @@ export const febrabanRouter = {
       if (input.operador && input.operador !== "__all__") {
         conditions.push(eq(febraban.operador, input.operador));
       }
+      if (input.pago === "nao") {
+        conditions.push(sql`NOT EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
+      } else if (input.pago === "sim") {
+        conditions.push(sql`EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
+      }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;
       const result = await db
@@ -123,6 +136,46 @@ export const febrabanRouter = {
         .from(febraban)
         .where(where);
       return Number(result[0]?.count ?? 0);
+    }),
+
+  // Exportar não pagos por empresa (todos os registros, sem paginação)
+  naoPagos: protectedProcedure
+    .input(z.object({
+      empresa: z.string().optional(),
+      mesano: z.number().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return [];
+
+      const conditions: any[] = [
+        sql`NOT EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`,
+      ];
+      if (input.empresa && input.empresa !== "__all__") {
+        conditions.push(eq(febraban.empresa, input.empresa));
+      }
+      if (input.mesano) {
+        conditions.push(eq(febraban.mesano, input.mesano));
+      }
+
+      const rows = await db
+        .select({
+          empresa: febraban.empresa,
+          mesano: febraban.mesano,
+          proposta: febraban.proposta,
+          linha: febraban.linha,
+          situacao: febraban.situacao,
+          operador: febraban.operador,
+          solicitacao: febraban.solicitacao,
+          prazo: febraban.prazo,
+          troco: febraban.troco,
+          financiado: febraban.financiado,
+        })
+        .from(febraban)
+        .where(and(...conditions))
+        .orderBy(asc(febraban.empresa), asc(febraban.ordemExcel), asc(febraban.id));
+
+      return rows;
     }),
 
   // Importar registros:

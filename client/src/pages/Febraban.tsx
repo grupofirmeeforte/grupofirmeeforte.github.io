@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Upload, Edit2, Trash2, X, ArrowLeft } from "lucide-react";
+import { Search, Upload, Edit2, Trash2, ArrowLeft, Download } from "lucide-react";
 import * as XLSX from "xlsx";
 
 // Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
@@ -96,7 +96,9 @@ export default function FebrabanPage() {
   const [mesano, setMesano] = useState<number | undefined>();
   const [situacao, setSituacao] = useState("__all__");
   const [operador, setOperador] = useState("__all__");
+  const [filtroPago, setFiltroPago] = useState<"todos" | "sim" | "nao">("todos");
   const [page, setPage] = useState(0);
+  const [exportandoNaoPagos, setExportandoNaoPagos] = useState(false);
 
   // Import state
   const [importModal, setImportModal] = useState(false);
@@ -120,6 +122,7 @@ export default function FebrabanPage() {
     mesano: mesano,
     situacao: situacao !== "__all__" ? situacao : undefined,
     operador: operador !== "__all__" ? operador : undefined,
+    pago: filtroPago,
   };
 
   const { data: rows, refetch } = trpc.febraban.list.useQuery(queryParams);
@@ -129,6 +132,7 @@ export default function FebrabanPage() {
     mesano: mesano,
     situacao: situacao !== "__all__" ? situacao : undefined,
     operador: operador !== "__all__" ? operador : undefined,
+    pago: filtroPago,
   });
   const { data: filtros } = trpc.febraban.filtros.useQuery();
 
@@ -162,6 +166,85 @@ export default function FebrabanPage() {
   });
 
   const totalPages = total ? Math.ceil(total / LIMIT) : 0;
+
+  // Exportar Não Pagos — busca todos os registros não pagos e gera Excel agrupado por empresa
+  async function handleExportarNaoPagos() {
+    setExportandoNaoPagos(true);
+    try {
+      const dados = await utils.client.febraban.naoPagos.query({
+        empresa: empresa !== "__all__" ? empresa : undefined,
+        mesano: mesano,
+      });
+
+      if (!dados || dados.length === 0) {
+        alert("Nenhum registro não pago encontrado com os filtros atuais.");
+        return;
+      }
+
+      // Agrupa por empresa em ordem alfabética
+      const porEmpresa: Record<string, typeof dados> = {};
+      for (const row of dados) {
+        const emp = row.empresa || "(Sem empresa)";
+        if (!porEmpresa[emp]) porEmpresa[emp] = [];
+        porEmpresa[emp].push(row);
+      }
+      const empresasOrdenadas = Object.keys(porEmpresa).sort();
+
+      const wb = XLSX.utils.book_new();
+
+      for (const emp of empresasOrdenadas) {
+        const registros = porEmpresa[emp];
+        const wsData: any[][] = [
+          ["EMPRESA", "MÊS/ANO", "PROPOSTA", "LINHA", "SITUAÇÃO", "OPERADOR", "SOLICITAÇÃO", "PRAZO", "TROCO", "FINANCIADO"],
+          ...registros.map(r => [
+            r.empresa || "",
+            mesanoToStr(r.mesano),
+            r.proposta,
+            r.linha ?? "",
+            r.situacao || "",
+            r.operador || "",
+            r.solicitacao || "",
+            r.prazo || "",
+            r.troco != null ? parseFloat(String(r.troco)) : "",
+            r.financiado != null ? parseFloat(String(r.financiado)) : "",
+          ]),
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+        // Largura das colunas
+        ws["!cols"] = [
+          { wch: 20 }, { wch: 10 }, { wch: 14 }, { wch: 8 },
+          { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 10 },
+          { wch: 14 }, { wch: 14 },
+        ];
+
+        // Nome da aba: máx 31 chars (limite do Excel), remove chars inválidos
+        const abaName = emp.replace(/[\\\/\*\?\[\]:]/g, "").substring(0, 31);
+        XLSX.utils.book_append_sheet(wb, ws, abaName);
+      }
+
+      // Adiciona aba RESUMO com total por empresa
+      const resumoData: any[][] = [
+        ["EMPRESA", "QTD NÃO PAGOS"],
+        ...empresasOrdenadas.map(emp => [emp, porEmpresa[emp].length]),
+        ["TOTAL", dados.length],
+      ];
+      const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
+      wsResumo["!cols"] = [{ wch: 25 }, { wch: 16 }];
+      XLSX.utils.book_append_sheet(wb, wsResumo, "RESUMO");
+
+      // Gera nome do arquivo com filtros aplicados
+      const mesanoStr = mesano ? mesanoToStr(mesano).replace("/", "-") : "todos";
+      const empStr = empresa !== "__all__" ? empresa.substring(0, 20) : "todas-empresas";
+      const fileName = `nao-pagos_${empStr}_${mesanoStr}.xlsx`;
+
+      XLSX.writeFile(wb, fileName);
+    } catch (err: any) {
+      alert(`Erro ao exportar: ${err?.message || err}`);
+    } finally {
+      setExportandoNaoPagos(false);
+    }
+  }
 
   // Parse Excel file — parser definitivo
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -339,6 +422,15 @@ export default function FebrabanPage() {
           <Button className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800" onClick={() => navigate("/")}><ArrowLeft className="w-4 h-4" /> Voltar</Button>
           <Button
             variant="outline"
+            className="gap-2 border-green-500 text-green-700 hover:bg-green-50"
+            onClick={handleExportarNaoPagos}
+            disabled={exportandoNaoPagos}
+          >
+            <Download className="w-4 h-4" />
+            {exportandoNaoPagos ? "Exportando..." : "Exportar Não Pagos"}
+          </Button>
+          <Button
+            variant="outline"
             className="gap-2 border-blue-400 text-blue-700 hover:bg-blue-50"
             onClick={() => { setImportModal(true); setImportResult(null); setImportData([]); setImportFileName(""); }}
           >
@@ -354,7 +446,7 @@ export default function FebrabanPage() {
           <CardTitle className="text-base">Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
             <div className="relative col-span-2 md:col-span-1">
               <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
               <Input
@@ -399,6 +491,29 @@ export default function FebrabanPage() {
                 {filtros?.operadores.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
               </SelectContent>
             </Select>
+
+            {/* Filtro Pago */}
+            <div className="flex items-center gap-1 border rounded-md overflow-hidden h-10">
+              {(["todos", "sim", "nao"] as const).map((opt) => {
+                const labels: Record<string, string> = { todos: "Todos", sim: "Pagos", nao: "Não Pagos" };
+                const active = filtroPago === opt;
+                const colors: Record<string, string> = {
+                  todos: active ? "bg-gray-700 text-white" : "bg-white text-gray-600 hover:bg-gray-50",
+                  sim: active ? "bg-green-600 text-white" : "bg-white text-gray-600 hover:bg-green-50",
+                  nao: active ? "bg-red-600 text-white" : "bg-white text-gray-600 hover:bg-red-50",
+                };
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    className={`flex-1 h-full text-xs font-medium px-1 transition-colors ${colors[opt]}`}
+                    onClick={() => { setFiltroPago(opt); setPage(0); }}
+                  >
+                    {labels[opt]}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -420,7 +535,6 @@ export default function FebrabanPage() {
                   <th className="px-3 py-2 text-left font-semibold text-gray-700">PRAZO</th>
                   <th className="px-3 py-2 text-right font-semibold text-gray-700">TROCO</th>
                   <th className="px-3 py-2 text-right font-semibold text-gray-700">FINANCIADO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700">SITUAÇÃO</th>
                   <th className="px-3 py-2 text-center font-semibold text-gray-700">TIPO</th>
                   <th className="px-3 py-2 text-center font-semibold text-gray-700">PAGO</th>
                   <th className="px-3 py-2 text-center font-semibold text-gray-700">AÇÕES</th>
@@ -428,9 +542,9 @@ export default function FebrabanPage() {
               </thead>
               <tbody>
                 {!rows ? (
-                  <tr><td colSpan={12} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                  <tr><td colSpan={13} className="text-center py-8 text-gray-400">Carregando...</td></tr>
                 ) : rows.length === 0 ? (
-                  <tr><td colSpan={12} className="text-center py-8 text-gray-400">Nenhum registro encontrado.</td></tr>
+                  <tr><td colSpan={13} className="text-center py-8 text-gray-400">Nenhum registro encontrado.</td></tr>
                 ) : (
                   rows.map((row) => (
                     <tr key={row.id} className="border-b hover:bg-gray-50 transition-colors">
@@ -444,7 +558,6 @@ export default function FebrabanPage() {
                       <td className="px-3 py-2">{row.prazo || "-"}</td>
                       <td className="px-3 py-2 text-right">{formatCurrency(row.troco)}</td>
                       <td className="px-3 py-2 text-right font-medium">{formatCurrency(row.financiado)}</td>
-                      <td className="px-3 py-2">{situacaoBadge(row.situacao)}</td>
                       <td className="px-3 py-2 text-center">{tipoBadge(row.situacao, row.troco, row.financiado)}</td>
                       <td className="px-3 py-2 text-center">
                         {row.pago ? (
@@ -495,7 +608,6 @@ export default function FebrabanPage() {
         </CardContent>
       </Card>
 
-      {/* Modal Importação */}
       {/* Painel de Importação — sem Dialog shadcn para evitar bloqueio do file picker */}
       {importModal && (
         <div
