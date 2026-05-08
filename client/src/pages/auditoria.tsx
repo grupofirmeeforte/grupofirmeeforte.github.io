@@ -122,8 +122,7 @@ export default function AuditoriaPage() {
         <div className="flex gap-2">
           <Button
             onClick={() => navigate('/')}
-            variant="outline"
-            className="gap-2"
+            className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800"
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar

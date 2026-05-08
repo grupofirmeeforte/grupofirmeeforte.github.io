@@ -19,7 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Upload, Edit2, Trash2, X } from "lucide-react";
+import { Search, Upload, Edit2, Trash2, X, ArrowLeft } from "lucide-react";
 import * as XLSX from "xlsx";
 
 // Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
@@ -336,7 +336,7 @@ export default function FebrabanPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/")}>← Voltar</Button>
+          <Button className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800" onClick={() => navigate("/")}><ArrowLeft className="w-4 h-4" /> Voltar</Button>
           <Button
             variant="outline"
             className="gap-2 border-blue-400 text-blue-700 hover:bg-blue-50"

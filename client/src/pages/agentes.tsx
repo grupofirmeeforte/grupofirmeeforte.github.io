@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit2, Trash2, Search, ExternalLink, GitMerge } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, ExternalLink, GitMerge, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 
 // Função para formatar data YYYY-MM-DD para DD/MM/YYYY
@@ -107,10 +107,9 @@ export default function AgentesPage() {
         <div className="flex gap-2">
           <Button
             onClick={() => navigate("/")}
-            variant="outline"
-            className="gap-2"
+            className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800"
           >
-            ← Voltar
+            <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
           <Button
             variant="outline"

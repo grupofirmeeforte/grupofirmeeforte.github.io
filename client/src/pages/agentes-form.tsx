@@ -195,11 +195,10 @@ export default function AgentesFormPage() {
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <Button
-          variant="ghost"
-          size="sm"
+          className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800"
           onClick={() => navigate("/agentes")}
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
         <div>
           <h1 className="text-3xl font-bold">

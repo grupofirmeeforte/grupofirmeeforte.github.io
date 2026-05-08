@@ -218,9 +218,9 @@ export default function Calculo() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <button onClick={handleCancel} className="p-2 hover:bg-slate-200 rounded">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
+            <Button onClick={handleCancel} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
+              <ArrowLeft className="w-4 h-4" /> Voltar
+            </Button>
             <div>
               <h1 className="text-4xl font-bold">Cálculo</h1>
               <p className="text-sm text-slate-600">Comissões, Pagamentos e Relatórios</p>

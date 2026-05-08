@@ -305,8 +305,8 @@ export default function ContaCorrente() {
             <p className="text-blue-200 text-sm">Operações de conta corrente</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" className="bg-white/10 text-white border-white/30 hover:bg-white/20" onClick={() => setLocation('/')}>
-              <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+            <Button onClick={() => setLocation('/')} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
+              <ArrowLeft className="w-4 h-4" /> Voltar
             </Button>
             <Button variant="outline" className="bg-emerald-500/80 text-white border-emerald-400 hover:bg-emerald-600" onClick={() => fileInputRef.current?.click()}>
               <Upload className="w-4 h-4 mr-2" /> Importar

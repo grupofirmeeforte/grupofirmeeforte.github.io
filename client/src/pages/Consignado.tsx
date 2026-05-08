@@ -473,7 +473,7 @@ export default function Consignado() {
             <p className="text-sm text-gray-500">Operações de crédito consignado</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setLocation('/')} className="flex items-center gap-2">
+            <Button onClick={() => setLocation('/')} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
               <ArrowLeft className="w-4 h-4" /> Voltar
             </Button>
             <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 border-green-500 text-green-700 hover:bg-green-50">

@@ -191,7 +191,7 @@ export default function Certificacoes() {
           'nr certifficado pldft': 'nrCertificadoPldft', 'nr certificado pldft': 'nrCertificadoPldft', 'nrcertificadopldft': 'nrCertificadoPldft', 'nrcertifficadopldft': 'nrCertificadoPldft',
         };
 
-        function toISODate(val: any): string | undefined {
+        const toISODate = (val: any): string | undefined => {
           if (!val) return undefined;
           if (val instanceof Date) {
             return val.toISOString().split('T')[0];
@@ -235,8 +235,8 @@ export default function Certificacoes() {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b px-6 py-4 flex items-center gap-4">
-        <Button variant="ghost" size="sm" onClick={() => setLocation('/')}>
-          <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+        <Button onClick={() => setLocation('/')} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
+          <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Certificações</h1>

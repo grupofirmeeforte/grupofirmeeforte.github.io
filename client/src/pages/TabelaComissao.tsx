@@ -284,7 +284,7 @@ export default function TabelaComissao() {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => setLocation('/')} className="flex items-center gap-2">
+            <Button onClick={() => setLocation('/')} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
               <ArrowLeft className="w-4 h-4" />
               Voltar
             </Button>
