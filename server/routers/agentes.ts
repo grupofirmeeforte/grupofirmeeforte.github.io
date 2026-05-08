@@ -323,23 +323,19 @@ export const agentesRouter = router({
       return Math.floor((d.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
     }
 
-    const map: Record<string, { status: string; diasMin: number | null }> = {};
+    type CertStatus = { status: string; dias: number | null };
+    function toStatus(dias: number | null): CertStatus {
+      if (dias === null) return { status: 'SEM_CERTIFICACAO', dias: null };
+      if (dias < 0) return { status: 'VENCIDO', dias };
+      if (dias <= 15) return { status: 'CRITICO', dias };
+      return { status: 'A_VENCER', dias };
+    }
+    const map: Record<string, { consig: CertStatus; lgpd: CertStatus }> = {};
     for (const c of certs) {
       if (!c.chaveJ || c.chaveJ === 'chaveJ') continue;
       const dias1 = calcDias(c.ventoCertif);
       const dias2 = calcDias(c.ventoCertif3);
-      let diasMin: number | null = null;
-      if (dias1 !== null && dias2 !== null) diasMin = Math.min(dias1, dias2);
-      else if (dias1 !== null) diasMin = dias1;
-      else if (dias2 !== null) diasMin = dias2;
-
-      let status: string;
-      if (diasMin === null) status = 'SEM_CERTIFICACAO';
-      else if (diasMin < 0) status = 'VENCIDO';
-      else if (diasMin <= 15) status = 'CRITICO';
-      else status = 'A_VENCER';
-
-      map[c.chaveJ.trim().toUpperCase()] = { status, diasMin };
+      map[c.chaveJ.trim().toUpperCase()] = { consig: toStatus(dias1), lgpd: toStatus(dias2) };
     }
     return map;
   }),
