@@ -680,6 +680,8 @@ export const febraban = mysqlTable("febraban", {
   prazo: varchar("prazo", { length: 20 }),           // ex: 96meses
   troco: decimal("troco", { precision: 15, scale: 2 }),
   financiado: decimal("financiado", { precision: 15, scale: 2 }),
+  financNovo: decimal("financNovo", { precision: 15, scale: 2 }),   // bruto quando troco=0 (financiamento novo)
+  trocoRefin: decimal("trocoRefin", { precision: 15, scale: 2 }),   // troco quando troco>0 (refinanciamento)
   situacao2: varchar("situacao2", { length: 100 }),  // coluna "Situação" (11ª coluna do Excel)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

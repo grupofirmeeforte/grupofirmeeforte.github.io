@@ -38,6 +38,18 @@ function formatCurrency(val: string | number | null | undefined): string {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+function tipoBadge(situacao: string | null | undefined, troco: string | number | null | undefined) {
+  // Cancelado tem prioridade
+  if (situacao && situacao.toLowerCase().includes("cancel")) {
+    return <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800 border border-red-300">CANCELADO</span>;
+  }
+  const trocoNum = troco == null || troco === "" ? 0 : (typeof troco === "number" ? troco : parseFloat(String(troco)));
+  if (!isNaN(trocoNum) && trocoNum > 0) {
+    return <span className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-100 text-orange-800 border border-orange-300">TROCO/REFIN</span>;
+  }
+  return <span className="px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-300">FINANC NOVO</span>;
+}
+
 function situacaoBadge(s: string | null | undefined) {
   if (!s) return <span className="text-gray-400">-</span>;
   const colors: Record<string, string> = {
@@ -361,15 +373,15 @@ export default function FebrabanPage() {
                   <th className="px-3 py-2 text-left font-semibold text-gray-700">PRAZO</th>
                   <th className="px-3 py-2 text-right font-semibold text-gray-700">TROCO</th>
                   <th className="px-3 py-2 text-right font-semibold text-gray-700">FINANCIADO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-700">SITUAÇÃO 2</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-700">TIPO</th>
                   <th className="px-3 py-2 text-center font-semibold text-gray-700">AÇÕES</th>
                 </tr>
               </thead>
               <tbody>
                 {!rows ? (
-                  <tr><td colSpan={12} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                  <tr><td colSpan={11} className="text-center py-8 text-gray-400">Carregando...</td></tr>
                 ) : rows.length === 0 ? (
-                  <tr><td colSpan={12} className="text-center py-8 text-gray-400">Nenhum registro encontrado.</td></tr>
+                  <tr><td colSpan={11} className="text-center py-8 text-gray-400">Nenhum registro encontrado.</td></tr>
                 ) : (
                   rows.map((row) => (
                     <tr key={row.id} className="border-b hover:bg-gray-50 transition-colors">
@@ -383,7 +395,7 @@ export default function FebrabanPage() {
                       <td className="px-3 py-2">{row.prazo || "-"}</td>
                       <td className="px-3 py-2 text-right">{formatCurrency(row.troco)}</td>
                       <td className="px-3 py-2 text-right font-medium">{formatCurrency(row.financiado)}</td>
-                      <td className="px-3 py-2">{row.situacao2 || "-"}</td>
+                      <td className="px-3 py-2 text-center">{tipoBadge(row.situacao, row.troco)}</td>
                       <td className="px-3 py-2">
                         <div className="flex gap-1 justify-center">
                           <Button
