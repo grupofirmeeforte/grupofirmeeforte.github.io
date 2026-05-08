@@ -223,8 +223,8 @@ export default function FebrabanPage() {
         empresa: empresa !== "__all__" ? empresa : undefined,
         mesano: mesano,
       });
-      // Exclui Canceladas
-      const dados = todos.filter(r => r.situacao !== 'Cancelada');
+      // Apenas Contratadas não pagas
+      const dados = todos.filter(r => r.situacao === 'Contratada');
 
       if (!dados || dados.length === 0) {
         alert("Nenhum registro não pago (sem canceladas) encontrado com os filtros atuais.");
