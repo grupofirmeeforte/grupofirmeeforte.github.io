@@ -326,7 +326,7 @@ export const agentesRouter = router({
     type CertStatus = { status: string; dias: number | null };
     function toStatus(dias: number | null): CertStatus {
       if (dias === null) return { status: 'SEM_CERTIFICACAO', dias: null };
-      if (dias < 0) return { status: 'VENCIDO', dias };
+      if (dias <= 0) return { status: 'VENCIDO', dias };
       if (dias <= 15) return { status: 'CRITICO', dias };
       return { status: 'A_VENCER', dias };
     }

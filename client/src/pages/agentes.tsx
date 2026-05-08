@@ -249,21 +249,22 @@ export default function AgentesPage() {
                           const key = agente.chaveJ?.trim().toUpperCase();
                           const c = key && statusCerts ? statusCerts[key]?.consig : undefined;
                           if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-400">-</span>;
-                          if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">Vencido {Math.abs(c.dias ?? 0)}d</Badge>;
-                          if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">Vence {c.dias}d</Badge>;
-                          return <Badge className="bg-green-100 text-green-800 border-0 text-xs">OK {c.dias}d</Badge>;
-                        })()}
+                          if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">{(c.dias ?? 0) === 0 ? 'Vencido hoje' : `Vencido há ${Math.abs(c.dias ?? 0)}d`}</Badge>;
+                           if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">Vence em {c.dias}d</Badge>;
+                           return <Badge className="bg-green-100 text-green-800 border-0 text-xs">A vencer {c.dias}d</Badge>;
+                         })()}
                       </TableCell>
                       {/* Certif. LGPD */}
                       <TableCell>
+
                         {(() => {
                           const key = agente.chaveJ?.trim().toUpperCase();
                           const c = key && statusCerts ? statusCerts[key]?.lgpd : undefined;
                           if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-400">-</span>;
-                          if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">Vencido {Math.abs(c.dias ?? 0)}d</Badge>;
-                          if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">Vence {c.dias}d</Badge>;
-                          return <Badge className="bg-green-100 text-green-800 border-0 text-xs">OK {c.dias}d</Badge>;
-                        })()}
+                          if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">{(c.dias ?? 0) === 0 ? 'Vencido hoje' : `Vencido há ${Math.abs(c.dias ?? 0)}d`}</Badge>;
+                           if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">Vence em {c.dias}d</Badge>;
+                           return <Badge className="bg-green-100 text-green-800 border-0 text-xs">A vencer {c.dias}d</Badge>;
+                         })()}
                       </TableCell>
                       <TableCell>
                         <span
