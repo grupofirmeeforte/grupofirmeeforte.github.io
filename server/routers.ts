@@ -441,7 +441,7 @@ export const appRouter = router({
         if (input?.chaveJ) conditions.push(like(consignados.chaveJ, `%${input.chaveJ}%`));
         if (input?.convenio) conditions.push(eq(consignados.convenio, input.convenio));
         const { desc } = await import('drizzle-orm');
-        return await db.select().from(consignados).where(and(...conditions)).orderBy(consignados.empresa, consignados.nomeAgente);
+        return await db.select().from(consignados).where(and(...conditions)).orderBy(consignados.id);
       }),
 
     criar: publicProcedure
@@ -518,8 +518,8 @@ export const appRouter = router({
         if (input?.chaveJ) conditions.push(like(consignados.chaveJ, `%${input.chaveJ}%`));
         if (input?.nomeAgente) conditions.push(like(consignados.nomeAgente, `%${input.nomeAgente}%`));
         return conditions.length > 0
-          ? await db.select().from(consignados).where(and(...conditions)).orderBy(consignados.empresa, consignados.nomeAgente)
-          : await db.select().from(consignados).orderBy(consignados.empresa, consignados.nomeAgente);
+          ? await db.select().from(consignados).where(and(...conditions)).orderBy(consignados.id)
+          : await db.select().from(consignados).orderBy(consignados.id);
       }),
 
     // Procedure para calcular fórmulas automáticas dado chaveJ e convenio
