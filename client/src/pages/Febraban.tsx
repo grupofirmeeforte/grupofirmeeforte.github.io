@@ -38,16 +38,24 @@ function formatCurrency(val: string | number | null | undefined): string {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function tipoBadge(situacao: string | null | undefined, troco: string | number | null | undefined) {
+function tipoBadge(situacao: string | null | undefined, troco: string | number | null | undefined, financiado: string | number | null | undefined) {
   // Cancelado tem prioridade
   if (situacao && situacao.toLowerCase().includes("cancel")) {
     return <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800 border border-red-300">CANCELADO</span>;
   }
-  const trocoNum = troco == null || troco === "" ? 0 : (typeof troco === "number" ? troco : parseFloat(String(troco)));
-  if (!isNaN(trocoNum) && trocoNum > 0) {
-    return <span className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-100 text-orange-800 border border-orange-300">TROCO/REFIN</span>;
+  const toNum = (v: string | number | null | undefined) => {
+    if (v == null || v === "") return 0;
+    const n = typeof v === "number" ? v : parseFloat(String(v).replace(",", "."));
+    return isNaN(n) ? 0 : Math.round(n * 100); // centavos para evitar float imprecision
+  };
+  const t = toNum(troco);
+  const f = toNum(financiado);
+  // FINANC NOVO: troco igual ao financiado (mesmo valor — sem liberação extra)
+  if (t === f) {
+    return <span className="px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-300">FINANC NOVO</span>;
   }
-  return <span className="px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-300">FINANC NOVO</span>;
+  // TROCO/REFIN: troco diferente do financiado
+  return <span className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-100 text-orange-800 border border-orange-300">TROCO/REFIN</span>;
 }
 
 function situacaoBadge(s: string | null | undefined) {
@@ -435,7 +443,7 @@ export default function FebrabanPage() {
                       <td className="px-3 py-2 text-right">{formatCurrency(row.troco)}</td>
                       <td className="px-3 py-2 text-right font-medium">{formatCurrency(row.financiado)}</td>
                       <td className="px-3 py-2">{situacaoBadge(row.situacao)}</td>
-                      <td className="px-3 py-2 text-center">{tipoBadge(row.situacao, row.troco)}</td>
+                      <td className="px-3 py-2 text-center">{tipoBadge(row.situacao, row.troco, row.financiado)}</td>
                       <td className="px-3 py-2">
                         <div className="flex gap-1 justify-center">
                           <Button
