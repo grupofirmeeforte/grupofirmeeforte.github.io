@@ -56,7 +56,7 @@ export const febrabanRouter = {
         .select()
         .from(febraban)
         .where(where)
-        .orderBy(asc(febraban.ordemExcel), asc(febraban.id))
+        .orderBy(asc(febraban.empresa), asc(febraban.ordemExcel), asc(febraban.id))
         .limit(input.limit)
         .offset(offset);
 
