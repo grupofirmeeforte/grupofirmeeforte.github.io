@@ -3,7 +3,6 @@ import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { certificacoes, agentes } from "../../drizzle/schema";
 import { eq, asc } from "drizzle-orm";
-
 function calcDiasFaltando(vencto: string | null | undefined): number | null {
   if (!vencto) return null;
   const hoje = new Date();
