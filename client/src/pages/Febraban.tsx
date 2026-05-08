@@ -159,6 +159,13 @@ export default function FebrabanPage() {
       const colMap: Record<string, number> = {};
       headers.forEach((h: string, i: number) => { colMap[h] = i; });
 
+      // Helper: parse number safely
+      const parseNum = (v: any): number | undefined => {
+        if (v === undefined || v === null || v === "") return undefined;
+        const n = typeof v === "number" ? v : parseFloat(String(v).replace(/\./g, "").replace(",", "."));
+        return isNaN(n) ? undefined : n;
+      };
+
       const registros: any[] = [];
       for (let i = 1; i < json.length; i++) {
         const row = json[i];
@@ -169,37 +176,51 @@ export default function FebrabanPage() {
           return idx !== undefined ? row[idx] : undefined;
         };
 
-        const proposta = get("PROPOSTA");
-        if (!proposta) continue;
+        const propostaRaw = get("PROPOSTA");
+        if (propostaRaw === undefined || propostaRaw === null || propostaRaw === "") continue;
+        // Proposta pode ser número inteiro no Excel — converter para string
+        const proposta = String(propostaRaw).trim();
 
-        // Parse date: could be Date object or string
-        let solicitacao = get("SOLICITAÇÃO") || get("SOLICITACAO");
-        if (solicitacao instanceof Date) {
-          solicitacao = solicitacao.toLocaleDateString("pt-BR");
-        } else if (solicitacao) {
-          solicitacao = String(solicitacao);
+        // Parse date: xlsx com cellDates=true retorna Date object
+        let solicitacao: string | undefined;
+        const solRaw = get("SOLICITAÇÃO") || get("SOLICITACAO");
+        if (solRaw) {
+          if (solRaw instanceof Date) {
+            solicitacao = solRaw.toLocaleDateString("pt-BR");
+          } else {
+            solicitacao = String(solRaw).trim() || undefined;
+          }
         }
 
         const mesanoRaw = get("MESANO");
-        const mesanoNum = mesanoRaw ? parseInt(String(mesanoRaw)) : undefined;
+        const mesanoNum = mesanoRaw !== undefined && mesanoRaw !== "" ? parseInt(String(mesanoRaw)) : undefined;
+
+        const finRaw = get("FINANCIADO");
+        const financiado = parseNum(finRaw);
 
         const trocoRaw = get("TROCO");
-        const finRaw = get("FINANCIADO");
+        let troco = parseNum(trocoRaw);
+        // Quando TROCO é 0 ou vazio, usar valor de FINANCIADO (bruto)
+        if (!troco && financiado) {
+          troco = financiado;
+        }
+
+        // Situação2 é a 11ª coluna (índice 10) com header 'Situação'
+        const sit2Raw = get("SITUAÇÃO2") || get("SITUACAO2") || get("SITUAÇÃO2") || (headers.length >= 11 ? row[10] : undefined);
+        const situacao2 = sit2Raw ? String(sit2Raw).trim() || undefined : undefined;
 
         registros.push({
           empresa: get("EMPRESA") ? String(get("EMPRESA")).trim() : undefined,
-          mesano: isNaN(mesanoNum!) ? undefined : mesanoNum,
-          proposta: String(proposta).trim(),
-          linha: get("LINHA") ? parseInt(String(get("LINHA"))) : undefined,
-          situacao: get("SITUAÇÃO") || get("SITUACAO") ? String(get("SITUAÇÃO") || get("SITUACAO")).trim() : undefined,
+          mesano: mesanoNum !== undefined && !isNaN(mesanoNum) ? mesanoNum : undefined,
+          proposta,
+          linha: get("LINHA") ? parseInt(String(get("LINHA"))) || undefined : undefined,
+          situacao: (get("SITUAÇÃO") || get("SITUACAO")) ? String(get("SITUAÇÃO") || get("SITUACAO")).trim() : undefined,
           operador: get("OPERADOR") ? String(get("OPERADOR")).trim() : undefined,
-          solicitacao: solicitacao || undefined,
+          solicitacao,
           prazo: get("PRAZO") ? String(get("PRAZO")).trim() : undefined,
-          troco: trocoRaw !== undefined && trocoRaw !== "" ? parseFloat(String(trocoRaw).replace(",", ".")) : undefined,
-          financiado: finRaw !== undefined && finRaw !== "" ? parseFloat(String(finRaw).replace(",", ".")) : undefined,
-          situacao2: get("SITUAÇÃO2") || get("SITUACAO2") || (headers.length >= 11 ? row[10] : undefined)
-            ? String(get("SITUAÇÃO2") || get("SITUACAO2") || row[10] || "").trim() || undefined
-            : undefined,
+          troco,
+          financiado,
+          situacao2,
         });
       }
 
