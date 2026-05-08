@@ -240,7 +240,7 @@ export default function Certificacoes() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Certificações</h1>
-          <p className="text-sm text-slate-500">Controle de certificações dos agentes (CONSIG e PLDFT)</p>
+          <p className="text-sm text-slate-500">Controle de certificações dos agentes (CONSIG e LGPD)</p>
         </div>
       </div>
 
@@ -274,7 +274,7 @@ export default function Certificacoes() {
                 <TableHead className="text-white font-semibold">CPF</TableHead>
                 <TableHead className="text-white font-semibold">Situação</TableHead>
                 <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação CONSIG</TableHead>
-                <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação PLDFT</TableHead>
+                <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação LGPD</TableHead>
                 <TableHead className="text-white font-semibold">Ações</TableHead>
               </TableRow>
               <TableRow className="bg-blue-600 hover:bg-blue-600">
@@ -320,7 +320,7 @@ export default function Certificacoes() {
                   <TableCell className="text-center">{c.diasFaltando ?? '-'}</TableCell>
                   <TableCell className={situacaoColor(c.situacaoCertif)}>{c.situacaoCertif || '-'}</TableCell>
                   <TableCell className="font-mono text-xs">{c.nrCertificadoConsig || '-'}</TableCell>
-                  {/* PLDFT */}
+                  {/* LGPD */}
                   <TableCell>{fmtDate(c.dataCertif2)}</TableCell>
                   <TableCell>{fmtDate(c.ventoCertif3)}</TableCell>
                   <TableCell className="text-center">{c.diasFaltando2 ?? '-'}</TableCell>
@@ -400,7 +400,7 @@ export default function Certificacoes() {
               <Input value={form.nrCertificadoConsig || ''} onChange={e => setForm(p => ({ ...p, nrCertificadoConsig: e.target.value }))} />
             </div>
             <div className="col-span-2 border-t pt-2">
-              <p className="text-xs font-bold text-purple-700 mb-2">Certificação PLDFT</p>
+              <p className="text-xs font-bold text-purple-700 mb-2">Certificação LGPD</p>
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">Data Certif 2 (AAAA-MM-DD)</label>
@@ -411,7 +411,7 @@ export default function Certificacoes() {
               <Input type="date" value={form.ventoCertif3 || ''} onChange={e => setForm(p => ({ ...p, ventoCertif3: e.target.value }))} />
             </div>
             <div className="col-span-2">
-              <label className="text-xs font-medium text-slate-600">Nr. Certificado PLDFT</label>
+              <label className="text-xs font-medium text-slate-600">Nr. Certificado LGPD</label>
               <Input value={form.nrCertificadoPldft || ''} onChange={e => setForm(p => ({ ...p, nrCertificadoPldft: e.target.value }))} />
             </div>
           </div>
