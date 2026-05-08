@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { febraban } from "../../drizzle/schema";
-import { eq, and, like, or, desc, asc, sql } from "drizzle-orm";
+import { febraban, consignados } from "../../drizzle/schema";
+import { eq, and, like, or, desc, asc, sql, isNotNull } from "drizzle-orm";
 
 // Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
 export function mesanoToStr(mesano: number): string {
@@ -53,7 +53,27 @@ export const febrabanRouter = {
       const where = conditions.length > 0 ? and(...conditions) : undefined;
 
       const rows = await db
-        .select()
+        .select({
+          id: febraban.id,
+          empresa: febraban.empresa,
+          mesano: febraban.mesano,
+          proposta: febraban.proposta,
+          linha: febraban.linha,
+          situacao: febraban.situacao,
+          operador: febraban.operador,
+          solicitacao: febraban.solicitacao,
+          prazo: febraban.prazo,
+          troco: febraban.troco,
+          financiado: febraban.financiado,
+          situacao2: febraban.situacao2,
+          ordemExcel: febraban.ordemExcel,
+          createdAt: febraban.createdAt,
+          updatedAt: febraban.updatedAt,
+          // pago: existe nrOperacao igual na tabela consignados
+          pago: sql<number>`CASE WHEN EXISTS (
+            SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta}
+          ) THEN 1 ELSE 0 END`,
+        })
         .from(febraban)
         .where(where)
         .orderBy(asc(febraban.empresa), asc(febraban.ordemExcel), asc(febraban.id))
