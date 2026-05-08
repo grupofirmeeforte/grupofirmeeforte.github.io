@@ -529,9 +529,10 @@ export default function FebrabanPage() {
             {/* Upload */}
             <div>
               <Label className="text-sm font-semibold mb-2 block">Arquivo Excel (.xlsx)</Label>
-              <div
-                className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 transition-colors"
-                onClick={() => fileInputRef.current?.click()}
+              {/* Usar label nativo com htmlFor para abrir o file picker dentro do Dialog */}
+              <label
+                htmlFor="febraban-file-input"
+                className="block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 transition-colors"
               >
                 {importFileName ? (
                   <div>
@@ -545,12 +546,12 @@ export default function FebrabanPage() {
                     <p className="text-xs text-gray-400 mt-1">Formato: EMPRESA, MESANO, PROPOSTA, LINHA, SITUAÇÃO, OPERADOR, SOLICITAÇÃO, PRAZO, TROCO, FINANCIADO</p>
                   </div>
                 )}
-              </div>
+              </label>
               <input
-                ref={fileInputRef}
+                id="febraban-file-input"
                 type="file"
-                accept=".xlsx,.xls,.csv"
-                className="hidden"
+                accept=".xlsx,.xls"
+                style={{ display: "none" }}
                 onChange={handleFileChange}
               />
             </div>
