@@ -15,6 +15,7 @@ import ContaCorrente from './pages/ContaCorrente';
 import Calculo from './pages/Calculo';
 import Relatorios from './pages/Relatorios';
 import Certificacoes from './pages/Certificacoes';
+import FebrabanPage from './pages/Febraban';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -50,6 +51,7 @@ function RouterWithInactivity() {
       <Route path={"/calculo"} component={Calculo} />
       <Route path={"/relatorios"} component={Relatorios} />
       <Route path={"/certificacoes"} component={Certificacoes} />
+      <Route path={"/febraban"} component={FebrabanPage} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />

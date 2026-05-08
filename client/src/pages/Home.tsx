@@ -105,12 +105,14 @@ export default function Home() {
       type: 'group',
       key: 'febraban',
       title: 'Febraban',
-      description: 'Gestão de arquivos e conformidade Febraban',
+      description: 'Relatório de Produção BB — importação e gestão de propostas',
       icon: ShieldCheck,
       color: 'bg-violet-600',
       borderColor: 'border-violet-200',
       bgColor: 'from-violet-50 to-purple-50',
-      subModules: [],
+      subModules: [
+        { title: 'Produção BB', description: 'Relatório de produção Febraban', icon: ShieldCheck, color: 'bg-violet-500', path: '/febraban' },
+      ],
     },
     {
       type: 'group',

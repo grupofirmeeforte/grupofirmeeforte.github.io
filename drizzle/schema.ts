@@ -662,3 +662,33 @@ export type InsertValoresCalculo = typeof valoresCalculo.$inferInsert;
 
 
 
+
+/**
+ * Tabela Febraban - Relatório de Produção BB
+ * Armazena os dados do relatório de produção do Banco do Brasil
+ * Chave única: proposta (número da operação)
+ */
+export const febraban = mysqlTable("febraban", {
+  id: int("id").autoincrement().primaryKey(),
+  empresa: varchar("empresa", { length: 100 }),
+  mesano: int("mesano"),                             // ex: 126 = jan/2026
+  proposta: varchar("proposta", { length: 20 }).notNull(), // número da operação (chave de negócio)
+  linha: int("linha"),                               // código da linha de produto
+  situacao: varchar("situacao", { length: 100 }),    // Contratada, Cancelada, Pendente
+  operador: varchar("operador", { length: 50 }),     // ChaveJ do operador
+  solicitacao: varchar("solicitacao", { length: 20 }), // data da solicitação (DD/MM/YYYY)
+  prazo: varchar("prazo", { length: 20 }),           // ex: 96meses
+  troco: decimal("troco", { precision: 15, scale: 2 }),
+  financiado: decimal("financiado", { precision: 15, scale: 2 }),
+  situacao2: varchar("situacao2", { length: 100 }),  // coluna "Situação" (11ª coluna do Excel)
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  propostaIdx: index("idx_febraban_proposta").on(table.proposta),
+  mesanoIdx: index("idx_febraban_mesano").on(table.mesano),
+  empresaIdx: index("idx_febraban_empresa").on(table.empresa),
+  operadorIdx: index("idx_febraban_operador").on(table.operador),
+}));
+
+export type Febraban = typeof febraban.$inferSelect;
+export type InsertFebraban = typeof febraban.$inferInsert;

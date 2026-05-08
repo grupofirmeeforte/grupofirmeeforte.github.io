@@ -5,6 +5,7 @@ import { publicProcedure, router, adminProcedure } from "./_core/trpc";
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { certificacoesRouter } from "./routers/certificacoes";
+import { febrabanRouter } from "./routers/febraban";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
 import { users, agentes } from "../drizzle/schema";
@@ -179,6 +180,7 @@ export const appRouter = router({
   }),
   agentes: agentesRouter,
   auditoria: auditoriaRouter,
+  febraban: febrabanRouter,
   sessoes: router({
     // Obter todas as sessões ativas
     getAtivas: publicProcedure.query(async () => {

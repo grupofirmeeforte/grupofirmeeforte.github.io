@@ -141,6 +141,13 @@
       "when": 1778251756898,
       "tag": "0019_gifted_major_mapleleaf",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1778252103603,
+      "tag": "0020_bitter_human_cannonball",
+      "breakpoints": true
     }
   ]
 }

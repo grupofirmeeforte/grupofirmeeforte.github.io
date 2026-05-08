@@ -264,3 +264,15 @@
 - [x] Validar formatação de moeda (R$ 133.854,57, etc.)
 - [ ] Implementar exportação para Excel
 - [ ] Implementar impressão de relatório
+
+## MÓDULO FEBRABAN — RELATÓRIO DE PRODUÇÃO BB
+- [x] Criar tabela `febraban` no schema Drizzle com colunas: empresa, mesano, proposta, linha, situacao, operador, solicitacao, prazo, troco, financiado, situacao2
+- [x] Aplicar migration SQL no banco de dados
+- [x] Criar router tRPC `febraban` com procedures: list, count, importar, update, delete, filtros
+- [x] Importação Excel com modo "Novo" (apenas adiciona) e "Subscrever" (adiciona + atualiza por proposta)
+- [x] Criar página /febraban com tabela completa de todas as colunas do relatório BB
+- [x] Filtros por empresa, mês/ano, situação e operador
+- [x] Botão Editar com modal de edição de todos os campos
+- [x] Botão Excluir com confirmação
+- [x] Paginação (100 registros por página)
+- [x] Adicionar link para /febraban no card do módulo Febraban na Home
