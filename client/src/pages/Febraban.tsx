@@ -100,6 +100,7 @@ export default function FebrabanPage() {
   const [page, setPage] = useState(0);
   const [exportandoNaoPagos, setExportandoNaoPagos] = useState(false);
   const [exportandoContratadas, setExportandoContratadas] = useState(false);
+  const [exportandoPendentes, setExportandoPendentes] = useState(false);
 
   // Import state
   const [importModal, setImportModal] = useState(false);
@@ -168,78 +169,71 @@ export default function FebrabanPage() {
 
   const totalPages = total ? Math.ceil(total / LIMIT) : 0;
 
-  // Exportar Não Pagos — busca todos os registros não pagos e gera Excel agrupado por empresa
+  // Função auxiliar para gerar Excel agrupado por empresa
+  function gerarExcelPorEmpresa(dados: any[], nomeArquivo: string, colunaResumo: string) {
+    const porEmpresa: Record<string, typeof dados> = {};
+    for (const row of dados) {
+      const emp = row.empresa || "(Sem empresa)";
+      if (!porEmpresa[emp]) porEmpresa[emp] = [];
+      porEmpresa[emp].push(row);
+    }
+    const empresasOrdenadas = Object.keys(porEmpresa).sort();
+    const wb = XLSX.utils.book_new();
+    for (const emp of empresasOrdenadas) {
+      const registros = porEmpresa[emp];
+      const wsData: any[][] = [
+        ["EMPRESA", "MÊS/ANO", "PROPOSTA", "LINHA", "SITUAÇÃO", "OPERADOR", "SOLICITAÇÃO", "PRAZO", "TROCO", "FINANCIADO"],
+        ...registros.map(r => [
+          r.empresa || "",
+          mesanoToStr(r.mesano),
+          r.proposta,
+          r.linha ?? "",
+          r.situacao || "",
+          r.operador || "",
+          r.solicitacao || "",
+          r.prazo || "",
+          r.troco != null ? parseFloat(String(r.troco)) : "",
+          r.financiado != null ? parseFloat(String(r.financiado)) : "",
+        ]),
+      ];
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      ws["!cols"] = [
+        { wch: 20 }, { wch: 10 }, { wch: 14 }, { wch: 8 },
+        { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 10 },
+        { wch: 14 }, { wch: 14 },
+      ];
+      XLSX.utils.book_append_sheet(wb, ws, emp.replace(/[\\\/\*\?\[\]:]/g, "").substring(0, 31));
+    }
+    const resumoData: any[][] = [
+      ["EMPRESA", colunaResumo],
+      ...empresasOrdenadas.map(emp => [emp, porEmpresa[emp].length]),
+      ["TOTAL", dados.length],
+    ];
+    const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
+    wsResumo["!cols"] = [{ wch: 25 }, { wch: 28 }];
+    XLSX.utils.book_append_sheet(wb, wsResumo, "RESUMO");
+    XLSX.writeFile(wb, nomeArquivo);
+  }
+
+  // Exportar Não Pagos (Contratadas + Pendentes, sem Canceladas)
   async function handleExportarNaoPagos() {
     setExportandoNaoPagos(true);
     try {
-      const dados = await utils.client.febraban.naoPagos.query({
+      const todos = await utils.client.febraban.naoPagos.query({
         empresa: empresa !== "__all__" ? empresa : undefined,
         mesano: mesano,
       });
+      // Exclui Canceladas
+      const dados = todos.filter(r => r.situacao !== 'Cancelada');
 
       if (!dados || dados.length === 0) {
-        alert("Nenhum registro não pago encontrado com os filtros atuais.");
+        alert("Nenhum registro não pago (sem canceladas) encontrado com os filtros atuais.");
         return;
       }
 
-      // Agrupa por empresa em ordem alfabética
-      const porEmpresa: Record<string, typeof dados> = {};
-      for (const row of dados) {
-        const emp = row.empresa || "(Sem empresa)";
-        if (!porEmpresa[emp]) porEmpresa[emp] = [];
-        porEmpresa[emp].push(row);
-      }
-      const empresasOrdenadas = Object.keys(porEmpresa).sort();
-
-      const wb = XLSX.utils.book_new();
-
-      for (const emp of empresasOrdenadas) {
-        const registros = porEmpresa[emp];
-        const wsData: any[][] = [
-          ["EMPRESA", "MÊS/ANO", "PROPOSTA", "LINHA", "SITUAÇÃO", "OPERADOR", "SOLICITAÇÃO", "PRAZO", "TROCO", "FINANCIADO"],
-          ...registros.map(r => [
-            r.empresa || "",
-            mesanoToStr(r.mesano),
-            r.proposta,
-            r.linha ?? "",
-            r.situacao || "",
-            r.operador || "",
-            r.solicitacao || "",
-            r.prazo || "",
-            r.troco != null ? parseFloat(String(r.troco)) : "",
-            r.financiado != null ? parseFloat(String(r.financiado)) : "",
-          ]),
-        ];
-        const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-        // Largura das colunas
-        ws["!cols"] = [
-          { wch: 20 }, { wch: 10 }, { wch: 14 }, { wch: 8 },
-          { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 10 },
-          { wch: 14 }, { wch: 14 },
-        ];
-
-        // Nome da aba: máx 31 chars (limite do Excel), remove chars inválidos
-        const abaName = emp.replace(/[\\\/\*\?\[\]:]/g, "").substring(0, 31);
-        XLSX.utils.book_append_sheet(wb, ws, abaName);
-      }
-
-      // Adiciona aba RESUMO com total por empresa
-      const resumoData: any[][] = [
-        ["EMPRESA", "QTD NÃO PAGOS"],
-        ...empresasOrdenadas.map(emp => [emp, porEmpresa[emp].length]),
-        ["TOTAL", dados.length],
-      ];
-      const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
-      wsResumo["!cols"] = [{ wch: 25 }, { wch: 16 }];
-      XLSX.utils.book_append_sheet(wb, wsResumo, "RESUMO");
-
-      // Gera nome do arquivo com filtros aplicados
       const mesanoStr = mesano ? mesanoToStr(mesano).replace("/", "-") : "todos";
       const empStr = empresa !== "__all__" ? empresa.substring(0, 20) : "todas-empresas";
-      const fileName = `nao-pagos_${empStr}_${mesanoStr}.xlsx`;
-
-      XLSX.writeFile(wb, fileName);
+      gerarExcelPorEmpresa(dados, `nao-pagos_${empStr}_${mesanoStr}.xlsx`, "QTD NÃO PAGOS");
     } catch (err: any) {
       alert(`Erro ao exportar: ${err?.message || err}`);
     } finally {
@@ -247,78 +241,49 @@ export default function FebrabanPage() {
     }
   }
 
-  // Exportar Contratadas Não Pagas
+  // Exportar apenas Contratadas não pagas
   async function handleExportarContratatasNaoPagas() {
     setExportandoContratadas(true);
     try {
-      const dados = await utils.client.febraban.naoPagos.query({
+      const todos = await utils.client.febraban.naoPagos.query({
         empresa: empresa !== "__all__" ? empresa : undefined,
         mesano: mesano,
       });
-
-      // Filtra apenas as Contratadas
-      const contratadas = dados.filter(r => r.situacao === 'Contratada');
-
-      if (!contratadas || contratadas.length === 0) {
-        alert("Nenhuma operação Contratada não paga encontrada com os filtros atuais.");
+      const dados = todos.filter(r => r.situacao === 'Contratada');
+      if (!dados || dados.length === 0) {
+        alert("Nenhuma operação Contratada não paga encontrada.");
         return;
       }
-
-      // Agrupa por empresa
-      const porEmpresa: Record<string, typeof contratadas> = {};
-      for (const row of contratadas) {
-        const emp = row.empresa || "(Sem empresa)";
-        if (!porEmpresa[emp]) porEmpresa[emp] = [];
-        porEmpresa[emp].push(row);
-      }
-      const empresasOrdenadas = Object.keys(porEmpresa).sort();
-
-      const wb = XLSX.utils.book_new();
-
-      for (const emp of empresasOrdenadas) {
-        const registros = porEmpresa[emp];
-        const wsData: any[][] = [
-          ["EMPRESA", "MÊS/ANO", "PROPOSTA", "LINHA", "SITUAÇÃO", "OPERADOR", "SOLICITAÇÃO", "PRAZO", "TROCO", "FINANCIADO"],
-          ...registros.map(r => [
-            r.empresa || "",
-            mesanoToStr(r.mesano),
-            r.proposta,
-            r.linha ?? "",
-            r.situacao || "",
-            r.operador || "",
-            r.solicitacao || "",
-            r.prazo || "",
-            r.troco != null ? parseFloat(String(r.troco)) : "",
-            r.financiado != null ? parseFloat(String(r.financiado)) : "",
-          ]),
-        ];
-        const ws = XLSX.utils.aoa_to_sheet(wsData);
-        ws["!cols"] = [
-          { wch: 20 }, { wch: 10 }, { wch: 14 }, { wch: 8 },
-          { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 10 },
-          { wch: 14 }, { wch: 14 },
-        ];
-        const abaName = emp.replace(/[\\\/\*\?\[\]:]/g, "").substring(0, 31);
-        XLSX.utils.book_append_sheet(wb, ws, abaName);
-      }
-
-      // Aba RESUMO
-      const resumoData: any[][] = [
-        ["EMPRESA", "QTD CONTRATADAS NÃO PAGAS"],
-        ...empresasOrdenadas.map(emp => [emp, porEmpresa[emp].length]),
-        ["TOTAL", contratadas.length],
-      ];
-      const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
-      wsResumo["!cols"] = [{ wch: 25 }, { wch: 26 }];
-      XLSX.utils.book_append_sheet(wb, wsResumo, "RESUMO");
-
       const mesanoStr = mesano ? mesanoToStr(mesano).replace("/", "-") : "todos";
       const empStr = empresa !== "__all__" ? empresa.substring(0, 20) : "todas-empresas";
-      XLSX.writeFile(wb, `contratadas-nao-pagas_${empStr}_${mesanoStr}.xlsx`);
+      gerarExcelPorEmpresa(dados, `contratadas-nao-pagas_${empStr}_${mesanoStr}.xlsx`, "QTD CONTRATADAS NÃO PAGAS");
     } catch (err: any) {
       alert(`Erro ao exportar: ${err?.message || err}`);
     } finally {
       setExportandoContratadas(false);
+    }
+  }
+
+  // Exportar apenas Pendentes não pagas
+  async function handleExportarPendentes() {
+    setExportandoPendentes(true);
+    try {
+      const todos = await utils.client.febraban.naoPagos.query({
+        empresa: empresa !== "__all__" ? empresa : undefined,
+        mesano: mesano,
+      });
+      const dados = todos.filter(r => r.situacao === 'Pendente');
+      if (!dados || dados.length === 0) {
+        alert("Nenhuma operação Pendente não paga encontrada.");
+        return;
+      }
+      const mesanoStr = mesano ? mesanoToStr(mesano).replace("/", "-") : "todos";
+      const empStr = empresa !== "__all__" ? empresa.substring(0, 20) : "todas-empresas";
+      gerarExcelPorEmpresa(dados, `pendentes-nao-pagas_${empStr}_${mesanoStr}.xlsx`, "QTD PENDENTES NÃO PAGAS");
+    } catch (err: any) {
+      alert(`Erro ao exportar: ${err?.message || err}`);
+    } finally {
+      setExportandoPendentes(false);
     }
   }
 
@@ -512,7 +477,16 @@ export default function FebrabanPage() {
             disabled={exportandoContratadas}
           >
             <Download className="w-4 h-4" />
-            {exportandoContratadas ? "Exportando..." : "Exportar Contratadas Não Pagas"}
+            {exportandoContratadas ? "Exportando..." : "Exportar Contratadas"}
+          </Button>
+          <Button
+            variant="outline"
+            className="gap-2 border-yellow-500 text-yellow-700 hover:bg-yellow-50"
+            onClick={handleExportarPendentes}
+            disabled={exportandoPendentes}
+          >
+            <Download className="w-4 h-4" />
+            {exportandoPendentes ? "Exportando..." : "Exportar Pendentes"}
           </Button>
           <Button
             variant="outline"
