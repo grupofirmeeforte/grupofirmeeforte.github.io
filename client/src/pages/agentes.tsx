@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, ExternalLink } from "lucide-react";
 import { useLocation } from "wouter";
 
 // Função para formatar data YYYY-MM-DD para DD/MM/YYYY
@@ -292,13 +292,27 @@ export default function AgentesPage() {
                       <TableCell>{agente.agencia}</TableCell>
                       <TableCell>{agente.conta}</TableCell>
                       <TableCell>{agente.pix}</TableCell>
-                      <TableCell className="text-right space-x-2">
+                      <TableCell className="text-right space-x-1">
+                        {agente.cpfAgente && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            title="Consultar no CRCP"
+                            onClick={() => {
+                              const cpfLimpo = agente.cpfAgente!.replace(/\D/g, '');
+                              window.open(`https://www.crcp.org.br/?cpf=${cpfLimpo}`, '_blank');
+                            }}
+                          >
+                            <ExternalLink className="w-4 h-4 text-blue-600" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => navigate(`/agentes/${agente.id}`)}
                         >
                           <Edit2 className="w-4 h-4" />
+
                         </Button>
                         <Button
                           variant="ghost"

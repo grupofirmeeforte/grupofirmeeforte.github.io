@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Pencil, Trash2, Upload } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Upload, ExternalLink } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 type Cert = {
@@ -328,6 +328,19 @@ export default function Certificacoes() {
                   <TableCell className="font-mono text-xs">{c.nrCertificadoPldft || '-'}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
+                      {c.cpf && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Consultar no CRCP"
+                          onClick={() => {
+                            const cpfLimpo = c.cpf!.replace(/\D/g, '');
+                            window.open(`https://www.crcp.org.br/?cpf=${cpfLimpo}`, '_blank');
+                          }}
+                        >
+                          <ExternalLink className="w-3 h-3 text-blue-600" />
+                        </Button>
+                      )}
                       <Button variant="ghost" size="sm" onClick={() => abrirEditar(c as Cert)}>
                         <Pencil className="w-3 h-3" />
                       </Button>
