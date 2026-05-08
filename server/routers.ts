@@ -138,10 +138,44 @@ export const appRouter = router({
           isAniversario = diaNasc === diaHoje && mesNasc === mesHoje;
         }
 
+        // Verificar se o agente tem acesso irrestrito (sem bloqueio de horário)
+        const AGENTES_ACESSO_IRRESTRITO = ['Sidnei Honorato Ultramare'];
+        const acessoIrrestrito = AGENTES_ACESSO_IRRESTRITO.some(
+          nome => agente.nomeAgente?.toLowerCase().trim() === nome.toLowerCase().trim()
+        );
+
+        // Verificar bloqueio de horário (apenas para agentes sem acesso irrestrito)
+        if (!acessoIrrestrito) {
+          // Usar horário de Brasília (UTC-3)
+          const agora = new Date();
+          const horarioBrasilia = new Date(agora.getTime() - 3 * 60 * 60 * 1000);
+          const diaSemana = horarioBrasilia.getUTCDay(); // 0=Dom, 6=Sáb
+          const hora = horarioBrasilia.getUTCHours();
+          const minuto = horarioBrasilia.getUTCMinutes();
+          const totalMinutos = hora * 60 + minuto;
+          const inicioPermitido = 7 * 60 + 30; // 07:30
+          const fimPermitido = 19 * 60 + 30; // 19:30
+
+          if (diaSemana === 0 || diaSemana === 6) {
+            throw new TRPCError({
+              code: 'FORBIDDEN',
+              message: 'Acesso permitido apenas de segunda a sexta.',
+            });
+          }
+
+          if (totalMinutos < inicioPermitido || totalMinutos >= fimPermitido) {
+            throw new TRPCError({
+              code: 'FORBIDDEN',
+              message: 'Acesso permitido apenas entre 07:30 e 19:30.',
+            });
+          }
+        }
+
         return {
           success: true,
           numeroEntrada,
           isAniversario,
+          acessoIrrestrito,
           agente: {
             id: agente.id,
             chaveJ: agente.chaveJ,

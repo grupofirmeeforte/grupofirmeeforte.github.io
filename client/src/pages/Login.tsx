@@ -30,9 +30,24 @@ export default function Login() {
       }, 3000);
     },
     onError: (err: TRPCClientErrorLike<any>) => {
+      const message = err.message || '';
+      // Erros de horário/dia não consomem tentativas de senha
+      if (
+        message.includes('segunda a sexta') ||
+        message.includes('07:30') ||
+        message.includes('Acesso permitido')
+      ) {
+        setError(message);
+        return;
+      }
+      // Erros de credenciais bloqueadas pelo servidor também não incrementam
+      if (message.includes('bloqueado após 3 tentativas')) {
+        setIsBlocked(true);
+        setError(message);
+        return;
+      }
       const newAttemptCount = attemptCount + 1;
       setAttemptCount(newAttemptCount);
-
       if (newAttemptCount >= 3) {
         setIsBlocked(true);
         setError('Sistema bloqueado após 3 tentativas falhas. Contate o administrador.');
@@ -45,25 +60,6 @@ export default function Login() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isBlocked) return;
-
-    const now = new Date();
-    const dayOfWeek = now.getDay();
-    const hour = now.getHours();
-
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
-      setError('Acesso permitido apenas de segunda a sexta.');
-      return;
-    }
-
-    const minute = now.getMinutes();
-    const totalMinutes = hour * 60 + minute;
-    const startTime = 7 * 60 + 30;
-    const endTime = 19 * 60 + 30;
-
-    if (totalMinutes < startTime || totalMinutes >= endTime) {
-      setError('Acesso permitido apenas entre 07:30 e 19:30.');
-      return;
-    }
 
     setError('');
     document.cookie = 'app_session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';

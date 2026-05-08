@@ -304,3 +304,9 @@
 - [ ] Importação via Excel (aba Pagtos)
 - [x] Filtros: Mês/Ano, Empresa, Tipo Pagto, Pago (Sim/Não/Todos)
 - [x] Exportar para Excel
+
+## FASE 27: EXCEÇÃO DE HORÁRIO PARA SIDNEI
+- [x] Verificar sistema de bloqueio de horário atual no servidor
+- [x] Adicionar exceção: Sidnei Honorato Ultramare tem acesso irrestrito (qualquer dia/horário)
+- [x] Exceção baseada no nome do agente no cadastro
+- [x] Quando Chave J mudar, o sistema aceita o novo número automaticamente (baseado no nome, não na chave)
