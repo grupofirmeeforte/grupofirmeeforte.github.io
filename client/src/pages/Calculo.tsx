@@ -211,7 +211,6 @@ export default function Calculo() {
     { label: "SRCC", key: "srccSoma", moeda: true },
     { label: "Vr. Líquido-SRCC", key: "vrLiquidoSrccSoma", moeda: true },
     { label: "Qtde Operações", key: "qtdeOperacoes", moeda: false },
-    { label: "Valor a Pagar", key: "valorAPagar", moeda: true },
   ];
 
   return (
