@@ -178,6 +178,47 @@ export const febrabanRouter = {
       return rows;
     }),
 
+  // Exportar contratadas não pagas (situação Contratada + não está na produção consignado)
+  contratatasNaoPagas: protectedProcedure
+    .input(z.object({
+      empresa: z.string().optional(),
+      mesano: z.number().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return [];
+
+      const conditions: any[] = [
+        sql`NOT EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`,
+        eq(febraban.situacao, 'Contratada'),
+      ];
+      if (input.empresa && input.empresa !== '__all__') {
+        conditions.push(eq(febraban.empresa, input.empresa));
+      }
+      if (input.mesano) {
+        conditions.push(eq(febraban.mesano, input.mesano));
+      }
+
+      const rows = await db
+        .select({
+          empresa: febraban.empresa,
+          mesano: febraban.mesano,
+          proposta: febraban.proposta,
+          linha: febraban.linha,
+          situacao: febraban.situacao,
+          operador: febraban.operador,
+          solicitacao: febraban.solicitacao,
+          prazo: febraban.prazo,
+          troco: febraban.troco,
+          financiado: febraban.financiado,
+        })
+        .from(febraban)
+        .where(and(...conditions))
+        .orderBy(asc(febraban.empresa), asc(febraban.mesano), asc(febraban.id));
+
+      return rows;
+    }),
+
   // Importar registros:
   // modo "novo" = apenas adiciona registros que ainda não existem (por proposta)
   // modo "subscrever" = adiciona novos E atualiza existentes pelo número da proposta

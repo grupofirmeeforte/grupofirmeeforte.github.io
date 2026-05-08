@@ -99,6 +99,7 @@ export default function FebrabanPage() {
   const [filtroPago, setFiltroPago] = useState<"todos" | "sim" | "nao">("todos");
   const [page, setPage] = useState(0);
   const [exportandoNaoPagos, setExportandoNaoPagos] = useState(false);
+  const [exportandoContratadas, setExportandoContratadas] = useState(false);
 
   // Import state
   const [importModal, setImportModal] = useState(false);
@@ -243,6 +244,81 @@ export default function FebrabanPage() {
       alert(`Erro ao exportar: ${err?.message || err}`);
     } finally {
       setExportandoNaoPagos(false);
+    }
+  }
+
+  // Exportar Contratadas Não Pagas
+  async function handleExportarContratatasNaoPagas() {
+    setExportandoContratadas(true);
+    try {
+      const dados = await utils.client.febraban.naoPagos.query({
+        empresa: empresa !== "__all__" ? empresa : undefined,
+        mesano: mesano,
+      });
+
+      // Filtra apenas as Contratadas
+      const contratadas = dados.filter(r => r.situacao === 'Contratada');
+
+      if (!contratadas || contratadas.length === 0) {
+        alert("Nenhuma operação Contratada não paga encontrada com os filtros atuais.");
+        return;
+      }
+
+      // Agrupa por empresa
+      const porEmpresa: Record<string, typeof contratadas> = {};
+      for (const row of contratadas) {
+        const emp = row.empresa || "(Sem empresa)";
+        if (!porEmpresa[emp]) porEmpresa[emp] = [];
+        porEmpresa[emp].push(row);
+      }
+      const empresasOrdenadas = Object.keys(porEmpresa).sort();
+
+      const wb = XLSX.utils.book_new();
+
+      for (const emp of empresasOrdenadas) {
+        const registros = porEmpresa[emp];
+        const wsData: any[][] = [
+          ["EMPRESA", "MÊS/ANO", "PROPOSTA", "LINHA", "SITUAÇÃO", "OPERADOR", "SOLICITAÇÃO", "PRAZO", "TROCO", "FINANCIADO"],
+          ...registros.map(r => [
+            r.empresa || "",
+            mesanoToStr(r.mesano),
+            r.proposta,
+            r.linha ?? "",
+            r.situacao || "",
+            r.operador || "",
+            r.solicitacao || "",
+            r.prazo || "",
+            r.troco != null ? parseFloat(String(r.troco)) : "",
+            r.financiado != null ? parseFloat(String(r.financiado)) : "",
+          ]),
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(wsData);
+        ws["!cols"] = [
+          { wch: 20 }, { wch: 10 }, { wch: 14 }, { wch: 8 },
+          { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 10 },
+          { wch: 14 }, { wch: 14 },
+        ];
+        const abaName = emp.replace(/[\\\/\*\?\[\]:]/g, "").substring(0, 31);
+        XLSX.utils.book_append_sheet(wb, ws, abaName);
+      }
+
+      // Aba RESUMO
+      const resumoData: any[][] = [
+        ["EMPRESA", "QTD CONTRATADAS NÃO PAGAS"],
+        ...empresasOrdenadas.map(emp => [emp, porEmpresa[emp].length]),
+        ["TOTAL", contratadas.length],
+      ];
+      const wsResumo = XLSX.utils.aoa_to_sheet(resumoData);
+      wsResumo["!cols"] = [{ wch: 25 }, { wch: 26 }];
+      XLSX.utils.book_append_sheet(wb, wsResumo, "RESUMO");
+
+      const mesanoStr = mesano ? mesanoToStr(mesano).replace("/", "-") : "todos";
+      const empStr = empresa !== "__all__" ? empresa.substring(0, 20) : "todas-empresas";
+      XLSX.writeFile(wb, `contratadas-nao-pagas_${empStr}_${mesanoStr}.xlsx`);
+    } catch (err: any) {
+      alert(`Erro ao exportar: ${err?.message || err}`);
+    } finally {
+      setExportandoContratadas(false);
     }
   }
 
@@ -428,6 +504,15 @@ export default function FebrabanPage() {
           >
             <Download className="w-4 h-4" />
             {exportandoNaoPagos ? "Exportando..." : "Exportar Não Pagos"}
+          </Button>
+          <Button
+            variant="outline"
+            className="gap-2 border-orange-500 text-orange-700 hover:bg-orange-50"
+            onClick={handleExportarContratatasNaoPagas}
+            disabled={exportandoContratadas}
+          >
+            <Download className="w-4 h-4" />
+            {exportandoContratadas ? "Exportando..." : "Exportar Contratadas Não Pagas"}
           </Button>
           <Button
             variant="outline"
