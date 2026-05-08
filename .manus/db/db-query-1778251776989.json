@@ -1,0 +1,70 @@
+{
+  "query": "\nSELECT id, empresa, chaveJ, nomeAgente, cpfAgente, email, celular, pix\nFROM agentes\nWHERE id IN (30001, 60001, 90002, 90003, 420001, 840009)\nORDER BY nomeAgente, id;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nSELECT id, empresa, chaveJ, nomeAgente, cpfAgente, email, celular, pix\nFROM agentes\nWHERE id IN (30001, 60001, 90002, 90003, 420001, 840009)\nORDER BY nomeAgente, id;\n",
+  "rows": [
+    {
+      "id": "420001",
+      "empresa": "BMF",
+      "chaveJ": "JJ613953",
+      "nomeAgente": "GISLAINE BARBOSA SOUZA",
+      "cpfAgente": "037.591.585-01",
+      "email": "gislanesouzakj54@gmail.com",
+      "celular": "NULL",
+      "pix": "037.591.585-01"
+    },
+    {
+      "id": "840009",
+      "empresa": "FLEX",
+      "chaveJ": "JJ222635",
+      "nomeAgente": "GISLAINE BARBOSA SOUZA",
+      "cpfAgente": "037.591.585-01",
+      "email": "gislanesouzakj54@gmail.com",
+      "celular": "NULL",
+      "pix": "037.591.585-01"
+    },
+    {
+      "id": "90002",
+      "empresa": "FLEX",
+      "chaveJ": "J1234568",
+      "nomeAgente": "SIDNEI HONORATO ULTRAMARE",
+      "cpfAgente": "041.574.758-95",
+      "email": "ultramare@gmail.com",
+      "celular": "(77) 99157-8959",
+      "pix": ""
+    },
+    {
+      "id": "90003",
+      "empresa": "BMF",
+      "chaveJ": "J1234569",
+      "nomeAgente": "SIDNEI HONORATO ULTRAMARE",
+      "cpfAgente": "041.574.758-95",
+      "email": "ultramare@gmail.com",
+      "celular": "(77) 99157-8959",
+      "pix": ""
+    },
+    {
+      "id": "30001",
+      "empresa": "BMF",
+      "chaveJ": "J9624265",
+      "nomeAgente": "THIAGO VIANA ULTRAMARE",
+      "cpfAgente": "046.219.855-31",
+      "email": "NULL",
+      "celular": "NULL",
+      "pix": ""
+    },
+    {
+      "id": "60001",
+      "empresa": "FLEX",
+      "chaveJ": "JG701582",
+      "nomeAgente": "THIAGO VIANA ULTRAMARE",
+      "cpfAgente": "046.219.855-31",
+      "email": "NULL",
+      "celular": "NULL",
+      "pix": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tempresa\tchaveJ\tnomeAgente\tcpfAgente\temail\tcelular\tpix\n420001\tBMF\tJJ613953\tGISLAINE BARBOSA SOUZA\t037.591.585-01\tgislanesouzakj54@gmail.com\tNULL\t037.591.585-01\n840009\tFLEX\tJJ222635\tGISLAINE BARBOSA SOUZA\t037.591.585-01\tgislanesouzakj54@gmail.com\tNULL\t037.591.585-01\n90002\tFLEX\tJ1234568\tSIDNEI HONORATO ULTRAMARE\t041.574.758-95\tultramare@gmail.com\t(77) 99157-8959\t\n90003\tBMF\tJ1234569\tSIDNEI HONORATO ULTRAMARE\t041.574.758-95\tultramare@gmail.com\t(77) 99157-8959\t\n30001\tBMF\tJ9624265\tTHIAGO VIANA ULTRAMARE\t046.219.855-31\tNULL\tNULL\t\n60001\tFLEX\tJG701582\tTHIAGO VIANA ULTRAMARE\t046.219.855-31\tNULL\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 273
+}

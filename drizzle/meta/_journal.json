@@ -134,6 +134,13 @@
       "when": 1778181408854,
       "tag": "0018_unique_iron_lad",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1778251756898,
+      "tag": "0019_gifted_major_mapleleaf",
+      "breakpoints": true
     }
   ]
 }

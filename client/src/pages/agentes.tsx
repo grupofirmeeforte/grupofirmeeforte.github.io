@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit2, Trash2, Search, ExternalLink } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, ExternalLink, GitMerge } from "lucide-react";
 import { useLocation } from "wouter";
 
 // Função para formatar data YYYY-MM-DD para DD/MM/YYYY
@@ -36,6 +36,7 @@ export default function AgentesPage() {
   const [situacao, setSituacao] = useState<string>("");
   const [cidade, setCidade] = useState<string>("");
   const [page, setPage] = useState(0);
+  const [showDuplicatas, setShowDuplicatas] = useState(false);
   const limit = 50;
 
   const { data: agentes, isLoading } = trpc.agentes.list.useQuery({
@@ -72,6 +73,26 @@ export default function AgentesPage() {
     }
   };
 
+  const { data: duplicatas, refetch: refetchDuplicatas } = trpc.agentes.listarDuplicatas.useQuery(
+    undefined,
+    { enabled: showDuplicatas }
+  );
+
+  const utils = trpc.useUtils();
+  const sincronizarMutation = trpc.agentes.sincronizarDuplicatas.useMutation({
+    onSuccess: (result) => {
+      const msg = result.atualizados.length > 0
+        ? `Sincronização concluída!\nRegistros atualizados: ${result.atualizados.join(', ')}.`
+        : `Registros já estão sincronizados (nenhum campo vazio encontrado).`;
+      alert(msg);
+      refetchDuplicatas();
+      utils.agentes.list.invalidate();
+    },
+    onError: (err) => {
+      alert(`Erro ao sincronizar: ${err.message}`);
+    },
+  });
+
   const totalPages = totalCount ? Math.ceil(totalCount / limit) : 0;
 
   return (
@@ -92,6 +113,14 @@ export default function AgentesPage() {
             ← Voltar
           </Button>
           <Button
+            variant="outline"
+            onClick={() => setShowDuplicatas(!showDuplicatas)}
+            className="gap-2 border-orange-400 text-orange-700 hover:bg-orange-50"
+          >
+            <GitMerge className="w-4 h-4" />
+            Duplicatas
+          </Button>
+          <Button
             onClick={() => navigate("/agentes/novo")}
             className="gap-2"
           >
@@ -100,6 +129,69 @@ export default function AgentesPage() {
           </Button>
         </div>
       </div>
+
+      {/* Painel de duplicatas */}
+      {showDuplicatas && (
+        <Card className="border-orange-300 bg-orange-50">
+          <CardHeader>
+              <CardTitle className="text-orange-800 flex items-center gap-2">
+              <GitMerge className="w-5 h-5" />
+              Cadastros com Mesmo Nome
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!duplicatas ? (
+              <p className="text-sm text-gray-500">Carregando...</p>
+            ) : duplicatas.length === 0 ? (
+              <p className="text-sm text-green-700 font-medium">✅ Nenhum cadastro duplicado encontrado!</p>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-orange-700">
+                  {duplicatas.length} grupo(s) encontrado(s). Clique em "Sincronizar" para copiar campos pessoais vazios
+                  (CPF, email, celular, banco, etc.) entre os cadastros do mesmo agente.
+                </p>
+                {duplicatas.map((grupo, gi) => (
+                  <div key={gi} className="bg-white border border-orange-200 rounded-lg p-3">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <p className="font-semibold text-sm">{grupo[0]?.nomeAgente} &mdash; CPF: {grupo[0]?.cpfAgente}</p>
+                        <div className="mt-2 space-y-1">
+                          {grupo.map((ag) => (
+                            <div key={ag.id} className="text-xs text-gray-600 flex gap-4">
+                              <span className="font-mono">#{ag.id}</span>
+                              <span>{ag.empresa}</span>
+                              <span>{ag.chaveJ}</span>
+                              <span>{ag.numCadastro}</span>
+                              <span className={ag.situacao?.startsWith('Ativo') ? 'text-green-700' : 'text-red-600'}>{ag.situacao}</span>
+                              <span className="text-gray-400">
+                                {[ag.cargo, ag.area, ag.cidade, ag.email, ag.celular].filter(Boolean).length} campos preenchidos
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-orange-500 text-orange-700 hover:bg-orange-100 ml-4"
+                        disabled={sincronizarMutation.isPending}
+                        onClick={() => {
+                          if (confirm(`Sincronizar campos pessoais entre os ${grupo.length} cadastros de "${grupo[0]?.nomeAgente}"?\nCampos vazios serão preenchidos com dados do outro cadastro. Nenhum registro será excluído.`)) {
+                            sincronizarMutation.mutate({ ids: grupo.map(a => a.id) });
+                          }
+                        }}
+                      >
+                        <GitMerge className="w-4 h-4 mr-1" />
+                        Sincronizar
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

@@ -289,6 +289,76 @@ export const agentesRouter = router({
       return result.map(r => r.supervisor).filter(Boolean);
   }),
 
+  // Detectar e listar duplicatas por Nome + CPF
+  listarDuplicatas: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    const todos = await db.select().from(agentes);
+    // Agrupar por nome normalizado + CPF normalizado
+    const grupos: Record<string, typeof todos> = {};
+    for (const a of todos) {
+      const nome = (a.nomeAgente ?? '').trim().toUpperCase();
+      const cpf = (a.cpfAgente ?? '').replace(/\D/g, '');
+      if (!nome || !cpf) continue;
+      const chave = `${nome}||${cpf}`;
+      if (!grupos[chave]) grupos[chave] = [];
+      grupos[chave].push(a);
+    }
+    // Retornar apenas grupos com mais de 1 registro
+    return Object.values(grupos).filter(g => g.length > 1);
+  }),
+
+  // Sincronizar campos pessoais entre duplicatas (mesmo Nome): preenche campos vazios
+  // em cada registro com dados do outro, sem excluir nenhum
+  sincronizarDuplicatas: protectedProcedure
+    .input(z.object({ ids: z.array(z.number()) }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      if (input.ids.length < 2) throw new Error("Informe ao menos 2 IDs para sincronizar");
+
+      // Buscar todos os registros
+      const registros: any[] = [];
+      for (const id of input.ids) {
+        const r = await db.select().from(agentes).where(eq(agentes.id, id)).limit(1);
+        if (r.length > 0) registros.push(r[0]);
+      }
+      if (registros.length < 2) throw new Error("Registros não encontrados");
+
+      // Campos pessoais que devem ser sincronizados entre registros do mesmo agente
+      const camposPessoais = [
+        'cpfAgente','email','celular','banco','agencia','conta','pix',
+        'dataNascimento','favorecido','tipo'
+      ];
+
+      // Construir o conjunto de valores mais completo para campos pessoais
+      const valoresMesclados: Record<string, any> = {};
+      for (const campo of camposPessoais) {
+        for (const reg of registros) {
+          if (!valoresMesclados[campo] && reg[campo] && reg[campo] !== '') {
+            valoresMesclados[campo] = reg[campo];
+          }
+        }
+      }
+
+      // Atualizar cada registro com os campos pessoais mesclados (somente onde está vazio)
+      const atualizados: number[] = [];
+      for (const reg of registros) {
+        const updates: Record<string, any> = {};
+        for (const campo of camposPessoais) {
+          if (valoresMesclados[campo] && (!reg[campo] || reg[campo] === '')) {
+            updates[campo] = valoresMesclados[campo];
+          }
+        }
+        if (Object.keys(updates).length > 0) {
+          await db.update(agentes).set(updates).where(eq(agentes.id, reg.id));
+          atualizados.push(reg.id);
+        }
+      }
+
+      return { sincronizados: input.ids, atualizados, valoresMesclados };
+    }),
+
   // Status de certificação para todos os agentes (coluna Certificação na tabela de Agentes)
   statusCertificacoes: protectedProcedure.query(async () => {
     const db = await getDb();

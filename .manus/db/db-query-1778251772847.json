@@ -1,0 +1,9 @@
+{
+  "query": "\n-- Grupo 1: SIDNEI HONORATO ULTRAMARE (90002=FLEX completo, 90003=BMF vazio)\nUPDATE agentes SET cpfAgente='041.574.758-95', email='ultramare@gmail.com', celular='(77) 99157-8959'\nWHERE id = 90003 AND (cpfAgente IS NULL OR cpfAgente = '');\n\n-- Grupo 2: GISLAINE BARBOSA SOUZA (420001=BMF com CPF/email, 840009=FLEX sem CPF)\nUPDATE agentes SET cpfAgente='037.591.585-01', email='gislanesouzakj54@gmail.com', pix='037.591.585-01'\nWHERE id = 840009 AND (cpfAgente IS NULL OR cpfAgente = '');\n\n-- Grupo 3: THIAGO VIANA ULTRAMARE (30001=BMF sem CPF, 60001=FLEX com CPF)\nUPDATE agentes SET cpfAgente='046.219.855-31'\nWHERE id = 30001 AND (cpfAgente IS NULL OR cpfAgente = '');\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \n-- Grupo 1: SIDNEI HONORATO ULTRAMARE (90002=FLEX completo, 90003=BMF vazio)\nUPDATE agentes SET cpfAgente='041.574.758-95', email='ultramare@gmail.com', celular='(77) 99157-8959'\nWHERE id = 90003 AND (cpfAgente IS NULL OR cpfAgente = '');\n\n-- Grupo 2: GISLAINE BARBOSA SOUZA (420001=BMF com CPF/email, 840009=FLEX sem CPF)\nUPDATE agentes SET cpfAgente='037.591.585-01', email='gislanesouzakj54@gmail.com', pix='037.591.585-01'\nWHERE id = 840009 AND (cpfAgente IS NULL OR cpfAgente = '');\n\n-- Grupo 3: THIAGO VIANA ULTRAMARE (30001=BMF sem CPF, 60001=FLEX com CPF)\nUPDATE agentes SET cpfAgente='046.219.855-31'\nWHERE id = 30001 AND (cpfAgente IS NULL OR cpfAgente = '');\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 315
+}

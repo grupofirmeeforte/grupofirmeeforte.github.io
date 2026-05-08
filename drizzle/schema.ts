@@ -70,7 +70,7 @@ export const agentes = mysqlTable("agentes", {
   agencia: varchar("agencia", { length: 50 }),
   conta: varchar("conta", { length: 50 }),
   tipo: varchar("tipo", { length: 50 }),
-  cpfAgente: varchar("cpfAgente", { length: 14 }).unique(),
+  cpfAgente: varchar("cpfAgente", { length: 14 }),
   pix: varchar("pix", { length: 255 }),
   dataNascimento: varchar("dataNascimento", { length: 10 }), // YYYY-MM-DD format
   celular: varchar("celular", { length: 20 }),
