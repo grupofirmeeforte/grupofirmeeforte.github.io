@@ -3,6 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -48,6 +49,10 @@ export default function AgentesPage() {
 
   const { data: empresas } = trpc.agentes.getEmpresas.useQuery();
   const { data: cidades } = trpc.agentes.getCidades.useQuery();
+  const { data: statusCerts } = trpc.agentes.statusCertificacoes.useQuery(undefined, {
+    refetchInterval: 24 * 60 * 60 * 1000, // atualiza uma vez por dia
+    staleTime: 24 * 60 * 60 * 1000,
+  });
   const { data: totalCount } = trpc.agentes.count.useQuery({
     search,
     empresa: empresa && empresa !== "__all__" ? empresa : undefined,
@@ -238,7 +243,32 @@ export default function AgentesPage() {
                       <TableCell>{agente.area}</TableCell>
                       <TableCell>{agente.vinculo}</TableCell>
                       <TableCell>
-                        <span className="text-sm text-slate-400">-</span>
+                        {(() => {
+                          const key = agente.chaveJ?.trim().toUpperCase();
+                          const cert = key && statusCerts ? statusCerts[key] : undefined;
+                          if (!cert || cert.status === 'SEM_CERTIFICACAO') {
+                            return <span className="text-xs text-slate-400 font-medium">Sem Certificação</span>;
+                          }
+                          if (cert.status === 'VENCIDO') {
+                            return (
+                              <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">
+                                Vencido há {Math.abs(cert.diasMin ?? 0)} dias
+                              </Badge>
+                            );
+                          }
+                          if (cert.status === 'CRITICO') {
+                            return (
+                              <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">
+                                Vence em {cert.diasMin} dias
+                              </Badge>
+                            );
+                          }
+                          return (
+                            <Badge className="bg-green-100 text-green-800 border-0 text-xs">
+                              A vencer em {cert.diasMin} dias
+                            </Badge>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell>
                         <span

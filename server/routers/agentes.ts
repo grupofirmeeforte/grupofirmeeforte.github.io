@@ -1,6 +1,6 @@
 import { eq, like, and, desc, isNotNull } from "drizzle-orm";
 import { z } from "zod";
-import { agentes } from "../../drizzle/schema";
+import { agentes, certificacoes } from "../../drizzle/schema";
 import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 
@@ -287,5 +287,60 @@ export const agentesRouter = router({
         .where(isNotNull(agentes.supervisor));
 
       return result.map(r => r.supervisor).filter(Boolean);
+  }),
+
+  // Status de certificação para todos os agentes (coluna Certificação na tabela de Agentes)
+  statusCertificacoes: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    const certs = await db.select({
+      chaveJ: certificacoes.chaveJ,
+      ventoCertif: certificacoes.ventoCertif,
+      ventoCertif3: certificacoes.ventoCertif3,
+    }).from(certificacoes);
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    function parseData(val: string | null | undefined): Date | null {
+      if (!val) return null;
+      const us = val.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+      if (us) {
+        let yyyy = us[3];
+        if (yyyy.length === 2) yyyy = parseInt(yyyy) >= 50 ? `19${yyyy}` : `20${yyyy}`;
+        const d = new Date(`${yyyy}-${us[1].padStart(2,'0')}-${us[2].padStart(2,'0')}`);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      const iso = val.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (iso) { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
+      return null;
+    }
+
+    function calcDias(vencto: string | null | undefined): number | null {
+      const d = parseData(vencto);
+      if (!d) return null;
+      return Math.floor((d.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+    }
+
+    const map: Record<string, { status: string; diasMin: number | null }> = {};
+    for (const c of certs) {
+      if (!c.chaveJ || c.chaveJ === 'chaveJ') continue;
+      const dias1 = calcDias(c.ventoCertif);
+      const dias2 = calcDias(c.ventoCertif3);
+      let diasMin: number | null = null;
+      if (dias1 !== null && dias2 !== null) diasMin = Math.min(dias1, dias2);
+      else if (dias1 !== null) diasMin = dias1;
+      else if (dias2 !== null) diasMin = dias2;
+
+      let status: string;
+      if (diasMin === null) status = 'SEM_CERTIFICACAO';
+      else if (diasMin < 0) status = 'VENCIDO';
+      else if (diasMin <= 15) status = 'CRITICO';
+      else status = 'A_VENCER';
+
+      map[c.chaveJ.trim().toUpperCase()] = { status, diasMin };
+    }
+    return map;
   }),
 });
