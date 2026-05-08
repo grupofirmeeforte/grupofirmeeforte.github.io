@@ -1,0 +1,30 @@
+{
+  "query": "SELECT mesAno, COUNT(*) as total FROM consignados GROUP BY mesAno ORDER BY mesAno;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT mesAno, COUNT(*) as total FROM consignados GROUP BY mesAno ORDER BY mesAno;",
+  "rows": [
+    {
+      "mesAno": "NULL",
+      "total": "2"
+    },
+    {
+      "mesAno": "01/2026",
+      "total": "776"
+    },
+    {
+      "mesAno": "02/2026",
+      "total": "1392"
+    },
+    {
+      "mesAno": "03/2026",
+      "total": "1182"
+    },
+    {
+      "mesAno": "04/2026",
+      "total": "800"
+    }
+  ],
+  "messages": [],
+  "stdout": "mesAno\ttotal\nNULL\t2\n01/2026\t776\n02/2026\t1392\n03/2026\t1182\n04/2026\t800\n",
+  "stderr": "",
+  "execution_time_ms": 258
+}
