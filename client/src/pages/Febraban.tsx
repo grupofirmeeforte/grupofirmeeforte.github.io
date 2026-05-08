@@ -481,124 +481,105 @@ export default function FebrabanPage() {
       </Card>
 
       {/* Modal Importação */}
-      <Dialog open={importModal} onOpenChange={setImportModal}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Upload className="w-5 h-5 text-blue-600" />
-              Importar Relatório BB (Excel)
-            </DialogTitle>
-          </DialogHeader>
+      {/* Painel de Importação — sem Dialog shadcn para evitar bloqueio do file picker */}
+      {importModal && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center" }}
+          onClick={(e) => { if (e.target === e.currentTarget) { setImportModal(false); } }}
+        >
+          <div style={{ background: "#fff", borderRadius: 12, padding: 24, width: 480, maxWidth: "95vw", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }}>
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Importar Relatório BB (Excel)</h2>
+              <button onClick={() => setImportModal(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: "#666" }}>✕</button>
+            </div>
 
-          <div className="space-y-4">
-            {/* Modo de importação */}
-            <div>
-              <Label className="text-sm font-semibold mb-2 block">Modo de importação</Label>
-              <div className="grid grid-cols-2 gap-3">
+            {/* Modo */}
+            <div style={{ marginBottom: 16 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Modo de importação</p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 <button
                   type="button"
                   onClick={() => setImportModo("novo")}
-                  className={`p-3 rounded-lg border-2 text-left transition-colors ${
-                    importModo === "novo"
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
+                  style={{ padding: "10px 12px", borderRadius: 8, border: importModo === "novo" ? "2px solid #3b82f6" : "2px solid #e5e7eb", background: importModo === "novo" ? "#eff6ff" : "#fff", cursor: "pointer", textAlign: "left" }}
                 >
-                  <div className="font-semibold text-sm">Novo</div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    Adiciona apenas registros com propostas novas. Ignora os que já existem.
-                  </div>
+                  <div style={{ fontWeight: 600, fontSize: 13 }}>Novo</div>
+                  <div style={{ fontSize: 11, color: "#6b7280", marginTop: 4 }}>Adiciona apenas propostas novas. Ignora as que já existem.</div>
                 </button>
                 <button
                   type="button"
                   onClick={() => setImportModo("subscrever")}
-                  className={`p-3 rounded-lg border-2 text-left transition-colors ${
-                    importModo === "subscrever"
-                      ? "border-orange-500 bg-orange-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
+                  style={{ padding: "10px 12px", borderRadius: 8, border: importModo === "subscrever" ? "2px solid #f97316" : "2px solid #e5e7eb", background: importModo === "subscrever" ? "#fff7ed" : "#fff", cursor: "pointer", textAlign: "left" }}
                 >
-                  <div className="font-semibold text-sm">Subscrever</div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    Adiciona novos E atualiza os existentes pelo número da proposta.
-                  </div>
+                  <div style={{ fontWeight: 600, fontSize: 13 }}>Subscrever</div>
+                  <div style={{ fontSize: 11, color: "#6b7280", marginTop: 4 }}>Adiciona novos E atualiza os existentes pelo número da proposta.</div>
                 </button>
               </div>
             </div>
 
-            {/* Upload */}
-            <div>
-              <Label className="text-sm font-semibold mb-2 block">Arquivo Excel (.xlsx)</Label>
-              {/* Usar label nativo com htmlFor para abrir o file picker dentro do Dialog */}
-              <label
-                htmlFor="febraban-file-input"
-                className="block border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 transition-colors"
-              >
-                {importFileName ? (
-                  <div>
-                    <p className="text-green-700 font-medium">{importFileName}</p>
-                    <p className="text-sm text-gray-500 mt-1">{importData.length} registros encontrados</p>
-                  </div>
-                ) : (
-                  <div>
-                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">Clique para selecionar o arquivo Excel</p>
-                    <p className="text-xs text-gray-400 mt-1">Formato: EMPRESA, MESANO, PROPOSTA, LINHA, SITUAÇÃO, OPERADOR, SOLICITAÇÃO, PRAZO, TROCO, FINANCIADO</p>
-                  </div>
-                )}
-              </label>
+            {/* File input nativo — sem nenhum wrapper que bloqueie */}
+            <div style={{ marginBottom: 16 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Arquivo Excel (.xlsx)</p>
               <input
-                id="febraban-file-input"
                 type="file"
                 accept=".xlsx,.xls"
-                style={{ display: "none" }}
                 onChange={handleFileChange}
+                style={{ display: "block", width: "100%", padding: "10px", border: "2px dashed #d1d5db", borderRadius: 8, cursor: "pointer", fontSize: 13, background: "#f9fafb" }}
               />
+              {importFileName && (
+                <div style={{ marginTop: 8, padding: "8px 12px", background: "#f0fdf4", borderRadius: 6, fontSize: 13, color: "#15803d" }}>
+                  <strong>{importFileName}</strong> — {importData.length} registros encontrados
+                </div>
+              )}
             </div>
 
             {/* Progresso */}
             {importProgress && (
-              <div className="space-y-1">
-                <div className="flex justify-between text-xs text-gray-600">
+              <div style={{ marginBottom: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#6b7280", marginBottom: 4 }}>
                   <span>Importando em lotes...</span>
-                  <span>{importProgress.current} / {importProgress.total}</span>
+                  <span>{importProgress.current} / {importProgress.total} ({Math.round((importProgress.current / importProgress.total) * 100)}%)</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-500 h-2 rounded-full transition-all"
-                    style={{ width: `${Math.round((importProgress.current / importProgress.total) * 100)}%` }}
-                  />
+                <div style={{ background: "#e5e7eb", borderRadius: 4, height: 8 }}>
+                  <div style={{ background: "#3b82f6", borderRadius: 4, height: 8, width: `${Math.round((importProgress.current / importProgress.total) * 100)}%`, transition: "width 0.3s" }} />
                 </div>
               </div>
             )}
 
             {/* Resultado */}
             {importResult && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm">
-                <p className="font-semibold text-green-800">Importação concluída!</p>
-                <div className="mt-1 space-y-0.5 text-green-700">
-                  <p>✅ Adicionados: <strong>{importResult.adicionados}</strong></p>
-                  <p>🔄 Atualizados: <strong>{importResult.atualizados}</strong></p>
-                  <p>⏭ Ignorados: <strong>{importResult.ignorados}</strong></p>
-                  <p>Total processados: <strong>{importResult.total}</strong></p>
-                </div>
+              <div style={{ marginBottom: 12, padding: "10px 14px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, fontSize: 13 }}>
+                <p style={{ fontWeight: 700, color: "#15803d", marginBottom: 4 }}>Importação concluída!</p>
+                <p style={{ color: "#166534" }}>Adicionados: <strong>{importResult.adicionados}</strong></p>
+                <p style={{ color: "#166534" }}>Atualizados: <strong>{importResult.atualizados}</strong></p>
+                <p style={{ color: "#166534" }}>Ignorados: <strong>{importResult.ignorados}</strong></p>
+                <p style={{ color: "#166534" }}>Total: <strong>{importResult.total}</strong></p>
               </div>
             )}
-          </div>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setImportModal(false)}>Fechar</Button>
-            <Button
-              onClick={handleImport}
-              disabled={importData.length === 0 || importing}
-              className="gap-2"
-            >
-              <Upload className="w-4 h-4" />
-              {importing ? `Importando... ${importProgress ? Math.round((importProgress.current / importProgress.total) * 100) : 0}%` : `Importar ${importData.length} registros`}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            {/* Botões */}
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8 }}>
+              <button
+                type="button"
+                onClick={() => setImportModal(false)}
+                style={{ padding: "8px 18px", borderRadius: 6, border: "1px solid #d1d5db", background: "#fff", cursor: "pointer", fontSize: 13 }}
+              >
+                Fechar
+              </button>
+              <button
+                type="button"
+                onClick={handleImport}
+                disabled={importData.length === 0 || importing}
+                style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: importData.length === 0 || importing ? "#93c5fd" : "#2563eb", color: "#fff", cursor: importData.length === 0 || importing ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 600 }}
+              >
+                {importing
+                  ? `Importando... ${importProgress ? Math.round((importProgress.current / importProgress.total) * 100) : 0}%`
+                  : `Importar ${importData.length} registros`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal Edição */}
       <Dialog open={editModal} onOpenChange={setEditModal}>
