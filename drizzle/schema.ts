@@ -336,19 +336,35 @@ export type InsertSeguro = typeof seguros.$inferInsert;
 
 /**
  * Tabela de Pagamentos
+ * Espelha exatamente as colunas da aba Pagtos do Excel
  */
 export const pagamentos = mysqlTable("pagamentos", {
   id: int("id").autoincrement().primaryKey(),
+  mesAno: varchar("mesAno", { length: 10 }),           // MM/AAAA
+  tipoPagto: varchar("tipoPagto", { length: 100 }),    // Comissão, Aluguel, Agua, etc.
+  cidadeUF: varchar("cidadeUF", { length: 150 }),      // Cidade/UF
   empresa: varchar("empresa", { length: 100 }),
-  mesAno: varchar("mesAno", { length: 10 }),
-  tipoPagamento: varchar("tipoPagamento", { length: 100 }),
-  total: decimal("total", { precision: 15, scale: 2 }),
-  menorMaior: varchar("menorMaior", { length: 50 }),
-  agenteId: int("agenteId"),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  cadastro: varchar("cadastro", { length: 50 }),
+  nomeFavorecido: varchar("nomeFavorecido", { length: 255 }),
+  banco: varchar("banco", { length: 100 }),
+  agencia: varchar("agencia", { length: 50 }),
+  conta: varchar("conta", { length: 50 }),
+  cpfCnpj: varchar("cpfCnpj", { length: 18 }),
+  tipoConta: varchar("tipoConta", { length: 50 }),
+  pix: varchar("pix", { length: 255 }),
+  valor: decimal("valor", { precision: 15, scale: 2 }),
+  pago: boolean("pago").default(false).notNull(),
+  dataPagto: varchar("dataPagto", { length: 10 }),     // DD/MM/AAAA
+  dataVencer: varchar("dataVencer", { length: 10 }),   // DD/MM/AAAA
+  origem: varchar("origem", { length: 50 }).default("manual"), // manual | sistema
+  observacao: text("observacao"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   mesAnoIdx: index("idx_pagamentos_mesAno").on(table.mesAno),
+  chaveJIdx: index("idx_pagamentos_chaveJ").on(table.chaveJ),
+  empresaIdx: index("idx_pagamentos_empresa").on(table.empresa),
 }));
 
 export type Pagamento = typeof pagamentos.$inferSelect;

@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as total FROM consignados WHERE nrOperacao IS NOT NULL AND nrOperacao != '';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COUNT(*) as total FROM consignados WHERE nrOperacao IS NOT NULL AND nrOperacao != '';",
+  "rows": [
+    {
+      "total": "2068"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n2068\n",
+  "stderr": "",
+  "execution_time_ms": 269
+}

@@ -291,3 +291,16 @@
 ## FASE 24: AJUSTES NA COLUNA PAGO DO FEBRABAN
 - [x] Coluna PAGO: quando não pago → badge "Não" vermelho (em vez de ficar em branco)
 - [x] Coluna PAGO: quando situação é Cancelada → badge "Cancelado" cinza (em vez de ficar em branco)
+
+## FASE 25: MÓDULO DE PAGAMENTOS NO FINANCEIRO
+- [x] Recriar tabela `pagamentos` no schema com todas as colunas do Excel (mesAno, tipoPagto, cidadeUF, empresa, chaveJ, cadastro, nomeFavorecido, banco, agencia, conta, cpfCnpj, tipoConta, pix, valor, pago, dataPagto, dataVencer, origem)
+- [x] Aplicar migration SQL no banco
+- [x] Criar router tRPC `pagamentos` com procedures: list, count, criar, editar, deletar, buscarAgente
+- [x] Bloqueio de duplicatas (mesma chaveJ + mesAno + tipoPagto não pode ser inserida duas vezes)
+- [x] Ao digitar Chave J, buscar automaticamente dados bancários do cadastro de agentes (banco, agência, conta, CPF/CNPJ, tipo conta, pix, nome favorecido)
+- [x] Tipos de pagamento fixos: Comissão, Aluguel, Agua, Ajuda de Custo, Energia, Cancelado, Internet, DespesasViagem, DespesasLoja, Propaganda, Reembolso, Reajuste, Outros
+- [x] Campo Pago: checkbox Sim/Não com data de pagamento
+- [ ] Botão "Gerar do Sistema" para selecionar registros do módulo Cálculo e trazer para pagamento
+- [ ] Importação via Excel (aba Pagtos)
+- [x] Filtros: Mês/Ano, Empresa, Tipo Pagto, Pago (Sim/Não/Todos)
+- [x] Exportar para Excel
