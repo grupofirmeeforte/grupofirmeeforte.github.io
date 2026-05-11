@@ -167,12 +167,7 @@ export default function Calculo() {
   const [valorDtPagto, setValorDtPagto] = useState("");
   const dtPagtoInputRef = useRef<HTMLInputElement>(null);
   const utils = trpc.useUtils();
-  const editarMutation = trpc.calculosImportados.editar.useMutation({
-    onSuccess: () => {
-      utils.calculosImportados.listar.invalidate();
-      setEditandoDtPagto(null);
-    },
-  });
+  const editarMutation = trpc.calculosImportados.editar.useMutation();
 
   const iniciarEdicaoDt = (r: any) => {
     setEditandoDtPagto(r.id);
@@ -181,7 +176,21 @@ export default function Calculo() {
   };
 
   const salvarDtPagto = (id: number) => {
-    editarMutation.mutate({ id, dtPagto: valorDtPagto || undefined });
+    // Se há linhas selecionadas E a linha editada está entre elas, aplica em todas
+    const idsParaSalvar =
+      selecionados.size > 1 && selecionados.has(id)
+        ? Array.from(selecionados)
+        : [id];
+
+    idsParaSalvar.forEach((rid) => {
+      editarMutation.mutate({ id: rid, dtPagto: valorDtPagto || undefined });
+    });
+
+    // Invalida a lista uma única vez após todas as mutações
+    setTimeout(() => {
+      utils.calculosImportados.listar.invalidate();
+      setEditandoDtPagto(null);
+    }, 300);
   };
 
   return (
@@ -323,7 +332,7 @@ export default function Calculo() {
                           <span
                             onClick={() => iniciarEdicaoDt(r)}
                             className="cursor-pointer hover:bg-purple-100 rounded px-1 py-0.5 min-w-[6rem] inline-block text-slate-700 border border-transparent hover:border-purple-300"
-                            title="Clique para editar"
+                            title={selecionados.size > 1 && selecionados.has(r.id) ? `Clique para editar e aplicar em ${selecionados.size} linhas selecionadas` : "Clique para editar"}
                           >
                             {r.dtPagto || <span className="text-slate-300 italic">DD/MM/AAAA</span>}
                           </span>
