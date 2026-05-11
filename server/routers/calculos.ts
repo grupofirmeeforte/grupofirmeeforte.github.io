@@ -1,7 +1,8 @@
 import { z } from "zod";
 import { publicProcedure, router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { calculos } from "../../drizzle/schema";
+import { calculos, pagamentos, agentes } from "../../drizzle/schema";
+import { TRPCError } from "@trpc/server";
 import { eq, and, like, or, sql, desc, asc } from "drizzle-orm";
 
 export const calculosRouter = router({
@@ -152,5 +153,106 @@ export const calculosRouter = router({
       if (!db) throw new Error('DB unavailable');
       await db.delete(calculos).where(eq(calculos.id, input.id));
       return { success: true };
+    }),
+
+  // Enviar selecionados para Pagamentos
+  enviarParaPagto: publicProcedure
+    .input(z.object({ ids: z.array(z.number()) }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Banco indisponível" });
+
+      // Buscar os registros de cálculo selecionados
+      const regs = await db
+        .select()
+        .from(calculos)
+        .where(sql`${calculos.id} IN (${sql.join(input.ids.map((id) => sql`${id}`), sql`, `)})`);
+
+      const resultados: { chaveJ: string; status: string; mensagem: string }[] = [];
+
+      for (const reg of regs) {
+        // Converter mesRef (ex: "426" ou "0426") para MM/AAAA
+        let mesAno = reg.mesRef ?? "";
+        if (mesAno.length === 3) mesAno = mesAno.slice(0, 1).padStart(2, "0") + "/20" + mesAno.slice(1);
+        else if (mesAno.length === 4) mesAno = mesAno.slice(0, 2) + "/20" + mesAno.slice(2);
+
+        const tipoPagto = reg.tipoPagamento ?? "Comissão";
+        const empresa = reg.empresa ?? "";
+        const chaveJ = reg.chaveJ ?? "";
+        const valor = reg.comissaoTotal ? String(parseFloat(reg.comissaoTotal)) : null;
+        const dataPagto = reg.dtPagto ?? null;
+
+        // Buscar dados do favorecido em Cadastro (agentes) pela Chave J
+        let nomeFavorecido: string | null = null;
+        let banco: string | null = null;
+        let agencia: string | null = null;
+        let conta: string | null = null;
+        let cpfCnpj: string | null = null;
+        let tipoConta: string | null = null;
+        let pix: string | null = null;
+        let cadastro: string | null = null;
+        let cidadeUF: string | null = null;
+
+        if (chaveJ) {
+          const agente = await db
+            .select()
+            .from(agentes)
+            .where(eq(agentes.chaveJ, chaveJ))
+            .limit(1);
+
+          if (agente.length > 0) {
+            const a = agente[0];
+            nomeFavorecido = a.favorecido ?? a.nomeAgente ?? null;
+            banco = a.banco ?? null;
+            agencia = a.agencia ?? null;
+            conta = a.conta ?? null;
+            cpfCnpj = a.cpfAgente ?? null;
+            tipoConta = a.tipo ?? null;
+            pix = a.pix ?? null;
+            cadastro = a.numCadastro ?? null;
+            cidadeUF = a.cidade ? (a.uf ? `${a.cidade}/${a.uf}` : a.cidade) : null;
+          }
+        }
+
+        // Verificar duplicata
+        if (chaveJ && mesAno && tipoPagto) {
+          const existente = await db
+            .select({ id: pagamentos.id })
+            .from(pagamentos)
+            .where(and(eq(pagamentos.chaveJ, chaveJ), eq(pagamentos.mesAno, mesAno), eq(pagamentos.tipoPagto, tipoPagto)))
+            .limit(1);
+
+          if (existente.length > 0) {
+            resultados.push({ chaveJ, status: "duplicado", mensagem: `Já existe lançamento de "${tipoPagto}" para ${chaveJ} em ${mesAno}` });
+            continue;
+          }
+        }
+
+        await db.insert(pagamentos).values({
+          mesAno,
+          tipoPagto,
+          empresa: empresa || null,
+          chaveJ: chaveJ || null,
+          cadastro,
+          nomeFavorecido,
+          banco,
+          agencia,
+          conta,
+          cpfCnpj,
+          tipoConta,
+          pix,
+          cidadeUF,
+          valor,
+          dataPagto,
+          pago: false,
+          origem: "sistema",
+        });
+
+        resultados.push({ chaveJ, status: "ok", mensagem: `Enviado com sucesso` });
+      }
+
+      const enviados = resultados.filter((r) => r.status === "ok").length;
+      const duplicados = resultados.filter((r) => r.status === "duplicado").length;
+      return { enviados, duplicados, resultados };
     }),
 });

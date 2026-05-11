@@ -159,6 +159,28 @@ export default function Calculo() {
   const soma = (key: string) =>
     (registros as any[]).reduce((acc, r) => acc + (parseFloat(String(r[key])) || 0), 0);
 
+  const enviarMutation = trpc.calculosImportados.enviarParaPagto.useMutation({
+    onSuccess: (data) => {
+      const msg = `✅ ${data.enviados} registro(s) enviado(s) para Pagamentos com sucesso!${
+        data.duplicados > 0 ? `\n⚠️ ${data.duplicados} já existiam e foram ignorados.` : ""
+      }`;
+      alert(msg);
+      setSelecionados(new Set());
+    },
+    onError: (err) => {
+      alert(`Erro ao enviar: ${err.message}`);
+    },
+  });
+
+  const handleEnviarParaPagto = () => {
+    if (selecionados.size === 0) {
+      alert("Selecione ao menos uma linha para enviar para pagamento.");
+      return;
+    }
+    if (!confirm(`Deseja enviar ${selecionados.size} registro(s) para Financeiro → Pagamentos?`)) return;
+    enviarMutation.mutate({ ids: Array.from(selecionados) });
+  };
+
   const todosSelecionados = registros.length > 0 && selecionados.size === registros.length;
   const algunsSelecionados = selecionados.size > 0 && selecionados.size < registros.length;
 
@@ -211,14 +233,9 @@ export default function Calculo() {
             <Download className="w-4 h-4" /> Exportar Excel
           </Button>
           <Button
-            onClick={() => {
-              if (selecionados.size === 0) {
-                alert("Selecione ao menos uma linha para enviar para pagamento.");
-                return;
-              }
-              alert(`${selecionados.size} registro(s) enviado(s) para pagamento.`);
-            }}
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+            onClick={handleEnviarParaPagto}
+            disabled={enviarMutation.isPending}
+            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 disabled:opacity-60"
           >
             <Send className="w-4 h-4" /> Enviar Para Pagto
           </Button>
