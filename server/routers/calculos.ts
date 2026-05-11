@@ -243,7 +243,8 @@ export const calculosRouter = router({
           pix,
           cidadeUF,
           valor,
-          dataPagto,
+          dataPagto: null,        // preenchido pelo financeiro ao pagar
+          dataVencer: dataPagto,  // data vinda do Cálculo é a data de vencimento
           pago: false,
           origem: "sistema",
         });
