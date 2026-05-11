@@ -95,8 +95,22 @@ export default function PagamentosPage() {
     setTimeout(() => dtPagtoRef.current?.focus(), 50);
   };
 
+  // Verifica se uma data DD/MM/AAAA já passou
+  const isAtrasado = (dataVencer: string | null) => {
+    if (!dataVencer) return false;
+    const partes = dataVencer.split("/");
+    if (partes.length !== 3) return false;
+    const [d, m, a] = partes;
+    const dt = new Date(Number(a), Number(m) - 1, Number(d));
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    return dt < hoje;
+  };
+
   const salvarDtPagto = (id: number) => {
-    editarDtPagtoMutation.mutate({ id, dataPagto: valorDtPagto || undefined });
+    // Se digitou uma data, marca como pago=true automaticamente
+    const pago = !!valorDtPagto;
+    editarDtPagtoMutation.mutate({ id, dataPagto: valorDtPagto || undefined, pago });
   };
 
   const queryParams = {
@@ -366,9 +380,11 @@ export default function PagamentosPage() {
                 <td className="px-2 py-1.5 whitespace-nowrap max-w-[120px] truncate" title={row.pix ?? ""}>{row.pix || "-"}</td>
                 <td className="px-2 py-1.5 text-right whitespace-nowrap font-medium text-green-400">{formatCurrency(row.valor)}</td>
                 <td className="px-2 py-1.5 text-center">
-                  {row.pago
+                  {row.dataPagto
                     ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-green-900/60 text-green-300 border border-green-700">Pago</span>
-                    : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
+                    : isAtrasado(row.dataVencer)
+                      ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-900/60 text-orange-300 border border-orange-600">Atrasado</span>
+                      : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
                   }
                 </td>
                 <td className="px-2 py-1.5 whitespace-nowrap">
