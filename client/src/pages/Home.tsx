@@ -67,7 +67,7 @@ export default function Home() {
       type: 'group',
       key: 'cadastros',
       title: 'Cadastros',
-      description: 'Agentes, Certificações, Despesas Fixas e Tabela Comissão',
+      description: 'Agentes, Certificações e Tabela Comissão',
       icon: BookUser,
       color: 'bg-blue-600',
       borderColor: 'border-blue-200',
@@ -75,7 +75,6 @@ export default function Home() {
       subModules: [
         { title: 'Agentes', description: 'Gerenciar agentes, dados pessoais e profissionais', icon: Users, color: 'bg-blue-500', path: '/agentes' },
         { title: 'Certificações', description: 'Controlar certificações e alertas de vencimento', icon: FileCheck, color: 'bg-green-500', path: '/certificacoes' },
-        { title: 'Despesas Fixas', description: 'Cadastro e gestão de despesas fixas', icon: Building2, color: 'bg-purple-500', path: '/fornecedores' },
         { title: 'Tabela Comissão', description: 'Faixas e percentuais de comissão por convênio', icon: TableProperties, color: 'bg-indigo-500', path: '/tabela-comissao' },
       ],
     },
@@ -126,6 +125,7 @@ export default function Home() {
       subModules: [
         { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/calculo' },
         { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos' },
+        { title: 'Despesas Fixas', description: 'Controle de despesas fixas', icon: Building2, color: 'bg-purple-500', path: '/fornecedores' },
       ],
     },
     {
