@@ -27,13 +27,25 @@ export const despesasFixasRouter = router({
       if (input.pago === "sim") conditions.push(eq(despesasFixas.pago, true));
       if (input.pago === "nao") conditions.push(eq(despesasFixas.pago, false));
 
-      return await db!
+      // Ordenar por mesAno desc (MM/AAAA -> converter para AAAA/MM para ordenar)
+      const rows = await db!
         .select()
         .from(despesasFixas)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(despesasFixas.id))
         .limit(input.limit)
         .offset(offset);
+
+      // Ordenar no JS: MM/AAAA -> AAAA/MM para comparação
+      rows.sort((a, b) => {
+        const toSort = (s: string | null) => {
+          if (!s) return '';
+          const parts = s.split('/');
+          if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
+          return s;
+        };
+        return toSort(b.mesAno) > toSort(a.mesAno) ? 1 : -1;
+      });
+      return rows;
     }),
 
   // Contar total
@@ -67,9 +79,14 @@ export const despesasFixasRouter = router({
     const db = await getDb();
     const rows = await db!
       .selectDistinct({ mesAno: despesasFixas.mesAno })
-      .from(despesasFixas)
-      .orderBy(desc(despesasFixas.mesAno));
-    return rows.map((r: any) => r.mesAno).filter(Boolean) as string[];
+      .from(despesasFixas);
+    const meses = rows.map((r: any) => r.mesAno).filter(Boolean) as string[];
+    // Ordenar MM/AAAA do mais recente para o mais antigo
+    meses.sort((a, b) => {
+      const toSort = (s: string) => { const p = s.split('/'); return p.length === 2 ? `${p[1]}/${p[0]}` : s; };
+      return toSort(b) > toSort(a) ? 1 : -1;
+    });
+    return meses;
   }),
 
   // Empresas disponíveis
