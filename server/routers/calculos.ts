@@ -93,6 +93,7 @@ export const calculosRouter = router({
       vrLiquidoC2: z.number().optional(),
       srccC2: z.number().optional(),
       vrLiquidoSrcc: z.number().optional(),
+      dtPagto: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();
@@ -133,6 +134,7 @@ export const calculosRouter = router({
       vrLiquidoC2: z.number().optional(),
       srccC2: z.number().optional(),
       vrLiquidoSrcc: z.number().optional(),
+      dtPagto: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();

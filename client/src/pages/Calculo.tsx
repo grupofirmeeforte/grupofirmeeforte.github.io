@@ -61,7 +61,7 @@ export default function Calculo() {
         "Percentual", "Comissão Total", "RBM Total", "Comissão Consig", "Comissão Consórcio",
         "ComissãoOurocap", "Comissão C/C", "Seguros", "Ajuda de Custo", "Créditos/Débitos",
         "Adiantamento", "Reajuste", "RbmcreditoC2", "RBMContaCorrente", "RbmConsorcioC2",
-        "RBMOurocap", "RBM Seguros", "Qtde Contas", "Vr. Liquido", "SRCC", "VrLiquido-Srcc",
+        "RBMOurocap", "RBM Seguros", "Qtde Contas", "Vr. Liquido", "SRCC", "VrLiquido-Srcc", "Dt Pagto",
       ];
       const linhas = (registros as any[]).map((r) => [
         r.tipoPagamento ?? "", r.empresa ?? "", r.situacao ?? "", fmtMesRef(r.mesRef),
@@ -87,6 +87,7 @@ export default function Calculo() {
         r.vrLiquidoC2 ? parseFloat(r.vrLiquidoC2) : "",
         r.srccC2 ? parseFloat(r.srccC2) : "",
         r.vrLiquidoSrcc ? parseFloat(r.vrLiquidoSrcc) : "",
+        r.dtPagto ?? "",
       ]);
       const ws = XLSX.utils.aoa_to_sheet([cab, ...linhas]);
       const wb = XLSX.utils.book_new();
@@ -125,6 +126,7 @@ export default function Calculo() {
     { label: "Vr. Liquido",        key: "vrLiquidoC2",      tipo: "moeda" },
     { label: "SRCC",               key: "srccC2",           tipo: "moeda" },
     { label: "VrLiquido-Srcc",     key: "vrLiquidoSrcc",    tipo: "moeda" },
+    { label: "Dt Pagto",            key: "dtPagto",          tipo: "texto" },
   ] as const;
 
   const renderVal = (r: any, col: typeof colunas[number]) => {

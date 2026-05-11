@@ -328,3 +328,10 @@
 - [x] Botão Voltar posicionado à direita
 - [x] Edição inline por linha (ícone lápis) com salvar/cancelar
 - [x] Exclusão por linha (ícone lixeira) com confirmação
+
+## FASE 26: COLUNA DT PAGTO NA TABELA CÁLCULO
+- [ ] Adicionar coluna dtPagto (varchar 10) na tabela calculos no schema Drizzle
+- [ ] Executar migração SQL no banco
+- [ ] Adicionar coluna Dt Pagto como última coluna na tabela Cálculo (formato DD/MM/AAAA)
+- [ ] Permitir edição da data no formato DD/MM/AAAA
+- [ ] Atualizar router calculos com campo dtPagto

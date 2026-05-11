@@ -404,6 +404,7 @@ export const calculos = mysqlTable("calculos", {
   vrLiquidoC2: decimal("vrLiquidoC2", { precision: 15, scale: 2 }),
   srccC2: decimal("srccC2", { precision: 15, scale: 2 }),
   vrLiquidoSrcc: decimal("vrLiquidoSrcc", { precision: 15, scale: 2 }),
+  dtPagto: varchar("dtPagto", { length: 10 }), // DD/MM/AAAA
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
