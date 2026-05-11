@@ -188,7 +188,7 @@ export default function DespesasFixasPage() {
             {enviarParaPagtoMutation.isPending ? "Enviando..." : "Enviar Para Pagto"}
           </Button>
           <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white text-xs h-7 px-2">Excel</Button>
-          <Button onClick={() => navigate("/financeiro")} size="sm" className="bg-gray-700 hover:bg-gray-600 text-white text-xs h-7 px-2">Voltar</Button>
+          <Button onClick={() => navigate("/")} size="sm" className="bg-gray-700 hover:bg-gray-600 text-white text-xs h-7 px-2">Voltar</Button>
         </div>
       </div>
 
