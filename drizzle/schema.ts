@@ -142,6 +142,32 @@ export type Fornecedor = typeof fornecedores.$inferSelect;
 export type InsertFornecedor = typeof fornecedores.$inferInsert;
 
 /**
+ * Tabela de Despesas Fixas
+ */
+export const despesasFixas = mysqlTable("despesasFixas", {
+  id: int("id").autoincrement().primaryKey(),
+  mesAno: varchar("mesAno", { length: 20 }),
+  tipoPagto: varchar("tipoPagto", { length: 100 }),
+  cidadeUF: varchar("cidadeUF", { length: 150 }),
+  empresa: varchar("empresa", { length: 100 }),
+  chaveResp: varchar("chaveResp", { length: 50 }),
+  nome: varchar("nome", { length: 255 }),
+  banco: varchar("banco", { length: 100 }),
+  agencia: varchar("agencia", { length: 20 }),
+  conta: varchar("conta", { length: 30 }),
+  cpfCnpj: varchar("cpfCnpj", { length: 20 }),
+  tipoConta: varchar("tipoConta", { length: 50 }),
+  pix: varchar("pix", { length: 255 }),
+  valor: decimal("valor", { precision: 15, scale: 2 }),
+  pago: boolean("pago").default(false),
+  dataPagto: varchar("dataPagto", { length: 20 }),
+  dataVencer: varchar("dataVencer", { length: 20 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type DespesaFixa = typeof despesasFixas.$inferSelect;
+export type InsertDespesaFixa = typeof despesasFixas.$inferInsert;
+
+/**
  * Tabela de Tabelas de Comissão
  * Define as faixas e percentuais de comissão
  */
