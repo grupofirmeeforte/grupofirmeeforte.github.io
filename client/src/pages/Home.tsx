@@ -124,7 +124,7 @@ export default function Home() {
       borderColor: 'border-red-200',
       bgColor: 'from-red-50 to-orange-50',
       subModules: [
-        { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/relatorios' },
+        { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/calculo' },
         { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos' },
       ],
     },
