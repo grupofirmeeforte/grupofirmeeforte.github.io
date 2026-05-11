@@ -54,6 +54,9 @@ export default function DespesasFixasPage() {
   const [filtroNome, setFiltroNome] = useState("");
   const [page, setPage] = useState(1);
 
+  // Seleção de linhas
+  const [selecionados, setSelecionados] = useState<Set<number>>(new Set());
+
   // Edição inline Dt Pagto
   const [editandoDtPagto, setEditandoDtPagto] = useState<number | null>(null);
   const [valorDtPagto, setValorDtPagto] = useState("");
@@ -86,6 +89,33 @@ export default function DespesasFixasPage() {
     onError: (e) => toast.error(e.message),
   });
 
+  const enviarParaPagtoMutation = trpc.despesasFixas.enviarParaPagto.useMutation({
+    onSuccess: (res: any) => {
+      toast.success(`${res.enviados} registro(s) enviado(s) para Pagamentos!`);
+      if (res.ignorados > 0) toast.info(`${res.ignorados} já existiam e foram ignorados.`);
+      setSelecionados(new Set());
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  // Seleção
+  const toggleSelecionado = (id: number) => {
+    setSelecionados(prev => {
+      const novo = new Set(prev);
+      if (novo.has(id)) novo.delete(id); else novo.add(id);
+      return novo;
+    });
+  };
+  const toggleTodos = () => {
+    if (selecionados.size === rows.length) {
+      setSelecionados(new Set());
+    } else {
+      setSelecionados(new Set(rows.map(r => r.id)));
+    }
+  };
+  const todosSelecionados = rows.length > 0 && selecionados.size === rows.length;
+  const algunsSelecionados = selecionados.size > 0 && selecionados.size < rows.length;
+
   const iniciarEdicaoDtPagto = (row: DespesaFixa) => {
     setEditandoDtPagto(row.id);
     setValorDtPagto(row.dataPagto ?? "");
@@ -95,6 +125,12 @@ export default function DespesasFixasPage() {
   const salvarDtPagto = (id: number) => {
     const pago = !!valorDtPagto;
     editarMutation.mutate({ id, dataPagto: valorDtPagto || undefined, pago });
+  };
+
+  const handleEnviarParaPagto = () => {
+    if (selecionados.size === 0) { toast.error("Selecione ao menos um registro."); return; }
+    if (!confirm(`Enviar ${selecionados.size} registro(s) para Pagamentos?`)) return;
+    enviarParaPagtoMutation.mutate({ ids: Array.from(selecionados) });
   };
 
   // Exportar Excel
@@ -124,8 +160,6 @@ export default function DespesasFixasPage() {
   }
 
   const totalPages = Math.ceil(total / 100);
-
-  // Calcular total de valor
   const totalValor = rows.reduce((acc, r) => acc + (r.valor ? parseFloat(r.valor) : 0), 0);
 
   return (
@@ -134,9 +168,20 @@ export default function DespesasFixasPage() {
       <div className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-white">Despesas Fixas</h1>
-          <p className="text-xs text-gray-400">Total: {total} registros</p>
+          <p className="text-xs text-gray-400">
+            Total: {total} registros
+            {selecionados.size > 0 && <span className="ml-2 text-purple-400 font-semibold">· {selecionados.size} selecionado(s)</span>}
+          </p>
         </div>
         <div className="flex gap-2">
+          <Button
+            onClick={handleEnviarParaPagto}
+            disabled={selecionados.size === 0 || enviarParaPagtoMutation.isPending}
+            size="sm"
+            className="bg-blue-700 hover:bg-blue-600 text-white text-xs h-8 disabled:opacity-40"
+          >
+            {enviarParaPagtoMutation.isPending ? "Enviando..." : "Enviar Para Pagto"}
+          </Button>
           <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white text-xs h-8">
             Exportar Excel
           </Button>
@@ -213,6 +258,15 @@ export default function DespesasFixasPage() {
         <table className="w-full text-xs border-collapse">
           <thead>
             <tr className="bg-gradient-to-r from-purple-700 to-pink-600 text-white">
+              <th className="px-2 py-2 text-center w-8">
+                <input
+                  type="checkbox"
+                  checked={todosSelecionados}
+                  ref={el => { if (el) el.indeterminate = algunsSelecionados; }}
+                  onChange={toggleTodos}
+                  className="w-3.5 h-3.5 cursor-pointer accent-purple-400"
+                />
+              </th>
               <th className="px-2 py-2 text-left whitespace-nowrap">Mês Ano</th>
               <th className="px-2 py-2 text-left whitespace-nowrap">Tipo Pagto</th>
               <th className="px-2 py-2 text-left whitespace-nowrap">Cidade/UF</th>
@@ -235,76 +289,87 @@ export default function DespesasFixasPage() {
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={17} className="text-center py-12 text-gray-500">
+                <td colSpan={18} className="text-center py-12 text-gray-500">
                   Nenhum registro encontrado.
                 </td>
               </tr>
-            ) : rows.map((row, i) => (
-              <tr key={row.id}
-                className={`border-b border-gray-800 hover:bg-gray-800/50 transition-colors ${i % 2 === 0 ? "bg-gray-900/60" : "bg-gray-900/30"}`}>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.mesAno || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.tipoPagto || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.cidadeUF || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.empresa || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap font-mono">{row.chaveResp || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap max-w-[180px] truncate" title={row.nome ?? ""}>{row.nome || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.banco || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.agencia || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.conta || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap font-mono">{row.cpfCnpj || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.tipoConta || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap max-w-[120px] truncate" title={row.pix ?? ""}>{row.pix || "-"}</td>
-                <td className="px-2 py-1.5 text-right whitespace-nowrap font-medium text-green-400">{formatCurrency(row.valor)}</td>
-                <td className="px-2 py-1.5 text-center">
-                  {row.dataPagto
-                    ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-green-900/60 text-green-300 border border-green-700">Pago</span>
-                    : isAtrasado(row.dataVencer)
-                      ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-900/60 text-orange-300 border border-orange-600">Atrasado</span>
-                      : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
-                  }
-                </td>
-                {/* Dt. Pagto editável inline */}
-                <td className="px-2 py-1.5 whitespace-nowrap">
-                  {editandoDtPagto === row.id ? (
+            ) : rows.map((row, i) => {
+              const sel = selecionados.has(row.id);
+              return (
+                <tr key={row.id}
+                  className={`border-b border-gray-800 hover:bg-gray-800/50 transition-colors ${sel ? "bg-purple-900/30 border-purple-700/40" : i % 2 === 0 ? "bg-gray-900/60" : "bg-gray-900/30"}`}>
+                  <td className="px-2 py-1.5 text-center">
                     <input
-                      ref={dtPagtoRef}
-                      type="text"
-                      value={valorDtPagto}
-                      onChange={e => setValorDtPagto(e.target.value)}
-                      onBlur={() => salvarDtPagto(row.id)}
-                      onKeyDown={e => {
-                        if (e.key === "Enter") salvarDtPagto(row.id);
-                        if (e.key === "Escape") setEditandoDtPagto(null);
-                      }}
-                      placeholder="DD/MM/AAAA"
-                      maxLength={10}
-                      className="w-28 border border-blue-500 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-800 text-white"
+                      type="checkbox"
+                      checked={sel}
+                      onChange={() => toggleSelecionado(row.id)}
+                      className="w-3.5 h-3.5 cursor-pointer accent-purple-400"
                     />
-                  ) : (
-                    <span
-                      onClick={() => iniciarEdicaoDtPagto(row as DespesaFixa)}
-                      className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[6rem] inline-block border border-transparent hover:border-blue-600"
-                      title="Clique para editar"
-                    >
-                      {row.dataPagto || <span className="text-gray-500 italic text-xs">DD/MM/AAAA</span>}
-                    </span>
-                  )}
-                </td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.dataVencer || "-"}</td>
-                <td className="px-2 py-1.5 text-center whitespace-nowrap">
-                  <Button size="sm" variant="outline"
-                    onClick={() => { if (confirm("Excluir este registro?")) deletarMutation.mutate({ id: row.id }); }}
-                    className="h-6 px-2 text-xs bg-red-900/40 border-red-700 text-red-300 hover:bg-red-800">
-                    Apagar
-                  </Button>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="px-2 py-1.5 whitespace-nowrap">{row.mesAno || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap">{row.tipoPagto || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap">{row.cidadeUF || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap">{row.empresa || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap font-mono">{row.chaveResp || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap max-w-[180px] truncate" title={row.nome ?? ""}>{row.nome || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap">{row.banco || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap">{row.agencia || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap">{row.conta || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap font-mono">{row.cpfCnpj || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap">{row.tipoConta || "-"}</td>
+                  <td className="px-2 py-1.5 whitespace-nowrap max-w-[120px] truncate" title={row.pix ?? ""}>{row.pix || "-"}</td>
+                  <td className="px-2 py-1.5 text-right whitespace-nowrap font-medium text-green-400">{formatCurrency(row.valor)}</td>
+                  <td className="px-2 py-1.5 text-center">
+                    {row.dataPagto
+                      ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-green-900/60 text-green-300 border border-green-700">Pago</span>
+                      : isAtrasado(row.dataVencer)
+                        ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-900/60 text-orange-300 border border-orange-600">Atrasado</span>
+                        : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
+                    }
+                  </td>
+                  {/* Dt. Pagto editável inline */}
+                  <td className="px-2 py-1.5 whitespace-nowrap">
+                    {editandoDtPagto === row.id ? (
+                      <input
+                        ref={dtPagtoRef}
+                        type="text"
+                        value={valorDtPagto}
+                        onChange={e => setValorDtPagto(e.target.value)}
+                        onBlur={() => salvarDtPagto(row.id)}
+                        onKeyDown={e => {
+                          if (e.key === "Enter") salvarDtPagto(row.id);
+                          if (e.key === "Escape") setEditandoDtPagto(null);
+                        }}
+                        placeholder="DD/MM/AAAA"
+                        maxLength={10}
+                        className="w-28 border border-blue-500 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-800 text-white"
+                      />
+                    ) : (
+                      <span
+                        onClick={() => iniciarEdicaoDtPagto(row as DespesaFixa)}
+                        className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[6rem] inline-block border border-transparent hover:border-blue-600"
+                        title="Clique para editar"
+                      >
+                        {row.dataPagto || <span className="text-gray-500 italic text-xs">DD/MM/AAAA</span>}
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-2 py-1.5 whitespace-nowrap">{row.dataVencer || "-"}</td>
+                  <td className="px-2 py-1.5 text-center whitespace-nowrap">
+                    <Button size="sm" variant="outline"
+                      onClick={() => { if (confirm("Excluir este registro?")) deletarMutation.mutate({ id: row.id }); }}
+                      className="h-6 px-2 text-xs bg-red-900/40 border-red-700 text-red-300 hover:bg-red-800">
+                      Apagar
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
           {rows.length > 0 && (
             <tfoot>
               <tr className="bg-gray-800 font-semibold text-white border-t-2 border-purple-600">
-                <td colSpan={12} className="px-2 py-2 text-right text-xs text-gray-400">Total:</td>
+                <td colSpan={13} className="px-2 py-2 text-right text-xs text-gray-400">Total:</td>
                 <td className="px-2 py-2 text-right text-green-400 text-xs">
                   {totalValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
                 </td>

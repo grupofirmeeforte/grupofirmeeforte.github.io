@@ -195,4 +195,54 @@ export const despesasFixasRouter = router({
       await db!.delete(despesasFixas).where(eq(despesasFixas.id, input.id));
       return { ok: true };
     }),
+
+  // Enviar selecionados para Pagamentos
+  enviarParaPagto: publicProcedure
+    .input(z.object({ ids: z.array(z.number()) }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      const { pagamentos } = await import("../../drizzle/schema");
+      let enviados = 0;
+      let ignorados = 0;
+
+      for (const id of input.ids) {
+        const rows = await db!.select().from(despesasFixas).where(eq(despesasFixas.id, id)).limit(1);
+        const row = rows[0];
+        if (!row) continue;
+
+        // Verificar se já existe: mesma chave + mesAno + tipoPagto
+        const existing = await db!.select({ id: pagamentos.id })
+          .from(pagamentos)
+          .where(
+            and(
+              eq(pagamentos.chaveJ, row.chaveResp ?? ""),
+              eq(pagamentos.mesAno, row.mesAno ?? ""),
+              eq(pagamentos.tipoPagto, row.tipoPagto ?? "")
+            )
+          ).limit(1);
+
+        if (existing.length > 0) { ignorados++; continue; }
+
+        await db!.insert(pagamentos).values({
+          mesAno: row.mesAno ?? "",
+          tipoPagto: row.tipoPagto ?? "",
+          empresa: row.empresa ?? "",
+          chaveJ: row.chaveResp ?? "",
+          nomeFavorecido: row.nome ?? "",
+          banco: row.banco ?? "",
+          agencia: row.agencia ?? "",
+          conta: row.conta ?? "",
+          cpfCnpj: row.cpfCnpj ?? "",
+          tipoConta: row.tipoConta ?? "",
+          pix: row.pix ?? "",
+          valor: row.valor ?? "0",
+          pago: false,
+          dataPagto: null,
+          dataVencer: row.dataVencer ?? null,
+        });
+        enviados++;
+      }
+
+      return { enviados, ignorados };
+    }),
 });
