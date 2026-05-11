@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -74,6 +74,30 @@ export default function PagamentosPage() {
 
   // Modal confirmar exclusão
   const [deletandoId, setDeletandoId] = useState<number | null>(null);
+
+  // Edição inline de Data Pagto
+  const [editandoDtPagto, setEditandoDtPagto] = useState<number | null>(null);
+  const [valorDtPagto, setValorDtPagto] = useState("");
+  const dtPagtoRef = useRef<HTMLInputElement>(null);
+  const utils = trpc.useUtils();
+
+  const editarDtPagtoMutation = trpc.pagamentos.editar.useMutation({
+    onSuccess: () => {
+      utils.pagamentos.list.invalidate();
+      setEditandoDtPagto(null);
+    },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const iniciarEdicaoDtPagto = (row: Pagamento) => {
+    setEditandoDtPagto(row.id);
+    setValorDtPagto(row.dataPagto ?? "");
+    setTimeout(() => dtPagtoRef.current?.focus(), 50);
+  };
+
+  const salvarDtPagto = (id: number) => {
+    editarDtPagtoMutation.mutate({ id, dataPagto: valorDtPagto || undefined });
+  };
 
   const queryParams = {
     mesAno: filtroMesAno || undefined,
@@ -347,7 +371,32 @@ export default function PagamentosPage() {
                     : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
                   }
                 </td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.dataPagto || "-"}</td>
+                <td className="px-2 py-1.5 whitespace-nowrap">
+                  {editandoDtPagto === row.id ? (
+                    <input
+                      ref={dtPagtoRef}
+                      type="text"
+                      value={valorDtPagto}
+                      onChange={(e) => setValorDtPagto(e.target.value)}
+                      onBlur={() => salvarDtPagto(row.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") salvarDtPagto(row.id);
+                        if (e.key === "Escape") setEditandoDtPagto(null);
+                      }}
+                      placeholder="DD/MM/AAAA"
+                      maxLength={10}
+                      className="w-28 border border-blue-500 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-800 text-white"
+                    />
+                  ) : (
+                    <span
+                      onClick={() => iniciarEdicaoDtPagto(row as Pagamento)}
+                      className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[6rem] inline-block border border-transparent hover:border-blue-600"
+                      title="Clique para editar"
+                    >
+                      {row.dataPagto || <span className="text-gray-500 italic text-xs">DD/MM/AAAA</span>}
+                    </span>
+                  )}
+                </td>
                 <td className="px-2 py-1.5 whitespace-nowrap">{row.dataVencer || "-"}</td>
                 <td className="px-2 py-1.5 text-center whitespace-nowrap">
                   <div className="flex gap-1 justify-center">
