@@ -50,7 +50,7 @@ export const pagamentosRouter = {
         .select()
         .from(pagamentos)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(pagamentos.createdAt))
+        .orderBy(desc(pagamentos.id))
         .limit(input.limit)
         .offset(offset);
     }),
