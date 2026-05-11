@@ -78,6 +78,9 @@ export default function DespesasFixasPage() {
   // Seleção
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set());
 
+  // Repetir meses (apenas no modo novo)
+  const [repetirMeses, setRepetirMeses] = useState(1);
+
   // Modal editar/novo
   const [modal, setModal] = useState<{ open: boolean; modo: "novo" | "editar"; dados: Omit<DespesaFixa, "id" | "pago"> & { id?: number } }>({
     open: false, modo: "novo", dados: { ...EMPTY },
@@ -134,7 +137,7 @@ export default function DespesasFixasPage() {
   const todosSelecionados = rows.length > 0 && selecionados.size === rows.length;
   const algunsSelecionados = selecionados.size > 0 && selecionados.size < rows.length;
 
-  const abrirNovo = () => setModal({ open: true, modo: "novo", dados: { ...EMPTY } });
+  const abrirNovo = () => { setRepetirMeses(1); setModal({ open: true, modo: "novo", dados: { ...EMPTY } }); };
   const abrirEditar = (row: DespesaFixa) => setModal({
     open: true, modo: "editar",
     dados: { id: row.id, mesAno: row.mesAno ?? "", tipoPagto: row.tipoPagto ?? "", cidadeUF: row.cidadeUF ?? "", empresa: row.empresa ?? "", chaveResp: row.chaveResp ?? "", nome: row.nome ?? "", banco: row.banco ?? "", agencia: row.agencia ?? "", conta: row.conta ?? "", cpfCnpj: row.cpfCnpj ?? "", tipoConta: row.tipoConta ?? "", pix: row.pix ?? "", valor: row.valor ?? "", dataPagto: row.dataPagto ?? "", dataVencer: row.dataVencer ?? "" },
@@ -145,7 +148,32 @@ export default function DespesasFixasPage() {
     if (modal.modo === "editar" && d.id) {
       editarMutation.mutate({ id: d.id, mesAno: d.mesAno || undefined, tipoPagto: d.tipoPagto || undefined, cidadeUF: d.cidadeUF || undefined, empresa: d.empresa || undefined, chaveResp: d.chaveResp || undefined, nome: d.nome || undefined, banco: d.banco || undefined, agencia: d.agencia || undefined, conta: d.conta || undefined, cpfCnpj: d.cpfCnpj || undefined, tipoConta: d.tipoConta || undefined, pix: d.pix || undefined, valor: d.valor || undefined, dataPagto: d.dataPagto || undefined, dataVencer: d.dataVencer || undefined });
     } else {
-      criarMutation.mutate({ mesAno: d.mesAno || undefined, tipoPagto: d.tipoPagto || undefined, cidadeUF: d.cidadeUF || undefined, empresa: d.empresa || undefined, chaveResp: d.chaveResp || undefined, nome: d.nome || undefined, banco: d.banco || undefined, agencia: d.agencia || undefined, conta: d.conta || undefined, cpfCnpj: d.cpfCnpj || undefined, tipoConta: d.tipoConta || undefined, pix: d.pix || undefined, valor: d.valor || undefined, dataPagto: d.dataPagto || undefined, dataVencer: d.dataVencer || undefined });
+      // Gerar registros para cada mês
+      const mesesParaCriar: string[] = [];
+      if (d.mesAno && repetirMeses > 1) {
+        const [mm, aaaa] = (d.mesAno ?? "").split("/");
+        let m = parseInt(mm, 10);
+        let a = parseInt(aaaa, 10);
+        for (let i = 0; i < repetirMeses; i++) {
+          mesesParaCriar.push(`${String(m).padStart(2, "0")}/${a}`);
+          m++;
+          if (m > 12) { m = 1; a++; }
+        }
+      } else {
+        mesesParaCriar.push(d.mesAno ?? "");
+      }
+      // Criar um por um sequencialmente
+      const criarTodos = async () => {
+        for (const mes of mesesParaCriar) {
+          await new Promise<void>((resolve, reject) => {
+            criarMutation.mutate({ mesAno: mes || undefined, tipoPagto: d.tipoPagto || undefined, cidadeUF: d.cidadeUF || undefined, empresa: d.empresa || undefined, chaveResp: d.chaveResp || undefined, nome: d.nome || undefined, banco: d.banco || undefined, agencia: d.agencia || undefined, conta: d.conta || undefined, cpfCnpj: d.cpfCnpj || undefined, tipoConta: d.tipoConta || undefined, pix: d.pix || undefined, valor: d.valor || undefined, dataPagto: d.dataPagto || undefined, dataVencer: d.dataVencer || undefined }, { onSuccess: () => resolve(), onError: (e) => reject(e) });
+          });
+        }
+        invalidate();
+        setModal(m => ({ ...m, open: false }));
+        toast.success(`${mesesParaCriar.length} registro(s) criado(s)!`);
+      };
+      criarTodos().catch((e: any) => toast.error(e.message));
     }
   };
 
@@ -373,6 +401,24 @@ export default function DespesasFixasPage() {
               <FormField label="Valor" value={modal.dados.valor ?? ""} onChange={v => setField("valor", v)} placeholder="0.00" />
               <FormField label="Dt. Pagto" value={modal.dados.dataPagto ?? ""} onChange={v => setField("dataPagto", v)} placeholder="DD/MM/AAAA" />
               <FormField label="Dt. Vencer" value={modal.dados.dataVencer ?? ""} onChange={v => setField("dataVencer", v)} placeholder="DD/MM/AAAA" />
+              {modal.modo === "novo" && (
+                <div className="flex flex-col gap-0.5 col-span-2">
+                  <label className="text-[10px] text-gray-400 font-medium">Repetir por quantos meses?</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min={1}
+                      max={60}
+                      value={repetirMeses}
+                      onChange={e => setRepetirMeses(Math.max(1, Math.min(60, parseInt(e.target.value) || 1)))}
+                      className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1 w-20 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    />
+                    <span className="text-[10px] text-gray-400">
+                      {repetirMeses === 1 ? "Apenas este mês" : `Criará ${repetirMeses} registros (${modal.dados.mesAno || "MM/AAAA"} até ${(() => { if (!modal.dados.mesAno) return "?"; const [mm, aa] = modal.dados.mesAno.split("/"); let m = parseInt(mm)+repetirMeses-1; let a = parseInt(aa); while(m>12){m-=12;a++;} return `${String(m).padStart(2,"0")}/${a}`; })()})`}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex justify-end gap-2 px-4 py-3 border-t border-gray-700">
               <Button onClick={() => setModal(m => ({ ...m, open: false }))} size="sm" variant="outline" className="h-7 px-3 text-xs bg-gray-800 border-gray-600 text-gray-300">Cancelar</Button>
