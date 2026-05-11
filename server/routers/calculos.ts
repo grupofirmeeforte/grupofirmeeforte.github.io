@@ -2,7 +2,7 @@ import { z } from "zod";
 import { publicProcedure, router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { calculos } from "../../drizzle/schema";
-import { eq, and, like, or, sql } from "drizzle-orm";
+import { eq, and, like, or, sql, desc, asc } from "drizzle-orm";
 
 export const calculosRouter = router({
   // Listar com filtros
@@ -35,7 +35,7 @@ export const calculosRouter = router({
         .select()
         .from(calculos)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(calculos.mesRef, calculos.empresa, calculos.nomeAgente);
+        .orderBy(desc(calculos.mesRef), asc(calculos.empresa), asc(calculos.nomeAgente));
 
       return result;
     }),
@@ -47,7 +47,7 @@ export const calculosRouter = router({
     const result = await db
       .selectDistinct({ mesRef: calculos.mesRef })
       .from(calculos)
-      .orderBy(calculos.mesRef);
+      .orderBy(desc(calculos.mesRef));
     return result.map(r => r.mesRef).filter(Boolean);
   }),
 
