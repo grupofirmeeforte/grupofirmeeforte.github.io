@@ -231,6 +231,14 @@ export default function DespesasFixasPage() {
         </div>
       </div>
 
+      {/* Paginação Topo */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 py-2 bg-gray-900 border-b border-gray-800">
+          <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Anterior</Button>
+          <span className="text-[10px] text-gray-400">Pág. {page} / {totalPages}</span>
+          <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Próxima</Button>
+        </div>
+      )}
       {/* Tabela */}
       <div className="overflow-x-auto">
         <table className="w-full text-[11px] border-collapse">

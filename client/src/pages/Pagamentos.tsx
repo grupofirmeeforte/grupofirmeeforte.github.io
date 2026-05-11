@@ -328,6 +328,16 @@ export default function PagamentosPage() {
         )}
       </div>
 
+      {/* Paginação Topo */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-3 py-2 bg-gray-900 border-b border-gray-700">
+          <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)}
+            className="bg-gray-800 border-gray-600 text-white text-xs h-6 px-2">← Anterior</Button>
+          <span className="text-xs text-gray-400">Página {page} de {totalPages}</span>
+          <Button size="sm" variant="outline" disabled={page === totalPages} onClick={() => setPage(p => p + 1)}
+            className="bg-gray-800 border-gray-600 text-white text-xs h-6 px-2">Próxima →</Button>
+        </div>
+      )}
       {/* Tabela */}
       <div className="overflow-x-auto">
         <table className="w-full text-xs border-collapse">

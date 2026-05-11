@@ -38,13 +38,29 @@ export default function Calculo() {
   const [chaveJ, setChaveJ] = useState("");
   const [nomeAgente, setNomeAgente] = useState("");
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set());
+  const [page, setPage] = useState(1);
+  const LIMIT = 100;
 
   const { data: meses = [] } = trpc.calculosImportados.mesesDisponiveis.useQuery();
   const { data: registros = [], isLoading } = trpc.calculosImportados.listar.useQuery({
     mesRef: mesRef || undefined,
     chaveJ: chaveJ || undefined,
     nomeAgente: nomeAgente || undefined,
+    page,
+    limit: LIMIT,
   });
+  const { data: total = 0 } = trpc.calculosImportados.contar.useQuery({
+    mesRef: mesRef || undefined,
+    chaveJ: chaveJ || undefined,
+    nomeAgente: nomeAgente || undefined,
+  });
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+
+  // Reset página ao mudar filtros
+  const handleFiltroChange = (setter: (v: string) => void) => (v: string) => {
+    setter(v);
+    setPage(1);
+  };
 
   // Mês anterior dinâmico
   const getMesAnterior = () => {
@@ -253,7 +269,7 @@ export default function Calculo() {
             <label className="block text-[10px] text-slate-500 mb-0.5">Mês/Ano</label>
             <select
               value={mesRef}
-              onChange={(e) => setMesRef(e.target.value)}
+              onChange={(e) => handleFiltroChange(setMesRef)(e.target.value)}
               className="border border-slate-300 rounded px-1.5 py-1 text-xs bg-white"
             >
               <option value=""></option>
@@ -267,7 +283,7 @@ export default function Calculo() {
             <label className="block text-[10px] text-slate-500 mb-0.5">Chave J</label>
             <Input
               value={chaveJ}
-              onChange={(e) => setChaveJ(e.target.value)}
+              onChange={(e) => handleFiltroChange(setChaveJ)(e.target.value)}
               placeholder="Ex: J9660864"
               className="text-xs h-7 py-1"
             />
@@ -276,7 +292,7 @@ export default function Calculo() {
             <label className="block text-[10px] text-slate-500 mb-0.5">Nome Agente</label>
             <Input
               value={nomeAgente}
-              onChange={(e) => setNomeAgente(e.target.value)}
+              onChange={(e) => handleFiltroChange(setNomeAgente)(e.target.value)}
               placeholder="Ex: João Silva"
               className="text-xs h-7 py-1"
             />
@@ -284,6 +300,14 @@ export default function Calculo() {
         </div>
       </div>
 
+      {/* Paginador TOPO */}
+      <div className="flex items-center justify-between px-3 py-1.5 bg-white border-b border-slate-200">
+        <span className="text-[11px] text-slate-500">{total} registros · Pág. {page}/{totalPages}</span>
+        <div className="flex gap-1">
+          <Button size="sm" variant="outline" className="h-6 text-xs px-2" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Anterior</Button>
+          <Button size="sm" variant="outline" className="h-6 text-xs px-2" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Próxima</Button>
+        </div>
+      </div>
       {/* Tabela */}
       <div className="bg-white overflow-x-auto">
         {isLoading ? (
@@ -395,6 +419,16 @@ export default function Calculo() {
           </table>
         )}
       </div>
+      {/* Paginador RODAPÉ */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-3 py-1.5 bg-white border-t border-slate-200">
+          <span className="text-[11px] text-slate-500">{total} registros · Pág. {page}/{totalPages}</span>
+          <div className="flex gap-1">
+            <Button size="sm" variant="outline" className="h-6 text-xs px-2" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Anterior</Button>
+            <Button size="sm" variant="outline" className="h-6 text-xs px-2" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Próxima</Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

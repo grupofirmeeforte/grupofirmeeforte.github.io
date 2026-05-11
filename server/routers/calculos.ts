@@ -13,6 +13,8 @@ export const calculosRouter = router({
       empresa: z.string().optional(),
       chaveJ: z.string().optional(),
       nomeAgente: z.string().optional(),
+      page: z.number().optional().default(1),
+      limit: z.number().optional().default(100),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -32,13 +34,39 @@ export const calculosRouter = router({
         conditions.push(like(calculos.nomeAgente, `%${input.nomeAgente}%`));
       }
 
+      const offset = (input.page - 1) * input.limit;
       const result = await db
         .select()
         .from(calculos)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(calculos.mesRef), asc(calculos.empresa), asc(calculos.nomeAgente));
+        .orderBy(desc(calculos.mesRef), asc(calculos.empresa), asc(calculos.nomeAgente))
+        .limit(input.limit)
+        .offset(offset);
 
       return result;
+    }),
+
+  // Contar total de registros
+  contar: publicProcedure
+    .input(z.object({
+      mesRef: z.string().optional(),
+      empresa: z.string().optional(),
+      chaveJ: z.string().optional(),
+      nomeAgente: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return 0;
+      const conditions = [];
+      if (input.mesRef) conditions.push(eq(calculos.mesRef, input.mesRef));
+      if (input.empresa && input.empresa !== "Todas") conditions.push(eq(calculos.empresa, input.empresa));
+      if (input.chaveJ) conditions.push(like(calculos.chaveJ, `%${input.chaveJ}%`));
+      if (input.nomeAgente) conditions.push(like(calculos.nomeAgente, `%${input.nomeAgente}%`));
+      const result = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(calculos)
+        .where(conditions.length > 0 ? and(...conditions) : undefined);
+      return Number(result[0]?.count ?? 0);
     }),
 
   // Listar meses disponíveis
