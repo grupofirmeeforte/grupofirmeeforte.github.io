@@ -25,6 +25,12 @@ type DespesaFixa = {
   dataVencer: string | null;
 };
 
+const EMPTY: Omit<DespesaFixa, "id" | "pago"> = {
+  mesAno: "", tipoPagto: "", cidadeUF: "", empresa: "", chaveResp: "",
+  nome: "", banco: "", agencia: "", conta: "", cpfCnpj: "",
+  tipoConta: "", pix: "", valor: "", dataPagto: "", dataVencer: "",
+};
+
 function formatCurrency(v: string | null | undefined) {
   if (!v) return "-";
   const n = parseFloat(v);
@@ -43,6 +49,21 @@ function isAtrasado(dataVencer: string | null) {
   return dt < hoje;
 }
 
+function FormField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      <label className="text-[10px] text-gray-400 font-medium">{label}</label>
+      <input
+        type="text"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder ?? label}
+        className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-purple-500"
+      />
+    </div>
+  );
+}
+
 export default function DespesasFixasPage() {
   const [, navigate] = useLocation();
 
@@ -54,8 +75,13 @@ export default function DespesasFixasPage() {
   const [filtroNome, setFiltroNome] = useState("");
   const [page, setPage] = useState(1);
 
-  // Seleção de linhas
+  // Seleção
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set());
+
+  // Modal editar/novo
+  const [modal, setModal] = useState<{ open: boolean; modo: "novo" | "editar"; dados: Omit<DespesaFixa, "id" | "pago"> & { id?: number } }>({
+    open: false, modo: "novo", dados: { ...EMPTY },
+  });
 
   // Edição inline Dt Pagto
   const [editandoDtPagto, setEditandoDtPagto] = useState<number | null>(null);
@@ -76,17 +102,21 @@ export default function DespesasFixasPage() {
   const { data: meses = [] } = trpc.despesasFixas.meses.useQuery();
   const { data: empresas = [] } = trpc.despesasFixas.empresas.useQuery();
 
+  const invalidate = () => { utils.despesasFixas.list.invalidate(); utils.despesasFixas.count.invalidate(); utils.despesasFixas.meses.invalidate(); };
+
   const editarMutation = trpc.despesasFixas.editar.useMutation({
-    onSuccess: () => {
-      utils.despesasFixas.list.invalidate();
-      setEditandoDtPagto(null);
-    },
-    onError: (e) => toast.error(e.message),
+    onSuccess: () => { invalidate(); setEditandoDtPagto(null); setModal(m => ({ ...m, open: false })); toast.success("Salvo!"); },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const criarMutation = trpc.despesasFixas.criar.useMutation({
+    onSuccess: () => { invalidate(); setModal(m => ({ ...m, open: false })); toast.success("Registro criado!"); },
+    onError: (e: any) => toast.error(e.message),
   });
 
   const deletarMutation = trpc.despesasFixas.deletar.useMutation({
-    onSuccess: () => { toast.success("Registro excluído!"); utils.despesasFixas.list.invalidate(); utils.despesasFixas.count.invalidate(); },
-    onError: (e) => toast.error(e.message),
+    onSuccess: () => { toast.success("Excluído!"); invalidate(); },
+    onError: (e: any) => toast.error(e.message),
   });
 
   const enviarParaPagtoMutation = trpc.despesasFixas.enviarParaPagto.useMutation({
@@ -99,33 +129,30 @@ export default function DespesasFixasPage() {
   });
 
   // Seleção
-  const toggleSelecionado = (id: number) => {
-    setSelecionados(prev => {
-      const novo = new Set(prev);
-      if (novo.has(id)) novo.delete(id); else novo.add(id);
-      return novo;
-    });
-  };
-  const toggleTodos = () => {
-    if (selecionados.size === rows.length) {
-      setSelecionados(new Set());
-    } else {
-      setSelecionados(new Set(rows.map(r => r.id)));
-    }
-  };
+  const toggleSelecionado = (id: number) => setSelecionados(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleTodos = () => setSelecionados(selecionados.size === rows.length ? new Set() : new Set(rows.map(r => r.id)));
   const todosSelecionados = rows.length > 0 && selecionados.size === rows.length;
   const algunsSelecionados = selecionados.size > 0 && selecionados.size < rows.length;
 
-  const iniciarEdicaoDtPagto = (row: DespesaFixa) => {
-    setEditandoDtPagto(row.id);
-    setValorDtPagto(row.dataPagto ?? "");
-    setTimeout(() => dtPagtoRef.current?.focus(), 50);
+  const abrirNovo = () => setModal({ open: true, modo: "novo", dados: { ...EMPTY } });
+  const abrirEditar = (row: DespesaFixa) => setModal({
+    open: true, modo: "editar",
+    dados: { id: row.id, mesAno: row.mesAno ?? "", tipoPagto: row.tipoPagto ?? "", cidadeUF: row.cidadeUF ?? "", empresa: row.empresa ?? "", chaveResp: row.chaveResp ?? "", nome: row.nome ?? "", banco: row.banco ?? "", agencia: row.agencia ?? "", conta: row.conta ?? "", cpfCnpj: row.cpfCnpj ?? "", tipoConta: row.tipoConta ?? "", pix: row.pix ?? "", valor: row.valor ?? "", dataPagto: row.dataPagto ?? "", dataVencer: row.dataVencer ?? "" },
+  });
+
+  const salvarModal = () => {
+    const d = modal.dados;
+    if (modal.modo === "editar" && d.id) {
+      editarMutation.mutate({ id: d.id, mesAno: d.mesAno || undefined, tipoPagto: d.tipoPagto || undefined, cidadeUF: d.cidadeUF || undefined, empresa: d.empresa || undefined, chaveResp: d.chaveResp || undefined, nome: d.nome || undefined, banco: d.banco || undefined, agencia: d.agencia || undefined, conta: d.conta || undefined, cpfCnpj: d.cpfCnpj || undefined, tipoConta: d.tipoConta || undefined, pix: d.pix || undefined, valor: d.valor || undefined, dataPagto: d.dataPagto || undefined, dataVencer: d.dataVencer || undefined });
+    } else {
+      criarMutation.mutate({ mesAno: d.mesAno || undefined, tipoPagto: d.tipoPagto || undefined, cidadeUF: d.cidadeUF || undefined, empresa: d.empresa || undefined, chaveResp: d.chaveResp || undefined, nome: d.nome || undefined, banco: d.banco || undefined, agencia: d.agencia || undefined, conta: d.conta || undefined, cpfCnpj: d.cpfCnpj || undefined, tipoConta: d.tipoConta || undefined, pix: d.pix || undefined, valor: d.valor || undefined, dataPagto: d.dataPagto || undefined, dataVencer: d.dataVencer || undefined });
+    }
   };
 
-  const salvarDtPagto = (id: number) => {
-    const pago = !!valorDtPagto;
-    editarMutation.mutate({ id, dataPagto: valorDtPagto || undefined, pago });
-  };
+  const setField = (k: keyof typeof EMPTY, v: string) => setModal(m => ({ ...m, dados: { ...m.dados, [k]: v } }));
+
+  const iniciarEdicaoDtPagto = (row: DespesaFixa) => { setEditandoDtPagto(row.id); setValorDtPagto(row.dataPagto ?? ""); setTimeout(() => dtPagtoRef.current?.focus(), 50); };
+  const salvarDtPagto = (id: number) => editarMutation.mutate({ id, dataPagto: valorDtPagto || undefined, pago: !!valorDtPagto });
 
   const handleEnviarParaPagto = () => {
     if (selecionados.size === 0) { toast.error("Selecione ao menos um registro."); return; }
@@ -133,26 +160,8 @@ export default function DespesasFixasPage() {
     enviarParaPagtoMutation.mutate({ ids: Array.from(selecionados) });
   };
 
-  // Exportar Excel
   function exportarExcel() {
-    const data = rows.map(r => ({
-      "Mês Ano": r.mesAno ?? "",
-      "Tipo Pagto": r.tipoPagto ?? "",
-      "Cidade/UF": r.cidadeUF ?? "",
-      "Empresa": r.empresa ?? "",
-      "Chave Resp.": r.chaveResp ?? "",
-      "Nome": r.nome ?? "",
-      "Banco": r.banco ?? "",
-      "Agência": r.agencia ?? "",
-      "Conta": r.conta ?? "",
-      "CPF/CNPJ": r.cpfCnpj ?? "",
-      "Tipo Conta": r.tipoConta ?? "",
-      "Pix": r.pix ?? "",
-      "Valor": r.valor ? parseFloat(r.valor) : 0,
-      "Pago": r.dataPagto ? "Pago" : isAtrasado(r.dataVencer) ? "Atrasado" : "Não",
-      "Dt. Pagto": r.dataPagto ?? "",
-      "Dt. Vencer": r.dataVencer ?? "",
-    }));
+    const data = rows.map(r => ({ "Mês Ano": r.mesAno ?? "", "Tipo Pagto": r.tipoPagto ?? "", "Cidade/UF": r.cidadeUF ?? "", "Empresa": r.empresa ?? "", "Chave Resp.": r.chaveResp ?? "", "Nome": r.nome ?? "", "Banco": r.banco ?? "", "Agência": r.agencia ?? "", "Conta": r.conta ?? "", "CPF/CNPJ": r.cpfCnpj ?? "", "Tipo Conta": r.tipoConta ?? "", "Pix": r.pix ?? "", "Valor": r.valor ? parseFloat(r.valor) : 0, "Pago": r.dataPagto ? "Pago" : isAtrasado(r.dataVencer) ? "Atrasado" : "Não", "Dt. Pagto": r.dataPagto ?? "", "Dt. Vencer": r.dataVencer ?? "" }));
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "DespesasFixas");
@@ -165,202 +174,147 @@ export default function DespesasFixasPage() {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
       {/* Header */}
-      <div className="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between">
+      <div className="bg-gray-900 border-b border-gray-800 px-3 py-2 flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold text-white">Despesas Fixas</h1>
-          <p className="text-xs text-gray-400">
+          <h1 className="text-base font-bold text-white">Despesas Fixas</h1>
+          <p className="text-[10px] text-gray-400">
             Total: {total} registros
             {selecionados.size > 0 && <span className="ml-2 text-purple-400 font-semibold">· {selecionados.size} selecionado(s)</span>}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={handleEnviarParaPagto}
-            disabled={selecionados.size === 0 || enviarParaPagtoMutation.isPending}
-            size="sm"
-            className="bg-blue-700 hover:bg-blue-600 text-white text-xs h-8 disabled:opacity-40"
-          >
+        <div className="flex gap-1.5">
+          <Button onClick={abrirNovo} size="sm" className="bg-purple-700 hover:bg-purple-600 text-white text-xs h-7 px-2">+ Novo</Button>
+          <Button onClick={handleEnviarParaPagto} disabled={selecionados.size === 0 || enviarParaPagtoMutation.isPending} size="sm" className="bg-blue-700 hover:bg-blue-600 text-white text-xs h-7 px-2 disabled:opacity-40">
             {enviarParaPagtoMutation.isPending ? "Enviando..." : "Enviar Para Pagto"}
           </Button>
-          <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white text-xs h-8">
-            Exportar Excel
-          </Button>
-          <Button onClick={() => navigate("/financeiro")} size="sm" className="bg-gray-700 hover:bg-gray-600 text-white text-xs h-8">
-            Voltar
-          </Button>
+          <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white text-xs h-7 px-2">Excel</Button>
+          <Button onClick={() => navigate("/financeiro")} size="sm" className="bg-gray-700 hover:bg-gray-600 text-white text-xs h-7 px-2">Voltar</Button>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="bg-gray-900 border-b border-gray-800 px-4 py-3">
-        <div className="text-xs font-semibold text-gray-400 mb-2">Filtros</div>
-        <div className="flex flex-wrap gap-3">
+      <div className="bg-gray-900 border-b border-gray-800 px-3 py-2">
+        <div className="flex flex-wrap gap-2">
           <div>
-            <label className="text-xs text-gray-400 block mb-1">Mês/Ano</label>
-            <select
-              value={filtroMesAno}
-              onChange={e => { setFiltroMesAno(e.target.value); setPage(1); }}
-              className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1.5 w-36"
-            >
+            <label className="text-[10px] text-gray-400 block mb-0.5">Mês/Ano</label>
+            <select value={filtroMesAno} onChange={e => { setFiltroMesAno(e.target.value); setPage(1); }} className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-28">
               <option value="">Todos</option>
               {meses.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-400 block mb-1">Empresa</label>
-            <select
-              value={filtroEmpresa}
-              onChange={e => { setFiltroEmpresa(e.target.value); setPage(1); }}
-              className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1.5 w-28"
-            >
+            <label className="text-[10px] text-gray-400 block mb-0.5">Empresa</label>
+            <select value={filtroEmpresa} onChange={e => { setFiltroEmpresa(e.target.value); setPage(1); }} className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-24">
               <option value="">Todas</option>
               {empresas.map(e => <option key={e} value={e}>{e}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-400 block mb-1">Tipo Pagto</label>
-            <select
-              value={filtroTipo}
-              onChange={e => { setFiltroTipo(e.target.value); setPage(1); }}
-              className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1.5 w-36"
-            >
+            <label className="text-[10px] text-gray-400 block mb-0.5">Tipo Pagto</label>
+            <select value={filtroTipo} onChange={e => { setFiltroTipo(e.target.value); setPage(1); }} className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-32">
               <option value="">Todos</option>
               {["Aluguel","DespesasLoja","Energia","Internet","Outros"].map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-400 block mb-1">Pago</label>
-            <select
-              value={filtroPago}
-              onChange={e => { setFiltroPago(e.target.value as any); setPage(1); }}
-              className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1.5 w-28"
-            >
+            <label className="text-[10px] text-gray-400 block mb-0.5">Pago</label>
+            <select value={filtroPago} onChange={e => { setFiltroPago(e.target.value as any); setPage(1); }} className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-24">
               <option value="todos">Todos</option>
               <option value="sim">Pago</option>
               <option value="nao">Não Pago</option>
             </select>
           </div>
           <div>
-            <label className="text-xs text-gray-400 block mb-1">Nome</label>
-            <input
-              type="text"
-              value={filtroNome}
-              onChange={e => { setFiltroNome(e.target.value); setPage(1); }}
-              placeholder="Ex: João Silva"
-              className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1.5 w-44"
-            />
+            <label className="text-[10px] text-gray-400 block mb-0.5">Nome</label>
+            <input type="text" value={filtroNome} onChange={e => { setFiltroNome(e.target.value); setPage(1); }} placeholder="Nome..." className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-36" />
           </div>
         </div>
       </div>
 
       {/* Tabela */}
       <div className="overflow-x-auto">
-        <table className="w-full text-xs border-collapse">
+        <table className="w-full text-[11px] border-collapse">
           <thead>
             <tr className="bg-gradient-to-r from-purple-700 to-pink-600 text-white">
-              <th className="px-2 py-2 text-center w-8">
-                <input
-                  type="checkbox"
-                  checked={todosSelecionados}
-                  ref={el => { if (el) el.indeterminate = algunsSelecionados; }}
-                  onChange={toggleTodos}
-                  className="w-3.5 h-3.5 cursor-pointer accent-purple-400"
-                />
+              <th className="px-1.5 py-1.5 text-center w-6">
+                <input type="checkbox" checked={todosSelecionados} ref={el => { if (el) el.indeterminate = algunsSelecionados; }} onChange={toggleTodos} className="w-3 h-3 cursor-pointer accent-purple-400" />
               </th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Mês Ano</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Tipo Pagto</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Cidade/UF</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Empresa</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Chave Resp.</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Nome</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Banco</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Agência</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Conta</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">CPF/CNPJ</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Tipo Conta</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Pix</th>
-              <th className="px-2 py-2 text-right whitespace-nowrap">Valor</th>
-              <th className="px-2 py-2 text-center whitespace-nowrap">Pago</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Dt. Pagto</th>
-              <th className="px-2 py-2 text-left whitespace-nowrap">Dt. Vencer</th>
-              <th className="px-2 py-2 text-center whitespace-nowrap">Ações</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Mês Ano</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Tipo Pagto</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Cidade/UF</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Empresa</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Chave</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Nome</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Banco</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Ag.</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Conta</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">CPF/CNPJ</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Tp.Conta</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Pix</th>
+              <th className="px-1.5 py-1.5 text-right whitespace-nowrap">Valor</th>
+              <th className="px-1.5 py-1.5 text-center whitespace-nowrap">Pago</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Dt.Pagto</th>
+              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Dt.Vencer</th>
+              <th className="px-1.5 py-1.5 text-center whitespace-nowrap">Ações</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
-              <tr>
-                <td colSpan={18} className="text-center py-12 text-gray-500">
-                  Nenhum registro encontrado.
-                </td>
-              </tr>
+              <tr><td colSpan={18} className="text-center py-10 text-gray-500">Nenhum registro encontrado.</td></tr>
             ) : rows.map((row, i) => {
               const sel = selecionados.has(row.id);
               return (
-                <tr key={row.id}
-                  className={`border-b border-gray-800 hover:bg-gray-800/50 transition-colors ${sel ? "bg-purple-900/30 border-purple-700/40" : i % 2 === 0 ? "bg-gray-900/60" : "bg-gray-900/30"}`}>
-                  <td className="px-2 py-1.5 text-center">
-                    <input
-                      type="checkbox"
-                      checked={sel}
-                      onChange={() => toggleSelecionado(row.id)}
-                      className="w-3.5 h-3.5 cursor-pointer accent-purple-400"
-                    />
+                <tr key={row.id} className={`border-b border-gray-800/60 hover:bg-gray-800/40 transition-colors ${sel ? "bg-purple-900/25" : i % 2 === 0 ? "bg-gray-900/50" : "bg-gray-900/20"}`}>
+                  <td className="px-1.5 py-1 text-center">
+                    <input type="checkbox" checked={sel} onChange={() => toggleSelecionado(row.id)} className="w-3 h-3 cursor-pointer accent-purple-400" />
                   </td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">{row.mesAno || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">{row.tipoPagto || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">{row.cidadeUF || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">{row.empresa || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap font-mono">{row.chaveResp || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap max-w-[180px] truncate" title={row.nome ?? ""}>{row.nome || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">{row.banco || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">{row.agencia || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">{row.conta || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap font-mono">{row.cpfCnpj || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">{row.tipoConta || "-"}</td>
-                  <td className="px-2 py-1.5 whitespace-nowrap max-w-[120px] truncate" title={row.pix ?? ""}>{row.pix || "-"}</td>
-                  <td className="px-2 py-1.5 text-right whitespace-nowrap font-medium text-green-400">{formatCurrency(row.valor)}</td>
-                  <td className="px-2 py-1.5 text-center">
+                  <td className="px-1.5 py-1 whitespace-nowrap">{row.mesAno || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap">{row.tipoPagto || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap max-w-[90px] truncate" title={row.cidadeUF ?? ""}>{row.cidadeUF || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap">{row.empresa || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap font-mono text-[10px]">{row.chaveResp || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap max-w-[140px] truncate" title={row.nome ?? ""}>{row.nome || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap max-w-[80px] truncate" title={row.banco ?? ""}>{row.banco || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap">{row.agencia || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap">{row.conta || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap font-mono text-[10px]">{row.cpfCnpj || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap">{row.tipoConta || "-"}</td>
+                  <td className="px-1.5 py-1 whitespace-nowrap max-w-[90px] truncate" title={row.pix ?? ""}>{row.pix || "-"}</td>
+                  <td className="px-1.5 py-1 text-right whitespace-nowrap font-medium text-green-400">{formatCurrency(row.valor)}</td>
+                  <td className="px-1.5 py-1 text-center">
                     {row.dataPagto
-                      ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-green-900/60 text-green-300 border border-green-700">Pago</span>
+                      ? <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-green-900/60 text-green-300 border border-green-700">Pago</span>
                       : isAtrasado(row.dataVencer)
-                        ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-900/60 text-orange-300 border border-orange-600">Atrasado</span>
-                        : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
+                        ? <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-orange-900/60 text-orange-300 border border-orange-600">Atrasado</span>
+                        : <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
                     }
                   </td>
-                  {/* Dt. Pagto editável inline */}
-                  <td className="px-2 py-1.5 whitespace-nowrap">
+                  <td className="px-1.5 py-1 whitespace-nowrap">
                     {editandoDtPagto === row.id ? (
-                      <input
-                        ref={dtPagtoRef}
-                        type="text"
-                        value={valorDtPagto}
-                        onChange={e => setValorDtPagto(e.target.value)}
+                      <input ref={dtPagtoRef} type="text" value={valorDtPagto} onChange={e => setValorDtPagto(e.target.value)}
                         onBlur={() => salvarDtPagto(row.id)}
-                        onKeyDown={e => {
-                          if (e.key === "Enter") salvarDtPagto(row.id);
-                          if (e.key === "Escape") setEditandoDtPagto(null);
-                        }}
-                        placeholder="DD/MM/AAAA"
-                        maxLength={10}
-                        className="w-28 border border-blue-500 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-blue-400 bg-gray-800 text-white"
-                      />
+                        onKeyDown={e => { if (e.key === "Enter") salvarDtPagto(row.id); if (e.key === "Escape") setEditandoDtPagto(null); }}
+                        placeholder="DD/MM/AAAA" maxLength={10}
+                        className="w-24 border border-blue-500 rounded px-1 py-0.5 text-[10px] focus:outline-none bg-gray-800 text-white" />
                     ) : (
-                      <span
-                        onClick={() => iniciarEdicaoDtPagto(row as DespesaFixa)}
-                        className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[6rem] inline-block border border-transparent hover:border-blue-600"
-                        title="Clique para editar"
-                      >
-                        {row.dataPagto || <span className="text-gray-500 italic text-xs">DD/MM/AAAA</span>}
+                      <span onClick={() => iniciarEdicaoDtPagto(row as DespesaFixa)}
+                        className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[5rem] inline-block border border-transparent hover:border-blue-600 text-[10px]" title="Clique para editar">
+                        {row.dataPagto || <span className="text-gray-600 italic">DD/MM/AAAA</span>}
                       </span>
                     )}
                   </td>
-                  <td className="px-2 py-1.5 whitespace-nowrap">{row.dataVencer || "-"}</td>
-                  <td className="px-2 py-1.5 text-center whitespace-nowrap">
-                    <Button size="sm" variant="outline"
-                      onClick={() => { if (confirm("Excluir este registro?")) deletarMutation.mutate({ id: row.id }); }}
-                      className="h-6 px-2 text-xs bg-red-900/40 border-red-700 text-red-300 hover:bg-red-800">
-                      Apagar
-                    </Button>
+                  <td className="px-1.5 py-1 whitespace-nowrap text-[10px]">{row.dataVencer || "-"}</td>
+                  <td className="px-1.5 py-1 text-center whitespace-nowrap">
+                    <div className="flex gap-1 justify-center">
+                      <button onClick={() => abrirEditar(row as DespesaFixa)}
+                        className="px-1.5 py-0.5 rounded text-[10px] bg-blue-900/50 text-blue-300 border border-blue-700 hover:bg-blue-800 transition-colors" title="Editar">
+                        ✏️
+                      </button>
+                      <button onClick={() => { if (confirm("Excluir?")) deletarMutation.mutate({ id: row.id }); }}
+                        className="px-1.5 py-0.5 rounded text-[10px] bg-red-900/50 text-red-300 border border-red-700 hover:bg-red-800 transition-colors" title="Excluir">
+                        🗑️
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -368,11 +322,9 @@ export default function DespesasFixasPage() {
           </tbody>
           {rows.length > 0 && (
             <tfoot>
-              <tr className="bg-gray-800 font-semibold text-white border-t-2 border-purple-600">
-                <td colSpan={13} className="px-2 py-2 text-right text-xs text-gray-400">Total:</td>
-                <td className="px-2 py-2 text-right text-green-400 text-xs">
-                  {totalValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
-                </td>
+              <tr className="bg-gray-800 font-semibold border-t-2 border-purple-600">
+                <td colSpan={13} className="px-1.5 py-1.5 text-right text-[10px] text-gray-400">Total:</td>
+                <td className="px-1.5 py-1.5 text-right text-green-400 text-[11px]">{totalValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
                 <td colSpan={4}></td>
               </tr>
             </tfoot>
@@ -382,16 +334,45 @@ export default function DespesasFixasPage() {
 
       {/* Paginação */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 py-4 bg-gray-900 border-t border-gray-800">
-          <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)}
-            className="h-7 px-3 text-xs bg-gray-800 border-gray-700 text-gray-300">
-            Anterior
-          </Button>
-          <span className="text-xs text-gray-400">Página {page} de {totalPages}</span>
-          <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}
-            className="h-7 px-3 text-xs bg-gray-800 border-gray-700 text-gray-300">
-            Próxima
-          </Button>
+        <div className="flex items-center justify-center gap-2 py-3 bg-gray-900 border-t border-gray-800">
+          <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Anterior</Button>
+          <span className="text-[10px] text-gray-400">Pág. {page} / {totalPages}</span>
+          <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Próxima</Button>
+        </div>
+      )}
+
+      {/* Modal Editar / Novo */}
+      {modal.open && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+              <h2 className="text-sm font-bold text-white">{modal.modo === "novo" ? "Nova Despesa Fixa" : "Editar Despesa Fixa"}</h2>
+              <button onClick={() => setModal(m => ({ ...m, open: false }))} className="text-gray-400 hover:text-white text-lg leading-none">×</button>
+            </div>
+            <div className="p-4 grid grid-cols-2 gap-3">
+              <FormField label="Mês Ano" value={modal.dados.mesAno ?? ""} onChange={v => setField("mesAno", v)} placeholder="MM/AAAA" />
+              <FormField label="Tipo Pagto" value={modal.dados.tipoPagto ?? ""} onChange={v => setField("tipoPagto", v)} />
+              <FormField label="Cidade/UF" value={modal.dados.cidadeUF ?? ""} onChange={v => setField("cidadeUF", v)} />
+              <FormField label="Empresa" value={modal.dados.empresa ?? ""} onChange={v => setField("empresa", v)} />
+              <FormField label="Chave Resp." value={modal.dados.chaveResp ?? ""} onChange={v => setField("chaveResp", v)} />
+              <FormField label="Nome" value={modal.dados.nome ?? ""} onChange={v => setField("nome", v)} />
+              <FormField label="Banco" value={modal.dados.banco ?? ""} onChange={v => setField("banco", v)} />
+              <FormField label="Agência" value={modal.dados.agencia ?? ""} onChange={v => setField("agencia", v)} />
+              <FormField label="Conta" value={modal.dados.conta ?? ""} onChange={v => setField("conta", v)} />
+              <FormField label="CPF/CNPJ" value={modal.dados.cpfCnpj ?? ""} onChange={v => setField("cpfCnpj", v)} />
+              <FormField label="Tipo Conta" value={modal.dados.tipoConta ?? ""} onChange={v => setField("tipoConta", v)} />
+              <FormField label="Pix" value={modal.dados.pix ?? ""} onChange={v => setField("pix", v)} />
+              <FormField label="Valor" value={modal.dados.valor ?? ""} onChange={v => setField("valor", v)} placeholder="0.00" />
+              <FormField label="Dt. Pagto" value={modal.dados.dataPagto ?? ""} onChange={v => setField("dataPagto", v)} placeholder="DD/MM/AAAA" />
+              <FormField label="Dt. Vencer" value={modal.dados.dataVencer ?? ""} onChange={v => setField("dataVencer", v)} placeholder="DD/MM/AAAA" />
+            </div>
+            <div className="flex justify-end gap-2 px-4 py-3 border-t border-gray-700">
+              <Button onClick={() => setModal(m => ({ ...m, open: false }))} size="sm" variant="outline" className="h-7 px-3 text-xs bg-gray-800 border-gray-600 text-gray-300">Cancelar</Button>
+              <Button onClick={salvarModal} size="sm" disabled={editarMutation.isPending || criarMutation.isPending} className="h-7 px-4 text-xs bg-purple-700 hover:bg-purple-600 text-white">
+                {editarMutation.isPending || criarMutation.isPending ? "Salvando..." : "Salvar"}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
