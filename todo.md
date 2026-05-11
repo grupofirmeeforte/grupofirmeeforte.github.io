@@ -335,3 +335,7 @@
 - [ ] Adicionar coluna Dt Pagto como última coluna na tabela Cálculo (formato DD/MM/AAAA)
 - [ ] Permitir edição da data no formato DD/MM/AAAA
 - [ ] Atualizar router calculos com campo dtPagto
+
+## AJUSTE: ORDENAÇÃO FEBRABAN
+- [x] Febraban: ordenar por data (mesano) do maior para o menor
+- [x] Febraban: novos registros inseridos aparecem no topo (mais recentes primeiro)

@@ -83,7 +83,7 @@ export const febrabanRouter = {
         })
         .from(febraban)
         .where(where)
-        .orderBy(asc(febraban.empresa), asc(febraban.ordemExcel), asc(febraban.id))
+        .orderBy(desc(febraban.mesano), asc(febraban.empresa), asc(febraban.ordemExcel), desc(febraban.id))
         .limit(input.limit)
         .offset(offset);
 
@@ -173,7 +173,7 @@ export const febrabanRouter = {
         })
         .from(febraban)
         .where(and(...conditions))
-        .orderBy(asc(febraban.empresa), asc(febraban.ordemExcel), asc(febraban.id));
+        .orderBy(desc(febraban.mesano), asc(febraban.empresa), asc(febraban.ordemExcel), desc(febraban.id));
 
       return rows;
     }),
@@ -214,7 +214,7 @@ export const febrabanRouter = {
         })
         .from(febraban)
         .where(and(...conditions))
-        .orderBy(asc(febraban.empresa), asc(febraban.mesano), asc(febraban.id));
+        .orderBy(desc(febraban.mesano), asc(febraban.empresa), desc(febraban.id));
 
       return rows;
     }),
