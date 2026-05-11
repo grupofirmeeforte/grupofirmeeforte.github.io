@@ -216,99 +216,99 @@ export default function Calculo() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between px-3 py-2 bg-white border-b border-slate-200">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Cálculo</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="text-base font-bold text-slate-800">Cálculo</h1>
+          <p className="text-[10px] text-slate-500">
             {registros.length} registro(s)
             {selecionados.size > 0 && (
               <span className="ml-2 text-purple-600 font-medium">· {selecionados.size} selecionado(s)</span>
             )}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={handleExportar} className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2">
-            <Download className="w-4 h-4" /> Exportar Excel
+        <div className="flex gap-1.5">
+          <Button onClick={handleExportar} size="sm" className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1 h-7 px-2 text-xs">
+            <Download className="w-3 h-3" /> Excel
           </Button>
           <Button
             onClick={handleEnviarParaPagto}
             disabled={enviarMutation.isPending}
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2 disabled:opacity-60"
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1 h-7 px-2 text-xs disabled:opacity-60"
           >
-            <Send className="w-4 h-4" /> Enviar Para Pagto
+            <Send className="w-3 h-3" /> Enviar Para Pagto
           </Button>
-          <Button onClick={() => navigate("/")} className="bg-gray-800 hover:bg-gray-900 text-white flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" /> Voltar
+          <Button onClick={() => navigate("/")} size="sm" className="bg-gray-800 hover:bg-gray-900 text-white flex items-center gap-1 h-7 px-2 text-xs">
+            <ArrowLeft className="w-3 h-3" /> Voltar
           </Button>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded border border-slate-200 p-4 mb-4">
-        <p className="font-semibold text-slate-700 mb-3">Filtros</p>
-        <div className="grid grid-cols-3 gap-4">
+      <div className="bg-white border-b border-slate-200 px-3 py-2">
+        <div className="flex flex-wrap gap-2">
           <div>
-            <label className="block text-xs text-slate-600 mb-1">Mês/Ano</label>
+            <label className="block text-[10px] text-slate-500 mb-0.5">Mês/Ano</label>
             <select
               value={mesRef}
               onChange={(e) => setMesRef(e.target.value)}
-              className="w-full border border-slate-300 rounded px-2 py-1.5 text-sm bg-white"
+              className="border border-slate-300 rounded px-1.5 py-1 text-xs bg-white"
             >
               <option value=""></option>
               {meses.map((m) => (
                 <option key={m} value={m ?? ""}>{fmtMesRef(m)}</option>
               ))}
             </select>
-            <p className="text-xs text-slate-400 mt-1">Mês anterior: {getMesAnterior()}</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">Mês ant.: {getMesAnterior()}</p>
           </div>
           <div>
-            <label className="block text-xs text-slate-600 mb-1">Chave J</label>
+            <label className="block text-[10px] text-slate-500 mb-0.5">Chave J</label>
             <Input
               value={chaveJ}
               onChange={(e) => setChaveJ(e.target.value)}
               placeholder="Ex: J9660864"
-              className="text-sm"
+              className="text-xs h-7 py-1"
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-600 mb-1">Nome Agente</label>
+            <label className="block text-[10px] text-slate-500 mb-0.5">Nome Agente</label>
             <Input
               value={nomeAgente}
               onChange={(e) => setNomeAgente(e.target.value)}
               placeholder="Ex: João Silva"
-              className="text-sm"
+              className="text-xs h-7 py-1"
             />
           </div>
         </div>
       </div>
 
       {/* Tabela */}
-      <div className="bg-white rounded border border-slate-200 overflow-x-auto">
+      <div className="bg-white overflow-x-auto">
         {isLoading ? (
           <div className="p-8 text-center text-slate-500">Carregando...</div>
         ) : registros.length === 0 ? (
           <div className="p-8 text-center text-slate-500">Nenhum registro encontrado</div>
         ) : (
-          <table className="w-full border-collapse text-xs">
+          <table className="w-full border-collapse" style={{ fontSize: "11px" }}>
             <thead>
               <tr style={{ background: "linear-gradient(90deg, #a855f7, #ec4899)" }}>
                 {/* Coluna de checkbox */}
-                <th className="px-2 py-2 text-center border-r border-white/20 w-8">
+                <th className="px-1.5 py-1.5 text-center border-r border-white/20 w-6">
                   <input
                     type="checkbox"
                     checked={todosSelecionados}
                     ref={(el) => { if (el) el.indeterminate = algunsSelecionados; }}
                     onChange={toggleTodos}
-                    className="w-3.5 h-3.5 cursor-pointer accent-white"
+                    className="w-3 h-3 cursor-pointer accent-white"
                     title="Selecionar todos"
                   />
                 </th>
                 {colunas.map((col) => (
                   <th
                     key={col.key}
-                    className="px-3 py-2 text-left font-bold text-white whitespace-nowrap border-r border-white/20 last:border-r-0"
+                    className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 last:border-r-0"
                   >
                     {col.label}
                   </th>
@@ -328,18 +328,18 @@ export default function Calculo() {
                   }
                 >
                   {/* Checkbox da linha */}
-                  <td className="px-2 py-1.5 text-center border-b border-slate-100 w-8">
+                  <td className="px-1.5 py-1 text-center border-b border-slate-100 w-6">
                     <input
                       type="checkbox"
                       checked={selecionados.has(r.id)}
                       onChange={() => toggleSelecionado(r.id)}
-                      className="w-3.5 h-3.5 cursor-pointer accent-purple-600"
+                      className="w-3 h-3 cursor-pointer accent-purple-600"
                     />
                   </td>
                   {colunas.map((col) => (
                     <td
                       key={col.key}
-                      className={`px-3 py-1.5 whitespace-nowrap border-b border-slate-100 ${col.tipo === "moeda" ? "text-right" : ""}`}
+                      className={`px-1.5 py-1 whitespace-nowrap border-b border-slate-100 ${col.tipo === "moeda" ? "text-right" : ""}`}
                     >
                       {col.key === "dtPagto" ? (
                         editandoDtPagto === r.id ? (
@@ -377,11 +377,11 @@ export default function Calculo() {
             <tfoot>
               <tr style={{ background: "linear-gradient(90deg, #7e22ce, #be185d)" }} className="font-bold text-white">
                 {/* Célula vazia para coluna de checkbox */}
-                <td className="px-2 py-2" />
+                <td className="px-1.5 py-1.5" />
                 {colunas.map((col, i) => (
                   <td
                     key={col.key}
-                    className={`px-3 py-2 whitespace-nowrap ${col.tipo === "moeda" ? "text-right" : ""}`}
+                    className={`px-1.5 py-1.5 whitespace-nowrap ${col.tipo === "moeda" ? "text-right" : ""}`}
                   >
                     {i === 0
                       ? "TOTAL"
