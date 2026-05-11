@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, Send } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -209,6 +209,18 @@ export default function Calculo() {
         <div className="flex gap-2">
           <Button onClick={handleExportar} className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2">
             <Download className="w-4 h-4" /> Exportar Excel
+          </Button>
+          <Button
+            onClick={() => {
+              if (selecionados.size === 0) {
+                alert("Selecione ao menos uma linha para enviar para pagamento.");
+                return;
+              }
+              alert(`${selecionados.size} registro(s) enviado(s) para pagamento.`);
+            }}
+            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+          >
+            <Send className="w-4 h-4" /> Enviar Para Pagto
           </Button>
           <Button onClick={() => navigate("/")} className="bg-gray-800 hover:bg-gray-900 text-white flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" /> Voltar
