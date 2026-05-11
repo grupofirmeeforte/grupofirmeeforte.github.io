@@ -328,6 +328,88 @@ export const febrabanRouter = {
       return { success: true };
     }),
 
+  // Resumo por empresa: totais de líquido (troco) por dia anterior, dia atual, contratado, pendente e ano
+  resumo: protectedProcedure
+    .input(z.object({
+      mesano: z.number().optional(), // filtro de mês/ano; se omitido usa o mês mais recente
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { empresas: [], mesanoAtual: null };
+
+      // Determinar mesano a usar
+      let mesano = input.mesano;
+      if (!mesano) {
+        const latest = await db
+          .select({ v: febraban.mesano })
+          .from(febraban)
+          .where(sql`mesano IS NOT NULL`)
+          .orderBy(desc(febraban.mesano))
+          .limit(1);
+        mesano = latest[0]?.v ?? undefined;
+      }
+      if (!mesano) return { empresas: [], mesanoAtual: null };
+
+      // Determinar o ano do mesano (ex: 426 → 2026, 126 → 2026)
+      const mesanoStr = String(mesano);
+      const anoSuffix = mesanoStr.slice(-2); // "26"
+      const anoFull = "20" + anoSuffix; // "2026"
+
+      // Data de hoje e ontem no formato DD/MM/AAAA
+      const hoje = new Date();
+      const ontem = new Date(hoje);
+      ontem.setDate(ontem.getDate() - 1);
+      const pad = (n: number) => String(n).padStart(2, "0");
+      const fmtDate = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+      const hojeStr = fmtDate(hoje);
+      const ontemStr = fmtDate(ontem);
+
+      const empresas = ["BMF", "FLEX"];
+      const result = [];
+
+      for (const emp of empresas) {
+        const baseWhere = sql`empresa = ${emp} AND mesano = ${mesano}`;
+        const anoWhere = sql`empresa = ${emp} AND RIGHT(LPAD(CAST(mesano AS CHAR), 6, '0'), 2) = ${anoSuffix}`;
+
+        const [contratado, pendente, diaAtual, diaAnterior, ano] = await Promise.all([
+          // Líquido contratado (situacao = Contratada)
+          db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
+            .from(febraban)
+            .where(sql`${baseWhere} AND situacao = 'Contratada'`),
+          // Líquido pendente (situacao = Pendente)
+          db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
+            .from(febraban)
+            .where(sql`${baseWhere} AND situacao = 'Pendente'`),
+          // Líquido do dia atual (solicitacao = hoje, situacao = Contratada)
+          db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
+            .from(febraban)
+            .where(sql`${baseWhere} AND solicitacao = ${hojeStr} AND situacao = 'Contratada'`),
+          // Líquido do dia anterior (solicitacao = ontem, situacao = Contratada)
+          db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
+            .from(febraban)
+            .where(sql`${baseWhere} AND solicitacao = ${ontemStr} AND situacao = 'Contratada'`),
+          // Líquido do ano (todos os meses do ano, situacao = Contratada)
+          db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
+            .from(febraban)
+            .where(sql`${anoWhere} AND situacao = 'Contratada'`),
+        ]);
+
+        result.push({
+          empresa: emp,
+          contratado: Number(contratado[0]?.total ?? 0),
+          pendente: Number(pendente[0]?.total ?? 0),
+          diaAtual: Number(diaAtual[0]?.total ?? 0),
+          diaAnterior: Number(diaAnterior[0]?.total ?? 0),
+          ano: Number(ano[0]?.total ?? 0),
+          hojeStr,
+          ontemStr,
+          anoFull,
+        });
+      }
+
+      return { empresas: result, mesanoAtual: mesano };
+    }),
+
   // Retorna valores únicos para filtros
   filtros: protectedProcedure.query(async () => {
     const db = await getDb();

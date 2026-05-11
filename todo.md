@@ -339,3 +339,7 @@
 ## AJUSTE: ORDENAÇÃO FEBRABAN
 - [x] Febraban: ordenar por data (mesano) do maior para o menor
 - [x] Febraban: novos registros inseridos aparecem no topo (mais recentes primeiro)
+
+## PAINEL RESUMO FEBRABAN (TOPO)
+- [x] Criar procedure tRPC resumo: totais por empresa (BMF/Flex) — líquido dia anterior, dia atual, contratado, pendente
+- [x] Adicionar painel de cards acima do cabeçalho da tabela Febraban com os totais

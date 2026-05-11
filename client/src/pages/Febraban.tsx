@@ -137,7 +137,7 @@ export default function FebrabanPage() {
     pago: filtroPago,
   });
   const { data: filtros } = trpc.febraban.filtros.useQuery();
-
+  const { data: resumo } = trpc.febraban.resumo.useQuery({ mesano: mesano });
   const utils = trpc.useUtils();
 
   const importarMutation = trpc.febraban.importar.useMutation({
@@ -451,6 +451,64 @@ export default function FebrabanPage() {
 
   return (
     <div className="space-y-4 p-6">
+      {/* Painel de Resumo por Empresa */}
+      {resumo && resumo.empresas.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+          {resumo.empresas.map((emp) => (
+            <div key={emp.empresa} className="rounded-xl border bg-white shadow-sm overflow-hidden">
+              {/* Cabeçalho da empresa */}
+              <div className={`px-4 py-2 flex items-center gap-2 ${emp.empresa === 'BMF' ? 'bg-blue-600' : 'bg-emerald-600'}`}>
+                <span className="text-white font-bold text-base tracking-wide">{emp.empresa}</span>
+                <span className="text-white/70 text-xs ml-auto">{mesanoToStr(resumo.mesanoAtual ?? undefined)}</span>
+              </div>
+              {/* Cards de métricas */}
+              <div className="grid grid-cols-5 divide-x">
+                {/* Dia anterior */}
+                <div className="px-3 py-2 text-center">
+                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Dia Anterior</div>
+                  <div className="text-[10px] text-gray-400 mb-0.5">{emp.ontemStr}</div>
+                  <div className="text-sm font-bold text-gray-800">
+                    {emp.diaAnterior.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                  </div>
+                </div>
+                {/* Dia atual */}
+                <div className="px-3 py-2 text-center">
+                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Dia Atual</div>
+                  <div className="text-[10px] text-gray-400 mb-0.5">{emp.hojeStr}</div>
+                  <div className="text-sm font-bold text-blue-700">
+                    {emp.diaAtual.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                  </div>
+                </div>
+                {/* Líquido Contratado */}
+                <div className="px-3 py-2 text-center">
+                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Contratado</div>
+                  <div className="text-[10px] text-gray-400 mb-0.5">no mês</div>
+                  <div className="text-sm font-bold text-green-700">
+                    {emp.contratado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                  </div>
+                </div>
+                {/* Líquido Pendente */}
+                <div className="px-3 py-2 text-center">
+                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Pendente</div>
+                  <div className="text-[10px] text-gray-400 mb-0.5">no mês</div>
+                  <div className="text-sm font-bold text-orange-600">
+                    {emp.pendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                  </div>
+                </div>
+                {/* Líquido do Ano */}
+                <div className="px-3 py-2 text-center">
+                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Ano {emp.anoFull}</div>
+                  <div className="text-[10px] text-gray-400 mb-0.5">contratado</div>
+                  <div className="text-sm font-bold text-purple-700">
+                    {emp.ano.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
