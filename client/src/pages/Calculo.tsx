@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Download } from "lucide-react";
@@ -162,6 +162,28 @@ export default function Calculo() {
   const todosSelecionados = registros.length > 0 && selecionados.size === registros.length;
   const algunsSelecionados = selecionados.size > 0 && selecionados.size < registros.length;
 
+  // Edição inline de Dt Pagto
+  const [editandoDtPagto, setEditandoDtPagto] = useState<number | null>(null);
+  const [valorDtPagto, setValorDtPagto] = useState("");
+  const dtPagtoInputRef = useRef<HTMLInputElement>(null);
+  const utils = trpc.useUtils();
+  const editarMutation = trpc.calculosImportados.editar.useMutation({
+    onSuccess: () => {
+      utils.calculosImportados.listar.invalidate();
+      setEditandoDtPagto(null);
+    },
+  });
+
+  const iniciarEdicaoDt = (r: any) => {
+    setEditandoDtPagto(r.id);
+    setValorDtPagto(r.dtPagto ?? "");
+    setTimeout(() => dtPagtoInputRef.current?.focus(), 50);
+  };
+
+  const salvarDtPagto = (id: number) => {
+    editarMutation.mutate({ id, dtPagto: valorDtPagto || undefined });
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 p-4">
       {/* Header */}
@@ -281,7 +303,34 @@ export default function Calculo() {
                       key={col.key}
                       className={`px-3 py-1.5 whitespace-nowrap border-b border-slate-100 ${col.tipo === "moeda" ? "text-right" : ""}`}
                     >
-                      {renderVal(r, col)}
+                      {col.key === "dtPagto" ? (
+                        editandoDtPagto === r.id ? (
+                          <input
+                            ref={dtPagtoInputRef}
+                            type="text"
+                            value={valorDtPagto}
+                            onChange={(e) => setValorDtPagto(e.target.value)}
+                            onBlur={() => salvarDtPagto(r.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") salvarDtPagto(r.id);
+                              if (e.key === "Escape") setEditandoDtPagto(null);
+                            }}
+                            placeholder="DD/MM/AAAA"
+                            maxLength={10}
+                            className="w-28 border border-purple-400 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500 bg-white"
+                          />
+                        ) : (
+                          <span
+                            onClick={() => iniciarEdicaoDt(r)}
+                            className="cursor-pointer hover:bg-purple-100 rounded px-1 py-0.5 min-w-[6rem] inline-block text-slate-700 border border-transparent hover:border-purple-300"
+                            title="Clique para editar"
+                          >
+                            {r.dtPagto || <span className="text-slate-300 italic">DD/MM/AAAA</span>}
+                          </span>
+                        )
+                      ) : (
+                        renderVal(r, col)
+                      )}
                     </td>
                   ))}
                 </tr>
