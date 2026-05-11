@@ -375,6 +375,7 @@ export type InsertPagamento = typeof pagamentos.$inferInsert;
  */
 export const calculos = mysqlTable("calculos", {
   id: int("id").autoincrement().primaryKey(),
+  tipoPagamento: varchar("tipoPagamento", { length: 100 }),
   mesRef: varchar("mesRef", { length: 10 }),
   empresa: varchar("empresa", { length: 100 }),
   chaveJ: varchar("chaveJ", { length: 50 }),
@@ -388,6 +389,7 @@ export const calculos = mysqlTable("calculos", {
   comissaoConsorcio: decimal("comissaoConsorcio", { precision: 15, scale: 2 }),
   comissaoOurocap: decimal("comissaoOurocap", { precision: 15, scale: 2 }),
   comissaoCc: decimal("comissaoCc", { precision: 15, scale: 2 }),
+  comissaoSeguros: decimal("comissaoSeguros", { precision: 15, scale: 2 }),
   ajudaCusto: decimal("ajudaCusto", { precision: 15, scale: 2 }),
   creditosDebitos: decimal("creditosDebitos", { precision: 15, scale: 2 }),
   adiantamento: decimal("adiantamento", { precision: 15, scale: 2 }),
@@ -397,6 +399,7 @@ export const calculos = mysqlTable("calculos", {
   rbmContaCorrente: decimal("rbmContaCorrente", { precision: 15, scale: 2 }),
   rbmConsorcioC2: decimal("rbmConsorcioC2", { precision: 15, scale: 2 }),
   rbmOurocap: decimal("rbmOurocap", { precision: 15, scale: 2 }),
+  rbmSeguros: decimal("rbmSeguros", { precision: 15, scale: 2 }),
   qtdeContas: int("qtdeContas"),
   vrLiquidoC2: decimal("vrLiquidoC2", { precision: 15, scale: 2 }),
   srccC2: decimal("srccC2", { precision: 15, scale: 2 }),

@@ -310,3 +310,21 @@
 - [x] Adicionar exceção: Sidnei Honorato Ultramare tem acesso irrestrito (qualquer dia/horário)
 - [x] Exceção baseada no nome do agente no cadastro
 - [x] Quando Chave J mudar, o sistema aceita o novo número automaticamente (baseado no nome, não na chave)
+## FASE 28: IMPORTAR CALCULOS.XLTX
+- [ ] Analisar estrutura da planilha Calculos.xltx
+- [ ] Criar tabela calculos_importados no banco com as colunas corretas
+- [ ] Importar todos os registros da planilha para o banco
+- [ ] Atualizar tela Cálculo para exibir os dados importados
+
+## FASE 25: REESCRITA DA PÁGINA CÁLCULO (DADOS REAIS)
+- [x] Criar router calculosRouter em server/routers/calculos.ts com listar/mesesDisponiveis/empresasDisponiveis/criar/editar/deletar
+- [x] Registrar calculosImportados no appRouter em server/routers.ts
+- [x] Atualizar schema Drizzle com colunas tipoPagamento, comissaoSeguros, rbmSeguros
+- [x] Reescrever Calculo.tsx para usar trpc.calculosImportados.listar (188 registros reais)
+- [x] Exibir todas as 29 colunas da tabela calculos (incluindo tipoPagamento)
+- [x] Filtros por Mês Ref (dropdown), Empresa (dropdown), Chave J, Nome Agente
+- [x] Linha de totais no rodapé da tabela
+- [x] Botão Exportar Excel (usando xlsx)
+- [x] Botão Voltar posicionado à direita
+- [x] Edição inline por linha (ícone lápis) com salvar/cancelar
+- [x] Exclusão por linha (ícone lixeira) com confirmação
