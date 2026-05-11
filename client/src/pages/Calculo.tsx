@@ -37,6 +37,7 @@ export default function Calculo() {
   const [mesRef, setMesRef] = useState("");
   const [chaveJ, setChaveJ] = useState("");
   const [nomeAgente, setNomeAgente] = useState("");
+  const [selecionados, setSelecionados] = useState<Set<number>>(new Set());
 
   const { data: meses = [] } = trpc.calculosImportados.mesesDisponiveis.useQuery();
   const { data: registros = [], isLoading } = trpc.calculosImportados.listar.useQuery({
@@ -52,6 +53,23 @@ export default function Calculo() {
     const ano = String(hoje.getFullYear()).slice(-2);
     if (mes === 1) return `12${String(parseInt(ano) - 1).padStart(2, "0")}`;
     return `${mes - 1}${ano}`;
+  };
+
+  const toggleSelecionado = (id: number) => {
+    setSelecionados((prev) => {
+      const novo = new Set(prev);
+      if (novo.has(id)) novo.delete(id);
+      else novo.add(id);
+      return novo;
+    });
+  };
+
+  const toggleTodos = () => {
+    if (selecionados.size === registros.length) {
+      setSelecionados(new Set());
+    } else {
+      setSelecionados(new Set((registros as any[]).map((r) => r.id)));
+    }
   };
 
   const handleExportar = () => {
@@ -126,7 +144,7 @@ export default function Calculo() {
     { label: "Vr. Liquido",        key: "vrLiquidoC2",      tipo: "moeda" },
     { label: "SRCC",               key: "srccC2",           tipo: "moeda" },
     { label: "VrLiquido-Srcc",     key: "vrLiquidoSrcc",    tipo: "moeda" },
-    { label: "Dt Pagto",            key: "dtPagto",          tipo: "texto" },
+    { label: "Dt Pagto",           key: "dtPagto",          tipo: "texto" },
   ] as const;
 
   const renderVal = (r: any, col: typeof colunas[number]) => {
@@ -141,13 +159,21 @@ export default function Calculo() {
   const soma = (key: string) =>
     (registros as any[]).reduce((acc, r) => acc + (parseFloat(String(r[key])) || 0), 0);
 
+  const todosSelecionados = registros.length > 0 && selecionados.size === registros.length;
+  const algunsSelecionados = selecionados.size > 0 && selecionados.size < registros.length;
+
   return (
     <div className="min-h-screen bg-slate-50 p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Cálculo</h1>
-          <p className="text-sm text-slate-500">{registros.length} registro(s)</p>
+          <p className="text-sm text-slate-500">
+            {registros.length} registro(s)
+            {selecionados.size > 0 && (
+              <span className="ml-2 text-purple-600 font-medium">· {selecionados.size} selecionado(s)</span>
+            )}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button onClick={handleExportar} className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2">
@@ -159,7 +185,7 @@ export default function Calculo() {
         </div>
       </div>
 
-      {/* Filtros — idêntico ao modelo */}
+      {/* Filtros */}
       <div className="bg-white rounded border border-slate-200 p-4 mb-4">
         <p className="font-semibold text-slate-700 mb-3">Filtros</p>
         <div className="grid grid-cols-3 gap-4">
@@ -208,6 +234,17 @@ export default function Calculo() {
           <table className="w-full border-collapse text-xs">
             <thead>
               <tr style={{ background: "linear-gradient(90deg, #a855f7, #ec4899)" }}>
+                {/* Coluna de checkbox */}
+                <th className="px-2 py-2 text-center border-r border-white/20 w-8">
+                  <input
+                    type="checkbox"
+                    checked={todosSelecionados}
+                    ref={(el) => { if (el) el.indeterminate = algunsSelecionados; }}
+                    onChange={toggleTodos}
+                    className="w-3.5 h-3.5 cursor-pointer accent-white"
+                    title="Selecionar todos"
+                  />
+                </th>
                 {colunas.map((col) => (
                   <th
                     key={col.key}
@@ -222,8 +259,23 @@ export default function Calculo() {
               {(registros as any[]).map((r, idx) => (
                 <tr
                   key={r.id}
-                  className={idx % 2 === 0 ? "bg-white hover:bg-purple-50" : "bg-slate-50 hover:bg-purple-50"}
+                  className={
+                    selecionados.has(r.id)
+                      ? "bg-purple-100 hover:bg-purple-150"
+                      : idx % 2 === 0
+                      ? "bg-white hover:bg-purple-50"
+                      : "bg-slate-50 hover:bg-purple-50"
+                  }
                 >
+                  {/* Checkbox da linha */}
+                  <td className="px-2 py-1.5 text-center border-b border-slate-100 w-8">
+                    <input
+                      type="checkbox"
+                      checked={selecionados.has(r.id)}
+                      onChange={() => toggleSelecionado(r.id)}
+                      className="w-3.5 h-3.5 cursor-pointer accent-purple-600"
+                    />
+                  </td>
                   {colunas.map((col) => (
                     <td
                       key={col.key}
@@ -237,6 +289,8 @@ export default function Calculo() {
             </tbody>
             <tfoot>
               <tr style={{ background: "linear-gradient(90deg, #7e22ce, #be185d)" }} className="font-bold text-white">
+                {/* Célula vazia para coluna de checkbox */}
+                <td className="px-2 py-2" />
                 {colunas.map((col, i) => (
                   <td
                     key={col.key}
