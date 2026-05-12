@@ -11,7 +11,10 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
-import { ArrowLeft, Upload, Trash2, Search, FileSpreadsheet, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import {
+  ArrowLeft, Upload, Trash2, Search, FileSpreadsheet,
+  AlertTriangle, CheckCircle2, TrendingDown, History, RefreshCw,
+} from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 
@@ -25,45 +28,90 @@ function fmt(v: string | number | null | undefined): string {
   return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
+function fmtNum(v: string | number | null | undefined): string {
+  if (v == null) return '—';
+  const n = parseFloat(String(v));
+  if (isNaN(n)) return '—';
+  return n.toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+}
+
 function normalize(s: string) {
   return s.toUpperCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^A-Z0-9]/g, '');
 }
 
+function fmtDate(d: Date | string | null | undefined): string {
+  if (!d) return '—';
+  if (d instanceof Date) {
+    return d.toLocaleDateString('pt-BR');
+  }
+  return String(d);
+}
+
 // ─── COMPONENTE PRINCIPAL ────────────────────────────────────────────────────
 export default function ProRataPage() {
   const [, navigate] = useLocation();
+  const [aba, setAba] = useState<'operacoes' | 'encerradas'>('operacoes');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [showImport, setShowImport] = useState(false);
-  const [importMode, setImportMode] = useState<'novo' | 'subscrever'>('novo');
+  const [importMode, setImportMode] = useState<'novo' | 'subscrever'>('subscrever');
   const [importData, setImportData] = useState<any[]>([]);
   const [importing, setImporting] = useState(false);
   const [showDeleteAll, setShowDeleteAll] = useState(false);
+  const [importacaoSelecionada, setImportacaoSelecionada] = useState<string | undefined>(undefined);
+  const [searchEnc, setSearchEnc] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
-
   const utils = trpc.useUtils();
 
+  // ─── QUERIES ──────────────────────────────────────────────────────────────
   const { data: rows = [], isLoading } = trpc.proRata.list.useQuery({
     search: search || undefined,
     limit: PAGE_SIZE,
     offset: page * PAGE_SIZE,
   });
 
-  const { data: countData } = trpc.proRata.count.useQuery({
-    search: search || undefined,
-  });
+  const { data: countData } = trpc.proRata.count.useQuery({ search: search || undefined });
   const total = countData?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  const { data: totaisData } = trpc.proRata.totais.useQuery({ search: search || undefined });
+
+  const { data: historicoData = [] } = trpc.proRata.historicoImportacoes.useQuery();
+
+  const { data: encerradasRows = [], isLoading: encLoading } = trpc.proRata.encerradas.useQuery({
+    importacaoId: importacaoSelecionada,
+    search: searchEnc || undefined,
+    limit: PAGE_SIZE,
+    offset: 0,
+  });
+
+  const { data: encTotais } = trpc.proRata.encerradasTotais.useQuery({
+    importacaoId: importacaoSelecionada,
+    search: searchEnc || undefined,
+  });
+
+  // ─── MUTATIONS ────────────────────────────────────────────────────────────
   const importarMutation = trpc.proRata.importar.useMutation({
     onSuccess: (res) => {
-      toast.success(`Importação concluída: ${res.inseridos} registros inseridos.`);
+      const msg = res.encerradas > 0
+        ? `Importação concluída: ${res.inseridos} registros. ⚠️ ${res.encerradas} operações encerradas detectadas!`
+        : `Importação concluída: ${res.inseridos} registros inseridos.`;
+      toast.success(msg, { duration: 6000 });
       utils.proRata.list.invalidate();
       utils.proRata.count.invalidate();
+      utils.proRata.totais.invalidate();
+      utils.proRata.historicoImportacoes.invalidate();
+      utils.proRata.encerradas.invalidate();
+      utils.proRata.encerradasTotais.invalidate();
       setShowImport(false);
       setImportData([]);
+      // Se detectou encerradas, vai para a aba de relatório
+      if (res.encerradas > 0) {
+        setImportacaoSelecionada(res.importacaoId);
+        setAba('encerradas');
+      }
     },
     onError: (err) => toast.error(`Erro: ${err.message}`),
   });
@@ -73,25 +121,30 @@ export default function ProRataPage() {
       toast.success('Todos os registros foram removidos.');
       utils.proRata.list.invalidate();
       utils.proRata.count.invalidate();
+      utils.proRata.totais.invalidate();
       setShowDeleteAll(false);
     },
     onError: (err) => toast.error(`Erro: ${err.message}`),
   });
 
-  // ─── LEITURA DO EXCEL ───────────────────────────────────────────────────────
+  // ─── LEITURA DO EXCEL ─────────────────────────────────────────────────────
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const wb = XLSX.read(ev.target?.result, { type: 'array' });
+        const wb = XLSX.read(ev.target?.result, { type: 'array', cellDates: true });
+        // Usar a primeira aba (P1-Promotiva ou qualquer nome)
         const ws = wb.Sheets[wb.SheetNames[0]];
-        const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
-        if (json.length < 2) { toast.error('Arquivo vazio ou sem dados.'); return; }
+        // Linha 1 é resumo, linha 2 é cabeçalho, dados a partir da linha 3
+        const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: false });
+        if (json.length < 3) { toast.error('Arquivo vazio ou sem dados.'); return; }
 
-        // Mapear cabeçalhos
-        const headers: string[] = (json[0] as any[]).map(h => normalize(String(h ?? '')));
+        // Cabeçalho na linha 2 (índice 1)
+        const headerRow = json[1] as any[];
+        const headers: string[] = headerRow.map(h => normalize(String(h ?? '')));
+
         const col = (row: any[], key: string) => {
           const idx = headers.indexOf(normalize(key));
           return idx >= 0 ? row[idx] : undefined;
@@ -107,43 +160,48 @@ export default function ProRataPage() {
 
         const toDate = (v: any): string | undefined => {
           if (!v) return undefined;
-          if (v instanceof Date && !isNaN(v.getTime())) {
-            const d = v.getDate().toString().padStart(2, '0');
-            const m = (v.getMonth() + 1).toString().padStart(2, '0');
-            const y = v.getFullYear();
+          const s = String(v).trim();
+          // Formato DD/MM/AAAA
+          if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
+          // Formato AAAA-MM-DD (ISO)
+          if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+            const [y, m, d] = s.split('T')[0].split('-');
             return `${d}/${m}/${y}`;
           }
-          const s = String(v).trim();
-          // Já no formato DD/MM/AAAA
-          if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
           return s || undefined;
         };
 
         const registros: any[] = [];
-        for (let i = 1; i < json.length; i++) {
+        // Dados a partir da linha 3 (índice 2)
+        for (let i = 2; i < json.length; i++) {
           const row = json[i];
           if (!row || row.every((c: any) => c === null || c === undefined || c === '')) continue;
 
-          const nrOperacao =
-            col(row, 'NRO OPERACAO') ?? col(row, 'NRO OPERAÇÃO') ??
-            col(row, 'NROPERACAO') ?? col(row, 'OPERACAO') ?? col(row, 'OPERAÇÃO');
-          if (nrOperacao == null || String(nrOperacao).trim() === '') continue;
+          // Nº Operação: coluna "NRO OPERACAO" ou "NRO OPERAÇÃO"
+          const nrOperacaoRaw =
+            col(row, 'NRO OPERACAO') ??
+            col(row, 'NRO OPERAÇÃO') ??
+            col(row, 'NROOPERACAO') ??
+            col(row, 'OPERACAO');
+          if (nrOperacaoRaw == null || String(nrOperacaoRaw).trim() === '') continue;
 
-          const qtdPagas = toNum(col(row, 'QTD PARCELAS PGS') ?? col(row, 'QTDPARCELASPGS') ?? col(row, 'PARCELAS PGS'));
-          const qtdTotal = toNum(col(row, 'QTD PARCELAS TOTAL') ?? col(row, 'QTDPARCELASTOTAL') ?? col(row, 'PARCELAS TOTAL'));
+          const qtdPagas = toNum(col(row, 'QTD PARCELAS PGS') ?? col(row, 'QTDPARCELASPGS'));
+          const qtdTotal = toNum(col(row, 'QTD PARCELAS TOTAL') ?? col(row, 'QTDPARCELASTOTAL'));
+          const comissaoRaw = col(row, 'COMISSAO') ?? col(row, 'COMISSÃO');
+          const empresaRaw = col(row, 'EMPRESA') ?? col(row, 'Empresa');
+          const codEstRaw = col(row, 'COD EST') ?? col(row, 'CODEST');
 
           registros.push({
             agenciaBB: col(row, 'AGENCIA BB') != null ? String(col(row, 'AGENCIA BB')).trim() : undefined,
-            nrOperacao: String(typeof nrOperacao === 'number' ? Math.round(nrOperacao) : nrOperacao).trim(),
-            chaveJ: col(row, 'CHAVE J') != null ? String(col(row, 'CHAVE J')).trim() : undefined,
-            valorFinanciado: col(row, 'VALOR FINANCIADO') != null ? String(toNum(col(row, 'VALOR FINANCIADO')) ?? '') : undefined,
-            comissao: col(row, 'COMISSAO') != null || col(row, 'COMISSÃO') != null
-              ? String(toNum(col(row, 'COMISSAO') ?? col(row, 'COMISSÃO')) ?? '') : undefined,
+            nrOperacao: String(nrOperacaoRaw).trim().replace(/\.0$/, ''),
+            chaveJ: col(row, 'CHAVEJ') != null ? String(col(row, 'CHAVEJ')).trim() : undefined,
+            valorFinanciado: col(row, 'VALORFINANCIADO') != null ? String(toNum(col(row, 'VALORFINANCIADO')) ?? '') : undefined,
+            comissao: comissaoRaw != null ? String(toNum(comissaoRaw) ?? '') : undefined,
             dataFinal: toDate(col(row, 'DATA FINAL') ?? col(row, 'DATAFINAL')),
             qtdParcelasPagas: qtdPagas != null ? Math.round(qtdPagas) : undefined,
             qtdParcelasTotal: qtdTotal != null ? Math.round(qtdTotal) : undefined,
-            codOps: col(row, 'COD OPS') != null ? String(col(row, 'COD OPS')).trim() : undefined,
-            codEst: col(row, 'COD EST') != null ? String(col(row, 'COD EST')).trim() : undefined,
+            codEst: codEstRaw != null ? String(codEstRaw).trim() : undefined,
+            empresa: empresaRaw != null ? String(empresaRaw).trim() : undefined,
           });
         }
 
@@ -165,7 +223,6 @@ export default function ProRataPage() {
       const LOTE = 500;
       for (let i = 0; i < importData.length; i += LOTE) {
         const lote = importData.slice(i, i + LOTE);
-        // Modo subscrever só na primeira chamada (limpa tudo); depois usa 'novo'
         const modo = i === 0 ? importMode : 'novo';
         await importarMutation.mutateAsync({ modo, registros: lote });
       }
@@ -173,16 +230,6 @@ export default function ProRataPage() {
       setImporting(false);
     }
   }
-
-  // ─── TOTAIS ───────────────────────────────────────────────────────────────
-  const totalFinanciado = useMemo(
-    () => (rows as any[]).reduce((acc: number, r: any) => acc + parseFloat(String(r.valorFinanciado ?? 0)), 0),
-    [rows]
-  );
-  const totalComissao = useMemo(
-    () => (rows as any[]).reduce((acc: number, r: any) => acc + parseFloat(String(r.comissao ?? 0)), 0),
-    [rows]
-  );
 
   // ─── PAGINADOR ────────────────────────────────────────────────────────────
   const Paginador = () => (
@@ -212,116 +259,295 @@ export default function ProRataPage() {
         </Button>
       </div>
 
-      <div className="p-6 space-y-4">
-        {/* Barra de ações */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              className="pl-9"
-              placeholder="Buscar por Nº Operação ou ChaveJ..."
-              value={search}
-              onChange={e => { setSearch(e.target.value); setPage(0); }}
-            />
-          </div>
-          <Button onClick={() => setShowImport(true)} className="bg-blue-600 hover:bg-blue-700">
-            <Upload className="w-4 h-4 mr-2" />
-            Importar Excel
-          </Button>
-          <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50" onClick={() => setShowDeleteAll(true)}>
-            <Trash2 className="w-4 h-4 mr-2" />
-            Limpar Tudo
-          </Button>
-        </div>
-
-        {/* Cards de totais */}
-        <div className="grid grid-cols-3 gap-4">
-          <Card className="border-blue-100 bg-blue-50">
-            <CardContent className="py-4">
-              <p className="text-xs text-blue-500 font-medium uppercase tracking-wide">Total Registros</p>
-              <p className="text-2xl font-bold text-blue-900">{total.toLocaleString('pt-BR')}</p>
-            </CardContent>
-          </Card>
-          <Card className="border-green-100 bg-green-50">
-            <CardContent className="py-4">
-              <p className="text-xs text-green-500 font-medium uppercase tracking-wide">Total Financiado (página)</p>
-              <p className="text-2xl font-bold text-green-900">{fmt(totalFinanciado)}</p>
-            </CardContent>
-          </Card>
-          <Card className="border-orange-100 bg-orange-50">
-            <CardContent className="py-4">
-              <p className="text-xs text-orange-500 font-medium uppercase tracking-wide">Total Comissão (página)</p>
-              <p className="text-2xl font-bold text-orange-900">{fmt(totalComissao)}</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Paginador topo */}
-        <Paginador />
-
-        {/* Tabela */}
-        <Card>
-          <CardContent className="p-0">
-            {isLoading ? (
-              <div className="text-center py-16 text-gray-400">Carregando...</div>
-            ) : (rows as any[]).length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 gap-3">
-                <FileSpreadsheet className="w-12 h-12 text-gray-300" />
-                <p className="text-gray-500 font-medium">Nenhum registro encontrado</p>
-                <p className="text-gray-400 text-sm">Importe um arquivo Excel para começar.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50">
-                      <TableHead className="font-semibold text-gray-700">Agência BB</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Nº Operação</TableHead>
-                      <TableHead className="font-semibold text-gray-700">ChaveJ</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-right">Vr. Financiado</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
-                      <TableHead className="font-semibold text-gray-700">Data Final</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-center">Parc. Pagas</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-center">Parc. Total</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-center bg-amber-50">Falta Receber</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-center">Cod Ops</TableHead>
-                      <TableHead className="font-semibold text-gray-700 text-center">Cod Est</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {(rows as any[]).map((row: any) => {
-                      const falta = row.qtdFaltaReceber ?? ((row.qtdParcelasTotal ?? 0) - (row.qtdParcelasPagas ?? 0));
-                      return (
-                        <TableRow key={row.id} className="hover:bg-gray-50">
-                          <TableCell className="text-gray-700 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
-                          <TableCell className="text-gray-700 font-mono text-sm font-medium">{row.nrOperacao}</TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="text-xs font-mono">{row.chaveJ || '—'}</Badge>
-                          </TableCell>
-                          <TableCell className="text-right font-semibold text-blue-700">{fmt(row.valorFinanciado)}</TableCell>
-                          <TableCell className="text-right text-green-700">{fmt(row.comissao)}</TableCell>
-                          <TableCell className="text-gray-700 text-sm">{row.dataFinal || '—'}</TableCell>
-                          <TableCell className="text-center text-gray-700">{row.qtdParcelasPagas ?? '—'}</TableCell>
-                          <TableCell className="text-center text-gray-700">{row.qtdParcelasTotal ?? '—'}</TableCell>
-                          <TableCell className="text-center bg-amber-50">
-                            <Badge className={`text-xs font-bold ${falta > 0 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                              {falta}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-center text-gray-500 text-sm">{row.codOps || '—'}</TableCell>
-                          <TableCell className="text-center text-gray-500 text-sm">{row.codEst || '—'}</TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
+      {/* Abas */}
+      <div className="bg-white border-b px-6">
+        <div className="flex gap-1">
+          <button
+            onClick={() => setAba('operacoes')}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              aba === 'operacoes'
+                ? 'border-indigo-600 text-indigo-700 bg-indigo-50'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            Operações
+            {total > 0 && (
+              <span className="ml-1 bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                {total.toLocaleString('pt-BR')}
+              </span>
             )}
-          </CardContent>
-        </Card>
+          </button>
+          <button
+            onClick={() => setAba('encerradas')}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              aba === 'encerradas'
+                ? 'border-red-600 text-red-700 bg-red-50'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <TrendingDown className="w-4 h-4" />
+            Relatório — Encerradas
+            {(encTotais?.total ?? 0) > 0 && (
+              <span className="ml-1 bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                {(encTotais?.total ?? 0).toLocaleString('pt-BR')}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
 
-        {/* Paginador rodapé */}
-        <Paginador />
+      <div className="p-6 space-y-4">
+
+        {/* ══════════════════ ABA OPERAÇÕES ══════════════════ */}
+        {aba === 'operacoes' && (
+          <>
+            {/* Barra de ações */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  className="pl-9"
+                  placeholder="Buscar por Nº Operação, ChaveJ ou Empresa..."
+                  value={search}
+                  onChange={e => { setSearch(e.target.value); setPage(0); }}
+                />
+              </div>
+              <Button onClick={() => setShowImport(true)} className="bg-indigo-600 hover:bg-indigo-700">
+                <Upload className="w-4 h-4 mr-2" />
+                Importar Excel
+              </Button>
+              <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50" onClick={() => setShowDeleteAll(true)}>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Limpar Tudo
+              </Button>
+            </div>
+
+            {/* Cards de resumo */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="border-indigo-100 bg-indigo-50">
+                <CardContent className="py-4">
+                  <p className="text-xs text-indigo-500 font-medium uppercase tracking-wide">Total Registros</p>
+                  <p className="text-2xl font-bold text-indigo-900">{(totaisData?.total ?? total).toLocaleString('pt-BR')}</p>
+                </CardContent>
+              </Card>
+              <Card className="border-blue-100 bg-blue-50">
+                <CardContent className="py-4">
+                  <p className="text-xs text-blue-500 font-medium uppercase tracking-wide">Total Financiado</p>
+                  <p className="text-xl font-bold text-blue-900">{fmt(totaisData?.totalFinanciado)}</p>
+                </CardContent>
+              </Card>
+              <Card className="border-amber-100 bg-amber-50">
+                <CardContent className="py-4">
+                  <p className="text-xs text-amber-500 font-medium uppercase tracking-wide">Total a Receber (VLR)</p>
+                  <p className="text-xl font-bold text-amber-900">{fmt(totaisData?.totalVlr)}</p>
+                  <p className="text-xs text-amber-400 mt-1">Comissão × Falta</p>
+                </CardContent>
+              </Card>
+              <Card className="border-green-100 bg-green-50">
+                <CardContent className="py-4">
+                  <p className="text-xs text-green-500 font-medium uppercase tracking-wide">Total Parcelas Faltando</p>
+                  <p className="text-2xl font-bold text-green-900">{(totaisData?.totalFalta ?? 0).toLocaleString('pt-BR')}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Paginador topo */}
+            <Paginador />
+
+            {/* Tabela */}
+            <Card>
+              <CardContent className="p-0">
+                {isLoading ? (
+                  <div className="text-center py-16 text-gray-400">Carregando...</div>
+                ) : (rows as any[]).length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 gap-3">
+                    <FileSpreadsheet className="w-12 h-12 text-gray-300" />
+                    <p className="text-gray-500 font-medium">Nenhum registro encontrado</p>
+                    <p className="text-gray-400 text-sm">Importe um arquivo Excel (.xlsm / .xlsx) para começar.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-50">
+                          <TableHead className="font-semibold text-gray-700">Agência BB</TableHead>
+                          <TableHead className="font-semibold text-gray-700">Nº Operação</TableHead>
+                          <TableHead className="font-semibold text-gray-700">ChaveJ</TableHead>
+                          <TableHead className="font-semibold text-gray-700">Empresa</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-right">Vr. Financiado</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                          <TableHead className="font-semibold text-gray-700">Data Final</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-center">Parc. Pagas</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-center">Parc. Total</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-center bg-amber-50">Falta</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-right bg-green-50">VLR (A Receber)</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-center">Cod Est</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {(rows as any[]).map((row: any) => {
+                          const falta = row.qtdFaltaReceber ?? ((row.qtdParcelasTotal ?? 0) - (row.qtdParcelasPagas ?? 0));
+                          return (
+                            <TableRow key={row.id} className="hover:bg-gray-50">
+                              <TableCell className="text-gray-700 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
+                              <TableCell className="text-gray-700 font-mono text-sm font-medium">{row.nrOperacao}</TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="text-xs font-mono">{row.chaveJ || '—'}</Badge>
+                              </TableCell>
+                              <TableCell className="text-gray-700 text-sm">{row.empresa || '—'}</TableCell>
+                              <TableCell className="text-right font-semibold text-blue-700">{fmt(row.valorFinanciado)}</TableCell>
+                              <TableCell className="text-right text-gray-700 text-sm">{fmtNum(row.comissao)}</TableCell>
+                              <TableCell className="text-gray-700 text-sm">{row.dataFinal || '—'}</TableCell>
+                              <TableCell className="text-center text-gray-700">{row.qtdParcelasPagas ?? '—'}</TableCell>
+                              <TableCell className="text-center text-gray-700">{row.qtdParcelasTotal ?? '—'}</TableCell>
+                              <TableCell className="text-center bg-amber-50">
+                                <Badge className={`text-xs font-bold ${falta > 0 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                                  {falta}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right font-bold text-green-700 bg-green-50">{fmt(row.vlr)}</TableCell>
+                              <TableCell className="text-center text-gray-500 text-sm">{row.codEst || '—'}</TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Paginador rodapé */}
+            <Paginador />
+          </>
+        )}
+
+        {/* ══════════════════ ABA ENCERRADAS ══════════════════ */}
+        {aba === 'encerradas' && (
+          <>
+            {/* Seletor de importação */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  className="pl-9"
+                  placeholder="Buscar por Nº Operação, ChaveJ ou Empresa..."
+                  value={searchEnc}
+                  onChange={e => setSearchEnc(e.target.value)}
+                />
+              </div>
+              <select
+                className="border rounded-md px-3 py-2 text-sm text-gray-700 bg-white"
+                value={importacaoSelecionada ?? ''}
+                onChange={e => setImportacaoSelecionada(e.target.value || undefined)}
+              >
+                <option value="">Todas as importações</option>
+                {historicoData.map((h: any) => (
+                  <option key={h.importacaoId} value={h.importacaoId}>
+                    {new Date(h.importacaoData).toLocaleString('pt-BR')} — {h.total} encerradas — {fmt(h.totalVlrPerdido)} perdido
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Cards de resumo encerradas */}
+            <div className="grid grid-cols-3 gap-4">
+              <Card className="border-red-100 bg-red-50">
+                <CardContent className="py-4">
+                  <p className="text-xs text-red-500 font-medium uppercase tracking-wide">Total Encerradas</p>
+                  <p className="text-2xl font-bold text-red-900">{(encTotais?.total ?? 0).toLocaleString('pt-BR')}</p>
+                  <p className="text-xs text-red-400 mt-1">Operações que pararam de gerar ganho</p>
+                </CardContent>
+              </Card>
+              <Card className="border-orange-100 bg-orange-50">
+                <CardContent className="py-4">
+                  <p className="text-xs text-orange-500 font-medium uppercase tracking-wide">Total VLR Perdido</p>
+                  <p className="text-xl font-bold text-orange-900">{fmt(encTotais?.totalVlrPerdido)}</p>
+                  <p className="text-xs text-orange-400 mt-1">Comissão que deixou de ser recebida</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gray-100 bg-gray-50">
+                <CardContent className="py-4">
+                  <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Financiado Encerrado</p>
+                  <p className="text-xl font-bold text-gray-900">{fmt(encTotais?.totalFinanciado)}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Tabela encerradas */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2 text-red-700">
+                  <TrendingDown className="w-4 h-4" />
+                  Operações que pararam de gerar ganho financeiro
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                {encLoading ? (
+                  <div className="text-center py-16 text-gray-400">Carregando...</div>
+                ) : (encerradasRows as any[]).length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 gap-3">
+                    <CheckCircle2 className="w-12 h-12 text-green-300" />
+                    <p className="text-gray-500 font-medium">Nenhuma operação encerrada registrada</p>
+                    <p className="text-gray-400 text-sm">As operações encerradas aparecem aqui ao importar uma nova planilha no modo Subscrever.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-red-50">
+                          <TableHead className="font-semibold text-gray-700">Data Importação</TableHead>
+                          <TableHead className="font-semibold text-gray-700">Nº Operação</TableHead>
+                          <TableHead className="font-semibold text-gray-700">ChaveJ</TableHead>
+                          <TableHead className="font-semibold text-gray-700">Empresa</TableHead>
+                          <TableHead className="font-semibold text-gray-700">Agência BB</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-right">Vr. Financiado</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                          <TableHead className="font-semibold text-gray-700">Data Final</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-center">Pagas</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-center">Total</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-right bg-red-50">VLR Perdido</TableHead>
+                          <TableHead className="font-semibold text-gray-700 text-center">Motivo</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {(encerradasRows as any[]).map((row: any) => (
+                          <TableRow key={row.id} className="hover:bg-red-50/50">
+                            <TableCell className="text-gray-500 text-xs">
+                              {new Date(row.importacaoData).toLocaleString('pt-BR')}
+                            </TableCell>
+                            <TableCell className="font-mono text-sm font-medium text-gray-800">{row.nrOperacao}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="text-xs font-mono">{row.chaveJ || '—'}</Badge>
+                            </TableCell>
+                            <TableCell className="text-gray-700 text-sm">{row.empresa || '—'}</TableCell>
+                            <TableCell className="text-gray-700 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
+                            <TableCell className="text-right text-blue-700 font-semibold">{fmt(row.valorFinanciado)}</TableCell>
+                            <TableCell className="text-right text-gray-700 text-sm">{fmtNum(row.comissao)}</TableCell>
+                            <TableCell className="text-gray-700 text-sm">{row.dataFinal || '—'}</TableCell>
+                            <TableCell className="text-center text-gray-700">{row.qtdParcelasPagas ?? '—'}</TableCell>
+                            <TableCell className="text-center text-gray-700">{row.qtdParcelasTotal ?? '—'}</TableCell>
+                            <TableCell className="text-right font-bold text-red-700 bg-red-50">{fmt(row.vlrPerdido)}</TableCell>
+                            <TableCell className="text-center">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                row.motivo === 'removida'
+                                  ? 'bg-orange-100 text-orange-700'
+                                  : 'bg-red-100 text-red-700'
+                              }`}>
+                                {row.motivo === 'removida' ? 'Removida' : 'Encerrada'}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
 
       {/* ─── MODAL IMPORTAÇÃO ─────────────────────────────────────────────── */}
@@ -329,11 +555,10 @@ export default function ProRataPage() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <FileSpreadsheet className="w-5 h-5 text-blue-600" />
+              <FileSpreadsheet className="w-5 h-5 text-indigo-600" />
               Importar Pró Rata — Excel
             </DialogTitle>
           </DialogHeader>
-
           <div className="space-y-4">
             {/* Modo de importação */}
             <div>
@@ -358,27 +583,29 @@ export default function ProRataPage() {
                       : 'border-gray-200 text-gray-600 hover:border-gray-300'
                   }`}
                 >
-                  <AlertTriangle className="w-4 h-4 inline mr-1" />
-                  Subscrever — Limpa e reimporta
+                  <RefreshCw className="w-4 h-4 inline mr-1" />
+                  Subscrever — Atualiza base
                 </button>
               </div>
               {importMode === 'subscrever' && (
-                <p className="text-xs text-orange-600 mt-1">⚠️ Todos os registros existentes serão apagados antes da importação.</p>
+                <p className="text-xs text-orange-600 mt-2 bg-orange-50 border border-orange-200 rounded p-2">
+                  ⚠️ A base atual será substituída. O sistema detectará automaticamente quais operações pararam de gerar ganho e registrará no relatório de Encerradas.
+                </p>
               )}
             </div>
 
             {/* Seleção de arquivo */}
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Arquivo Excel (.xlsx / .xls):</p>
+              <p className="text-sm font-medium text-gray-700 mb-1">Arquivo Excel (.xlsm / .xlsx / .xls):</p>
               <p className="text-xs text-gray-500 mb-2">
-                Colunas esperadas: <strong>AGENCIA BB, NRO OPERACAO, CHAVE J, VALOR FINANCIADO, COMISSÃO, DATA FINAL, QTD PARCELAS PGS, QTD PARCELAS TOTAL, COD OPS, COD EST</strong>
+                Colunas esperadas (linha 2 do arquivo): <strong>AGENCIA BB, NRO OPERACAO, CHAVEJ, VALORFINANCIADO, COMISSÃO, DATA FINAL, QTD PARCELAS PGS, QTD PARCELAS TOTAL, COD EST, Empresa</strong>
               </p>
               <input
                 ref={fileRef}
                 type="file"
-                accept=".xlsx,.xls"
+                accept=".xlsx,.xls,.xlsm"
                 onChange={handleFile}
-                className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                className="block w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer"
               />
             </div>
 
@@ -389,12 +616,11 @@ export default function ProRataPage() {
                   ✓ {importData.length} registros prontos para importar
                 </p>
                 <p className="text-xs text-green-600 mt-1">
-                  Exemplo: Op. {importData[0]?.nrOperacao} — ChaveJ {importData[0]?.chaveJ || '—'}
+                  Exemplo: Op. {importData[0]?.nrOperacao} — ChaveJ {importData[0]?.chaveJ || '—'} — Empresa {importData[0]?.empresa || '—'}
                 </p>
               </div>
             )}
           </div>
-
           <DialogFooter>
             <Button variant="outline" onClick={() => { setShowImport(false); setImportData([]); }}>
               Cancelar
@@ -402,7 +628,7 @@ export default function ProRataPage() {
             <Button
               onClick={handleImport}
               disabled={importData.length === 0 || importing}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-indigo-600 hover:bg-indigo-700"
             >
               {importing ? 'Importando...' : `Importar ${importData.length > 0 ? importData.length : ''} registros`}
             </Button>
@@ -420,7 +646,7 @@ export default function ProRataPage() {
             </DialogTitle>
           </DialogHeader>
           <p className="text-sm text-gray-600">
-            Tem certeza que deseja remover <strong>todos os {total} registros</strong> do Pró Rata? Esta ação não pode ser desfeita.
+            Tem certeza que deseja remover <strong>todos os {total} registros</strong> da base de Pró Rata? Esta ação não pode ser desfeita.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeleteAll(false)}>Cancelar</Button>

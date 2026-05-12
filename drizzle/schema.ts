@@ -778,10 +778,11 @@ export const proRata = mysqlTable("pro_rata", {
   dataFinal: varchar("dataFinal", { length: 10 }),              // DD/MM/AAAA
   qtdParcelasPagas: int("qtdParcelasPagas"),
   qtdParcelasTotal: int("qtdParcelasTotal"),
-  codOps: varchar("codOps", { length: 20 }),
   codEst: varchar("codEst", { length: 20 }),
-  // Coluna calculada (armazenada para facilitar filtros)
+  empresa: varchar("empresa", { length: 100 }),
+  // Colunas calculadas (armazenadas para facilitar filtros e totais)
   qtdFaltaReceber: int("qtdFaltaReceber"),
+  vlr: decimal("vlr", { precision: 15, scale: 4 }),  // comissao * qtdFaltaReceber
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
@@ -790,3 +791,26 @@ export const proRata = mysqlTable("pro_rata", {
 }));
 export type ProRata = typeof proRata.$inferSelect;
 export type InsertProRata = typeof proRata.$inferInsert;
+
+// Tabela de operações encerradas (detectadas ao importar nova planilha)
+export const proRataEncerradas = mysqlTable("pro_rata_encerradas", {
+  id: int("id").autoincrement().primaryKey(),
+  importacaoId: varchar("importacaoId", { length: 36 }).notNull(), // UUID da importação
+  importacaoData: timestamp("importacaoData").defaultNow().notNull(),
+  nrOperacao: varchar("nrOperacao", { length: 50 }).notNull(),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  agenciaBB: varchar("agenciaBB", { length: 20 }),
+  empresa: varchar("empresa", { length: 100 }),
+  valorFinanciado: decimal("valorFinanciado", { precision: 15, scale: 2 }),
+  comissao: decimal("comissao", { precision: 15, scale: 4 }),
+  dataFinal: varchar("dataFinal", { length: 10 }),
+  qtdParcelasPagas: int("qtdParcelasPagas"),
+  qtdParcelasTotal: int("qtdParcelasTotal"),
+  vlrPerdido: decimal("vlrPerdido", { precision: 15, scale: 4 }), // vlr que deixou de receber
+  motivo: varchar("motivo", { length: 50 }).default("encerrada"), // 'encerrada' | 'removida'
+}, (table) => ({
+  nrOperacaoIdx: index("idx_enc_nrOperacao").on(table.nrOperacao),
+  importacaoIdx: index("idx_enc_importacao").on(table.importacaoId),
+}));
+export type ProRataEncerrada = typeof proRataEncerradas.$inferSelect;
+export type InsertProRataEncerrada = typeof proRataEncerradas.$inferInsert;
