@@ -1,4 +1,4 @@
-import { eq, like, and, desc, isNotNull } from "drizzle-orm";
+import { eq, like, and, desc, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { agentes, certificacoes } from "../../drizzle/schema";
 import { protectedProcedure, router } from "../_core/trpc";
@@ -157,17 +157,19 @@ export const agentesRouter = router({
       return result.length > 0 ? result[0] : null;
     }),
 
-  // Obter agente por ChaveJ
+  // Obter agente por ChaveJ (case-insensitive)
   getByChaveJ: protectedProcedure
     .input(z.object({ chaveJ: z.string() }))
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
 
+      const chaveJUpper = input.chaveJ.toUpperCase().trim();
+      // Busca case-insensitive: compara UPPER(TRIM(chaveJ)) com o valor em maiúsculas
       const result = await db
         .select()
         .from(agentes)
-        .where(eq(agentes.chaveJ, input.chaveJ))
+        .where(sql`UPPER(TRIM(${agentes.chaveJ})) = ${chaveJUpper}`)
         .limit(1);
 
       return result.length > 0 ? result[0] : null;
