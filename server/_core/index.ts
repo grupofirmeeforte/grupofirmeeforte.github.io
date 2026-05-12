@@ -8,6 +8,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { gerarFeriadosAno } from "../routers/feriados";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -36,6 +37,18 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+
+  // Cron: renovar feriados automaticamente (chamado pelo Heartbeat em 1º dez)
+  app.post("/api/scheduled/renovar-feriados", async (req, res) => {
+    try {
+      const taskUid = req.headers["x-manus-cron-task-uid"] as string;
+      if (!taskUid) return res.status(403).json({ error: "cron-only" });
+      const result = await gerarFeriadosAno();
+      res.json({ ok: true, ...result });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message, timestamp: new Date().toISOString() });
+    }
+  });
   // tRPC API
   app.use(
     "/api/trpc",

@@ -741,3 +741,24 @@ export const febraban = mysqlTable("febraban", {
 
 export type Febraban = typeof febraban.$inferSelect;
 export type InsertFebraban = typeof febraban.$inferInsert;
+
+/**
+ * Tabela de Feriados
+ * Feriados nacionais e estaduais (Bahia)
+ */
+export const feriados = mysqlTable("feriados", {
+  id: int("id").autoincrement().primaryKey(),
+  data: varchar("data", { length: 10 }).notNull(),         // DD/MM/AAAA
+  nome: varchar("nome", { length: 255 }).notNull(),
+  tipo: varchar("tipo", { length: 20 }).notNull(),          // 'nacional' | 'estadual' | 'municipal'
+  estado: varchar("estado", { length: 2 }),                 // 'BA' para estadual, null para nacional
+  ano: int("ano").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  dataIdx: index("idx_feriados_data").on(table.data),
+  anoIdx: index("idx_feriados_ano").on(table.ano),
+  tipoIdx: index("idx_feriados_tipo").on(table.tipo),
+}));
+export type Feriado = typeof feriados.$inferSelect;
+export type InsertFeriado = typeof feriados.$inferInsert;

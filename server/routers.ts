@@ -9,6 +9,7 @@ import { febrabanRouter } from "./routers/febraban";
 import { pagamentosRouter } from "./routers/pagamentos";
 import { calculosRouter } from "./routers/calculos";
 import { despesasFixasRouter } from "./routers/despesasFixas";
+import { feriadosRouter } from "./routers/feriados";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
 import { users, agentes } from "../drizzle/schema";
@@ -219,6 +220,7 @@ export const appRouter = router({
   despesasFixas: despesasFixasRouter,
   auditoria: auditoriaRouter,
   febraban: febrabanRouter,
+  feriados: feriadosRouter,
   pagamentos: pagamentosRouter,
   calculosImportados: calculosRouter,
   sessoes: router({

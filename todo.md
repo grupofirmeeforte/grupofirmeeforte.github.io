@@ -343,3 +343,14 @@
 ## PAINEL RESUMO FEBRABAN (TOPO)
 - [x] Criar procedure tRPC resumo: totais por empresa (BMF/Flex) — líquido dia anterior, dia atual, contratado, pendente
 - [x] Adicionar painel de cards acima do cabeçalho da tabela Febraban com os totais
+
+## ABA AUDITORIA (NOVA)
+- [ ] Schema: tabela feriados (id, data, nome, tipo: nacional/estadual, estado)
+- [ ] Migration SQL aplicada via webdev_execute_sql
+- [ ] Procedure tRPC: listar logs de acesso com filtros (usuário, módulo, período)
+- [ ] Procedure tRPC: listar/adicionar/editar/remover feriados
+- [ ] Seed: popular tabela com feriados nacionais e da Bahia (2025 e 2026)
+- [ ] Página Auditoria: relatório de acessos com filtros e paginação
+- [ ] Página Auditoria: tabela de feriados nacionais e BA com CRUD
+- [ ] Adicionar aba Auditoria no menu principal (Home)
+- [ ] Adicionar rota /auditoria no App.tsx
