@@ -18,6 +18,7 @@ import Certificacoes from './pages/Certificacoes';
 import FebrabanPage from './pages/Febraban';
 import PagamentosPage from './pages/Pagamentos';
 import ExtratosPage from './pages/Extratos';
+import ProRataPage from './pages/ProRata';
 import DespesasFixasPage from './pages/DespesasFixas';
 
 // import ChangePasswordPage from "./pages/change-password";
@@ -58,6 +59,7 @@ function RouterWithInactivity() {
       <Route path={"/pagamentos"} component={PagamentosPage} />
       <Route path={"/fornecedores"} component={DespesasFixasPage} />
       <Route path={"/extratos"} component={ExtratosPage} />
+      <Route path={"/pro-rata"} component={ProRataPage} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />

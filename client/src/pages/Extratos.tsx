@@ -6,19 +6,20 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key, Calendar } from 'lucide-react';
+import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key, Calendar, TrendingUp } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 
 // ─── TIPOS DE SUBABAS ────────────────────────────────────────────────────────
-type Aba = 'consignado' | 'cc' | 'consorcio' | 'ourocap' | 'seguros' | 'bbdental';
+type Aba = 'consignado' | 'cc' | 'consorcio' | 'ourocap' | 'seguros' | 'bbdental' | 'perspectiva';
 
 const ABAS: { id: Aba; label: string; icon: React.ElementType; cor: string }[] = [
-  { id: 'consignado', label: 'Extrato Consignado',  icon: FileText,   cor: 'bg-blue-600'   },
-  { id: 'cc',         label: 'Extrato C/C',          icon: CreditCard, cor: 'bg-green-600'  },
-  { id: 'consorcio',  label: 'Extrato Consórcio',    icon: Users,      cor: 'bg-purple-600' },
-  { id: 'ourocap',    label: 'Extrato Ourocap',       icon: Star,       cor: 'bg-yellow-600' },
-  { id: 'seguros',    label: 'Extrato Seguros',       icon: Shield,     cor: 'bg-red-600'    },
-  { id: 'bbdental',   label: 'Extrato BB Dental',     icon: Smile,      cor: 'bg-teal-600'   },
+  { id: 'consignado',   label: 'Extrato Consignado',    icon: FileText,    cor: 'bg-blue-600'    },
+  { id: 'cc',           label: 'Extrato C/C',            icon: CreditCard,  cor: 'bg-green-600'   },
+  { id: 'consorcio',    label: 'Extrato Consórcio',      icon: Users,       cor: 'bg-purple-600'  },
+  { id: 'ourocap',      label: 'Extrato Ourocap',         icon: Star,        cor: 'bg-yellow-600'  },
+  { id: 'seguros',      label: 'Extrato Seguros',         icon: Shield,      cor: 'bg-red-600'     },
+  { id: 'bbdental',     label: 'Extrato BB Dental',       icon: Smile,       cor: 'bg-teal-600'    },
+  { id: 'perspectiva',  label: 'Perspectiva de Ganho',   icon: TrendingUp,  cor: 'bg-indigo-600'  },
 ];
 
 // ─── PAINEL DE IDENTIFICAÇÃO (topo de todas as abas) ─────────────────────────
@@ -169,6 +170,180 @@ function ExtratoConsignado() {
   );
 }
 
+// ─── PERSPECTIVA DE GANHO ────────────────────────────────────────────────────
+function PerspectivadeGanho() {
+  // Mês atual no formato mesano (ex: maio/2026 → 526)
+  const agora = new Date();
+  const mesAtual = agora.getMonth() + 1;
+  const anoAtual = agora.getFullYear() % 100;
+  const mesanoAtual = mesAtual * 100 + anoAtual;
+  const mesAtualStr = `${String(mesAtual).padStart(2, '0')}/${agora.getFullYear()}`;
+
+  const { data: meData } = trpc.auth.me.useQuery();
+  let chaveJLogado = '';
+  if (meData?.email && meData.email.includes('@')) {
+    chaveJLogado = meData.email.split('@')[0].toUpperCase();
+  }
+  const { data: agenteData } = trpc.agentes.getByChaveJ.useQuery(
+    { chaveJ: chaveJLogado },
+    { enabled: !!chaveJLogado }
+  );
+  const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
+
+  const { data, isLoading } = trpc.febraban.perspectiva.useQuery(
+    { chaveJ: chaveJLogado || undefined, mesano: mesanoAtual },
+    { enabled: !!chaveJLogado }
+  );
+
+  const rows = data?.rows ?? [];
+  const percentualAgente = data?.percentualAgente ?? null;
+
+  // Totais para o demonstrativo
+  const totalLiquido = useMemo(
+    () => rows.reduce((acc, r: any) => acc + parseFloat(String(r.troco ?? 0)), 0),
+    [rows]
+  );
+  const totalBruto = useMemo(
+    () => rows.reduce((acc, r: any) => acc + parseFloat(String(r.financiado ?? 0)), 0),
+    [rows]
+  );
+  const totalPerspectiva = useMemo(
+    () => rows.reduce((acc, r: any) => acc + (r.perspectivaComissao ?? 0), 0),
+    [rows]
+  );
+
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  // Mapeamento de código de linha para nome de produto
+  const nomeProduto = (linha: number | null) => {
+    if (!linha) return '—';
+    return String(linha);
+  };
+
+  return (
+    <div>
+      <PainelIdentificacao chaveJ={chaveJLogado} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
+
+      {/* ─── DEMONSTRATIVO RESUMIDO ─────────────────────────────────────── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <Card className="border-indigo-100 bg-indigo-50">
+          <CardContent className="py-4">
+            <p className="text-xs text-indigo-500 font-medium uppercase tracking-wide">Total Operações</p>
+            <p className="text-2xl font-bold text-indigo-900">{rows.length}</p>
+            <p className="text-xs text-indigo-400 mt-1">{mesAtualStr}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-blue-100 bg-blue-50">
+          <CardContent className="py-4">
+            <p className="text-xs text-blue-500 font-medium uppercase tracking-wide">Total Líquido</p>
+            <p className="text-xl font-bold text-blue-900">{fmt(totalLiquido)}</p>
+            <p className="text-xs text-blue-400 mt-1">Valor líquido contratado</p>
+          </CardContent>
+        </Card>
+        <Card className="border-green-100 bg-green-50">
+          <CardContent className="py-4">
+            <p className="text-xs text-green-500 font-medium uppercase tracking-wide">Total Bruto</p>
+            <p className="text-xl font-bold text-green-900">{fmt(totalBruto)}</p>
+            <p className="text-xs text-green-400 mt-1">Valor bruto financiado</p>
+          </CardContent>
+        </Card>
+        <Card className="border-amber-100 bg-amber-50">
+          <CardContent className="py-4">
+            <p className="text-xs text-amber-500 font-medium uppercase tracking-wide">Perspectiva Comissão</p>
+            <p className="text-xl font-bold text-amber-900">{fmt(totalPerspectiva)}</p>
+            <p className="text-xs text-amber-400 mt-1">
+              {percentualAgente != null ? `${percentualAgente.toFixed(2)}% sobre líquido` : 'Percentual não cadastrado'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ─── TABELA DETALHADA ────────────────────────────────────────────── */}
+      {isLoading ? (
+        <div className="text-center py-16 text-gray-400">Carregando...</div>
+      ) : rows.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
+            <TrendingUp className="w-12 h-12 text-gray-300" />
+            <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesAtualStr}</p>
+            <p className="text-gray-400 text-sm">Verifique se há produção Febraban importada para o mês atual.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50">
+                    <TableHead className="font-semibold text-gray-700">Operação</TableHead>
+                    <TableHead className="font-semibold text-gray-700">Produto</TableHead>
+                    <TableHead className="font-semibold text-gray-700">Situação</TableHead>
+                    <TableHead className="font-semibold text-gray-700">ChaveJ</TableHead>
+                    <TableHead className="font-semibold text-gray-700">Data</TableHead>
+                    <TableHead className="font-semibold text-gray-700">Prazo</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-right">Líquido</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-right">Bruto</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-right bg-amber-50">Perspectiva Comissão</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(rows as any[]).map((row: any) => (
+                    <TableRow key={row.id} className="hover:bg-gray-50">
+                      <TableCell className="font-mono text-sm font-medium text-gray-800">{row.proposta}</TableCell>
+                      <TableCell className="text-gray-700 text-sm">{nomeProduto(row.linha)}</TableCell>
+                      <TableCell>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          row.situacao === 'Contratada' ? 'bg-green-100 text-green-700' :
+                          row.situacao === 'Pendente'   ? 'bg-yellow-100 text-yellow-700' :
+                          row.situacao === 'Cancelada'  ? 'bg-red-100 text-red-700' :
+                          'bg-gray-100 text-gray-600'
+                        }`}>{row.situacao || '—'}</span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-xs font-mono">{row.operador || '—'}</Badge>
+                      </TableCell>
+                      <TableCell className="text-gray-700 text-sm">{row.solicitacao || '—'}</TableCell>
+                      <TableCell className="text-gray-700 text-sm">{row.prazo || '—'}</TableCell>
+                      <TableCell className="text-right font-semibold text-blue-700">
+                        {fmt(parseFloat(String(row.troco ?? 0)))}
+                      </TableCell>
+                      <TableCell className="text-right text-green-700">
+                        {fmt(parseFloat(String(row.financiado ?? 0)))}
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-amber-700 bg-amber-50">
+                        {row.perspectivaComissao != null ? fmt(row.perspectivaComissao) : '—'}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {/* Rodapé com totais */}
+            <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-gray-500">{rows.length} operação(ões) — {mesAtualStr}</span>
+              <div className="flex gap-6">
+                <div className="text-right">
+                  <p className="text-xs text-gray-400">Total Líquido</p>
+                  <p className="font-bold text-blue-700">{fmt(totalLiquido)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-400">Total Bruto</p>
+                  <p className="font-bold text-green-700">{fmt(totalBruto)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-400">Total Perspectiva</p>
+                  <p className="font-bold text-amber-700">{fmt(totalPerspectiva)}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 // ─── PLACEHOLDER PARA ABAS EM DESENVOLVIMENTO ────────────────────────────────
 function ConteudoAbaPlaceholder({ aba }: { aba: Aba }) {
   const info = ABAS.find(a => a.id === aba)!;
@@ -252,8 +427,9 @@ export default function ExtratosPage() {
 
       {/* Conteúdo da aba selecionada */}
       <div className="p-6">
-        {aba === 'consignado' && <ExtratoConsignado />}
-        {aba !== 'consignado' && <ConteudoAbaPlaceholder aba={aba} />}
+        {aba === 'consignado'  && <ExtratoConsignado />}
+        {aba === 'perspectiva' && <PerspectivadeGanho />}
+        {aba !== 'consignado' && aba !== 'perspectiva' && <ConteudoAbaPlaceholder aba={aba} />}
       </div>
     </div>
   );

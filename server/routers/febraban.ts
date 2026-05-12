@@ -449,6 +449,75 @@ export const febrabanRouter = {
       return { empresas: result, mesanoAtual: mesano };
     }),
 
+  // Perspectiva de Ganho: todos os registros do usuário logado com cálculo de comissão
+  perspectiva: protectedProcedure
+    .input(z.object({
+      chaveJ: z.string().optional(),
+      mesano: z.number().optional(),
+    }))
+    .query(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+      const { calculos } = await import('../../drizzle/schema');
+
+      // ChaveJ do usuário logado
+      let chaveJLogado: string | null = null;
+      if (ctx.user?.email && ctx.user.email.includes('@')) {
+        chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
+      }
+      const chaveJ = input.chaveJ ?? chaveJLogado;
+
+      const conditions: any[] = [];
+      if (chaveJ) conditions.push(like(febraban.operador, `%${chaveJ}%`));
+      if (input.mesano) conditions.push(eq(febraban.mesano, input.mesano));
+
+      const rows = await db
+        .select({
+          id: febraban.id,
+          proposta: febraban.proposta,
+          linha: febraban.linha,
+          situacao: febraban.situacao,
+          operador: febraban.operador,
+          solicitacao: febraban.solicitacao,
+          prazo: febraban.prazo,
+          troco: febraban.troco,
+          financiado: febraban.financiado,
+          empresa: febraban.empresa,
+          mesano: febraban.mesano,
+        })
+        .from(febraban)
+        .where(conditions.length ? and(...conditions) : undefined)
+        .orderBy(
+          sql`STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y') DESC`,
+          asc(febraban.proposta)
+        );
+
+      // Buscar percentual do agente na tabela calculos (último registro disponível)
+      let percentualAgente: number | null = null;
+      if (chaveJ) {
+        const calcRow = await db
+          .select({ percentual: calculos.percentual })
+          .from(calculos)
+          .where(like(calculos.chaveJ, `%${chaveJ}%`))
+          .orderBy(desc(calculos.mesRef))
+          .limit(1);
+        if (calcRow.length > 0 && calcRow[0].percentual != null) {
+          percentualAgente = parseFloat(String(calcRow[0].percentual));
+        }
+      }
+
+      // Calcular PerspectivaComissão = Líquido (troco) × percentual / 100
+      const result = rows.map(r => {
+        const liquido = r.troco != null ? parseFloat(String(r.troco)) : 0;
+        const perspectivaComissao = percentualAgente != null
+          ? (liquido * percentualAgente) / 100
+          : null;
+        return { ...r, percentualAgente, perspectivaComissao };
+      });
+
+      return { rows: result, chaveJ: chaveJ ?? '', percentualAgente };
+    }),
+
   // Retorna valores únicos para filtros
   filtros: protectedProcedure.query(async () => {
     const db = await getDb();

@@ -371,3 +371,20 @@
 - [x] Procedure extratoConsignado.listar corrigida (await getDb(), campos corretos)
 - [x] Botão Voltar com cor escura (bg-gray-900)
 - [ ] Demais 5 subabas de Extratos (C/C, Consórcio, Ourocap, Seguros, BB Dental) — aguardando colunas do usuário
+
+## FASE 30: PRÓ RATA (Financeiro)
+- [x] Tabela pro_rata criada no banco de dados
+- [x] Schema Drizzle atualizado com tabela proRata
+- [x] Router proRata.ts criado (list, count, importar, deletarTodos, deletar)
+- [x] Página ProRata.tsx criada com tabela completa e coluna "Qtd Falta Receber"
+- [x] Importação Excel (modo Novo e Subscrever)
+- [x] Rota /pro-rata registrada no App.tsx
+- [x] Pró Rata adicionado como submodulo no Financeiro (Home)
+
+## FASE 31: PERSPECTIVA DE GANHO (Extratos)
+- [x] Procedure febraban.perspectiva criada (filtra por ChaveJ + mês atual)
+- [x] Aba "Perspectiva de Ganho" adicionada em Extratos.tsx
+- [x] Demonstrativo resumido no topo (Total Operações, Líquido, Bruto, Perspectiva Comissão)
+- [x] Tabela com colunas: Operação, Produto, Situação, ChaveJ, Data, Prazo, Líquido, Bruto, Perspectiva Comissão
+- [x] Rodapé com totais
+- [x] Mês atual (não mês anterior) como referência

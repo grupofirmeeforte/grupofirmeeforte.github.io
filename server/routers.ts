@@ -7,6 +7,7 @@ import { auditoriaRouter } from "./routers/auditoria";
 import { certificacoesRouter } from "./routers/certificacoes";
 import { febrabanRouter } from "./routers/febraban";
 import { pagamentosRouter } from "./routers/pagamentos";
+import { proRataRouter } from "./routers/proRata";
 import { calculosRouter } from "./routers/calculos";
 import { despesasFixasRouter } from "./routers/despesasFixas";
 import { feriadosRouter } from "./routers/feriados";
@@ -222,6 +223,7 @@ export const appRouter = router({
   febraban: febrabanRouter,
   feriados: feriadosRouter,
   pagamentos: pagamentosRouter,
+  proRata: proRataRouter,
   calculosImportados: calculosRouter,
   sessoes: router({
     // Obter todas as sessões ativas

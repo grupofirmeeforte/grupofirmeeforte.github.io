@@ -763,3 +763,30 @@ export const feriados = mysqlTable("feriados", {
 }));
 export type Feriado = typeof feriados.$inferSelect;
 export type InsertFeriado = typeof feriados.$inferInsert;
+
+/**
+ * Tabela Pró Rata
+ * Operações de consignado com controle de parcelas pagas e a receber
+ */
+export const proRata = mysqlTable("pro_rata", {
+  id: int("id").autoincrement().primaryKey(),
+  agenciaBB: varchar("agenciaBB", { length: 20 }),
+  nrOperacao: varchar("nrOperacao", { length: 50 }).notNull(),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  valorFinanciado: decimal("valorFinanciado", { precision: 15, scale: 2 }),
+  comissao: decimal("comissao", { precision: 15, scale: 4 }),   // valor mensal da comissão
+  dataFinal: varchar("dataFinal", { length: 10 }),              // DD/MM/AAAA
+  qtdParcelasPagas: int("qtdParcelasPagas"),
+  qtdParcelasTotal: int("qtdParcelasTotal"),
+  codOps: varchar("codOps", { length: 20 }),
+  codEst: varchar("codEst", { length: 20 }),
+  // Coluna calculada (armazenada para facilitar filtros)
+  qtdFaltaReceber: int("qtdFaltaReceber"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  nrOperacaoIdx: index("idx_pro_rata_nrOperacao").on(table.nrOperacao),
+  chaveJIdx: index("idx_pro_rata_chaveJ").on(table.chaveJ),
+}));
+export type ProRata = typeof proRata.$inferSelect;
+export type InsertProRata = typeof proRata.$inferInsert;
