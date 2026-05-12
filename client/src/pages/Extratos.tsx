@@ -261,39 +261,40 @@ function PerspectivadeGanho() {
       </div>
 
       {/* ─── TABELA DETALHADA ────────────────────────────────────────────── */}
-      {isLoading ? (
-        <div className="text-center py-16 text-gray-400">Carregando...</div>
-      ) : rows.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-            <TrendingUp className="w-12 h-12 text-gray-300" />
-            <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesAtualStr}</p>
-            <p className="text-gray-400 text-sm">Verifique se há produção Febraban importada para o mês atual.</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gray-50">
-                    <TableHead className="font-semibold text-gray-700">Operação</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Produto</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Situação</TableHead>
-                    <TableHead className="font-semibold text-gray-700">ChaveJ</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Data</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Prazo</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-right">Líquido</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-right">Bruto</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-right bg-amber-50">Perspectiva Comissão</TableHead>
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Linha</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Situação</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Operador</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Solicitação</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Prazo</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-right">Troco</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-right">Financiado</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Tipo</TableHead>
+                  <TableHead className="font-semibold text-amber-600 uppercase text-xs tracking-wide text-right bg-amber-50">Comissão</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={10} className="text-center py-10 text-gray-400">Carregando...</TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {(rows as any[]).map((row: any) => (
+                ) : rows.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={10} className="text-center py-10 text-gray-400">
+                      Nenhuma operação encontrada para {mesAtualStr}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  (rows as any[]).map((row: any) => (
                     <TableRow key={row.id} className="hover:bg-gray-50">
                       <TableCell className="font-mono text-sm font-medium text-gray-800">{row.proposta}</TableCell>
-                      <TableCell className="text-gray-700 text-sm">{nomeProduto(row.linha)}</TableCell>
+                      <TableCell className="text-gray-700 text-sm">{row.linha ?? '—'}</TableCell>
                       <TableCell>
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                           row.situacao === 'Contratada' ? 'bg-green-100 text-green-700' :
@@ -302,9 +303,7 @@ function PerspectivadeGanho() {
                           'bg-gray-100 text-gray-600'
                         }`}>{row.situacao || '—'}</span>
                       </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-xs font-mono">{row.operador || '—'}</Badge>
-                      </TableCell>
+                      <TableCell className="font-mono text-sm text-gray-700">{row.operador || '—'}</TableCell>
                       <TableCell className="text-gray-700 text-sm">{row.solicitacao || '—'}</TableCell>
                       <TableCell className="text-gray-700 text-sm">{row.prazo || '—'}</TableCell>
                       <TableCell className="text-right font-semibold text-blue-700">
@@ -313,35 +312,36 @@ function PerspectivadeGanho() {
                       <TableCell className="text-right text-green-700">
                         {fmt(parseFloat(String(row.financiado ?? 0)))}
                       </TableCell>
+                      <TableCell className="text-gray-700 text-sm">{row.empresa || '—'}</TableCell>
                       <TableCell className="text-right font-bold text-amber-700 bg-amber-50">
                         {row.perspectivaComissao != null ? fmt(row.perspectivaComissao) : '—'}
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            {/* Rodapé com totais */}
-            <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-gray-500">{rows.length} operação(ões) — {mesAtualStr}</span>
-              <div className="flex gap-6">
-                <div className="text-right">
-                  <p className="text-xs text-gray-400">Total Líquido</p>
-                  <p className="font-bold text-blue-700">{fmt(totalLiquido)}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-400">Total Bruto</p>
-                  <p className="font-bold text-green-700">{fmt(totalBruto)}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-gray-400">Total Perspectiva</p>
-                  <p className="font-bold text-amber-700">{fmt(totalPerspectiva)}</p>
-                </div>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          {/* Rodapé com totais */}
+          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-500">{rows.length} operação(ões) — {mesAtualStr}</span>
+            <div className="flex gap-6">
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Total Troco</p>
+                <p className="font-bold text-blue-700">{fmt(totalLiquido)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Total Financiado</p>
+                <p className="font-bold text-green-700">{fmt(totalBruto)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Total Comissão</p>
+                <p className="font-bold text-amber-700">{fmt(totalPerspectiva)}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
