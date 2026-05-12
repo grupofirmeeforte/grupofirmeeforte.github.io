@@ -3,7 +3,7 @@ import { publicProcedure, router } from "../_core/trpc";
 import { getAuditLogs, createAuditLog, updateAuditLogSaida } from "../db";
 import { getDb } from "../db";
 import { auditoria } from "../../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export const auditoriaRouter = router({
   list: publicProcedure
@@ -27,7 +27,7 @@ export const auditoriaRouter = router({
       }
 
       return await query
-        .orderBy(auditoria.horarioEntrada)
+        .orderBy(desc(auditoria.horarioEntrada))
         .limit(input.limit)
         .offset(input.offset);
     }),
