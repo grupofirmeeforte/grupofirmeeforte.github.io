@@ -225,42 +225,7 @@ function PerspectivadeGanho() {
   return (
     <div>
       <PainelIdentificacao chaveJ={chaveJReal || chaveJExibicao} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
-
-      {/* ─── DEMONSTRATIVO RESUMIDO ─────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Card className="border-indigo-100 bg-indigo-50">
-          <CardContent className="py-4">
-            <p className="text-xs text-indigo-500 font-medium uppercase tracking-wide">Total Operações</p>
-            <p className="text-2xl font-bold text-indigo-900">{rows.length}</p>
-            <p className="text-xs text-indigo-400 mt-1">{mesAtualStr}</p>
-          </CardContent>
-        </Card>
-        <Card className="border-blue-100 bg-blue-50">
-          <CardContent className="py-4">
-            <p className="text-xs text-blue-500 font-medium uppercase tracking-wide">Total Líquido</p>
-            <p className="text-xl font-bold text-blue-900">{fmt(totalLiquido)}</p>
-            <p className="text-xs text-blue-400 mt-1">Valor líquido contratado</p>
-          </CardContent>
-        </Card>
-        <Card className="border-green-100 bg-green-50">
-          <CardContent className="py-4">
-            <p className="text-xs text-green-500 font-medium uppercase tracking-wide">Total Bruto</p>
-            <p className="text-xl font-bold text-green-900">{fmt(totalBruto)}</p>
-            <p className="text-xs text-green-400 mt-1">Valor bruto financiado</p>
-          </CardContent>
-        </Card>
-        <Card className="border-amber-100 bg-amber-50">
-          <CardContent className="py-4">
-            <p className="text-xs text-amber-500 font-medium uppercase tracking-wide">Perspectiva Comissão</p>
-            <p className="text-xl font-bold text-amber-900">{fmt(totalPerspectiva)}</p>
-            <p className="text-xs text-amber-400 mt-1">
-              {percentualAgente != null ? `${percentualAgente.toFixed(2)}% sobre líquido` : 'Percentual não cadastrado'}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* ─── TABELA DETALHADA ────────────────────────────────────────────── */}
+      {/* ─── TABELA DETALHADA──────────────────────────────────────── */}
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
