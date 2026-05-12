@@ -31,12 +31,17 @@ export const febrabanRouter = {
 
       const conditions: any[] = [];
       if (input.search) {
-        conditions.push(
-          or(
-            like(febraban.proposta, `%${input.search}%`),
-            like(febraban.operador, `%${input.search}%`),
-          )
-        );
+        // Se filtro de operador já está ativo, busca só em proposta para evitar conflito
+        if (input.operador && input.operador !== "__all__") {
+          conditions.push(like(febraban.proposta, `%${input.search}%`));
+        } else {
+          conditions.push(
+            or(
+              like(febraban.proposta, `%${input.search}%`),
+              like(febraban.operador, `%${input.search}%`),
+            )
+          );
+        }
       }
       if (input.empresa && input.empresa !== "__all__") {
         conditions.push(eq(febraban.empresa, input.empresa));
@@ -105,12 +110,16 @@ export const febrabanRouter = {
 
       const conditions: any[] = [];
       if (input.search) {
-        conditions.push(
-          or(
-            like(febraban.proposta, `%${input.search}%`),
-            like(febraban.operador, `%${input.search}%`),
-          )
-        );
+        if (input.operador && input.operador !== "__all__") {
+          conditions.push(like(febraban.proposta, `%${input.search}%`));
+        } else {
+          conditions.push(
+            or(
+              like(febraban.proposta, `%${input.search}%`),
+              like(febraban.operador, `%${input.search}%`),
+            )
+          );
+        }
       }
       if (input.empresa && input.empresa !== "__all__") {
         conditions.push(eq(febraban.empresa, input.empresa));
