@@ -514,6 +514,7 @@ export default function FebrabanPage() {
                   <div className="text-sm font-bold text-gray-800">
                     {emp.diaAnterior.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
                   </div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdDiaAnterior} op.</div>
                 </div>
                 {/* Dia atual */}
                 <div className="px-3 py-2 text-center">
@@ -522,6 +523,7 @@ export default function FebrabanPage() {
                   <div className="text-sm font-bold text-blue-700">
                     {emp.diaAtual.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
                   </div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdDiaAtual} op.</div>
                 </div>
                 {/* Líquido Contratado */}
                 <div className="px-3 py-2 text-center">
@@ -530,6 +532,7 @@ export default function FebrabanPage() {
                   <div className="text-sm font-bold text-green-700">
                     {emp.contratado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
                   </div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdContratado} op.</div>
                 </div>
                 {/* Líquido Pendente */}
                 <div className="px-3 py-2 text-center">
@@ -538,6 +541,7 @@ export default function FebrabanPage() {
                   <div className="text-sm font-bold text-orange-600">
                     {emp.pendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
                   </div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdPendente} op.</div>
                 </div>
                 {/* Líquido do Ano */}
                 <div className="px-3 py-2 text-center">
@@ -546,6 +550,7 @@ export default function FebrabanPage() {
                   <div className="text-sm font-bold text-purple-700">
                     {emp.ano.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
                   </div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdAno} op.</div>
                 </div>
               </div>
             </div>

@@ -380,27 +380,38 @@ export const febrabanRouter = {
         const baseWhere = sql`empresa = ${emp} AND mesano = ${mesano}`;
         const anoWhere = sql`empresa = ${emp} AND RIGHT(LPAD(CAST(mesano AS CHAR), 6, '0'), 2) = ${anoSuffix}`;
 
-        const [contratado, pendente, diaAtual, diaAnterior, ano] = await Promise.all([
+        const [contratado, pendente, diaAtual, diaAnterior, ano,
+               qtdContratado, qtdPendente, qtdDiaAtual, qtdDiaAnterior, qtdAno] = await Promise.all([
           // Líquido contratado (situacao = Contratada)
           db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
-            .from(febraban)
-            .where(sql`${baseWhere} AND situacao = 'Contratada'`),
+            .from(febraban).where(sql`${baseWhere} AND situacao = 'Contratada'`),
           // Líquido pendente (situacao = Pendente)
           db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
-            .from(febraban)
-            .where(sql`${baseWhere} AND situacao = 'Pendente'`),
-          // Líquido do dia atual (solicitacao = hoje, situacao = Contratada)
+            .from(febraban).where(sql`${baseWhere} AND situacao = 'Pendente'`),
+          // Líquido do dia atual
           db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
-            .from(febraban)
-            .where(sql`${baseWhere} AND solicitacao = ${hojeStr} AND situacao = 'Contratada'`),
-          // Líquido do dia anterior (solicitacao = ontem, situacao = Contratada)
+            .from(febraban).where(sql`${baseWhere} AND solicitacao = ${hojeStr} AND situacao = 'Contratada'`),
+          // Líquido do dia anterior
           db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
-            .from(febraban)
-            .where(sql`${baseWhere} AND solicitacao = ${ontemStr} AND situacao = 'Contratada'`),
-          // Líquido do ano (todos os meses do ano, situacao = Contratada)
+            .from(febraban).where(sql`${baseWhere} AND solicitacao = ${ontemStr} AND situacao = 'Contratada'`),
+          // Líquido do ano
           db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
-            .from(febraban)
-            .where(sql`${anoWhere} AND situacao = 'Contratada'`),
+            .from(febraban).where(sql`${anoWhere} AND situacao = 'Contratada'`),
+          // Contagem de operações contratadas
+          db.select({ cnt: sql<number>`COUNT(*)` })
+            .from(febraban).where(sql`${baseWhere} AND situacao = 'Contratada'`),
+          // Contagem de operações pendentes
+          db.select({ cnt: sql<number>`COUNT(*)` })
+            .from(febraban).where(sql`${baseWhere} AND situacao = 'Pendente'`),
+          // Contagem dia atual
+          db.select({ cnt: sql<number>`COUNT(*)` })
+            .from(febraban).where(sql`${baseWhere} AND solicitacao = ${hojeStr} AND situacao = 'Contratada'`),
+          // Contagem dia anterior
+          db.select({ cnt: sql<number>`COUNT(*)` })
+            .from(febraban).where(sql`${baseWhere} AND solicitacao = ${ontemStr} AND situacao = 'Contratada'`),
+          // Contagem do ano
+          db.select({ cnt: sql<number>`COUNT(*)` })
+            .from(febraban).where(sql`${anoWhere} AND situacao = 'Contratada'`),
         ]);
 
         result.push({
@@ -410,6 +421,11 @@ export const febrabanRouter = {
           diaAtual: Number(diaAtual[0]?.total ?? 0),
           diaAnterior: Number(diaAnterior[0]?.total ?? 0),
           ano: Number(ano[0]?.total ?? 0),
+          qtdContratado: Number(qtdContratado[0]?.cnt ?? 0),
+          qtdPendente: Number(qtdPendente[0]?.cnt ?? 0),
+          qtdDiaAtual: Number(qtdDiaAtual[0]?.cnt ?? 0),
+          qtdDiaAnterior: Number(qtdDiaAnterior[0]?.cnt ?? 0),
+          qtdAno: Number(qtdAno[0]?.cnt ?? 0),
           hojeStr,
           ontemStr,
           anoFull,
