@@ -179,19 +179,22 @@ function PerspectivadeGanho() {
   const mesAtualStr = `${String(mesAtual).padStart(2, '0')}/${anoAtual}`;
 
   const { data: meData } = trpc.auth.me.useQuery();
-  let chaveJLogado = '';
-  if (meData?.email && meData.email.includes('@')) {
-    chaveJLogado = meData.email.split('@')[0].toUpperCase();
-  }
-  const { data: agenteData } = trpc.agentes.getByChaveJ.useQuery(
-    { chaveJ: chaveJLogado },
-    { enabled: !!chaveJLogado }
+  const emailLogado = meData?.email ?? '';
+
+  // Busca o agente pelo email do usuário logado para obter o ChaveJ real (ex: J1234568)
+  const { data: agenteData } = trpc.agentes.getByEmail.useQuery(
+    { email: emailLogado },
+    { enabled: !!emailLogado }
   );
   const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
+  // ChaveJ real do agente (código do operador no Febraban)
+  const chaveJReal = (agenteData as any)?.chaveJ ?? '';
+  // ChaveJ para exibir no painel (parte do email antes do @, em maiúsculas)
+  const chaveJExibicao = emailLogado.includes('@') ? emailLogado.split('@')[0].toUpperCase() : '';
 
   const { data, isLoading } = trpc.febraban.perspectiva.useQuery(
-    { chaveJ: chaveJLogado || undefined, mes: mesAtual, ano: anoAtual },
-    { enabled: !!chaveJLogado }
+    { chaveJ: chaveJReal || undefined, mes: mesAtual, ano: anoAtual },
+    { enabled: !!emailLogado }
   );
 
   const rows = data?.rows ?? [];
@@ -221,7 +224,7 @@ function PerspectivadeGanho() {
 
   return (
     <div>
-      <PainelIdentificacao chaveJ={chaveJLogado} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
+      <PainelIdentificacao chaveJ={chaveJReal || chaveJExibicao} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
 
       {/* ─── DEMONSTRATIVO RESUMIDO ─────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">

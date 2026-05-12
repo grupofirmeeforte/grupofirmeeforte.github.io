@@ -157,6 +157,21 @@ export const agentesRouter = router({
       return result.length > 0 ? result[0] : null;
     }),
 
+  // Obter agente por email (case-insensitive)
+  getByEmail: protectedProcedure
+    .input(z.object({ email: z.string() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      const emailLower = input.email.toLowerCase().trim();
+      const result = await db
+        .select()
+        .from(agentes)
+        .where(sql`LOWER(TRIM(${agentes.email})) = ${emailLower}`)
+        .limit(1);
+      return result.length > 0 ? result[0] : null;
+    }),
+
   // Obter agente por ChaveJ (case-insensitive)
   getByChaveJ: protectedProcedure
     .input(z.object({ chaveJ: z.string() }))
