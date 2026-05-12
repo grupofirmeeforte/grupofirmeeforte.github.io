@@ -475,7 +475,9 @@ export const febrabanRouter = {
       const ano = input.ano ?? agora.getFullYear();
 
       const conditions: any[] = [];
-      if (chaveJ) conditions.push(like(febraban.operador, `%${chaveJ}%`));
+      // Filtrar por operador: usa o ChaveJ real do agente (código J, ex: J1234568)
+      // Match exato case-insensitive
+      if (chaveJ) conditions.push(sql`UPPER(TRIM(${febraban.operador})) = ${chaveJ.toUpperCase().trim()}`);
       // Filtrar por data de solicitação no mês/ano atual (campo DD/MM/AAAA)
       conditions.push(
         sql`MONTH(STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y')) = ${mes} AND YEAR(STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y')) = ${ano}`
@@ -508,7 +510,7 @@ export const febrabanRouter = {
         const calcRow = await db
           .select({ percentual: calculos.percentual })
           .from(calculos)
-          .where(like(calculos.chaveJ, `%${chaveJ}%`))
+          .where(sql`UPPER(TRIM(${calculos.chaveJ})) = ${chaveJ.toUpperCase().trim()}`)
           .orderBy(desc(calculos.mesRef))
           .limit(1);
         if (calcRow.length > 0 && calcRow[0].percentual != null) {

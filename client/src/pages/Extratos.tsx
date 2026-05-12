@@ -389,13 +389,17 @@ export default function ExtratosPage() {
   const abaInicial: Aba = ABAS.find(a => a.id === abaParam) ? abaParam! : 'consignado';
   const [aba, setAba] = useState<Aba>(abaInicial);
 
+  // Título dinâmico: principal sempre "Extratos", subtítulo mostra a subaba ativa
+  const abaInfo = ABAS.find(a => a.id === aba);
+  const subtituloPagina = abaInfo ? abaInfo.label : 'Extratos bancários e financeiros';
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Cabeçalho */}
       <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Extratos</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Extratos bancários e financeiros</p>
+          <p className="text-sm text-gray-500 mt-0.5">{subtituloPagina}</p>
         </div>
         <Button variant="default" className="bg-gray-900 hover:bg-gray-800" onClick={() => navigate('/')}>
           <ArrowLeft className="w-4 h-4 mr-2" />
