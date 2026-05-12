@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -105,6 +105,7 @@ export default function Home() {
         { title: 'Extrato Ourocap', description: 'Extrato de Ourocap', icon: FileText, color: 'bg-yellow-600', path: '/extratos?aba=ourocap' },
         { title: 'Extrato Seguros', description: 'Extrato de seguros', icon: FileText, color: 'bg-red-600', path: '/extratos?aba=seguros' },
         { title: 'Extrato BB Dental', description: 'Extrato BB Dental', icon: FileText, color: 'bg-teal-600', path: '/extratos?aba=bbdental' },
+        { title: 'Perspectiva de Ganho', description: 'Perspectiva de comissão do mês atual', icon: TrendingUp, color: 'bg-indigo-600', path: '/extratos?aba=perspectiva' },
       ],
     },
     {
