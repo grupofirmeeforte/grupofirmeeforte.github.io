@@ -1,0 +1,16 @@
+{
+  "query": "SELECT COUNT(*) as total_acima_10, MAX(comissao) as max_comissao, MIN(comissao) as min_comissao, AVG(comissao) as avg_comissao FROM pro_rata WHERE comissao > 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COUNT(*) as total_acima_10, MAX(comissao) as max_comissao, MIN(comissao) as min_comissao, AVG(comissao) as avg_comissao FROM pro_rata WHERE comissao > 10;",
+  "rows": [
+    {
+      "total_acima_10": "2842",
+      "max_comissao": "126.6300",
+      "min_comissao": "10.0200",
+      "avg_comissao": "19.83449683"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_acima_10\tmax_comissao\tmin_comissao\tavg_comissao\n2842\t126.6300\t10.0200\t19.83449683\n",
+  "stderr": "",
+  "execution_time_ms": 282
+}

@@ -134,11 +134,12 @@ export default function ProRataPage() {
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const wb = XLSX.read(ev.target?.result, { type: 'array', cellDates: true });
+        const wb = XLSX.read(ev.target?.result, { type: 'array', cellDates: false });
         // Usar a primeira aba (P1-Promotiva ou qualquer nome)
         const ws = wb.Sheets[wb.SheetNames[0]];
         // Linha 1 é resumo, linha 2 é cabeçalho, dados a partir da linha 3
-        const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: false });
+        // raw: true para preservar números reais (datas como serial, comissão como float)
+        const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
         if (json.length < 3) { toast.error('Arquivo vazio ou sem dados.'); return; }
 
         // Cabeçalho na linha 2 (índice 1)
@@ -153,13 +154,35 @@ export default function ProRataPage() {
         const toNum = (v: any): number | undefined => {
           if (v == null || v === '') return undefined;
           if (typeof v === 'number') return v;
-          const s = String(v).replace(/R\$\s*/g, '').replace(/\./g, '').replace(',', '.').trim();
+          // Suporte a formato brasileiro: "1.234,56" → 1234.56
+          const s = String(v).replace(/R\$\s*/g, '').trim();
+          // Se tem ponto E vírgula: formato BR (1.234,56)
+          if (s.includes(',') && s.includes('.')) {
+            const clean = s.replace(/\./g, '').replace(',', '.');
+            const n = parseFloat(clean);
+            return isNaN(n) ? undefined : n;
+          }
+          // Se só tem vírgula: formato BR simples (1234,56)
+          if (s.includes(',')) {
+            const clean = s.replace(',', '.');
+            const n = parseFloat(clean);
+            return isNaN(n) ? undefined : n;
+          }
           const n = parseFloat(s);
           return isNaN(n) ? undefined : n;
         };
 
         const toDate = (v: any): string | undefined => {
-          if (!v) return undefined;
+          if (v == null || v === '') return undefined;
+          // Se for número: serial do Excel (ex: 46143 = uma data)
+          if (typeof v === 'number') {
+            // Excel serial: dias desde 30/12/1899
+            const date = new Date(Math.round((v - 25569) * 86400 * 1000));
+            const dd = String(date.getUTCDate()).padStart(2, '0');
+            const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const yyyy = date.getUTCFullYear();
+            return `${dd}/${mm}/${yyyy}`;
+          }
           const s = String(v).trim();
           // Formato DD/MM/AAAA
           if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
@@ -167,6 +190,15 @@ export default function ProRataPage() {
           if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
             const [y, m, d] = s.split('T')[0].split('-');
             return `${d}/${m}/${y}`;
+          }
+          // String numérica (serial como texto)
+          if (/^\d{4,5}$/.test(s)) {
+            const serial = parseInt(s, 10);
+            const date = new Date(Math.round((serial - 25569) * 86400 * 1000));
+            const dd = String(date.getUTCDate()).padStart(2, '0');
+            const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const yyyy = date.getUTCFullYear();
+            return `${dd}/${mm}/${yyyy}`;
           }
           return s || undefined;
         };
@@ -191,11 +223,7 @@ export default function ProRataPage() {
           const empresaRaw = col(row, 'EMPRESA') ?? col(row, 'Empresa');
           const codEstRaw = col(row, 'COD EST') ?? col(row, 'CODEST');
 
-          // Normalizar comissão automaticamente:
-          // Se o valor lido for > 10, provavelmente está multiplicado por 100
-          // (ex: arquivo com 41 em vez de 0,41 → divide por 100 automaticamente)
-          let comissaoVal = toNum(comissaoRaw);
-          if (comissaoVal != null && comissaoVal > 10) comissaoVal = comissaoVal / 100;
+          const comissaoVal = toNum(comissaoRaw);
 
           registros.push({
             agenciaBB: col(row, 'AGENCIA BB') != null ? String(col(row, 'AGENCIA BB')).trim() : undefined,

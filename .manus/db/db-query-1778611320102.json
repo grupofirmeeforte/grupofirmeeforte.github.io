@@ -1,0 +1,45 @@
+{
+  "query": "SELECT nrOperacao, comissao, dataFinal, vlr, qtdFaltaReceber FROM pro_rata LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT nrOperacao, comissao, dataFinal, vlr, qtdFaltaReceber FROM pro_rata LIMIT 5;",
+  "rows": [
+    {
+      "nrOperacao": "135289021",
+      "comissao": "28.1800",
+      "dataFinal": "01/08/2030",
+      "vlr": "1465.3600",
+      "qtdFaltaReceber": "52"
+    },
+    {
+      "nrOperacao": "168060260",
+      "comissao": "0.3800",
+      "dataFinal": "01/11/2026",
+      "vlr": "2.6600",
+      "qtdFaltaReceber": "7"
+    },
+    {
+      "nrOperacao": "119994625",
+      "comissao": "22.3600",
+      "dataFinal": "01/12/2029",
+      "vlr": "983.8400",
+      "qtdFaltaReceber": "44"
+    },
+    {
+      "nrOperacao": "118254509",
+      "comissao": "1.7800",
+      "dataFinal": "01/11/2030",
+      "vlr": "97.9000",
+      "qtdFaltaReceber": "55"
+    },
+    {
+      "nrOperacao": "946279202",
+      "comissao": "9.0000",
+      "dataFinal": "01/08/2027",
+      "vlr": "144.0000",
+      "qtdFaltaReceber": "16"
+    }
+  ],
+  "messages": [],
+  "stdout": "nrOperacao\tcomissao\tdataFinal\tvlr\tqtdFaltaReceber\n135289021\t28.1800\t01/08/2030\t1465.3600\t52\n168060260\t0.3800\t01/11/2026\t2.6600\t7\n119994625\t22.3600\t01/12/2029\t983.8400\t44\n118254509\t1.7800\t01/11/2030\t97.9000\t55\n946279202\t9.0000\t01/08/2027\t144.0000\t16\n",
+  "stderr": "",
+  "execution_time_ms": 266
+}
