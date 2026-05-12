@@ -71,6 +71,8 @@ export const proRataRouter = router({
       if (!db) throw new Error("Database not available");
 
       const conditions = [];
+      // Totais somam apenas operações ativas (codEst = 1)
+      conditions.push(eq(proRata.codEst, '1'));
       if (input.chaveJ) conditions.push(like(proRata.chaveJ, `%${input.chaveJ}%`));
       if (input.search) {
         conditions.push(

@@ -1,0 +1,45 @@
+{
+  "query": "SELECT nrOperacao, valorFinanciado, comissao, qtdFaltaReceber, vlr FROM pro_rata LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT nrOperacao, valorFinanciado, comissao, qtdFaltaReceber, vlr FROM pro_rata LIMIT 5;",
+  "rows": [
+    {
+      "nrOperacao": "186418790",
+      "valorFinanciado": "130.00",
+      "comissao": "0.4100",
+      "qtdFaltaReceber": "81",
+      "vlr": "33.2100"
+    },
+    {
+      "nrOperacao": "151198856",
+      "valorFinanciado": "150.00",
+      "comissao": "2.1100",
+      "qtdFaltaReceber": "22",
+      "vlr": "46.4200"
+    },
+    {
+      "nrOperacao": "994065754",
+      "valorFinanciado": "150.00",
+      "comissao": "2.1100",
+      "qtdFaltaReceber": "61",
+      "vlr": "128.7100"
+    },
+    {
+      "nrOperacao": "159363134",
+      "valorFinanciado": "400.00",
+      "comissao": "2.3300",
+      "qtdFaltaReceber": "54",
+      "vlr": "125.8200"
+    },
+    {
+      "nrOperacao": "148036491",
+      "valorFinanciado": "1.00",
+      "comissao": "14.1100",
+      "qtdFaltaReceber": "61",
+      "vlr": "860.7100"
+    }
+  ],
+  "messages": [],
+  "stdout": "nrOperacao\tvalorFinanciado\tcomissao\tqtdFaltaReceber\tvlr\n186418790\t130.00\t0.4100\t81\t33.2100\n151198856\t150.00\t2.1100\t22\t46.4200\n994065754\t150.00\t2.1100\t61\t128.7100\n159363134\t400.00\t2.3300\t54\t125.8200\n148036491\t1.00\t14.1100\t61\t860.7100\n",
+  "stderr": "",
+  "execution_time_ms": 277
+}

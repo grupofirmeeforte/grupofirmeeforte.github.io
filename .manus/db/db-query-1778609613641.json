@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE pro_rata SET comissao = comissao / 100, vlr = vlr / 100;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute UPDATE pro_rata SET comissao = comissao / 100, vlr = vlr / 100;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 560
+}
