@@ -88,7 +88,12 @@ export const febrabanRouter = {
         })
         .from(febraban)
         .where(where)
-        .orderBy(desc(febraban.mesano), asc(febraban.empresa), asc(febraban.ordemExcel), desc(febraban.id))
+        .orderBy(
+          sql`STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y') DESC`,
+          asc(febraban.empresa),
+          asc(febraban.ordemExcel),
+          desc(febraban.id)
+        )
         .limit(input.limit)
         .offset(offset);
 
@@ -182,7 +187,12 @@ export const febrabanRouter = {
         })
         .from(febraban)
         .where(and(...conditions))
-        .orderBy(desc(febraban.mesano), asc(febraban.empresa), asc(febraban.ordemExcel), desc(febraban.id));
+        .orderBy(
+          sql`STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y') DESC`,
+          asc(febraban.empresa),
+          asc(febraban.ordemExcel),
+          desc(febraban.id)
+        );
 
       return rows;
     }),
@@ -223,7 +233,11 @@ export const febrabanRouter = {
         })
         .from(febraban)
         .where(and(...conditions))
-        .orderBy(desc(febraban.mesano), asc(febraban.empresa), desc(febraban.id));
+        .orderBy(
+          sql`STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y') DESC`,
+          asc(febraban.empresa),
+          desc(febraban.id)
+        );
 
       return rows;
     }),
