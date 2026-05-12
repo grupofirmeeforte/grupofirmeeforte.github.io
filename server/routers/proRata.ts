@@ -176,12 +176,8 @@ export const proRataRouter = router({
             let motivo: string | null = null;
             let vlrPerdido: number | null = null;
 
-            if (!nova) {
-              // Operação removida da nova planilha
-              motivo = "removida";
-              vlrPerdido = parseBrDecimal(atual.vlr);
-            } else {
-              // Operação presente mas falta chegou a 0
+            if (nova) {
+              // Só marca encerrada se a operação está na nova planilha com Falta = 0
               const novasPagas = nova.qtdParcelasPagas ?? null;
               const novasTotal = nova.qtdParcelasTotal ?? null;
               const novaFalta = calcFaltaReceber(novasPagas, novasTotal);
@@ -190,6 +186,7 @@ export const proRataRouter = router({
                 vlrPerdido = parseBrDecimal(atual.vlr);
               }
             }
+            // Operações removidas da planilha NÃO são marcadas como encerradas
 
             if (motivo) {
               encerradas.push({
