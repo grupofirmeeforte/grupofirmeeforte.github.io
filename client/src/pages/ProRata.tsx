@@ -191,12 +191,18 @@ export default function ProRataPage() {
           const empresaRaw = col(row, 'EMPRESA') ?? col(row, 'Empresa');
           const codEstRaw = col(row, 'COD EST') ?? col(row, 'CODEST');
 
+          // Normalizar comissão automaticamente:
+          // Se o valor lido for > 10, provavelmente está multiplicado por 100
+          // (ex: arquivo com 41 em vez de 0,41 → divide por 100 automaticamente)
+          let comissaoVal = toNum(comissaoRaw);
+          if (comissaoVal != null && comissaoVal > 10) comissaoVal = comissaoVal / 100;
+
           registros.push({
             agenciaBB: col(row, 'AGENCIA BB') != null ? String(col(row, 'AGENCIA BB')).trim() : undefined,
             nrOperacao: String(nrOperacaoRaw).trim().replace(/\.0$/, ''),
             chaveJ: col(row, 'CHAVEJ') != null ? String(col(row, 'CHAVEJ')).trim() : undefined,
             valorFinanciado: col(row, 'VALORFINANCIADO') != null ? String(toNum(col(row, 'VALORFINANCIADO')) ?? '') : undefined,
-            comissao: comissaoRaw != null ? String(toNum(comissaoRaw) ?? '') : undefined,
+            comissao: comissaoVal != null ? String(comissaoVal) : undefined,
             dataFinal: toDate(col(row, 'DATA FINAL') ?? col(row, 'DATAFINAL')),
             qtdParcelasPagas: qtdPagas != null ? Math.round(qtdPagas) : undefined,
             qtdParcelasTotal: qtdTotal != null ? Math.round(qtdTotal) : undefined,

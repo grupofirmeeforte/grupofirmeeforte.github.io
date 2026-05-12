@@ -1,0 +1,31 @@
+{
+  "query": "SELECT nrOperacao, valorFinanciado, comissao, qtdFaltaReceber, vlr FROM pro_rata WHERE nrOperacao IN ('135289021', '168060260', '119994625') LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT nrOperacao, valorFinanciado, comissao, qtdFaltaReceber, vlr FROM pro_rata WHERE nrOperacao IN ('135289021', '168060260', '119994625') LIMIT 5;",
+  "rows": [
+    {
+      "nrOperacao": "135289021",
+      "valorFinanciado": "18150.00",
+      "comissao": "28.1800",
+      "qtdFaltaReceber": "52",
+      "vlr": "1465.3600"
+    },
+    {
+      "nrOperacao": "168060260",
+      "valorFinanciado": "2000.00",
+      "comissao": "38.0000",
+      "qtdFaltaReceber": "7",
+      "vlr": "266.0000"
+    },
+    {
+      "nrOperacao": "119994625",
+      "valorFinanciado": "14400.00",
+      "comissao": "22.3600",
+      "qtdFaltaReceber": "44",
+      "vlr": "983.8400"
+    }
+  ],
+  "messages": [],
+  "stdout": "nrOperacao\tvalorFinanciado\tcomissao\tqtdFaltaReceber\tvlr\n135289021\t18150.00\t28.1800\t52\t1465.3600\n168060260\t2000.00\t38.0000\t7\t266.0000\n119994625\t14400.00\t22.3600\t44\t983.8400\n",
+  "stderr": "",
+  "execution_time_ms": 267
+}
