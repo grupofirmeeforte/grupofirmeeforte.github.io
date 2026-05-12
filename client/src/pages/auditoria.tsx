@@ -176,6 +176,16 @@ export default function AuditoriaPage() {
               </Button>
             </div>
           </div>
+          {/* Paginação topo logs */}
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-gray-500">Página {page + 1} de {Math.max(1, totalPages)}</p>
+            <div className="flex gap-1">
+              <Button onClick={() => setPage(0)} disabled={page === 0} variant="outline" size="sm"><ChevronFirst className="w-4 h-4" /></Button>
+              <Button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} variant="outline" size="sm"><ChevronLeft className="w-4 h-4" /></Button>
+              <Button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} variant="outline" size="sm"><ChevronRight className="w-4 h-4" /></Button>
+              <Button onClick={() => setPage(totalPages - 1)} disabled={page >= totalPages - 1} variant="outline" size="sm"><ChevronLast className="w-4 h-4" /></Button>
+            </div>
+          </div>
 
           <Card>
             <CardHeader><CardTitle className="text-base">Filtros</CardTitle></CardHeader>
@@ -265,6 +275,15 @@ export default function AuditoriaPage() {
               <Plus className="w-4 h-4" /> Novo Feriado
             </Button>
           </div>
+          {/* Paginação topo feriados (navegação por ano) */}
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-gray-500">Ano: {filtroAno}</p>
+            <div className="flex gap-1">
+              <Button onClick={() => setFiltroAno(a => a - 1)} variant="outline" size="sm"><ChevronLeft className="w-4 h-4" /></Button>
+              <span className="px-3 py-1 text-sm font-semibold border rounded-md bg-white">{filtroAno}</span>
+              <Button onClick={() => setFiltroAno(a => a + 1)} variant="outline" size="sm"><ChevronRight className="w-4 h-4" /></Button>
+            </div>
+          </div>
 
           <Card>
             <CardHeader><CardTitle className="text-base">Filtros</CardTitle></CardHeader>
@@ -291,6 +310,15 @@ export default function AuditoriaPage() {
             </CardContent>
           </Card>
 
+          {/* Paginação rodapé feriados */}
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-gray-500">Ano: {filtroAno}</p>
+            <div className="flex gap-1">
+              <Button onClick={() => setFiltroAno(a => a - 1)} variant="outline" size="sm"><ChevronLeft className="w-4 h-4" /></Button>
+              <span className="px-3 py-1 text-sm font-semibold border rounded-md bg-white">{filtroAno}</span>
+              <Button onClick={() => setFiltroAno(a => a + 1)} variant="outline" size="sm"><ChevronRight className="w-4 h-4" /></Button>
+            </div>
+          </div>
           <Card>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
