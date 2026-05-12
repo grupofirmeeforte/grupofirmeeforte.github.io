@@ -14,9 +14,29 @@ function calcFaltaReceber(pagas: number | null, total: number | null): number | 
 
 function parseBrDecimal(val: string | number | null | undefined): number | null {
   if (val == null) return null;
+  if (typeof val === 'number') return val;
   const s = String(val).trim();
   if (!s) return null;
-  const clean = s.replace(/R\$\s*/g, '').replace(/\./g, '').replace(',', '.').trim();
+  // Remover símbolo de moeda e espaços
+  const raw = s.replace(/R\$\s*/g, '').replace(/\s/g, '').trim();
+  let clean: string;
+  if (raw.includes(',')) {
+    // Formato BR: "1.234,56" ou "1234,56" — vírgula é decimal
+    clean = raw.replace(/\./g, '').replace(',', '.');
+  } else if (raw.includes('.')) {
+    // Sem vírgula, tem ponto: verificar se é decimal ou milhar
+    const parts = raw.split('.');
+    const lastPart = parts[parts.length - 1];
+    if (lastPart.length <= 2) {
+      // Ex: "9.99", "15139.67" — ponto é decimal
+      clean = raw;
+    } else {
+      // Ex: "1.513.967" — ponto é separador de milhar BR
+      clean = raw.replace(/\./g, '');
+    }
+  } else {
+    clean = raw;
+  }
   const n = parseFloat(clean);
   return isNaN(n) ? null : n;
 }

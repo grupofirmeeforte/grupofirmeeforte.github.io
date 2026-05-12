@@ -1,0 +1,9 @@
+{
+  "query": "SELECT nrOperacao, comissao, valorFinanciado, vlr, qtdFaltaReceber FROM pro_rata WHERE nrOperacao IN ('897822200','186418790','151198856') LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT nrOperacao, comissao, valorFinanciado, vlr, qtdFaltaReceber FROM pro_rata WHERE nrOperacao IN ('897822200','186418790','151198856') LIMIT 5;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 262
+}

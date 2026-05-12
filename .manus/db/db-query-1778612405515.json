@@ -1,0 +1,24 @@
+{
+  "query": "SELECT \n  COUNT(*) as total,\n  MIN(comissao) as min_com, MAX(comissao) as max_com, AVG(comissao) as avg_com,\n  MIN(valorFinanciado) as min_vf, MAX(valorFinanciado) as max_vf, AVG(valorFinanciado) as avg_vf\nFROM pro_rata;\nSELECT nrOperacao, comissao, valorFinanciado, vlr, qtdFaltaReceber FROM pro_rata WHERE nrOperacao IN ('897822200','186418790','151198856') LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT \n  COUNT(*) as total,\n  MIN(comissao) as min_com, MAX(comissao) as max_com, AVG(comissao) as avg_com,\n  MIN(valorFinanciado) as min_vf, MAX(valorFinanciado) as max_vf, AVG(valorFinanciado) as avg_vf\nFROM pro_rata;\nSELECT nrOperacao, comissao, valorFinanciado, vlr, qtdFaltaReceber FROM pro_rata WHERE nrOperacao IN ('897822200','186418790','151198856') LIMIT 5;",
+  "rows": [
+    {
+      "total": "16911",
+      "min_com": "1.0000",
+      "max_com": "12663.0000",
+      "avg_com": "563.58033233",
+      "min_vf": "10000.00",
+      "max_vf": "13200000.00",
+      "avg_vf": "688593.263320"
+    }
+  ],
+  "messages": [
+    "nrOperacao\tcomissao\tvalorFinanciado\tvlr\tqtdFaltaReceber",
+    "186418790\t41.0000\t130000.00\t3321.0000\t81",
+    "151198856\t211.0000\t150000.00\t4642.0000\t22",
+    "897822200\t999.0000\t1513967.00\t3996.0000\t4"
+  ],
+  "stdout": "total\tmin_com\tmax_com\tavg_com\tmin_vf\tmax_vf\tavg_vf\n16911\t1.0000\t12663.0000\t563.58033233\t10000.00\t13200000.00\t688593.263320\nnrOperacao\tcomissao\tvalorFinanciado\tvlr\tqtdFaltaReceber\n186418790\t41.0000\t130000.00\t3321.0000\t81\n151198856\t211.0000\t150000.00\t4642.0000\t22\n897822200\t999.0000\t1513967.00\t3996.0000\t4\n",
+  "stderr": "",
+  "execution_time_ms": 300
+}

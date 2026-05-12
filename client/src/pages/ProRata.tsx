@@ -153,21 +153,37 @@ export default function ProRataPage() {
 
         const toNum = (v: any): number | undefined => {
           if (v == null || v === '') return undefined;
+          // Número puro (raw:true retorna assim)
           if (typeof v === 'number') return v;
-          // Suporte a formato brasileiro: "1.234,56" → 1234.56
-          const s = String(v).replace(/R\$\s*/g, '').trim();
-          // Se tem ponto E vírgula: formato BR (1.234,56)
-          if (s.includes(',') && s.includes('.')) {
+          // Remover símbolo de moeda e espaços
+          const s = String(v).replace(/R\$\s*/g, '').replace(/\s/g, '').trim();
+          if (!s) return undefined;
+          // Formato BR com ponto de milhar e vírgula decimal: "1.234,56" ou "1.234.567,89"
+          if (s.includes(',')) {
+            // Tem vírgula = decimal BR
             const clean = s.replace(/\./g, '').replace(',', '.');
             const n = parseFloat(clean);
             return isNaN(n) ? undefined : n;
           }
-          // Se só tem vírgula: formato BR simples (1234,56)
-          if (s.includes(',')) {
-            const clean = s.replace(',', '.');
-            const n = parseFloat(clean);
-            return isNaN(n) ? undefined : n;
+          // Formato com ponto: pode ser decimal (9.99) ou milhar (1.234)
+          // Se o ponto está a menos de 3 casas do fim, é decimal: "9.99", "130,000.00"
+          if (s.includes('.')) {
+            const parts = s.split('.');
+            const lastPart = parts[parts.length - 1];
+            if (lastPart.length <= 2) {
+              // Última parte tem 1-2 dígitos: é decimal (ex: "9.99", "1,513,967.00")
+              // Remover vírgulas de milhar (formato en-US) e tratar ponto como decimal
+              const clean = s.replace(/,/g, '');
+              const n = parseFloat(clean);
+              return isNaN(n) ? undefined : n;
+            } else {
+              // Última parte tem 3+ dígitos: ponto é separador de milhar BR
+              const clean = s.replace(/\./g, '');
+              const n = parseFloat(clean);
+              return isNaN(n) ? undefined : n;
+            }
           }
+          // Sem ponto nem vírgula: número inteiro
           const n = parseFloat(s);
           return isNaN(n) ? undefined : n;
         };
@@ -224,12 +240,13 @@ export default function ProRataPage() {
           const codEstRaw = col(row, 'COD EST') ?? col(row, 'CODEST');
 
           const comissaoVal = toNum(comissaoRaw);
+          const vlrFinVal = toNum(col(row, 'VALORFINANCIADO'));
 
           registros.push({
             agenciaBB: col(row, 'AGENCIA BB') != null ? String(col(row, 'AGENCIA BB')).trim() : undefined,
             nrOperacao: String(nrOperacaoRaw).trim().replace(/\.0$/, ''),
             chaveJ: col(row, 'CHAVEJ') != null ? String(col(row, 'CHAVEJ')).trim() : undefined,
-            valorFinanciado: col(row, 'VALORFINANCIADO') != null ? String(toNum(col(row, 'VALORFINANCIADO')) ?? '') : undefined,
+            valorFinanciado: vlrFinVal != null ? String(vlrFinVal) : undefined,
             comissao: comissaoVal != null ? String(comissaoVal) : undefined,
             dataFinal: toDate(col(row, 'DATA FINAL') ?? col(row, 'DATAFINAL')),
             qtdParcelasPagas: qtdPagas != null ? Math.round(qtdPagas) : undefined,
