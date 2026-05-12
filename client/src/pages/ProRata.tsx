@@ -397,7 +397,7 @@ export default function ProRataPage() {
                               </TableCell>
                               <TableCell className="text-gray-700 text-sm">{row.empresa || '—'}</TableCell>
                               <TableCell className="text-right font-semibold text-blue-700">{fmt(row.valorFinanciado)}</TableCell>
-                              <TableCell className="text-right text-gray-700 text-sm">{fmtNum(row.comissao)}</TableCell>
+                              <TableCell className="text-right text-gray-700 text-sm">{fmt(row.comissao)}</TableCell>
                               <TableCell className="text-gray-700 text-sm">{row.dataFinal || '—'}</TableCell>
                               <TableCell className="text-center text-gray-700">{row.qtdParcelasPagas ?? '—'}</TableCell>
                               <TableCell className="text-center text-gray-700">{row.qtdParcelasTotal ?? '—'}</TableCell>
@@ -524,7 +524,7 @@ export default function ProRataPage() {
                             <TableCell className="text-gray-700 text-sm">{row.empresa || '—'}</TableCell>
                             <TableCell className="text-gray-700 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
                             <TableCell className="text-right text-blue-700 font-semibold">{fmt(row.valorFinanciado)}</TableCell>
-                            <TableCell className="text-right text-gray-700 text-sm">{fmtNum(row.comissao)}</TableCell>
+                            <TableCell className="text-right text-gray-700 text-sm">{fmt(row.comissao)}</TableCell>
                             <TableCell className="text-gray-700 text-sm">{row.dataFinal || '—'}</TableCell>
                             <TableCell className="text-center text-gray-700">{row.qtdParcelasPagas ?? '—'}</TableCell>
                             <TableCell className="text-center text-gray-700">{row.qtdParcelasTotal ?? '—'}</TableCell>
