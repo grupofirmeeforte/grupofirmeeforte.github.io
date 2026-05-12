@@ -375,7 +375,7 @@ export default function ProRataPage() {
             </div>
 
             {/* Cards de resumo */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <Card className="border-indigo-100 bg-indigo-50">
                 <CardContent className="py-4">
                   <p className="text-xs text-indigo-500 font-medium uppercase tracking-wide">Total Registros</p>
@@ -393,6 +393,15 @@ export default function ProRataPage() {
                   <p className="text-xs text-amber-500 font-medium uppercase tracking-wide">Total a Receber (VLR)</p>
                   <p className="text-xl font-bold text-amber-900">{fmt(totaisData?.totalVlr)}</p>
                   <p className="text-xs text-amber-400 mt-1">Comissão × Falta</p>
+                </CardContent>
+              </Card>
+              <Card className="border-purple-100 bg-purple-50">
+                <CardContent className="py-4">
+                  <p className="text-xs text-purple-500 font-medium uppercase tracking-wide">A Receber — Mês Anterior</p>
+                  <p className="text-xl font-bold text-purple-900">{fmt(totaisData?.totalMesAnterior ?? 0)}</p>
+                  <p className="text-xs text-purple-400 mt-1">
+                    {totaisData?.countMesAnterior ?? 0} op. vencendo em {totaisData?.mesAnteriorLabel ?? ''}
+                  </p>
                 </CardContent>
               </Card>
               <Card className="border-green-100 bg-green-50">

@@ -115,12 +115,32 @@ export const proRataRouter = router({
         .from(proRata)
         .where(where);
 
+      // Total a receber no mês anterior: operações com dataFinal no mês passado
+      const now = new Date();
+      const mesAnterior = now.getMonth() === 0 ? 12 : now.getMonth(); // getMonth() é 0-based, então mês anterior = getMonth()
+      const anoMesAnterior = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+      const mmAnterior = String(mesAnterior).padStart(2, '0');
+      const yyyyAnterior = String(anoMesAnterior);
+      // dataFinal está no formato DD/MM/AAAA
+      const mesAnteriorPattern = `%/${mmAnterior}/${yyyyAnterior}`;
+
+      const resultMesAnterior = await db
+        .select({
+          totalMesAnterior: sql<number>`COALESCE(SUM(vlr), 0)`,
+          countMesAnterior: sql<number>`COUNT(*)`,
+        })
+        .from(proRata)
+        .where(and(eq(proRata.codEst, '1'), sql`dataFinal LIKE ${mesAnteriorPattern}`));
+
       return {
         total: Number(result[0]?.total ?? 0),
         totalVlr: Number(result[0]?.totalVlr ?? 0),
         totalFinanciado: Number(result[0]?.totalFinanciado ?? 0),
         totalComissao: Number(result[0]?.totalComissao ?? 0),
         totalFalta: Number(result[0]?.totalFalta ?? 0),
+        totalMesAnterior: Number(resultMesAnterior[0]?.totalMesAnterior ?? 0),
+        countMesAnterior: Number(resultMesAnterior[0]?.countMesAnterior ?? 0),
+        mesAnteriorLabel: `${mmAnterior}/${yyyyAnterior}`,
       };
     }),
 
@@ -203,7 +223,10 @@ export const proRataRouter = router({
               const novaFalta = calcFaltaReceber(novasPagas, novasTotal);
               if (novaFalta === 0 && (atual.qtdFaltaReceber ?? 0) > 0) {
                 motivo = "encerrada";
-                vlrPerdido = parseBrDecimal(atual.vlr);
+                // Calcular vlrPerdido como comissao × parcelas que faltavam
+                const comissaoNum = parseBrDecimal(atual.comissao);
+                const faltava = atual.qtdFaltaReceber ?? 0;
+                vlrPerdido = (comissaoNum != null && faltava > 0) ? comissaoNum * faltava : null;
               }
             }
             // Operações removidas da planilha NÃO são marcadas como encerradas

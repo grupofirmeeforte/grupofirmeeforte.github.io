@@ -1,0 +1,70 @@
+{
+  "query": "-- Encerradas com vlrPerdido\nSELECT e.nrOperacao, e.comissao, e.vlrPerdido, e.qtdParcelasPagas, e.qtdParcelasTotal,\n       p.comissao as comissao_atual, p.vlr as vlr_atual, p.qtdFaltaReceber\nFROM pro_rata_encerradas e\nLEFT JOIN pro_rata p ON p.nrOperacao = e.nrOperacao\nLIMIT 6;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute -- Encerradas com vlrPerdido\nSELECT e.nrOperacao, e.comissao, e.vlrPerdido, e.qtdParcelasPagas, e.qtdParcelasTotal,\n       p.comissao as comissao_atual, p.vlr as vlr_atual, p.qtdFaltaReceber\nFROM pro_rata_encerradas e\nLEFT JOIN pro_rata p ON p.nrOperacao = e.nrOperacao\nLIMIT 6;",
+  "rows": [
+    {
+      "nrOperacao": "984080309",
+      "comissao": "0.0700",
+      "vlrPerdido": "11200.0000",
+      "qtdParcelasPagas": "45",
+      "qtdParcelasTotal": "61",
+      "comissao_atual": "0.0700",
+      "vlr_atual": "0.0000",
+      "qtdFaltaReceber": "0"
+    },
+    {
+      "nrOperacao": "938038171",
+      "comissao": "2.5800",
+      "vlrPerdido": "361200.0000",
+      "qtdParcelasPagas": "70",
+      "qtdParcelasTotal": "84",
+      "comissao_atual": "2.5800",
+      "vlr_atual": "0.0000",
+      "qtdFaltaReceber": "0"
+    },
+    {
+      "nrOperacao": "155880744",
+      "comissao": "2.8700",
+      "vlrPerdido": "1836800.0000",
+      "qtdParcelasPagas": "21",
+      "qtdParcelasTotal": "85",
+      "comissao_atual": "2.8700",
+      "vlr_atual": "0.0000",
+      "qtdFaltaReceber": "0"
+    },
+    {
+      "nrOperacao": "976702400",
+      "comissao": "2.5400",
+      "vlrPerdido": "787400.0000",
+      "qtdParcelasPagas": "51",
+      "qtdParcelasTotal": "82",
+      "comissao_atual": "2.5400",
+      "vlr_atual": "0.0000",
+      "qtdFaltaReceber": "0"
+    },
+    {
+      "nrOperacao": "966246750",
+      "comissao": "0.7900",
+      "vlrPerdido": "86900.0000",
+      "qtdParcelasPagas": "56",
+      "qtdParcelasTotal": "67",
+      "comissao_atual": "0.7900",
+      "vlr_atual": "0.0000",
+      "qtdFaltaReceber": "0"
+    },
+    {
+      "nrOperacao": "126430337",
+      "comissao": "1.0400",
+      "vlrPerdido": "384800.0000",
+      "qtdParcelasPagas": "35",
+      "qtdParcelasTotal": "72",
+      "comissao_atual": "1.0400",
+      "vlr_atual": "0.0000",
+      "qtdFaltaReceber": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "nrOperacao\tcomissao\tvlrPerdido\tqtdParcelasPagas\tqtdParcelasTotal\tcomissao_atual\tvlr_atual\tqtdFaltaReceber\n984080309\t0.0700\t11200.0000\t45\t61\t0.0700\t0.0000\t0\n938038171\t2.5800\t361200.0000\t70\t84\t2.5800\t0.0000\t0\n155880744\t2.8700\t1836800.0000\t21\t85\t2.8700\t0.0000\t0\n976702400\t2.5400\t787400.0000\t51\t82\t2.5400\t0.0000\t0\n966246750\t0.7900\t86900.0000\t56\t67\t0.7900\t0.0000\t0\n126430337\t1.0400\t384800.0000\t35\t72\t1.0400\t0.0000\t0\n",
+  "stderr": "",
+  "execution_time_ms": 268
+}
