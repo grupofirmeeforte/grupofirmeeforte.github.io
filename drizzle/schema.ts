@@ -752,6 +752,7 @@ export const feriados = mysqlTable("feriados", {
   nome: varchar("nome", { length: 255 }).notNull(),
   tipo: varchar("tipo", { length: 20 }).notNull(),          // 'nacional' | 'estadual' | 'municipal'
   estado: varchar("estado", { length: 2 }),                 // 'BA' para estadual, null para nacional
+  cidade: varchar("cidade", { length: 100 }),               // para feriados municipais
   ano: int("ano").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

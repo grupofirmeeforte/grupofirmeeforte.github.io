@@ -24,6 +24,7 @@ type Feriado = {
   nome: string;
   tipo: string;
   estado: string | null;
+  cidade: string | null;
   ano: number;
 };
 
@@ -57,7 +58,7 @@ export default function AuditoriaPage() {
   const [filtroTipo, setFiltroTipo] = useState('todos');
   const [modalAberto, setModalAberto] = useState(false);
   const [feriadoEditando, setFeriadoEditando] = useState<Feriado | null>(null);
-  const [form, setForm] = useState({ data: '', nome: '', tipo: 'nacional', estado: '', ano: new Date().getFullYear() });
+  const [form, setForm] = useState({ data: '', nome: '', tipo: 'nacional', estado: '', cidade: '', ano: new Date().getFullYear() });
 
   const utils = trpc.useUtils();
 
@@ -82,13 +83,13 @@ export default function AuditoriaPage() {
 
   const abrirCriar = () => {
     setFeriadoEditando(null);
-    setForm({ data: '', nome: '', tipo: 'nacional', estado: '', ano: filtroAno });
+    setForm({ data: '', nome: '', tipo: 'nacional', estado: '', cidade: '', ano: filtroAno });
     setModalAberto(true);
   };
 
   const abrirEditar = (f: Feriado) => {
     setFeriadoEditando(f);
-    setForm({ data: f.data, nome: f.nome, tipo: f.tipo, estado: f.estado ?? '', ano: f.ano });
+    setForm({ data: f.data, nome: f.nome, tipo: f.tipo, estado: f.estado ?? '', cidade: f.cidade ?? '', ano: f.ano });
     setModalAberto(true);
   };
 
@@ -98,6 +99,7 @@ export default function AuditoriaPage() {
       nome: form.nome,
       tipo: form.tipo as 'nacional' | 'estadual' | 'municipal',
       estado: form.estado || null,
+      cidade: form.cidade || null,
       ano: form.ano,
     };
     if (feriadoEditando) {
@@ -329,12 +331,13 @@ export default function AuditoriaPage() {
                       <TableHead>Nome do Feriado</TableHead>
                       <TableHead>Tipo</TableHead>
                       <TableHead>Estado</TableHead>
+                      <TableHead>Cidade</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {loadingFeriados ? (
-                      <TableRow><TableCell colSpan={5} className="text-center py-8 text-gray-400">Carregando...</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-400">Carregando...</TableCell></TableRow>
                     ) : feriadosList && feriadosList.length > 0 ? (
                       feriadosList.map((f: Feriado, idx: number) => (
                         <TableRow key={f.id} className={idx % 2 === 0 ? 'bg-blue-50/30' : ''}>
@@ -346,6 +349,7 @@ export default function AuditoriaPage() {
                             </span>
                           </TableCell>
                           <TableCell>{f.estado ?? '—'}</TableCell>
+                          <TableCell className="text-sm text-gray-600">{f.cidade ?? '—'}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex gap-1 justify-end">
                               <Button size="sm" variant="ghost" onClick={() => abrirEditar(f)} className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50">
@@ -359,7 +363,7 @@ export default function AuditoriaPage() {
                         </TableRow>
                       ))
                     ) : (
-                      <TableRow><TableCell colSpan={5} className="text-center py-8 text-gray-400">Nenhum feriado encontrado para {filtroAno}</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-400">Nenhum feriado encontrado para {filtroAno}</TableCell></TableRow>
                     )}
                   </TableBody>
                 </Table>
@@ -399,6 +403,12 @@ export default function AuditoriaPage() {
               <div className="space-y-1">
                 <Label>Estado (sigla)</Label>
                 <Input placeholder="ex: BA" maxLength={2} value={form.estado} onChange={(e) => setForm(f => ({ ...f, estado: e.target.value.toUpperCase() }))} />
+              </div>
+            )}
+            {form.tipo === 'municipal' && (
+              <div className="space-y-1">
+                <Label>Cidade</Label>
+                <Input placeholder="ex: SALVADOR" value={form.cidade} onChange={(e) => setForm(f => ({ ...f, cidade: e.target.value.toUpperCase() }))} />
               </div>
             )}
             <div className="space-y-1">

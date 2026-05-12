@@ -114,6 +114,7 @@ export const feriadosRouter = {
       nome: z.string(),
       tipo: z.enum(["nacional", "estadual", "municipal"]),
       estado: z.string().optional().nullable(),
+      cidade: z.string().optional().nullable(),
       ano: z.number(),
     }))
     .mutation(async ({ input }) => {
@@ -130,6 +131,7 @@ export const feriadosRouter = {
       nome: z.string().optional(),
       tipo: z.enum(["nacional", "estadual", "municipal"]).optional(),
       estado: z.string().optional().nullable(),
+      cidade: z.string().optional().nullable(),
       ano: z.number().optional(),
     }))
     .mutation(async ({ input }) => {
