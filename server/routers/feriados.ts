@@ -2,7 +2,7 @@ import { z } from "zod";
 import { protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { feriados } from "../../drizzle/schema";
-import { eq, and, desc, asc, sql } from "drizzle-orm";
+import { eq, and, desc, asc, sql, like } from "drizzle-orm";
 
 // Cálculo da Páscoa (algoritmo de Butcher)
 function calcularPascoa(ano: number): Date {
@@ -86,7 +86,9 @@ export const feriadosRouter = {
   list: protectedProcedure
     .input(z.object({
       ano: z.number().optional(),
-      tipo: z.string().optional(), // 'nacional' | 'estadual' | 'todos'
+      tipo: z.string().optional(), // 'nacional' | 'estadual' | 'municipal' | 'todos'
+      cidade: z.string().optional(), // filtro por cidade
+      mes: z.number().optional(), // filtro por mês (1-12)
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -94,6 +96,8 @@ export const feriadosRouter = {
       const conditions: any[] = [];
       if (input.ano) conditions.push(eq(feriados.ano, input.ano));
       if (input.tipo && input.tipo !== "todos") conditions.push(eq(feriados.tipo, input.tipo));
+      if (input.cidade && input.cidade !== "__all__") conditions.push(like(feriados.cidade, `%${input.cidade}%`));
+      if (input.mes) conditions.push(sql`MONTH(STR_TO_DATE(${feriados.data}, '%d/%m/%Y')) = ${input.mes}`);
       const where = conditions.length > 0 ? and(...conditions) : undefined;
       return await db.select().from(feriados)
         .where(where)

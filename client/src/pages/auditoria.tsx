@@ -66,6 +66,8 @@ export default function AuditoriaPage() {
   // ── FERIADOS ──
   const [filtroAno, setFiltroAno] = useState<number>(new Date().getFullYear());
   const [filtroTipo, setFiltroTipo] = useState('todos');
+  const [filtroCidade, setFiltroCidade] = useState('');
+  const [filtroMes, setFiltroMes] = useState<number>(0);
   const [modalAberto, setModalAberto] = useState(false);
   const [feriadoEditando, setFeriadoEditando] = useState<Feriado | null>(null);
   const [form, setForm] = useState({ data: '', nome: '', tipo: 'nacional', estado: '', cidade: '', ano: new Date().getFullYear() });
@@ -73,9 +75,12 @@ export default function AuditoriaPage() {
   const utils = trpc.useUtils();
 
   const { data: anos } = trpc.feriados.anos.useQuery();
+  const [cidadeInput, setCidadeInput] = useState('');
   const { data: feriadosList, isLoading: loadingFeriados } = trpc.feriados.list.useQuery({
     ano: filtroAno,
     tipo: filtroTipo !== 'todos' ? filtroTipo : undefined,
+    cidade: filtroCidade || undefined,
+    mes: filtroMes > 0 ? filtroMes : undefined,
   });
 
   const criarFeriado = trpc.feriados.create.useMutation({
@@ -318,6 +323,28 @@ export default function AuditoriaPage() {
                     <SelectItem value="municipal">Municipal</SelectItem>
                   </SelectContent>
                 </Select>
+                {/* Filtro por mês */}
+                <Select value={String(filtroMes)} onValueChange={v => setFiltroMes(Number(v))}>
+                  <SelectTrigger className="w-40"><SelectValue placeholder="Mês" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">Todos os meses</SelectItem>
+                    {['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'].map((m, i) => (
+                      <SelectItem key={i+1} value={String(i+1)}>{m}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {/* Filtro por cidade */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Buscar cidade..."
+                    value={cidadeInput}
+                    onChange={e => setCidadeInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && setFiltroCidade(cidadeInput)}
+                    className="w-44"
+                  />
+                  <Button size="sm" variant="outline" onClick={() => setFiltroCidade(cidadeInput)}>Buscar</Button>
+                  {filtroCidade && <Button size="sm" variant="ghost" onClick={() => { setFiltroCidade(''); setCidadeInput(''); }}>Limpar</Button>}
+                </div>
               </div>
             </CardContent>
           </Card>
