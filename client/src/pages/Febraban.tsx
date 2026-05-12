@@ -341,36 +341,78 @@ export default function FebrabanPage() {
           return String(v).trim() || undefined;
         };
 
+            // Detectar formato: novo (Operação/Produto/ChaveJ/Data/Liquido/Bruto) ou antigo (PROPOSTA/LINHA/OPERADOR/SOLICITACAO/TROCO/FINANCIADO)
+        const isNovoFormato = colMap[norm("OPERACAO")] !== undefined || colMap[norm("OPERAÇÃO")] !== undefined;
+
+        // Converte Mês/Ano (Date ou número) para MESANO numérico (ex: 04/2026 → 426)
+        const toMesano = (v: any): number | undefined => {
+          if (!v) return undefined;
+          if (v instanceof Date && !isNaN(v.getTime())) {
+            const mes = v.getMonth() + 1;
+            const ano = v.getFullYear() % 100; // últimos 2 dígitos
+            return mes * 100 + ano; // ex: 4*100+26 = 426
+          }
+          // string MM/AAAA
+          const s = String(v).trim();
+          const m = s.match(/^(\d{1,2})[/\-](\d{2,4})$/);
+          if (m) {
+            const mes = parseInt(m[1]);
+            const ano = parseInt(m[2]) % 100;
+            return mes * 100 + ano;
+          }
+          // número direto (ex: 426)
+          const n = parseInt(s);
+          return isNaN(n) ? undefined : n;
+        };
+
         const registros: any[] = [];
         for (let i = 1; i < json.length; i++) {
           const row = json[i];
           if (!row || row.every((c: any) => c === null || c === undefined || c === "")) continue;
 
-          const propostaRaw = col(row, "PROPOSTA");
+          let propostaRaw: any;
+          let financiado: number | undefined;
+          let troco: number | undefined;
+          let mesano: number | undefined;
+          let empresa: string | undefined;
+          let linha: number | undefined;
+          let situacao: string | undefined;
+          let operador: string | undefined;
+          let solicitacao: string | undefined;
+          let prazo: string | undefined;
+
+          if (isNovoFormato) {
+            // Novo formato: Empresa, Mês/Ano, Operação, Produto, Situação, ChaveJ, Data, Prazo, Liquido, Bruto
+            propostaRaw = col(row, "OPERACAO") ?? col(row, "OPERAÇÃO");
+            empresa   = col(row, "EMPRESA") ? String(col(row, "EMPRESA")).trim() : undefined;
+            mesano    = toMesano(col(row, "MES/ANO") ?? col(row, "MÊS/ANO") ?? col(row, "MES/ANO"));
+            linha     = col(row, "PRODUTO") ? (parseInt(String(col(row, "PRODUTO"))) || undefined) : undefined;
+            situacao  = (() => { const v = col(row, "SITUACAO") ?? col(row, "SITUAÇÃO"); return v != null && v !== "" ? String(v).trim() : undefined; })();
+            operador  = col(row, "CHAVEJ") ? String(col(row, "CHAVEJ")).trim() : undefined;
+            solicitacao = toDate(col(row, "DATA"));
+            prazo     = col(row, "PRAZO") ? String(col(row, "PRAZO")).trim() : undefined;
+            troco     = toNum(col(row, "LIQUIDO"));
+            financiado = toNum(col(row, "BRUTO"));
+          } else {
+            // Formato antigo: EMPRESA, MESANO, PROPOSTA, LINHA, SITUACAO, OPERADOR, SOLICITACAO, PRAZO, TROCO, FINANCIADO
+            propostaRaw = col(row, "PROPOSTA");
+            empresa   = col(row, "EMPRESA") ? String(col(row, "EMPRESA")).trim() : undefined;
+            const mesanoRaw = col(row, "MESANO");
+            mesano    = mesanoRaw !== undefined && mesanoRaw !== "" ? (parseInt(String(mesanoRaw)) || undefined) : undefined;
+            linha     = col(row, "LINHA") ? (parseInt(String(col(row, "LINHA"))) || undefined) : undefined;
+            situacao  = (() => { const v = col(row, "SITUACAO"); return v != null && v !== "" ? String(v).trim() : undefined; })();
+            operador  = col(row, "OPERADOR") ? String(col(row, "OPERADOR")).trim() : undefined;
+            solicitacao = toDate(col(row, "SOLICITACAO") ?? col(row, "SOLICITAÇÃO"));
+            prazo     = col(row, "PRAZO") ? String(col(row, "PRAZO")).trim() : undefined;
+            financiado = toNum(col(row, "FINANCIADO"));
+            const trocoRaw = toNum(col(row, "TROCO"));
+            troco = (!trocoRaw || trocoRaw === 0) ? financiado : trocoRaw;
+          }
+
           if (propostaRaw === undefined || propostaRaw === null || propostaRaw === "") continue;
           const proposta = String(typeof propostaRaw === "number" ? Math.round(propostaRaw) : propostaRaw).trim();
 
-          const financiado = toNum(col(row, "FINANCIADO"));
-          const trocoRaw   = toNum(col(row, "TROCO"));
-          // TROCO=0 → usar FINANCIADO como bruto
-          const troco = (!trocoRaw || trocoRaw === 0) ? financiado : trocoRaw;
-
-          const mesanoRaw = col(row, "MESANO");
-          const mesano = mesanoRaw !== undefined && mesanoRaw !== "" ? (parseInt(String(mesanoRaw)) || undefined) : undefined;
-
-          registros.push({
-            empresa:    col(row, "EMPRESA")  ? String(col(row, "EMPRESA")).trim()  : undefined,
-            mesano,
-            proposta,
-            linha:      col(row, "LINHA")    ? (parseInt(String(col(row, "LINHA"))) || undefined) : undefined,
-            situacao:   (() => { const v = col(row, "SITUACAO"); return v != null && v !== "" ? String(v).trim() : undefined; })(),
-            operador:   col(row, "OPERADOR") ? String(col(row, "OPERADOR")).trim() : undefined,
-            solicitacao: toDate(col(row, "SOLICITACAO") ?? col(row, "SOLICITAÇÃO")),
-            prazo:      col(row, "PRAZO")    ? String(col(row, "PRAZO")).trim()    : undefined,
-            troco,
-            financiado,
-            situacao2:  undefined,
-          });
+          registros.push({ empresa, mesano, proposta, linha, situacao, operador, solicitacao, prazo, troco, financiado, situacao2: undefined });
         }
 
         setImportData(registros);
@@ -765,6 +807,20 @@ export default function FebrabanPage() {
               </div>
             </div>
 
+            {/* Link para download do template */}
+            <div style={{ marginBottom: 12, padding: "10px 12px", background: "#f0f9ff", borderRadius: 8, border: "1px solid #bae6fd", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#0369a1" }}>Formato aceito</div>
+                <div style={{ fontSize: 11, color: "#0284c7", marginTop: 2 }}>Colunas: Empresa, Mês/Ano, Operação, Produto, Situação, ChaveJ, Data, Prazo, Liquido, Bruto</div>
+              </div>
+              <a
+                href="/manus-storage/template_febraban_bb_a26405ba.xlsx"
+                download="template_febraban_bb.xlsx"
+                style={{ fontSize: 12, fontWeight: 600, color: "#0369a1", textDecoration: "none", background: "#e0f2fe", padding: "6px 12px", borderRadius: 6, whiteSpace: "nowrap", border: "1px solid #7dd3fc" }}
+              >
+                ⬇ Baixar Template
+              </a>
+            </div>
             {/* File input nativo — sem nenhum wrapper que bloqueie */}
             <div style={{ marginBottom: 16 }}>
               <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 8 }}>Arquivo Excel (.xlsx)</p>
