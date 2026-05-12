@@ -126,11 +126,14 @@ export const proRataRouter = router({
 
       const resultMesAnterior = await db
         .select({
-          totalMesAnterior: sql<number>`COALESCE(SUM(vlr), 0)`,
+          totalMesAnterior: sql<number>`COALESCE(SUM(CAST(comissao AS DECIMAL(10,4))), 0)`,
           countMesAnterior: sql<number>`COUNT(*)`,
         })
         .from(proRata)
-        .where(and(eq(proRata.codEst, '1'), sql`dataFinal LIKE ${mesAnteriorPattern}`));
+        .where(and(
+          eq(proRata.codEst, '1'),
+          sql`dataFinal LIKE ${mesAnteriorPattern}`
+        ));
 
       return {
         total: Number(result[0]?.total ?? 0),

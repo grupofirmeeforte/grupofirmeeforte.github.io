@@ -400,7 +400,7 @@ export default function ProRataPage() {
                   <p className="text-xs text-purple-500 font-medium uppercase tracking-wide">A Receber — Mês Anterior</p>
                   <p className="text-xl font-bold text-purple-900">{fmt(totaisData?.totalMesAnterior ?? 0)}</p>
                   <p className="text-xs text-purple-400 mt-1">
-                    {totaisData?.countMesAnterior ?? 0} op. vencendo em {totaisData?.mesAnteriorLabel ?? ''}
+                    {totaisData?.countMesAnterior ?? 0} op. com Data Final em {totaisData?.mesAnteriorLabel ?? ''}
                   </p>
                 </CardContent>
               </Card>
@@ -509,6 +509,35 @@ export default function ProRataPage() {
                   </option>
                 ))}
               </select>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2 border-green-600 text-green-700 hover:bg-green-50"
+                onClick={() => {
+                  const rows = encerradasRows as any[];
+                  if (!rows.length) return;
+                  const ws = XLSX.utils.json_to_sheet(rows.map(r => ({
+                    'Data Importação': new Date(r.importacaoData).toLocaleString('pt-BR'),
+                    'Nº Operação': r.nrOperacao,
+                    'ChaveJ': r.chaveJ || '',
+                    'Empresa': r.empresa || '',
+                    'Agência BB': r.agenciaBB || '',
+                    'Vr. Financiado': parseFloat(r.valorFinanciado) || 0,
+                    'Comissão': parseFloat(r.comissao) || 0,
+                    'Data Final': r.dataFinal || '',
+                    'Pagas': r.qtdParcelasPagas ?? 0,
+                    'Total': r.qtdParcelasTotal ?? 0,
+                    'VLR Perdido': parseFloat(r.vlrPerdido) || 0,
+                    'Motivo': r.motivo === 'removida' ? 'Removida' : 'Encerrada',
+                  })));
+                  const wb = XLSX.utils.book_new();
+                  XLSX.utils.book_append_sheet(wb, ws, 'Encerradas');
+                  XLSX.writeFile(wb, `encerradas_${new Date().toISOString().slice(0,10)}.xlsx`);
+                }}
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                Exportar Excel
+              </Button>
             </div>
 
             {/* Cards de resumo encerradas */}
