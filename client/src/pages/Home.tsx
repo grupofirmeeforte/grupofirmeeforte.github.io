@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -163,6 +163,20 @@ export default function Home() {
       borderColor: 'border-amber-200',
       bgColor: 'from-amber-50 to-yellow-50',
       subModules: [],
+    },
+    {
+      type: 'group',
+      key: 'auditoria',
+      title: 'Auditoria',
+      description: 'Logs de acesso e feriados nacionais e estaduais',
+      icon: ClipboardList,
+      color: 'bg-slate-700',
+      borderColor: 'border-slate-200',
+      bgColor: 'from-slate-50 to-gray-50',
+      subModules: [
+        { title: 'Logs de Acesso', description: 'Histórico de acessos ao sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria' },
+        { title: 'Feriados', description: 'Feriados nacionais e estaduais BA', icon: ClipboardList, color: 'bg-slate-500', path: '/auditoria' },
+      ],
     },
   ];
 
