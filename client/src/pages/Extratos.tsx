@@ -172,12 +172,11 @@ function ExtratoConsignado() {
 
 // ─── PERSPECTIVA DE GANHO ────────────────────────────────────────────────────
 function PerspectivadeGanho() {
-  // Mês atual no formato mesano (ex: maio/2026 → 526)
+  // Mês atual
   const agora = new Date();
   const mesAtual = agora.getMonth() + 1;
-  const anoAtual = agora.getFullYear() % 100;
-  const mesanoAtual = mesAtual * 100 + anoAtual;
-  const mesAtualStr = `${String(mesAtual).padStart(2, '0')}/${agora.getFullYear()}`;
+  const anoAtual = agora.getFullYear();
+  const mesAtualStr = `${String(mesAtual).padStart(2, '0')}/${anoAtual}`;
 
   const { data: meData } = trpc.auth.me.useQuery();
   let chaveJLogado = '';
@@ -191,7 +190,7 @@ function PerspectivadeGanho() {
   const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
 
   const { data, isLoading } = trpc.febraban.perspectiva.useQuery(
-    { chaveJ: chaveJLogado || undefined, mesano: mesanoAtual },
+    { chaveJ: chaveJLogado || undefined, mes: mesAtual, ano: anoAtual },
     { enabled: !!chaveJLogado }
   );
 

@@ -449,11 +449,13 @@ export const febrabanRouter = {
       return { empresas: result, mesanoAtual: mesano };
     }),
 
-  // Perspectiva de Ganho: todos os registros do usuário logado com cálculo de comissão
+  // Perspectiva de Ganho: registros do usuário logado filtrados pela data do mês atual
   perspectiva: protectedProcedure
     .input(z.object({
       chaveJ: z.string().optional(),
-      mesano: z.number().optional(),
+      // mes e ano para filtro por data (padrão: mês atual)
+      mes: z.number().optional(),
+      ano: z.number().optional(),
     }))
     .query(async ({ input, ctx }) => {
       const db = await getDb();
@@ -467,9 +469,17 @@ export const febrabanRouter = {
       }
       const chaveJ = input.chaveJ ?? chaveJLogado;
 
+      // Mês e ano para filtro — padrão: mês atual
+      const agora = new Date();
+      const mes = input.mes ?? (agora.getMonth() + 1);
+      const ano = input.ano ?? agora.getFullYear();
+
       const conditions: any[] = [];
       if (chaveJ) conditions.push(like(febraban.operador, `%${chaveJ}%`));
-      if (input.mesano) conditions.push(eq(febraban.mesano, input.mesano));
+      // Filtrar por data de solicitação no mês/ano atual (campo DD/MM/AAAA)
+      conditions.push(
+        sql`MONTH(STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y')) = ${mes} AND YEAR(STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y')) = ${ano}`
+      );
 
       const rows = await db
         .select({
