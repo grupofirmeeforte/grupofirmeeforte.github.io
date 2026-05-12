@@ -1,8 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile } from 'lucide-react';
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key, Calendar } from 'lucide-react';
+import { trpc } from '@/lib/trpc';
 
 // ─── TIPOS DE SUBABAS ────────────────────────────────────────────────────────
 type Aba = 'consignado' | 'cc' | 'consorcio' | 'ourocap' | 'seguros' | 'bbdental';
@@ -16,20 +21,186 @@ const ABAS: { id: Aba; label: string; icon: React.ElementType; cor: string }[] =
   { id: 'bbdental',   label: 'Extrato BB Dental',     icon: Smile,      cor: 'bg-teal-600'   },
 ];
 
-// ─── COMPONENTE PLACEHOLDER POR ABA ─────────────────────────────────────────
-function ConteudoAba({ aba }: { aba: Aba }) {
+// ─── PAINEL DE IDENTIFICAÇÃO (topo de todas as abas) ─────────────────────────
+function PainelIdentificacao({ chaveJ, nomeAgente, mesRef }: {
+  chaveJ: string;
+  nomeAgente: string;
+  mesRef: string;
+}) {
+  return (
+    <div className="grid grid-cols-3 gap-4 mb-6">
+      <Card className="border-blue-100 bg-blue-50">
+        <CardContent className="flex items-center gap-3 py-4">
+          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+            <Key className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-xs text-blue-500 font-medium uppercase tracking-wide">ChaveJ</p>
+            <p className="text-lg font-bold text-blue-900">{chaveJ || '—'}</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-green-100 bg-green-50">
+        <CardContent className="flex items-center gap-3 py-4">
+          <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center">
+            <User className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-xs text-green-500 font-medium uppercase tracking-wide">Nome</p>
+            <p className="text-lg font-bold text-green-900 truncate max-w-[180px]">{nomeAgente || '—'}</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-orange-100 bg-orange-50">
+        <CardContent className="flex items-center gap-3 py-4">
+          <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
+            <Calendar className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-xs text-orange-500 font-medium uppercase tracking-wide">Mês de Referência</p>
+            <p className="text-lg font-bold text-orange-900">{mesRef || '—'}</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ─── EXTRATO CONSIGNADO ───────────────────────────────────────────────────────
+function ExtratoConsignado() {
+  const { data, isLoading } = trpc.extratoConsignado.listar.useQuery({});
+
+  const chaveJ = data?.chaveJ ?? '';
+  const mesRef = data?.mesRef ?? '';
+
+  // Busca nome do agente pelo chaveJ
+  const { data: agenteData } = trpc.agentes.getByChaveJ.useQuery(
+    { chaveJ },
+    { enabled: !!chaveJ }
+  );
+  const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
+
+  const rows = data?.rows ?? [];
+
+  const totalLiquido = useMemo(
+    () => (rows as any[]).reduce((acc: number, r: any) => acc + parseFloat(String(r.valorLiquido ?? 0)), 0),
+    [rows]
+  );
+  const totalComissao = useMemo(
+    () => (rows as any[]).reduce((acc: number, r: any) => acc + parseFloat(String(r.comissao ?? 0)), 0),
+    [rows]
+  );
+
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const fmtPct = (v: string | number | null) =>
+    v != null ? `${parseFloat(String(v)).toFixed(2)}%` : '—';
+
+  return (
+    <div>
+      <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+
+      {isLoading ? (
+        <div className="text-center py-16 text-gray-400">Carregando...</div>
+      ) : rows.length === 0 ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
+            <FileText className="w-12 h-12 text-gray-300" />
+            <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+            <p className="text-gray-400 text-sm">Verifique se há produção importada para o mês de referência.</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50">
+                    <TableHead className="font-semibold text-gray-700">Nome</TableHead>
+                    <TableHead className="font-semibold text-gray-700">Nº Operação</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-center">Parcelas</TableHead>
+                    <TableHead className="font-semibold text-gray-700">Convênio</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-right">Juros</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-right">Valor Líquido</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-right">Percentual</TableHead>
+                    <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(rows as any[]).map((row: any) => (
+                    <TableRow key={row.id} className="hover:bg-gray-50">
+                      <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
+                      <TableCell className="text-gray-700 font-mono text-sm">{row.nrOperacao || '—'}</TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="text-xs">
+                          {row.parcelas ?? '—'}x
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-gray-700 text-sm">{row.convenio || '—'}</TableCell>
+                      <TableCell className="text-right text-gray-700">{fmtPct(row.juros)}</TableCell>
+                      <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.valorLiquido ?? 0)))}</TableCell>
+                      <TableCell className="text-right text-gray-700">{fmtPct(row.percentual)}</TableCell>
+                      <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {/* Rodapé com totais */}
+            <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-gray-500">{rows.length} operação(ões)</span>
+              <div className="flex gap-6">
+                <div className="text-right">
+                  <p className="text-xs text-gray-400">Total Valor Líquido</p>
+                  <p className="font-bold text-blue-700">{fmt(totalLiquido)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-400">Total Comissão</p>
+                  <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// ─── PLACEHOLDER PARA ABAS EM DESENVOLVIMENTO ────────────────────────────────
+function ConteudoAbaPlaceholder({ aba }: { aba: Aba }) {
   const info = ABAS.find(a => a.id === aba)!;
   const Icon = info.icon;
+
+  // Mês de referência: mês anterior
+  const agora = new Date();
+  const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
+  const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
+  const mesRef = `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+
+  const { data: meData } = trpc.auth.me.useQuery();
+  let chaveJ = '';
+  if (meData?.email && meData.email.includes('@')) {
+    chaveJ = meData.email.split('@')[0].toUpperCase();
+  }
+  const { data: agenteData } = trpc.agentes.getByChaveJ.useQuery({ chaveJ }, { enabled: !!chaveJ });
+  const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
+
   return (
-    <Card>
-      <CardContent className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className={`w-16 h-16 rounded-2xl ${info.cor} flex items-center justify-center`}>
-          <Icon className="w-8 h-8 text-white" />
-        </div>
-        <h2 className="text-xl font-semibold text-gray-700">{info.label}</h2>
-        <p className="text-gray-400 text-sm">Módulo em desenvolvimento. Em breve disponível.</p>
-      </CardContent>
-    </Card>
+    <div>
+      <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-20 gap-4">
+          <div className={`w-16 h-16 rounded-2xl ${info.cor} flex items-center justify-center`}>
+            <Icon className="w-8 h-8 text-white" />
+          </div>
+          <h2 className="text-xl font-semibold text-gray-700">{info.label}</h2>
+          <p className="text-gray-400 text-sm">Módulo em desenvolvimento. Em breve disponível.</p>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
@@ -40,8 +211,6 @@ export default function ExtratosPage() {
   const abaParam = params.get('aba') as Aba | null;
   const abaInicial: Aba = ABAS.find(a => a.id === abaParam) ? abaParam! : 'consignado';
   const [aba, setAba] = useState<Aba>(abaInicial);
-
-  const abaAtual = ABAS.find(a => a.id === aba)!;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -83,7 +252,8 @@ export default function ExtratosPage() {
 
       {/* Conteúdo da aba selecionada */}
       <div className="p-6">
-        <ConteudoAba aba={aba} />
+        {aba === 'consignado' && <ExtratoConsignado />}
+        {aba !== 'consignado' && <ConteudoAbaPlaceholder aba={aba} />}
       </div>
     </div>
   );

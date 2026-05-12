@@ -354,3 +354,20 @@
 - [ ] Página Auditoria: tabela de feriados nacionais e BA com CRUD
 - [ ] Adicionar aba Auditoria no menu principal (Home)
 - [ ] Adicionar rota /auditoria no App.tsx
+
+## EXTRATO CONSIGNADO
+- [ ] Criar tabela extrato_consignado no banco (nome, nr_operacao, parcelas, convenio, juros, valor_liquido, percentual, comissao, chave_j, mes_ref)
+- [ ] Criar procedure tRPC para listar extrato consignado por chaveJ e mes_ref
+- [ ] Painel de identificacao no topo: ChaveJ (do log), Nome (do cadastro), Mes de referencia (mes anterior)
+- [ ] Tabela com colunas: Nome, Nr. Operacao, Parcelas, Convenio, Juros, Valor Liquido, Percentual, Comissao
+- [ ] Todas as 6 subabas de Extratos devem ter o painel de identificacao no topo
+
+## FASE 29: EXTRATO CONSIGNADO (IMPLEMENTADO)
+- [x] Página Extratos.tsx criada com 6 subabas (Consignado, C/C, Consórcio, Ourocap, Seguros, BB Dental)
+- [x] Painel de identificação no topo de todas as subabas: ChaveJ, Nome, Mês de Referência
+- [x] Extrato Consignado: busca dados da tabela consignados por chaveJ + mês anterior
+- [x] Tabela com 8 colunas: Nome, Nº Operação, Parcelas, Convênio, Juros, Valor Líquido, Percentual, Comissão
+- [x] Totais de Valor Líquido e Comissão no rodapé da tabela
+- [x] Procedure extratoConsignado.listar corrigida (await getDb(), campos corretos)
+- [x] Botão Voltar com cor escura (bg-gray-900)
+- [ ] Demais 5 subabas de Extratos (C/C, Consórcio, Ourocap, Seguros, BB Dental) — aguardando colunas do usuário

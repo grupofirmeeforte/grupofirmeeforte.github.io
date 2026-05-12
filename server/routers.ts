@@ -1,7 +1,7 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router, adminProcedure } from "./_core/trpc";
+import { publicProcedure, router, adminProcedure, protectedProcedure } from "./_core/trpc";
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { certificacoesRouter } from "./routers/certificacoes";
@@ -1176,5 +1176,66 @@ export const appRouter = router({
       }),
   }),
 
-});
+  // ─── EXTRATO CONSIGNADO ────────────────────────────────────────────────────
+  extratoConsignado: router({
+    // Lista operações do mês anterior para a ChaveJ do usuário logado
+    listar: protectedProcedure
+      .input(z.object({
+        chaveJ: z.string().optional(),
+        mesAno: z.string().optional(), // formato MM/AAAA
+      }))
+      .query(async ({ input, ctx }) => {
+        const { consignados } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new Error('Database connection not available');
+        const db = dbConn;
+        const { and, eq, like } = await import('drizzle-orm');
+
+        // Determinar mês de referência: mês anterior ao atual
+        const agora = new Date();
+        const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
+        const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
+        const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+        // Converter MM/AAAA para formato MM/AAAA usado no campo mes do consignado
+        const [mm, aaaa] = mesRef.split('/');
+        const mesFormatado = `${mm}/${aaaa}`;
+
+        // ChaveJ: extrai do email do usuário logado (formato chaveJ@dominio) ou usa a fornecida
+        let chaveJLogado: string | null = null;
+        if (ctx.user?.email && ctx.user.email.includes('@')) {
+          chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
+        }
+        const chaveJ = input.chaveJ ?? chaveJLogado;
+
+        const conditions = [];
+        if (chaveJ) conditions.push(like(consignados.chaveJ, `%${chaveJ}%`));
+        if (mesFormatado) conditions.push(eq(consignados.mes, mesFormatado));
+
+        const rows = await db
+          .select({
+            id: consignados.id,
+            nomeAgente: consignados.nomeAgente,
+            nrOperacao: consignados.nrOperacao,
+            parcelas: consignados.parcela,
+            convenio: consignados.convenio,
+            juros: consignados.juros,
+            valorLiquido: consignados.valorLiquido,
+            percentual: consignados.percentual,
+            comissao: consignados.comissao,
+            chaveJ: consignados.chaveJ,
+            mes: consignados.mes,
+            empresa: consignados.empresa,
+          })
+          .from(consignados)
+          .where(conditions.length ? and(...conditions) : undefined)
+          .orderBy(consignados.nomeAgente);
+
+        return {
+          rows,
+          mesRef: mesFormatado,
+          chaveJ: chaveJ ?? '',
+        };
+      }),
+  }),
+});;
 export type AppRouter = typeof appRouter;
