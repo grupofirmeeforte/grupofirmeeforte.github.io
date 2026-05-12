@@ -174,8 +174,8 @@ export default function Home() {
       borderColor: 'border-slate-200',
       bgColor: 'from-slate-50 to-gray-50',
       subModules: [
-        { title: 'Logs de Acesso', description: 'Histórico de acessos ao sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria' },
-        { title: 'Feriados', description: 'Feriados nacionais e estaduais BA', icon: ClipboardList, color: 'bg-slate-500', path: '/auditoria' },
+        { title: 'Logs de Acesso', description: 'Histórico de acessos ao sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria?aba=logs' },
+        { title: 'Feriados', description: 'Feriados nacionais e estaduais BA', icon: ClipboardList, color: 'bg-slate-500', path: '/auditoria?aba=feriados' },
       ],
     },
   ];

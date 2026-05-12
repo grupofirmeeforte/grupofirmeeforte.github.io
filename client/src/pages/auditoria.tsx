@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +31,17 @@ type Feriado = {
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 export default function AuditoriaPage() {
   const [, navigate] = useLocation();
-  const [aba, setAba] = useState<'logs' | 'feriados'>('logs');
+  const searchParams = new URLSearchParams(window.location.search);
+  const abaParam = searchParams.get('aba');
+  const [aba, setAba] = useState<'logs' | 'feriados'>(abaParam === 'feriados' ? 'feriados' : 'logs');
+
+  // Atualiza aba quando o parâmetro de URL muda
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const p = params.get('aba');
+    if (p === 'feriados') setAba('feriados');
+    else setAba('logs');
+  }, [window.location.search]);
 
   // ── LOGS ──
   const [filtroChaveJ, setFiltroChaveJ] = useState('');
