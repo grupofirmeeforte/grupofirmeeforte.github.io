@@ -132,7 +132,7 @@ export const proRataRouter = router({
         .from(proRata)
         .where(and(
           eq(proRata.codEst, '1'),
-          sql`dataFinal LIKE ${mesAnteriorPattern}`
+          sql`qtdFaltaReceber > 0`
         ));
 
       return {

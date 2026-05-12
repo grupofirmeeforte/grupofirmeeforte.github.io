@@ -400,7 +400,7 @@ export default function ProRataPage() {
                   <p className="text-xs text-purple-500 font-medium uppercase tracking-wide">A Receber — Mês Anterior</p>
                   <p className="text-xl font-bold text-purple-900">{fmt(totaisData?.totalMesAnterior ?? 0)}</p>
                   <p className="text-xs text-purple-400 mt-1">
-                    {totaisData?.countMesAnterior ?? 0} op. com Data Final em {totaisData?.mesAnteriorLabel ?? ''}
+                    {totaisData?.countMesAnterior ?? 0} operações ativas
                   </p>
                 </CardContent>
               </Card>
