@@ -391,8 +391,10 @@ export default function FebrabanPage() {
             operador  = col(row, "CHAVEJ") ? String(col(row, "CHAVEJ")).trim() : undefined;
             solicitacao = toDate(col(row, "DATA"));
             prazo     = col(row, "PRAZO") ? String(col(row, "PRAZO")).trim() : undefined;
-            troco     = toNum(col(row, "LIQUIDO"));
             financiado = toNum(col(row, "BRUTO"));
+            const liquidoRaw = toNum(col(row, "LIQUIDO"));
+            // Liquido=0 significa FINANC NOVO → troco = financiado (mesmo valor)
+            troco = (!liquidoRaw || liquidoRaw === 0) ? financiado : liquidoRaw;
           } else {
             // Formato antigo: EMPRESA, MESANO, PROPOSTA, LINHA, SITUACAO, OPERADOR, SOLICITACAO, PRAZO, TROCO, FINANCIADO
             propostaRaw = col(row, "PROPOSTA");
