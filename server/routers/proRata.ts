@@ -130,10 +130,7 @@ export const proRataRouter = router({
           countMesAnterior: sql<number>`COUNT(*)`,
         })
         .from(proRata)
-        .where(and(
-          eq(proRata.codEst, '1'),
-          sql`qtdFaltaReceber > 0`
-        ));
+        .where(eq(proRata.codEst, '1'));
 
       return {
         total: Number(result[0]?.total ?? 0),
