@@ -43,7 +43,66 @@ export const certificacoesRouter = router({
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) return [];
-      let rows = await db.select().from(certificacoes).orderBy(asc(certificacoes.empresa), asc(certificacoes.nomeAgente));
+
+      // Buscar todas as certificações existentes
+      const certRows = await db.select().from(certificacoes);
+      const certMap = new Map<string, typeof certRows[0]>();
+      for (const c of certRows) {
+        if (c.chaveJ) certMap.set(c.chaveJ.toUpperCase(), c);
+      }
+
+      // Buscar todos os agentes ativos
+      const agenteRows = await db.select({
+        chaveJ: agentes.chaveJ,
+        nomeAgente: agentes.nomeAgente,
+        empresa: agentes.empresa,
+        situacao: agentes.situacao,
+      }).from(agentes);
+
+      // Montar lista unificada: certificações existentes + agentes sem certificação
+      const certChaves = new Set(certRows.map(c => (c.chaveJ || '').toUpperCase()));
+      const agentesSemCert = agenteRows.filter(a => a.chaveJ && !certChaves.has(a.chaveJ.toUpperCase()));
+
+      // Criar registros sintéticos para agentes sem certificação
+      const sinteticos = agentesSemCert.map(a => ({
+        id: -1,
+        chaveJ: a.chaveJ,
+        nomeAgente: a.nomeAgente,
+        empresa: a.empresa,
+        situacao: a.situacao,
+        cpf: null,
+        dataCertif: null, ventoCertif: null, nrCertif: null,
+        dataCertif3: null, ventoCertif3: null, nrCertif3: null,
+        dataCertif2: null, ventoCertif2: null, nrCertif2: null,
+        dataCertif4: null, ventoCertif4: null, nrCertif4: null,
+        createdAt: null, updatedAt: null,
+      } as any));
+
+      let rows: any[] = [...certRows, ...sinteticos];
+
+      // Enriquecer certificações com dados do agente quando faltam
+      rows = rows.map(r => {
+        if (r.chaveJ && (!r.nomeAgente || !r.empresa)) {
+          const ag = agenteRows.find(a => (a.chaveJ || '').toUpperCase() === (r.chaveJ || '').toUpperCase());
+          if (ag) {
+            return {
+              ...r,
+              nomeAgente: r.nomeAgente || ag.nomeAgente,
+              empresa: r.empresa || ag.empresa,
+              situacao: r.situacao || ag.situacao,
+            };
+          }
+        }
+        return r;
+      });
+
+      // Ordenar por empresa e nome
+      rows.sort((a, b) => {
+        const ea = (a.empresa || '').localeCompare(b.empresa || '');
+        if (ea !== 0) return ea;
+        return (a.nomeAgente || '').localeCompare(b.nomeAgente || '');
+      });
+
       if (input?.busca) {
         const b = input.busca.toLowerCase();
         rows = rows.filter(r =>
@@ -53,6 +112,7 @@ export const certificacoesRouter = router({
           (r.empresa || '').toLowerCase().includes(b)
         );
       }
+
       // Calcular dias faltando e situação em tempo real
       return rows.map(r => {
         const dias1 = calcDiasFaltando(r.ventoCertif);
