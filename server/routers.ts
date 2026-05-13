@@ -1179,6 +1179,7 @@ export const appRouter = router({
   }),
 
   // ─── EXTRATO CONSIGNADO ────────────────────────────────────────────────────
+  // Helper interno: extrai chaveJ do agente logado via openId (formato: agente_<id>)
   extratoConsignado: router({
     // Lista operações do mês anterior para a ChaveJ do usuário logado
     listar: protectedProcedure
@@ -1202,10 +1203,13 @@ export const appRouter = router({
         const [mm, aaaa] = mesRef.split('/');
         const mesFormatado = `${mm}/${aaaa}`;
 
-        // ChaveJ: extrai do email do usuário logado (formato chaveJ@dominio) ou usa a fornecida
+        // ChaveJ: busca pelo openId do usuário logado (formato: agente_<id>)
         let chaveJLogado: string | null = null;
-        if (ctx.user?.email && ctx.user.email.includes('@')) {
-          chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
+        if (ctx.user?.openId?.startsWith('agente_')) {
+          const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+          const { agentes: agentesTable } = await import('../drizzle/schema');
+          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+          chaveJLogado = agenteRow?.chaveJ ?? null;
         }
         const chaveJ = input.chaveJ ?? chaveJLogado;
 
@@ -1256,8 +1260,11 @@ export const appRouter = router({
         const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
         const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
         let chaveJLogado: string | null = null;
-        if (ctx.user?.email && ctx.user.email.includes('@')) {
-          chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
+        if (ctx.user?.openId?.startsWith('agente_')) {
+          const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+          const { agentes: agentesTable } = await import('../drizzle/schema');
+          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+          chaveJLogado = agenteRow?.chaveJ ?? null;
         }
         const chaveJ = input.chaveJ ?? chaveJLogado;
         const conditions: any[] = [];
@@ -1289,8 +1296,11 @@ export const appRouter = router({
         const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
         const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
         let chaveJLogado: string | null = null;
-        if (ctx.user?.email && ctx.user.email.includes('@')) {
-          chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
+        if (ctx.user?.openId?.startsWith('agente_')) {
+          const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+          const { agentes: agentesTable } = await import('../drizzle/schema');
+          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+          chaveJLogado = agenteRow?.chaveJ ?? null;
         }
         const chaveJ = input.chaveJ ?? chaveJLogado;
         const conditions: any[] = [];
@@ -1322,8 +1332,11 @@ export const appRouter = router({
         const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
         const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
         let chaveJLogado: string | null = null;
-        if (ctx.user?.email && ctx.user.email.includes('@')) {
-          chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
+        if (ctx.user?.openId?.startsWith('agente_')) {
+          const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+          const { agentes: agentesTable } = await import('../drizzle/schema');
+          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+          chaveJLogado = agenteRow?.chaveJ ?? null;
         }
         const chaveJ = input.chaveJ ?? chaveJLogado;
         const conditions: any[] = [];
