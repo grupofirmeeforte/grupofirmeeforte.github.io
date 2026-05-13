@@ -570,28 +570,28 @@ function MinhaTabela() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-800">
-                    <TableHead className="text-white font-semibold text-xs uppercase">Convênio</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase">Tx Juros De</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase">Tx Juros Até</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase">Valor Mín.</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase">Meses De</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase text-blue-300">Meses Até</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3">Convênio</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3">Tx Juros De</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3">Tx Juros Até</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3">Valor Mín.</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3">Meses De</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase text-blue-300 py-2 px-3">Meses Até</TableHead>
                     {colunaExibida && (
-                      <TableHead className="text-amber-300 font-bold text-xs uppercase bg-amber-900">{labelAtivo(colunaExibida)}</TableHead>
+                      <TableHead className="text-amber-300 font-bold text-xs uppercase bg-amber-900 py-2 px-3">{labelAtivo(colunaExibida)}</TableHead>
                     )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {tabela.map((row: any) => (
                     <TableRow key={row.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium text-sm">{row.convenio ?? '—'}</TableCell>
-                      <TableCell className="text-sm">{row.txJurosDe ? fmtPct(row.txJurosDe) : '—'}</TableCell>
-                      <TableCell className="text-sm">{row.txJurosAte === 'acima' ? 'acima' : (row.txJurosAte ? fmtPct(row.txJurosAte) : '—')}</TableCell>
-                      <TableCell className="text-sm">{row.valorMinimo ?? '—'}</TableCell>
-                      <TableCell className="text-sm">{row.mesesDe ?? '—'}</TableCell>
-                      <TableCell className="text-blue-700 font-semibold text-sm">{row.mesesAte ?? '—'}</TableCell>
+                      <TableCell className="font-medium text-xs py-1 px-3">{row.convenio ?? '—'}</TableCell>
+                      <TableCell className="text-xs py-1 px-3">{row.txJurosDe ? fmtPct(row.txJurosDe) : '—'}</TableCell>
+                      <TableCell className="text-xs py-1 px-3">{row.txJurosAte === 'acima' ? 'acima' : (row.txJurosAte ? fmtPct(row.txJurosAte) : '—')}</TableCell>
+                      <TableCell className="text-xs py-1 px-3">{row.valorMinimo ?? '—'}</TableCell>
+                      <TableCell className="text-xs py-1 px-3">{row.mesesDe ?? '—'}</TableCell>
+                      <TableCell className="text-blue-700 font-semibold text-xs py-1 px-3">{row.mesesAte ?? '—'}</TableCell>
                       {colunaExibida && (
-                        <TableCell className="font-bold text-amber-700 bg-amber-50 text-sm">
+                        <TableCell className="font-bold text-amber-700 bg-amber-50 text-xs py-1 px-3">
                           {fmtPct(row[colunaExibida])}
                         </TableCell>
                       )}
