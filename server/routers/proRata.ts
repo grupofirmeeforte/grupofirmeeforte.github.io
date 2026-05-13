@@ -144,8 +144,8 @@ export const proRataRouter = router({
         totalFinanciado: Number(result[0]?.totalFinanciado ?? 0),
         totalComissao: Number(result[0]?.totalComissao ?? 0),
         totalFalta: Number(result[0]?.totalFalta ?? 0),
-        totalMesAnterior: Number((resultMesAnterior as any)[0]?.totalMesAnterior ?? 0),
-        countMesAnterior: Number((resultMesAnterior as any)[0]?.countMesAnterior ?? 0),
+        totalMesAnterior: Number((resultMesAnterior as any)[0]?.[0]?.totalMesAnterior ?? 0),
+        countMesAnterior: Number((resultMesAnterior as any)[0]?.[0]?.countMesAnterior ?? 0),
         mesAnteriorLabel: `${mmAnterior}/${yyyyAnterior}`,
       };
     }),
