@@ -16,6 +16,7 @@ type SubModule = {
   color: string;
   path: string;
   subKey?: string; // chave usada no mapa de permissões
+  ceoOnly?: boolean; // somente CEO pode ver
 };
 
 type GroupModule = {
@@ -34,7 +35,8 @@ export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const [, navigate] = useLocation();
   const [grupoAberto, setGrupoAberto] = useState<string | null>(null);
-  const { podeVer, isAdminOuCeo } = usePermissao();
+  const { podeVer, isAdminOuCeo, cargo } = usePermissao();
+  const isCEO = cargo === 'CEO';
 
   const handleLogout = async () => {
     await logout();
@@ -137,7 +139,7 @@ export default function Home() {
         { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/calculo', subKey: 'calculo' },
         { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos', subKey: 'pagamentos' },
         { title: 'Despesas Fixas', description: 'Controle de despesas fixas', icon: Building2, color: 'bg-purple-500', path: '/fornecedores', subKey: 'despesas' },
-        { title: 'Pró Rata', description: 'Operações com controle de parcelas pagas e a receber', icon: DollarSign, color: 'bg-indigo-600', path: '/pro-rata', subKey: 'pro-rata' },
+        { title: 'Pró Rata', description: 'Operações com controle de parcelas pagas e a receber', icon: DollarSign, color: 'bg-indigo-600', path: '/pro-rata', subKey: 'pro-rata', ceoOnly: true },
       ],
     },
     {
@@ -244,9 +246,10 @@ export default function Home() {
                     <CardContent>
                       <CardDescription className="text-sm">{grupo.description}</CardDescription>
                       {(() => {
-                          const visibleSubs = isAdminOuCeo
+                          const visibleSubs = (isAdminOuCeo
                             ? grupo.subModules
-                            : grupo.subModules.filter(m => !m.subKey || podeVer(grupo.key, m.subKey));
+                            : grupo.subModules.filter(m => !m.subKey || podeVer(grupo.key, m.subKey)))
+                            .filter(m => !m.ceoOnly || isCEO);
                           return visibleSubs.length > 0 ? (
                             <div className="flex flex-wrap gap-1 mt-3">
                               {visibleSubs.map(m => (
@@ -340,9 +343,10 @@ export default function Home() {
             </div>
 
             {(() => {
-              const visibleMods = isAdminOuCeo
+              const visibleMods = (isAdminOuCeo
                 ? grupoAtual.subModules
-                : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey));
+                : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
+                .filter(m => !m.ceoOnly || isCEO);
               return visibleMods.length === 0 ? (
               <div className="text-center py-12 text-slate-400">
                 <p className="text-lg font-medium">Em breve</p>

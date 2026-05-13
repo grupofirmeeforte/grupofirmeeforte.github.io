@@ -400,3 +400,8 @@
 - [x] Alterar opção "ADM" para "Admin" no campo Área do formulário de agentes
 - [x] Alterar opção "Vendas" para "Promotor" no campo Área do formulário de agentes
 - [x] Mover botão "Voltar" para junto dos botões de ação (Importar/Novo) na página Certificações
+
+## RESTRIÇÃO DE ACESSO - PRÓ RATA
+- [x] Sub-aba "Pró Rata" (dentro de Financeiro) visível e acessível somente para CEO
+- [x] Bloquear acesso na Home.tsx (não exibir o card para não-CEO)
+- [x] Bloquear acesso direto via URL na página ProRata.tsx (redirecionar se não for CEO)

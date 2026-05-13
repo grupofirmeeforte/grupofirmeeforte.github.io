@@ -1,5 +1,6 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useEffect } from 'react';
 import { useLocation } from 'wouter';
+import { useAuth } from '@/_core/hooks/useAuth';
 import * as XLSX from 'xlsx';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -52,6 +53,17 @@ function fmtDate(d: Date | string | null | undefined): string {
 // ─── COMPONENTE PRINCIPAL ────────────────────────────────────────────────────
 export default function ProRataPage() {
   const [, navigate] = useLocation();
+  const { user, loading: authLoading } = useAuth();
+  const cargo = (user as any)?.cargo ?? '';
+  const isCEO = cargo === 'CEO';
+
+  // Redirecionar para home se não for CEO
+  useEffect(() => {
+    if (!authLoading && !isCEO) {
+      navigate('/');
+    }
+  }, [authLoading, isCEO, navigate]);
+
   const [aba, setAba] = useState<'operacoes' | 'encerradas'>('operacoes');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
@@ -294,8 +306,21 @@ export default function ProRataPage() {
       </div>
     </div>
   );
+  // ─── RENDER ─────────────────────────────────────────────────────────────────────────────────
+  // Enquanto autenticação carrega, exibir spinner
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto mb-3"></div>
+          <p className="text-gray-500">Verificando acesso...</p>
+        </div>
+      </div>
+    );
+  }
+  // Se não for CEO, não renderizar nada (o useEffect já redireciona)
+  if (!isCEO) return null;
 
-  // ─── RENDER ───────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Cabeçalho */}
