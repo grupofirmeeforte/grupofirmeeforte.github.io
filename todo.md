@@ -395,3 +395,8 @@
 - [ ] Criar seção de permissões por sub-aba no formulário de cadastro/edição de agentes (visível apenas para admins)
 - [ ] Aplicar restrições de acesso no frontend por sub-aba conforme permissões do agente logado
 - [ ] Somente admins podem alterar permissões de outros agentes
+
+## AJUSTES DE NOMENCLATURA
+- [x] Alterar opção "ADM" para "Admin" no campo Área do formulário de agentes
+- [x] Alterar opção "Vendas" para "Promotor" no campo Área do formulário de agentes
+- [x] Mover botão "Voltar" para junto dos botões de ação (Importar/Novo) na página Certificações

@@ -380,9 +380,9 @@ export default function AgentesFormPage() {
                     <SelectValue placeholder="Selecione uma área" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ADM">ADM</SelectItem>
+                    <SelectItem value="Admin">Admin</SelectItem>
                     <SelectItem value="Comercial">Comercial</SelectItem>
-                    <SelectItem value="Vendas">Vendas</SelectItem>
+                    <SelectItem value="Promotor">Promotor</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
