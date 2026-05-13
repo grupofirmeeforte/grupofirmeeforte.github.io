@@ -10,9 +10,9 @@ import { toast } from "sonner";
 import * as XLSX from "xlsx";
 
 const TIPOS_PAGTO = [
-  "Agua", "Ajuda de Custo", "Aluguel", "Cancelado", "Comissão",
-  "DespesasLoja", "DespesasViagem", "Energia", "Internet",
-  "Outros", "Propaganda", "Reajuste", "Reembolso",
+  "Adto", "Agua", "Ajuda de Custo", "Aluguel", "Cancelado", "Comissão",
+  "DespesasLoja", "DespesasViagem", "Energia", "Ferias", "Internet",
+  "Outros", "Pagto", "Propaganda", "Reajuste", "Reembolso",
 ];
 
 const TIPOS_CONTA = ["Corrente", "Poupança", "Salário", "Pagamento"];
