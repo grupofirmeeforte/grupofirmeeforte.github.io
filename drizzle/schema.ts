@@ -175,7 +175,7 @@ export type InsertDespesaFixa = typeof despesasFixas.$inferInsert;
 export const tabelasComissao = mysqlTable("tabelasComissao", {
   id: int("id").autoincrement().primaryKey(),
   empresa: varchar("empresa", { length: 100 }),
-  codigo: varchar("codigo", { length: 4 }),
+  codigo: varchar("codigo", { length: 24 }),
   faixa1: varchar("faixa1", { length: 20 }),
   faixa2: varchar("faixa2", { length: 20 }),
   faixa3: varchar("faixa3", { length: 20 }),

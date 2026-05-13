@@ -417,7 +417,7 @@ export const appRouter = router({
     criar: publicProcedure
       .input(z.object({
         empresa: z.string().optional(),
-        codigo: z.string().max(4).optional(),
+        codigo: z.string().max(24).optional(),
         faixa1: z.string().optional(), faixa2: z.string().optional(),
         faixa3: z.string().optional(), faixa4: z.string().optional(), faixa5: z.string().optional(),
         tabelaCalculo: z.string().optional(), referencia: z.string().optional(),
@@ -437,12 +437,11 @@ export const appRouter = router({
         const { tabelasComissao } = await import('../drizzle/schema');
         return await db.insert(tabelasComissao).values(input);
       }),
-
     atualizar: publicProcedure
       .input(z.object({
         id: z.number(),
         empresa: z.string().optional(),
-        codigo: z.string().max(4).optional(),
+        codigo: z.string().max(24).optional(),
         faixa1: z.string().optional(), faixa2: z.string().optional(),
         faixa3: z.string().optional(), faixa4: z.string().optional(), faixa5: z.string().optional(),
         tabelaCalculo: z.string().optional(), referencia: z.string().optional(),

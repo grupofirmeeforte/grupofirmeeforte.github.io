@@ -643,8 +643,8 @@ export default function TabelaComissao() {
               <Input value={form.empresa || ''} onChange={e => setField('empresa', e.target.value)} placeholder="BMF, FLEX..." />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Código <span className="text-gray-400 text-xs">(4 dígitos)</span></label>
-              <Input value={form.codigo || ''} onChange={e => setField('codigo', e.target.value.slice(0,4))} placeholder="0001" maxLength={4} />
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Código <span className="text-gray-400 text-xs">(até 5 códigos separados por /)</span></label>
+              <Input value={form.codigo || ''} onChange={e => setField('codigo', e.target.value.slice(0,24))} placeholder="2880/2881/2882" maxLength={24} />
             </div>
             <div className="col-span-2">
               <label className="text-sm font-medium text-gray-700 mb-1 block">Convênio</label>
