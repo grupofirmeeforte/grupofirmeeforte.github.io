@@ -526,14 +526,14 @@ function MinhaTabela() {
   const tabela = (data?.tabela ?? []) as any[];
   const totalLiquido = data?.totalLiquidoSemSRCC ?? 0;
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  // Formata decimal (ex: 0.0195) como percentual legível (ex: 1,950%)
+  // Formata decimal (ex: 0.0195) como percentual legível no formato XX,XX% (2 casas decimais)
   const fmtPct = (v: string | null | undefined) => {
     if (!v) return '—';
     const normalized = String(v).replace(',', '.');
     const n = parseFloat(normalized);
     if (isNaN(n)) return String(v);
     const pctVal = n > 1 ? n : n * 100;
-    return pctVal.toFixed(3).replace('.', ',') + '%';
+    return pctVal.toFixed(2).replace('.', ',') + '%';
   };
   // Colunas de ativo que têm pelo menos um valor preenchido na tabela
   const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
