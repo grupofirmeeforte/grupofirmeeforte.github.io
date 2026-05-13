@@ -1274,6 +1274,78 @@ export const appRouter = router({
         };
       }),
   }),
+  minhaTabela: router({
+    // Retorna o total Liq. sem SRCC do mês atual + tabela de comissão + nível ativo do agente
+    obter: protectedProcedure.query(async ({ ctx }) => {
+      const dbConn = await getDb();
+      if (!dbConn) throw new Error('Database connection not available');
+      const db = dbConn;
+      const { consignados, tabelasComissao, valoresCalculo: valCalc } = await import('../drizzle/schema');
+      const { and, eq, like, sql } = await import('drizzle-orm');
+      // ChaveJ e empresa do agente logado
+      let chaveJLogado: string | null = null;
+      let empresaAgente: string | null = null;
+      if (ctx.user?.openId?.startsWith('agente_')) {
+        const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+        const { agentes: agentesTable } = await import('../drizzle/schema');
+        const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ, nomeAgente: agentesTable.nomeAgente, empresa: agentesTable.empresa }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+        chaveJLogado = agenteRow?.chaveJ ?? null;
+        empresaAgente = agenteRow?.empresa ?? null;
+      }
+      // Mês atual no formato do banco (ex: '526' para 05/2026)
+      const agora = new Date();
+      const mesAtual = agora.getMonth() + 1;
+      const anoAtual = agora.getFullYear();
+      const anoShort = String(anoAtual).slice(2);
+      const mesBanco = `${mesAtual}${anoShort}`;
+      const mesRef = `${String(mesAtual).padStart(2, '0')}/${anoAtual}`;
+      // Buscar todos os registros do agente no mês atual
+      let totalLiquidoSemSRCC = 0;
+      if (chaveJLogado) {
+        const rows = await db
+          .select({ valorLiquido: consignados.valorLiquido, restricaoSRCC: consignados.restricaoSRCC })
+          .from(consignados)
+          .where(and(like(consignados.chaveJ, `%${chaveJLogado}%`), eq(consignados.mes, mesBanco)));
+        const totalVL = rows.reduce((s, r) => s + (parseFloat(String(r.valorLiquido ?? '0')) || 0), 0);
+        const totalSRCC = rows
+          .filter(r => ['sim', 'SIM', 'Sim'].includes(String(r.restricaoSRCC ?? '')))
+          .reduce((s, r) => s + (parseFloat(String(r.valorLiquido ?? '0')) || 0), 0);
+        totalLiquidoSemSRCC = totalVL - totalSRCC;
+      }
+      // Buscar valores de meta dos ativos
+      const [valRow] = await db.select().from(valCalc).where(eq(valCalc.id, 1)).limit(1);
+      const metas: Record<string, number> = {};
+      if (valRow) {
+        for (let i = 1; i <= 10; i++) {
+          const key = `ativo${String(i).padStart(2, '0')}` as keyof typeof valRow;
+          metas[key] = parseFloat(String(valRow[key] ?? '0')) || 0;
+        }
+      }
+      // Determinar nível ativo: maior faixa que o agente atingiu
+      let nivelAtivo: string | null = null;
+      const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
+      for (let i = ativoKeys.length - 1; i >= 0; i--) {
+        const meta = metas[ativoKeys[i]] ?? 0;
+        if (meta > 0 && totalLiquidoSemSRCC >= meta) {
+          nivelAtivo = ativoKeys[i];
+          break;
+        }
+      }
+      // Buscar tabela de comissão filtrada pela empresa do agente
+      const tabela = empresaAgente
+        ? await db.select().from(tabelasComissao).where(eq(tabelasComissao.empresa, empresaAgente))
+        : await db.select().from(tabelasComissao);
+      return {
+        totalLiquidoSemSRCC,
+        nivelAtivo,
+        metas,
+        tabela,
+        mesRef,
+        chaveJ: chaveJLogado ?? '',
+        empresa: empresaAgente ?? '',
+      };
+    }),
+  }),
   extratoCC: router({
     listar: protectedProcedure
       .input(z.object({

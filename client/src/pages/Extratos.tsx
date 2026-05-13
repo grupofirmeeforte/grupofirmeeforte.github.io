@@ -514,6 +514,91 @@ function ConteudoAbaPlaceholder({ aba }: { aba: Aba }) {
   );
 }
 
+// ─── MINHA TABELA ───────────────────────────────────────────────────────────
+function MinhaTabela() {
+  const { data: meData } = trpc.auth.me.useQuery();
+  const chaveJ = (meData as any)?.chaveJ ?? '';
+  const nomeAgente = (meData as any)?.nomeAgente ?? '';
+  const agora = new Date();
+  const mesAtualStr = `${String(agora.getMonth() + 1).padStart(2, '0')}/${agora.getFullYear()}`;
+  const { data, isLoading } = trpc.minhaTabela.obter.useQuery();
+  const nivelAtivo = data?.nivelAtivo ?? null;
+  const tabela = (data?.tabela ?? []) as any[];
+  const totalLiquido = data?.totalLiquidoSemSRCC ?? 0;
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const fmtPct = (v: string | null) => v ? `${v}%` : '—';
+  // Colunas de ativo que têm pelo menos um valor preenchido na tabela
+  const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
+  const colunasComValor = ativoKeys.filter(k => tabela.some(r => r[k] != null && r[k] !== ''));
+  // Exibe apenas a coluna do nível ativo atingido
+  const colunaExibida = nivelAtivo && colunasComValor.includes(nivelAtivo) ? nivelAtivo : (colunasComValor[0] ?? null);
+  const labelAtivo = (k: string) => `Ativo ${parseInt(k.replace('ativo', ''), 10).toString().padStart(2, '0')}`;
+  return (
+    <div>
+      <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
+      <div className="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-6">
+        <div>
+          <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">Produção Líq. sem SRCC ({mesAtualStr})</p>
+          <p className="text-xl font-bold text-blue-800">{fmt(totalLiquido)}</p>
+        </div>
+        {nivelAtivo && (
+          <div>
+            <p className="text-xs text-green-600 font-semibold uppercase tracking-wide">Nível atingido</p>
+            <p className="text-xl font-bold text-green-700">{labelAtivo(nivelAtivo)}</p>
+          </div>
+        )}
+        {!nivelAtivo && !isLoading && (
+          <p className="text-sm text-gray-400">Nenhuma faixa de meta atingida ainda neste mês.</p>
+        )}
+      </div>
+      <Card>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <div className="flex items-center justify-center py-20 text-gray-400">Carregando...</div>
+          ) : tabela.length === 0 ? (
+            <div className="flex items-center justify-center py-20 text-gray-400">Nenhum registro encontrado para sua empresa.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-800">
+                    <TableHead className="text-white font-semibold text-xs uppercase">Convênio</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase">Tx Juros De</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase">Tx Juros Até</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase">Valor Mín.</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase">Meses De</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase">Meses Até</TableHead>
+                    {colunaExibida && (
+                      <TableHead className="text-amber-300 font-bold text-xs uppercase bg-amber-900">{labelAtivo(colunaExibida)}</TableHead>
+                    )}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tabela.map((row: any) => (
+                    <TableRow key={row.id} className="hover:bg-gray-50">
+                      <TableCell className="font-medium text-sm">{row.convenio ?? '—'}</TableCell>
+                      <TableCell className="text-sm">{row.faixa1 ? `${row.faixa1}%` : '—'}</TableCell>
+                      <TableCell className="text-sm">{row.faixa2 ? `${row.faixa2}%` : 'acima'}</TableCell>
+                      <TableCell className="text-sm">{row.faixa3 ? `>=${row.faixa3}` : '—'}</TableCell>
+                      <TableCell className="text-sm">{row.faixa4 ?? '—'}</TableCell>
+                      <TableCell className="text-blue-700 font-semibold text-sm">{row.faixa5 ?? '—'}</TableCell>
+                      {colunaExibida && (
+                        <TableCell className="font-bold text-amber-700 bg-amber-50 text-sm">
+                          {fmtPct(row[colunaExibida])}
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // ─── COMPONENTE PRINCIPAL ────────────────────────────────────────────────────
 export default function ExtratosPage() {
   const [, navigate] = useLocation();
@@ -571,7 +656,7 @@ export default function ExtratosPage() {
         {aba === 'consorcio'   && <ExtratoConsorcio />}
         {aba === 'ourocap'     && <ExtratoOurocap />}
         {aba === 'perspectiva' && <PerspectivadeGanho />}
-        {aba === 'minha-tabela' && <ConteudoAbaPlaceholder aba={aba} />}
+        {aba === 'minha-tabela' && <MinhaTabela />}
         {aba !== 'consignado' && aba !== 'cc' && aba !== 'consorcio' && aba !== 'ourocap' && aba !== 'perspectiva' && aba !== 'minha-tabela' && <ConteudoAbaPlaceholder aba={aba} />}
       </div>
     </div>

@@ -418,3 +418,10 @@
 - [ ] Permitir edição inline do campo Código na tabela
 - [ ] Incluir campo Código no formulário de criação de novo registro
 - [ ] Usar campo Código como referência para cálculos de comissão futuros
+
+## MINHA TABELA - LÓGICA DE FAIXAS DE META
+- [ ] Criar procedure no servidor para buscar total Líquido sem SRCC do mês atual por chaveJ
+- [ ] Criar procedure para buscar tabela de comissão + valoresCalculo + determinar nível ativo do agente
+- [ ] Implementar componente MinhaTabela no Extratos.tsx substituindo o placeholder
+- [ ] Exibir somente a coluna do Ativo atingido (ocultar as demais)
+- [ ] Exibir painel de identificação (chaveJ, nome, mês atual)
