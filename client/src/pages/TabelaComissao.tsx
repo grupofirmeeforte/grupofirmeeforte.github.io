@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 type TabelaRow = {
   id: number;
   empresa: string | null;
+  codigo: string | null;
   faixa1: string | null; faixa2: string | null; faixa3: string | null;
   faixa4: string | null; faixa5: string | null;
   tabelaCalculo: string | null; referencia: string | null;
@@ -34,7 +35,7 @@ type TabelaRow = {
 };
 
 type FormData = {
-  empresa?: string; faixa1?: string; faixa2?: string; faixa3?: string;
+  empresa?: string; codigo?: string; faixa1?: string; faixa2?: string; faixa3?: string;
   faixa4?: string; faixa5?: string; tabelaCalculo?: string; referencia?: string;
   convenio?: string; txJurosDe?: string; txJurosAte?: string; valorMinimo?: string;
   mesesDe?: string; mesesAte?: string;
@@ -428,6 +429,7 @@ export default function TabelaComissao() {
               <thead>
                 <tr style={{background: 'linear-gradient(90deg, #002776 0%, #003d99 40%, #0055cc 70%, #1a6ed8 100%)'}} className="text-white">
                   <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Empresa</th>
+                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Código</th>
                   <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Convênio</th>
                   <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Tx Juros De</th>
                   <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Tx Juros Até</th>
@@ -450,11 +452,11 @@ export default function TabelaComissao() {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={18} className="text-center py-8 text-gray-500">Carregando...</td>
+                    <td colSpan={19} className="text-center py-8 text-gray-500">Carregando...</td>
                   </tr>
                 ) : filteredRows.length === 0 ? (
                   <tr>
-                    <td colSpan={18} className="text-center py-8 text-gray-500">Nenhum registro encontrado</td>
+                    <td colSpan={19} className="text-center py-8 text-gray-500">Nenhum registro encontrado</td>
                   </tr>
                 ) : (
                   filteredRows.map((row, idx) => (
@@ -464,6 +466,13 @@ export default function TabelaComissao() {
                           value={row.empresa}
                           onSave={(v) => handleCellSave(row.id, 'empresa', v)}
                           isSaving={savingCell === `${row.id}-empresa`}
+                        />
+                      </td>
+                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
+                        <EditableCell
+                          value={(row as any).codigo}
+                          onSave={(v) => handleCellSave(row.id, 'codigo' as any, v)}
+                          isSaving={savingCell === `${row.id}-codigo`}
                         />
                       </td>
                       <td className="px-3 py-1.5 text-gray-700 whitespace-nowrap max-w-[180px] truncate">
@@ -629,11 +638,14 @@ export default function TabelaComissao() {
           </DialogHeader>
 
           <div className="grid grid-cols-2 gap-4 py-2">
-            <div className="col-span-2">
+             <div>
               <label className="text-sm font-medium text-gray-700 mb-1 block">Empresa</label>
               <Input value={form.empresa || ''} onChange={e => setField('empresa', e.target.value)} placeholder="BMF, FLEX..." />
             </div>
-
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Código <span className="text-gray-400 text-xs">(4 dígitos)</span></label>
+              <Input value={form.codigo || ''} onChange={e => setField('codigo', e.target.value.slice(0,4))} placeholder="0001" maxLength={4} />
+            </div>
             <div className="col-span-2">
               <label className="text-sm font-medium text-gray-700 mb-1 block">Convênio</label>
               <Input value={form.convenio || ''} onChange={e => setField('convenio', e.target.value)} placeholder="CONSIGNADO INSS, FEDERAL..." />

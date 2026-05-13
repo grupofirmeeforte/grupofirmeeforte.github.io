@@ -405,3 +405,16 @@
 - [x] Sub-aba "Pró Rata" (dentro de Financeiro) visível e acessível somente para CEO
 - [x] Bloquear acesso na Home.tsx (não exibir o card para não-CEO)
 - [x] Bloquear acesso direto via URL na página ProRata.tsx (redirecionar se não for CEO)
+
+## TABELA DE COMISSÃO - CAMPO CÓDIGO
+- [ ] Adicionar coluna "codigo" (varchar 4) no schema drizzle e migrar banco
+- [ ] Adicionar coluna "Código" na tabela visual (após Empresa, antes de Convênio)
+- [ ] Permitir edição inline do campo Código na tabela
+- [ ] Incluir campo Código no formulário de criação de novo registro
+
+## TABELA DE COMISSÃO - CAMPO CÓDIGO
+- [ ] Adicionar coluna "codigo" (varchar 4) no schema drizzle e migrar banco
+- [ ] Adicionar coluna "Código" na tabela visual (após Empresa, antes de Convênio)
+- [ ] Permitir edição inline do campo Código na tabela
+- [ ] Incluir campo Código no formulário de criação de novo registro
+- [ ] Usar campo Código como referência para cálculos de comissão futuros

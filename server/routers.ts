@@ -417,6 +417,7 @@ export const appRouter = router({
     criar: publicProcedure
       .input(z.object({
         empresa: z.string().optional(),
+        codigo: z.string().max(4).optional(),
         faixa1: z.string().optional(), faixa2: z.string().optional(),
         faixa3: z.string().optional(), faixa4: z.string().optional(), faixa5: z.string().optional(),
         tabelaCalculo: z.string().optional(), referencia: z.string().optional(),
@@ -441,6 +442,7 @@ export const appRouter = router({
       .input(z.object({
         id: z.number(),
         empresa: z.string().optional(),
+        codigo: z.string().max(4).optional(),
         faixa1: z.string().optional(), faixa2: z.string().optional(),
         faixa3: z.string().optional(), faixa4: z.string().optional(), faixa5: z.string().optional(),
         tabelaCalculo: z.string().optional(), referencia: z.string().optional(),
