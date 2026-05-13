@@ -425,3 +425,8 @@
 - [ ] Implementar componente MinhaTabela no Extratos.tsx substituindo o placeholder
 - [ ] Exibir somente a coluna do Ativo atingido (ocultar as demais)
 - [ ] Exibir painel de identificação (chaveJ, nome, mês atual)
+
+## PERSPECTIVA DE GANHO - CORREÇÕES
+- [ ] Comissão de operações Canceladas e Pendentes deve ser R$0,00 (somente Contratadas têm comissão)
+- [ ] Minha Tabela: tabela de comissão deve aparecer mesmo sem produção no mês atual
+- [ ] Minha Tabela: usar mês mais recente disponível para calcular nível ativo quando não há dados do mês atual

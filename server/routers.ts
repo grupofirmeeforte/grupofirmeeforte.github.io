@@ -1331,10 +1331,10 @@ export const appRouter = router({
           break;
         }
       }
-      // Buscar tabela de comissão filtrada pela empresa do agente
-      const tabela = empresaAgente
-        ? await db.select().from(tabelasComissao).where(eq(tabelasComissao.empresa, empresaAgente))
-        : await db.select().from(tabelasComissao);
+      // Buscar tabela de comissão: FLEX e BMF compartilham a mesma tabela (BMF)
+      // Mapear empresa do agente para a empresa da tabela
+      const empresaTabela = (empresaAgente === 'FLEX' || empresaAgente === 'BMF') ? 'BMF' : (empresaAgente ?? 'BMF');
+      const tabela = await db.select().from(tabelasComissao).where(eq(tabelasComissao.empresa, empresaTabela));
       return {
         totalLiquidoSemSRCC,
         nivelAtivo,

@@ -519,11 +519,15 @@ export const febrabanRouter = {
       }
 
       // Calcular PerspectivaComissão = Líquido (troco) × percentual / 100
+      // Canceladas e Pendentes sempre têm comissão = R$0,00
       const result = rows.map(r => {
-        const liquido = r.troco != null ? parseFloat(String(r.troco)) : 0;
-        const perspectivaComissao = percentualAgente != null
-          ? (liquido * percentualAgente) / 100
-          : null;
+        const isContratada = (r.situacao ?? '').trim().toLowerCase() === 'contratada';
+        const liquido = (isContratada && r.troco != null) ? parseFloat(String(r.troco)) : 0;
+        const perspectivaComissao = !isContratada
+          ? 0
+          : percentualAgente != null
+            ? (liquido * percentualAgente) / 100
+            : null;
         return { ...r, percentualAgente, perspectivaComissao };
       });
 
