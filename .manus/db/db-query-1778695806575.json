@@ -1,0 +1,34 @@
+{
+  "query": "SELECT chaveJ, mes, COUNT(*) as total, SUM(CAST(valorLiquido AS DECIMAL(15,2))) as total_liquido FROM consignados WHERE chaveJ LIKE '%JH299827%' GROUP BY chaveJ, mes ORDER BY mes DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT chaveJ, mes, COUNT(*) as total, SUM(CAST(valorLiquido AS DECIMAL(15,2))) as total_liquido FROM consignados WHERE chaveJ LIKE '%JH299827%' GROUP BY chaveJ, mes ORDER BY mes DESC LIMIT 10;",
+  "rows": [
+    {
+      "chaveJ": "JH299827",
+      "mes": "426",
+      "total": "17",
+      "total_liquido": "95624.56"
+    },
+    {
+      "chaveJ": "jh299827",
+      "mes": "326",
+      "total": "15",
+      "total_liquido": "74110.92"
+    },
+    {
+      "chaveJ": "JH299827",
+      "mes": "226",
+      "total": "20",
+      "total_liquido": "126611.50"
+    },
+    {
+      "chaveJ": "JH299827",
+      "mes": "126",
+      "total": "10",
+      "total_liquido": "85176.79"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\tmes\ttotal\ttotal_liquido\nJH299827\t426\t17\t95624.56\njh299827\t326\t15\t74110.92\nJH299827\t226\t20\t126611.50\nJH299827\t126\t10\t85176.79\n",
+  "stderr": "",
+  "execution_time_ms": 267
+}

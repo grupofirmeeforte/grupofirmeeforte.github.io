@@ -1,0 +1,55 @@
+{
+  "query": "SELECT convenio, txJurosDe, txJurosAte, valorMinimo, mesesDe, mesesAte, ativo01 FROM tabelasComissao WHERE empresa = 'BMF' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT convenio, txJurosDe, txJurosAte, valorMinimo, mesesDe, mesesAte, ativo01 FROM tabelasComissao WHERE empresa = 'BMF' LIMIT 5;",
+  "rows": [
+    {
+      "convenio": "CONSIGNADO INSS",
+      "txJurosDe": "0.0185",
+      "txJurosAte": "acima",
+      "valorMinimo": ">=$1.000,00",
+      "mesesDe": "48",
+      "mesesAte": "60",
+      "ativo01": "0.0065"
+    },
+    {
+      "convenio": "CONSIGNADO INSS",
+      "txJurosDe": "0.0185",
+      "txJurosAte": "acima",
+      "valorMinimo": ">=$1.000,00",
+      "mesesDe": "61",
+      "mesesAte": "83",
+      "ativo01": "0.0085"
+    },
+    {
+      "convenio": "CONSIGNADO INSS",
+      "txJurosDe": "0.0185",
+      "txJurosAte": "acima",
+      "valorMinimo": ">=$1.000,00",
+      "mesesDe": "84",
+      "mesesAte": "96",
+      "ativo01": "0.014"
+    },
+    {
+      "convenio": "CONSIGNADO INSS",
+      "txJurosDe": "0.01",
+      "txJurosAte": "acima",
+      "valorMinimo": ">=$100,00",
+      "mesesDe": "48",
+      "mesesAte": "60",
+      "ativo01": "0.0065"
+    },
+    {
+      "convenio": "CONSIGNADO INSS",
+      "txJurosDe": "0.01",
+      "txJurosAte": "acima",
+      "valorMinimo": ">=$100,00",
+      "mesesDe": "61",
+      "mesesAte": "83",
+      "ativo01": "0.008"
+    }
+  ],
+  "messages": [],
+  "stdout": "convenio\ttxJurosDe\ttxJurosAte\tvalorMinimo\tmesesDe\tmesesAte\tativo01\nCONSIGNADO INSS\t0.0185\tacima\t>=$1.000,00\t48\t60\t0.0065\nCONSIGNADO INSS\t0.0185\tacima\t>=$1.000,00\t61\t83\t0.0085\nCONSIGNADO INSS\t0.0185\tacima\t>=$1.000,00\t84\t96\t0.014\nCONSIGNADO INSS\t0.01\tacima\t>=$100,00\t48\t60\t0.0065\nCONSIGNADO INSS\t0.01\tacima\t>=$100,00\t61\t83\t0.008\n",
+  "stderr": "",
+  "execution_time_ms": 265
+}

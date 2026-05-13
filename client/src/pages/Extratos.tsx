@@ -526,12 +526,20 @@ function MinhaTabela() {
   const tabela = (data?.tabela ?? []) as any[];
   const totalLiquido = data?.totalLiquidoSemSRCC ?? 0;
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  const fmtPct = (v: string | null) => v ? `${v}%` : '—';
+  // Formata decimal (ex: 0.0195) como percentual legível (ex: 1,950%)
+  const fmtPct = (v: string | null | undefined) => {
+    if (!v) return '—';
+    const normalized = String(v).replace(',', '.');
+    const n = parseFloat(normalized);
+    if (isNaN(n)) return String(v);
+    const pctVal = n > 1 ? n : n * 100;
+    return pctVal.toFixed(3).replace('.', ',') + '%';
+  };
   // Colunas de ativo que têm pelo menos um valor preenchido na tabela
   const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
   const colunasComValor = ativoKeys.filter(k => tabela.some(r => r[k] != null && r[k] !== ''));
-  // Exibe apenas a coluna do nível ativo atingido
-  const colunaExibida = nivelAtivo && colunasComValor.includes(nivelAtivo) ? nivelAtivo : (colunasComValor[0] ?? null);
+  // Exibe apenas a coluna do nível ativo atingido; se não atingiu nenhum, não exibe coluna de ativo
+  const colunaExibida = nivelAtivo && colunasComValor.includes(nivelAtivo) ? nivelAtivo : null;
   const labelAtivo = (k: string) => `Ativo ${parseInt(k.replace('ativo', ''), 10).toString().padStart(2, '0')}`;
   return (
     <div>
@@ -567,7 +575,7 @@ function MinhaTabela() {
                     <TableHead className="text-white font-semibold text-xs uppercase">Tx Juros Até</TableHead>
                     <TableHead className="text-white font-semibold text-xs uppercase">Valor Mín.</TableHead>
                     <TableHead className="text-white font-semibold text-xs uppercase">Meses De</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase">Meses Até</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase text-blue-300">Meses Até</TableHead>
                     {colunaExibida && (
                       <TableHead className="text-amber-300 font-bold text-xs uppercase bg-amber-900">{labelAtivo(colunaExibida)}</TableHead>
                     )}
@@ -577,11 +585,11 @@ function MinhaTabela() {
                   {tabela.map((row: any) => (
                     <TableRow key={row.id} className="hover:bg-gray-50">
                       <TableCell className="font-medium text-sm">{row.convenio ?? '—'}</TableCell>
-                      <TableCell className="text-sm">{row.faixa1 ? `${row.faixa1}%` : '—'}</TableCell>
-                      <TableCell className="text-sm">{row.faixa2 ? `${row.faixa2}%` : 'acima'}</TableCell>
-                      <TableCell className="text-sm">{row.faixa3 ? `>=${row.faixa3}` : '—'}</TableCell>
-                      <TableCell className="text-sm">{row.faixa4 ?? '—'}</TableCell>
-                      <TableCell className="text-blue-700 font-semibold text-sm">{row.faixa5 ?? '—'}</TableCell>
+                      <TableCell className="text-sm">{row.txJurosDe ? fmtPct(row.txJurosDe) : '—'}</TableCell>
+                      <TableCell className="text-sm">{row.txJurosAte === 'acima' ? 'acima' : (row.txJurosAte ? fmtPct(row.txJurosAte) : '—')}</TableCell>
+                      <TableCell className="text-sm">{row.valorMinimo ?? '—'}</TableCell>
+                      <TableCell className="text-sm">{row.mesesDe ?? '—'}</TableCell>
+                      <TableCell className="text-blue-700 font-semibold text-sm">{row.mesesAte ?? '—'}</TableCell>
                       {colunaExibida && (
                         <TableCell className="font-bold text-amber-700 bg-amber-50 text-sm">
                           {fmtPct(row[colunaExibida])}

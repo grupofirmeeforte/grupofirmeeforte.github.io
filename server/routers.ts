@@ -1299,18 +1299,20 @@ export const appRouter = router({
       const anoShort = String(anoAtual).slice(2);
       const mesBanco = `${mesAtual}${anoShort}`;
       const mesRef = `${String(mesAtual).padStart(2, '0')}/${anoAtual}`;
-      // Buscar todos os registros do agente no mês atual
+      // Buscar total de troco do Febraban (apenas Contratadas) para o mês atual
       let totalLiquidoSemSRCC = 0;
       if (chaveJLogado) {
+        const { febraban: febTable } = await import('../drizzle/schema');
+        const mesanoNum = parseInt(`${mesAtual}${anoShort}`);
         const rows = await db
-          .select({ valorLiquido: consignados.valorLiquido, restricaoSRCC: consignados.restricaoSRCC })
-          .from(consignados)
-          .where(and(like(consignados.chaveJ, `%${chaveJLogado}%`), eq(consignados.mes, mesBanco)));
-        const totalVL = rows.reduce((s, r) => s + (parseFloat(String(r.valorLiquido ?? '0')) || 0), 0);
-        const totalSRCC = rows
-          .filter(r => ['sim', 'SIM', 'Sim'].includes(String(r.restricaoSRCC ?? '')))
-          .reduce((s, r) => s + (parseFloat(String(r.valorLiquido ?? '0')) || 0), 0);
-        totalLiquidoSemSRCC = totalVL - totalSRCC;
+          .select({ troco: febTable.troco })
+          .from(febTable)
+          .where(and(
+            like(febTable.operador, `%${chaveJLogado}%`),
+            eq(febTable.mesano, mesanoNum),
+            eq(febTable.situacao, 'Contratada')
+          ));
+        totalLiquidoSemSRCC = rows.reduce((s, r) => s + (parseFloat(String(r.troco ?? '0')) || 0), 0);
       }
       // Buscar valores de meta dos ativos
       const [valRow] = await db.select().from(valCalc).where(eq(valCalc.id, 1)).limit(1);

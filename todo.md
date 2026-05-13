@@ -430,3 +430,10 @@
 - [ ] Comissão de operações Canceladas e Pendentes deve ser R$0,00 (somente Contratadas têm comissão)
 - [ ] Minha Tabela: tabela de comissão deve aparecer mesmo sem produção no mês atual
 - [ ] Minha Tabela: usar mês mais recente disponível para calcular nível ativo quando não há dados do mês atual
+
+## FASE 25: CORREÇÃO DO MINHATABEL (BUG CRÍTICO)
+- [x] Diagnosticar que a tabela valoresCalculo não existia no banco de produção
+- [x] Criar tabela valoresCalculo com valores padrão (R$30k a R$300k)
+- [x] Corrigir formatação de percentuais no MinhaTabela (decimal → percentual legível)
+- [x] Corrigir campos exibidos na tabela: usar txJurosDe/txJurosAte/valorMinimo/mesesDe/mesesAte em vez de faixa1-5
+- [x] Corrigir lógica de colunaExibida: mostrar apenas a coluna do nível ativo atingido (null se não atingiu)

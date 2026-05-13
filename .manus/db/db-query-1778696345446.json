@@ -1,0 +1,60 @@
+{
+  "query": "SELECT convenio, faixa1, faixa2, faixa3, faixa4, faixa5, ativo01, ativo02 FROM tabelasComissao WHERE empresa = 'BMF' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT convenio, faixa1, faixa2, faixa3, faixa4, faixa5, ativo01, ativo02 FROM tabelasComissao WHERE empresa = 'BMF' LIMIT 5;",
+  "rows": [
+    {
+      "convenio": "CONSIGNADO INSS",
+      "faixa1": "0.0195",
+      "faixa2": "0.0196",
+      "faixa3": "0.0202",
+      "faixa4": "0.0212",
+      "faixa5": "0.0215",
+      "ativo01": "0.0065",
+      "ativo02": "0.0065"
+    },
+    {
+      "convenio": "CONSIGNADO INSS",
+      "faixa1": "0.0234",
+      "faixa2": "0.0235",
+      "faixa3": "0.0243",
+      "faixa4": "0.0255",
+      "faixa5": "0.0258",
+      "ativo01": "0.0085",
+      "ativo02": "0.0085"
+    },
+    {
+      "convenio": "CONSIGNADO INSS",
+      "faixa1": "0.0319",
+      "faixa2": "0.0321",
+      "faixa3": "0.0332",
+      "faixa4": "0.0348",
+      "faixa5": "0.0352",
+      "ativo01": "0.014",
+      "ativo02": "0.014"
+    },
+    {
+      "convenio": "CONSIGNADO INSS",
+      "faixa1": "0.0195",
+      "faixa2": "0.0196",
+      "faixa3": "0.0202",
+      "faixa4": "0.0212",
+      "faixa5": "0.0215",
+      "ativo01": "0.0065",
+      "ativo02": "0.0065"
+    },
+    {
+      "convenio": "CONSIGNADO INSS",
+      "faixa1": "0.0234",
+      "faixa2": "0.0235",
+      "faixa3": "0.0243",
+      "faixa4": "0.0255",
+      "faixa5": "0.0258",
+      "ativo01": "0.008",
+      "ativo02": "0.008"
+    }
+  ],
+  "messages": [],
+  "stdout": "convenio\tfaixa1\tfaixa2\tfaixa3\tfaixa4\tfaixa5\tativo01\tativo02\nCONSIGNADO INSS\t0.0195\t0.0196\t0.0202\t0.0212\t0.0215\t0.0065\t0.0065\nCONSIGNADO INSS\t0.0234\t0.0235\t0.0243\t0.0255\t0.0258\t0.0085\t0.0085\nCONSIGNADO INSS\t0.0319\t0.0321\t0.0332\t0.0348\t0.0352\t0.014\t0.014\nCONSIGNADO INSS\t0.0195\t0.0196\t0.0202\t0.0212\t0.0215\t0.0065\t0.0065\nCONSIGNADO INSS\t0.0234\t0.0235\t0.0243\t0.0255\t0.0258\t0.008\t0.008\n",
+  "stderr": "",
+  "execution_time_ms": 262
+}
