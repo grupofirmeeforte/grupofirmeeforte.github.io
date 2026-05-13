@@ -1,0 +1,8 @@
+{
+  "query": "SELECT mes, chaveJ, COUNT(*) as total FROM extratoConsignados WHERE chaveJ LIKE '%JH299827%' GROUP BY mes, chaveJ LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT mes, chaveJ, COUNT(*) as total FROM extratoConsignados WHERE chaveJ LIKE '%JH299827%' GROUP BY mes, chaveJ LIMIT 10;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'mes' in 'group statement'"
+  ]
+}

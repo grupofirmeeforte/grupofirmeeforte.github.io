@@ -1199,9 +1199,11 @@ export const appRouter = router({
         const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
         const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
         const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
-        // Converter MM/AAAA para formato MM/AAAA usado no campo mes do consignado
+        // Converter MM/AAAA para formato usado no banco: M26 ou MM26 (mes sem zero + 2 digitos do ano)
         const [mm, aaaa] = mesRef.split('/');
-        const mesFormatado = `${mm}/${aaaa}`;
+        const mesFormatado = `${mm}/${aaaa}`; // para exibição
+        const anoShort = aaaa ? aaaa.slice(2) : String(anoRef).slice(2); // ex: '26'
+        const mesBanco = `${parseInt(mm, 10)}${anoShort}`; // ex: '426' para 04/2026
 
         // ChaveJ: busca pelo openId do usuário logado (formato: agente_<id>)
         let chaveJLogado: string | null = null;
@@ -1215,7 +1217,7 @@ export const appRouter = router({
 
         const conditions = [];
         if (chaveJ) conditions.push(like(consignados.chaveJ, `%${chaveJ}%`));
-        if (mesFormatado) conditions.push(eq(consignados.mes, mesFormatado));
+        if (mesBanco) conditions.push(eq(consignados.mes, mesBanco));
 
         const rows = await db
           .select({
