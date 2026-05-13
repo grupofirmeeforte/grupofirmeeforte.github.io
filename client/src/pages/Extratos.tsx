@@ -10,7 +10,7 @@ import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key,
 import { trpc } from '@/lib/trpc';
 
 // ─── TIPOS DE SUBABAS ────────────────────────────────────────────────────────
-type Aba = 'consignado' | 'cc' | 'consorcio' | 'ourocap' | 'seguros' | 'bbdental' | 'perspectiva';
+type Aba = 'consignado' | 'cc' | 'consorcio' | 'ourocap' | 'seguros' | 'bbdental' | 'perspectiva' | 'minha-tabela';
 
 const ABAS: { id: Aba; label: string; icon: React.ElementType; cor: string }[] = [
   { id: 'consignado',   label: 'Extrato Consignado',    icon: FileText,    cor: 'bg-blue-600'    },
@@ -20,6 +20,7 @@ const ABAS: { id: Aba; label: string; icon: React.ElementType; cor: string }[] =
   { id: 'seguros',      label: 'Extrato Seguros',         icon: Shield,      cor: 'bg-red-600'     },
   { id: 'bbdental',     label: 'Extrato BB Dental',       icon: Smile,       cor: 'bg-teal-600'    },
   { id: 'perspectiva',  label: 'Perspectiva de Ganho',   icon: TrendingUp,  cor: 'bg-indigo-600'  },
+  { id: 'minha-tabela', label: 'Minha Tabela',            icon: FileText,    cor: 'bg-orange-600'  },
 ];
 
 // ─── PAINEL DE IDENTIFICAÇÃO (topo de todas as abas) ─────────────────────────
@@ -584,7 +585,8 @@ export default function ExtratosPage() {
         {aba === 'consorcio'   && <ExtratoConsorcio />}
         {aba === 'ourocap'     && <ExtratoOurocap />}
         {aba === 'perspectiva' && <PerspectivadeGanho />}
-        {aba !== 'consignado' && aba !== 'cc' && aba !== 'consorcio' && aba !== 'ourocap' && aba !== 'perspectiva' && <ConteudoAbaPlaceholder aba={aba} />}
+        {aba === 'minha-tabela' && <ConteudoAbaPlaceholder aba={aba} />}
+        {aba !== 'consignado' && aba !== 'cc' && aba !== 'consorcio' && aba !== 'ourocap' && aba !== 'perspectiva' && aba !== 'minha-tabela' && <ConteudoAbaPlaceholder aba={aba} />}
       </div>
     </div>
   );

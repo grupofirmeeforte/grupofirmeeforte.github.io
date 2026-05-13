@@ -31,6 +31,7 @@ const MODULOS_PERMISSOES = [
     { key: 'seguros', label: 'Extrato Seguros' },
     { key: 'bbdental', label: 'Extrato BB Dental' },
     { key: 'perspectiva', label: 'Perspectiva de Ganho' },
+    { key: 'minha-tabela', label: 'Minha Tabela' },
   ]},
   { modulo: 'financeiro', label: 'Financeiro', subabas: [
     { key: 'calculo', label: 'Cálculo' },
