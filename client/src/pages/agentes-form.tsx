@@ -69,7 +69,7 @@ export default function AgentesFormPage() {
   const [match, params] = useRoute("/agentes/:id");
   const agenteId = params?.id ? parseInt(params.id) : null;
   const { user: currentUser } = useAuth();
-  const isAdmin = (currentUser as any)?.permissoes === 'admin' || (currentUser as any)?.cargo === 'CEO';
+  const isAdmin = (currentUser as any)?.permissoes === 'admin' || (currentUser as any)?.cargo === 'CEO' || (currentUser as any)?.cargo === 'ADM' || (currentUser as any)?.cargo === 'Admin';
 
   const [formData, setFormData] = useState({
     numCadastro: "",
@@ -361,6 +361,7 @@ export default function AgentesFormPage() {
                     <SelectValue placeholder="Selecione um cargo" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="Admin">Admin</SelectItem>
                     <SelectItem value="CEO">CEO</SelectItem>
                     <SelectItem value="Gerente">Gerente</SelectItem>
                     <SelectItem value="Promotor">Promotor</SelectItem>
