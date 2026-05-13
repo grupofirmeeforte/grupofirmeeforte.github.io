@@ -180,22 +180,12 @@ function PerspectivadeGanho() {
   const mesAtualStr = `${String(mesAtual).padStart(2, '0')}/${anoAtual}`;
 
   const { data: meData } = trpc.auth.me.useQuery();
-  const emailLogado = meData?.email ?? '';
-
-  // Busca o agente pelo email do usuário logado para obter o ChaveJ real (ex: J1234568)
-  const { data: agenteData } = trpc.agentes.getByEmail.useQuery(
-    { email: emailLogado },
-    { enabled: !!emailLogado }
-  );
-  const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
-  // ChaveJ real do agente (código do operador no Febraban)
-  const chaveJReal = (agenteData as any)?.chaveJ ?? '';
-  // ChaveJ para exibir no painel (parte do email antes do @, em maiúsculas)
-  const chaveJExibicao = emailLogado.includes('@') ? emailLogado.split('@')[0].toUpperCase() : '';
+  const chaveJReal = (meData as any)?.chaveJ ?? '';
+  const nomeAgente = (meData as any)?.nomeAgente ?? '';
 
   const { data, isLoading } = trpc.febraban.perspectiva.useQuery(
     { chaveJ: chaveJReal || undefined, mes: mesAtual, ano: anoAtual },
-    { enabled: !!emailLogado }
+    { enabled: !!chaveJReal }
   );
 
   const rows = data?.rows ?? [];
@@ -225,7 +215,7 @@ function PerspectivadeGanho() {
 
   return (
     <div>
-      <PainelIdentificacao chaveJ={chaveJReal || chaveJExibicao} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
+      <PainelIdentificacao chaveJ={chaveJReal} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
       {/* ─── TABELA DETALHADA──────────────────────────────────────── */}
       <Card>
         <CardContent className="p-0">
@@ -505,12 +495,8 @@ function ConteudoAbaPlaceholder({ aba }: { aba: Aba }) {
   const mesRef = `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
 
   const { data: meData } = trpc.auth.me.useQuery();
-  let chaveJ = '';
-  if (meData?.email && meData.email.includes('@')) {
-    chaveJ = meData.email.split('@')[0].toUpperCase();
-  }
-  const { data: agenteData } = trpc.agentes.getByChaveJ.useQuery({ chaveJ }, { enabled: !!chaveJ });
-  const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
+  const chaveJ = (meData as any)?.chaveJ ?? '';
+  const nomeAgente = (meData as any)?.nomeAgente ?? '';
 
   return (
     <div>

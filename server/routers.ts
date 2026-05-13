@@ -35,6 +35,8 @@ export const appRouter = router({
             permissoes: agentes.permissoes,
             permissoesModulos: agentes.permissoesModulos,
             cargo: agentes.cargo,
+            nomeAgente: agentes.nomeAgente,
+            chaveJ: agentes.chaveJ,
           }).from(agentes).where(eq(agentes.id, agenteId)).limit(1);
           if (agenteRow) {
             return {
@@ -42,6 +44,8 @@ export const appRouter = router({
               permissoes: agenteRow.permissoes ?? 'leitor',
               permissoesModulos: agenteRow.permissoesModulos ?? null,
               cargo: agenteRow.cargo ?? null,
+              nomeAgente: agenteRow.nomeAgente ?? null,
+              chaveJ: agenteRow.chaveJ ?? null,
             };
           }
         }
