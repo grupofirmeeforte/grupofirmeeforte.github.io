@@ -111,6 +111,7 @@ export default function Home() {
         { title: 'Extrato Seguros', description: 'Extrato de seguros', icon: FileText, color: 'bg-red-600', path: '/extratos?aba=seguros', subKey: 'seguros' },
         { title: 'Extrato BB Dental', description: 'Extrato BB Dental', icon: FileText, color: 'bg-teal-600', path: '/extratos?aba=bbdental', subKey: 'bbdental' },
         { title: 'Perspectiva de Ganho', description: 'Perspectiva de comissão do mês atual', icon: TrendingUp, color: 'bg-indigo-600', path: '/extratos?aba=perspectiva', subKey: 'perspectiva' },
+        { title: 'Minha Tabela', description: 'Tabela personalizada de comissões', icon: TableProperties, color: 'bg-orange-500', path: '/extratos?aba=minha-tabela', subKey: 'minha-tabela' },
       ],
     },
     {
