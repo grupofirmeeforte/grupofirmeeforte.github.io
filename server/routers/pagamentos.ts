@@ -163,7 +163,21 @@ export const pagamentosRouter = {
         }
       }
 
-      const valorNum = input.valor ? parseFloat(input.valor.replace(",", ".")) : null;
+      // Converter valor em formato BR (ex: "R$4.326,88" ou "4.326,88" ou "4326.88") para número
+      const parseValorBR = (v: string | null | undefined): number | null => {
+        if (!v) return null;
+        const s = v.replace(/R\$\s*/g, '').replace(/\s/g, '').trim();
+        if (!s) return null;
+        let clean: string;
+        if (s.includes(',')) {
+          clean = s.replace(/\./g, '').replace(',', '.');
+        } else {
+          clean = s;
+        }
+        const n = parseFloat(clean);
+        return isNaN(n) ? null : n;
+      };
+      const valorNum = parseValorBR(input.valor);
 
       await db.insert(pagamentos).values({
         mesAno: input.mesAno,
@@ -225,7 +239,16 @@ export const pagamentosRouter = {
         if (v !== undefined) updateData[k] = v;
       }
       if (valor !== undefined) {
-        updateData.valor = valor ? String(parseFloat(valor.replace(",", "."))) : null;
+        const parseValorBREdit = (v: string | null | undefined): number | null => {
+          if (!v) return null;
+          const s = v.replace(/R\$\s*/g, '').replace(/\s/g, '').trim();
+          if (!s) return null;
+          const clean = s.includes(',') ? s.replace(/\./g, '').replace(',', '.') : s;
+          const n = parseFloat(clean);
+          return isNaN(n) ? null : n;
+        };
+        const vNum = parseValorBREdit(valor);
+        updateData.valor = vNum !== null ? String(vNum) : null;
       }
 
       if (Object.keys(updateData).length > 0) {

@@ -17,6 +17,21 @@ const TIPOS_PAGTO = [
 
 const TIPOS_CONTA = ["Corrente", "Poupança", "Salário", "Pagamento"];
 
+// Máscara automática para MM/AAAA (digita só números, barra inserida automaticamente)
+function maskMesAno(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 6);
+  if (digits.length <= 2) return digits;
+  return digits.slice(0, 2) + '/' + digits.slice(2);
+}
+
+// Máscara automática para DD/MM/AAAA (digita só números, barras inseridas automaticamente)
+function maskData(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return digits.slice(0, 2) + '/' + digits.slice(2);
+  return digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4);
+}
+
 type Pagamento = {
   id: number;
   mesAno: string | null;
@@ -466,8 +481,8 @@ export default function PagamentosPage() {
             {/* Mês/Ano */}
             <div>
               <Label className="text-xs text-gray-400">Mês/Ano *</Label>
-              <Input value={form.mesAno} onChange={e => setForm(f => ({ ...f, mesAno: e.target.value }))}
-                placeholder="MM/AAAA" className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+              <Input value={form.mesAno} onChange={e => setForm(f => ({ ...f, mesAno: maskMesAno(e.target.value) }))}
+                placeholder="MM/AAAA" maxLength={7} className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
             </div>
 
             {/* Tipo Pagto */}
@@ -587,8 +602,8 @@ export default function PagamentosPage() {
             {/* Data Vencer */}
             <div>
               <Label className="text-xs text-gray-400">Data Vencer</Label>
-              <Input value={form.dataVencer} onChange={e => setForm(f => ({ ...f, dataVencer: e.target.value }))}
-                placeholder="DD/MM/AAAA" className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+              <Input value={form.dataVencer} onChange={e => setForm(f => ({ ...f, dataVencer: maskData(e.target.value) }))}
+                placeholder="DD/MM/AAAA" maxLength={10} className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
             </div>
 
             {/* Pago */}
@@ -603,8 +618,8 @@ export default function PagamentosPage() {
             {form.pago && (
               <div>
                 <Label className="text-xs text-gray-400">Data Pagto</Label>
-                <Input value={form.dataPagto} onChange={e => setForm(f => ({ ...f, dataPagto: e.target.value }))}
-                  placeholder="DD/MM/AAAA" className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+                <Input value={form.dataPagto} onChange={e => setForm(f => ({ ...f, dataPagto: maskData(e.target.value) }))}
+                  placeholder="DD/MM/AAAA" maxLength={10} className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
               </div>
             )}
 
