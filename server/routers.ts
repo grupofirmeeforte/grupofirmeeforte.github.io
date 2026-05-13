@@ -1239,5 +1239,103 @@ export const appRouter = router({
         };
       }),
   }),
-});;
-export type AppRouter = typeof appRouter;
+  extratoCC: router({
+    listar: protectedProcedure
+      .input(z.object({
+        chaveJ: z.string().optional(),
+        mesAno: z.string().optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const { extratoContas } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new Error('Database connection not available');
+        const db = dbConn;
+        const { and, eq, like } = await import('drizzle-orm');
+        const agora = new Date();
+        const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
+        const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
+        const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+        let chaveJLogado: string | null = null;
+        if (ctx.user?.email && ctx.user.email.includes('@')) {
+          chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
+        }
+        const chaveJ = input.chaveJ ?? chaveJLogado;
+        const conditions: any[] = [];
+        if (chaveJ) conditions.push(like(extratoContas.chaveJ, `%${chaveJ}%`));
+        if (mesRef) conditions.push(eq(extratoContas.mesAno, mesRef));
+        const rows = await db
+          .select()
+          .from(extratoContas)
+          .where(conditions.length ? and(...conditions) : undefined)
+          .orderBy(extratoContas.nome);
+        return { rows, mesRef, chaveJ: chaveJ ?? '' };
+      }),
+  }),
+
+  extratoConsorcio: router({
+    listar: protectedProcedure
+      .input(z.object({
+        chaveJ: z.string().optional(),
+        mesAno: z.string().optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const { extratoConsorcios } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new Error('Database connection not available');
+        const db = dbConn;
+        const { and, eq, like } = await import('drizzle-orm');
+        const agora = new Date();
+        const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
+        const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
+        const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+        let chaveJLogado: string | null = null;
+        if (ctx.user?.email && ctx.user.email.includes('@')) {
+          chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
+        }
+        const chaveJ = input.chaveJ ?? chaveJLogado;
+        const conditions: any[] = [];
+        if (chaveJ) conditions.push(like(extratoConsorcios.chaveJ, `%${chaveJ}%`));
+        if (mesRef) conditions.push(eq(extratoConsorcios.mesAno, mesRef));
+        const rows = await db
+          .select()
+          .from(extratoConsorcios)
+          .where(conditions.length ? and(...conditions) : undefined)
+          .orderBy(extratoConsorcios.nome);
+        return { rows, mesRef, chaveJ: chaveJ ?? '' };
+      }),
+  }),
+
+  extratoOurocap: router({
+    listar: protectedProcedure
+      .input(z.object({
+        chaveJ: z.string().optional(),
+        mesAno: z.string().optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const { extratoOurocap } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new Error('Database connection not available');
+        const db = dbConn;
+        const { and, eq, like } = await import('drizzle-orm');
+        const agora = new Date();
+        const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
+        const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
+        const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+        let chaveJLogado: string | null = null;
+        if (ctx.user?.email && ctx.user.email.includes('@')) {
+          chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
+        }
+        const chaveJ = input.chaveJ ?? chaveJLogado;
+        const conditions: any[] = [];
+        if (chaveJ) conditions.push(like(extratoOurocap.chaveJ, `%${chaveJ}%`));
+        if (mesRef) conditions.push(eq(extratoOurocap.mesAno, mesRef));
+        const rows = await db
+          .select()
+          .from(extratoOurocap)
+          .where(conditions.length ? and(...conditions) : undefined)
+          .orderBy(extratoOurocap.nome);
+        return { rows, mesRef, chaveJ: chaveJ ?? '' };
+      }),
+  }),
+});
+export type AppRouter = typeof appRouter;;

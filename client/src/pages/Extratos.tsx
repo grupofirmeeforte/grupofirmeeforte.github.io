@@ -311,6 +311,187 @@ function PerspectivadeGanho() {
   );
 }
 
+// ─── EXTRATO C/C ────────────────────────────────────────────────────────────
+function ExtratoCC() {
+  const { data, isLoading } = trpc.extratoCC.listar.useQuery({});
+  const rows = data?.rows ?? [];
+  const mesRef = data?.mesRef ?? '';
+  const chaveJ = data?.chaveJ ?? '';
+  const { data: agenteData } = trpc.agentes.getByChaveJ.useQuery({ chaveJ }, { enabled: !!chaveJ });
+  const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
+  const totalComissao = useMemo(() => (rows as any[]).reduce((acc: number, r: any) => acc + parseFloat(String(r.comissao ?? 0)), 0), [rows]);
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return (
+    <div>
+      <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+      {isLoading ? (
+        <div className="text-center py-16 text-gray-400">Carregando...</div>
+      ) : rows.length === 0 ? (
+        <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
+          <CreditCard className="w-12 h-12 text-gray-300" />
+          <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+        </CardContent></Card>
+      ) : (
+        <Card><CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-semibold text-gray-700">Agência</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Chave J</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(rows as any[]).map((row: any) => (
+                  <TableRow key={row.id} className="hover:bg-gray-50">
+                    <TableCell className="text-gray-700">{row.agencia || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-700">{row.chaveJ || '—'}</TableCell>
+                    <TableCell className="font-medium text-gray-900">{row.nome || '—'}</TableCell>
+                    <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-500">{rows.length} registro(s)</span>
+            <div className="text-right">
+              <p className="text-xs text-gray-400">Total Comissão</p>
+              <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
+            </div>
+          </div>
+        </CardContent></Card>
+      )}
+    </div>
+  );
+}
+
+// ─── EXTRATO CONSÓRCIO ───────────────────────────────────────────────────────
+function ExtratoConsorcio() {
+  const { data, isLoading } = trpc.extratoConsorcio.listar.useQuery({});
+  const rows = data?.rows ?? [];
+  const mesRef = data?.mesRef ?? '';
+  const chaveJ = data?.chaveJ ?? '';
+  const { data: agenteData } = trpc.agentes.getByChaveJ.useQuery({ chaveJ }, { enabled: !!chaveJ });
+  const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
+  const totalComissao = useMemo(() => (rows as any[]).reduce((acc: number, r: any) => acc + parseFloat(String(r.comissao ?? 0)), 0), [rows]);
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const fmtNum = (v: any) => v != null ? Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '—';
+  return (
+    <div>
+      <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+      {isLoading ? (
+        <div className="text-center py-16 text-gray-400">Carregando...</div>
+      ) : rows.length === 0 ? (
+        <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
+          <Users className="w-12 h-12 text-gray-300" />
+          <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+        </CardContent></Card>
+      ) : (
+        <Card><CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-semibold text-gray-700">Nº Operação</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-center">Parcela</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Segmento</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-right">Valor Bem</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(rows as any[]).map((row: any) => (
+                  <TableRow key={row.id} className="hover:bg-gray-50">
+                    <TableCell className="font-mono text-sm text-gray-700">{row.nrOperacao || '—'}</TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant="outline" className="text-xs">{row.parcelas ?? '—'}</Badge>
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-sm">{row.segmento || '—'}</TableCell>
+                    <TableCell className="text-right text-blue-700 font-semibold">{fmtNum(row.valorBem)}</TableCell>
+                    <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-500">{rows.length} operação(ões)</span>
+            <div className="text-right">
+              <p className="text-xs text-gray-400">Total Comissão</p>
+              <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
+            </div>
+          </div>
+        </CardContent></Card>
+      )}
+    </div>
+  );
+}
+
+// ─── EXTRATO OUROCAP ─────────────────────────────────────────────────────────
+function ExtratoOurocap() {
+  const { data, isLoading } = trpc.extratoOurocap.listar.useQuery({});
+  const rows = data?.rows ?? [];
+  const mesRef = data?.mesRef ?? '';
+  const chaveJ = data?.chaveJ ?? '';
+  const { data: agenteData } = trpc.agentes.getByChaveJ.useQuery({ chaveJ }, { enabled: !!chaveJ });
+  const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
+  const totalLiquido = useMemo(() => (rows as any[]).reduce((acc: number, r: any) => acc + parseFloat(String(r.valorLiquido ?? 0)), 0), [rows]);
+  const totalComissao = useMemo(() => (rows as any[]).reduce((acc: number, r: any) => acc + parseFloat(String(r.comissao ?? 0)), 0), [rows]);
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return (
+    <div>
+      <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+      {isLoading ? (
+        <div className="text-center py-16 text-gray-400">Carregando...</div>
+      ) : rows.length === 0 ? (
+        <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
+          <Star className="w-12 h-12 text-gray-300" />
+          <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+        </CardContent></Card>
+      ) : (
+        <Card><CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-semibold text-gray-700">Nº Operação</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-right">Valor Líquido</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(rows as any[]).map((row: any) => (
+                  <TableRow key={row.id} className="hover:bg-gray-50">
+                    <TableCell className="font-mono text-sm text-gray-700">{row.nrOperacao || '—'}</TableCell>
+                    <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.valorLiquido ?? 0)))}</TableCell>
+                    <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-500">{rows.length} operação(ões)</span>
+            <div className="flex gap-6">
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Total Valor Líquido</p>
+                <p className="font-bold text-blue-700">{fmt(totalLiquido)}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Total Comissão</p>
+                <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
+              </div>
+            </div>
+          </div>
+        </CardContent></Card>
+      )}
+    </div>
+  );
+}
+
 // ─── PLACEHOLDER PARA ABAS EM DESENVOLVIMENTO ────────────────────────────────
 function ConteudoAbaPlaceholder({ aba }: { aba: Aba }) {
   const info = ABAS.find(a => a.id === aba)!;
@@ -399,8 +580,11 @@ export default function ExtratosPage() {
       {/* Conteúdo da aba selecionada */}
       <div className="p-6">
         {aba === 'consignado'  && <ExtratoConsignado />}
+        {aba === 'cc'          && <ExtratoCC />}
+        {aba === 'consorcio'   && <ExtratoConsorcio />}
+        {aba === 'ourocap'     && <ExtratoOurocap />}
         {aba === 'perspectiva' && <PerspectivadeGanho />}
-        {aba !== 'consignado' && aba !== 'perspectiva' && <ConteudoAbaPlaceholder aba={aba} />}
+        {aba !== 'consignado' && aba !== 'cc' && aba !== 'consorcio' && aba !== 'ourocap' && aba !== 'perspectiva' && <ConteudoAbaPlaceholder aba={aba} />}
       </div>
     </div>
   );
