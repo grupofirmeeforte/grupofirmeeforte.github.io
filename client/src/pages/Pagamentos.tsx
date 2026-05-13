@@ -12,7 +12,7 @@ import * as XLSX from "xlsx";
 const TIPOS_PAGTO = [
   "Adto", "Agua", "Ajuda de Custo", "Aluguel", "Cancelado", "Comissão",
   "DespesasLoja", "DespesasViagem", "Energia", "Ferias", "Internet",
-  "Outros", "Pagto", "Propaganda", "Reajuste", "Reembolso",
+  "Outros", "Pagto", "Propaganda", "Reajuste", "Reembolso", "Salário",
 ];
 
 const TIPOS_CONTA = ["Corrente", "Poupança", "Salário", "Pagamento"];
