@@ -437,3 +437,8 @@
 - [x] Corrigir formatação de percentuais no MinhaTabela (decimal → percentual legível)
 - [x] Corrigir campos exibidos na tabela: usar txJurosDe/txJurosAte/valorMinimo/mesesDe/mesesAte em vez de faixa1-5
 - [x] Corrigir lógica de colunaExibida: mostrar apenas a coluna do nível ativo atingido (null se não atingiu)
+
+## FASE 26: CORREÇÕES MINHA TABELA (NÍVEL E FORMATAÇÃO)
+- [x] Corrigir servidor: usar campo 'situacao' do agente (ex: Ativo03) para determinar coluna de comissão a exibir
+- [x] Corrigir formatação das colunas no deploy publicado (ainda mostrando valores antigos faixa1-5)
+- [x] Garantir que a produção Febraban ainda seja exibida no painel de informações

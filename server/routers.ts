@@ -1282,15 +1282,17 @@ export const appRouter = router({
       const db = dbConn;
       const { consignados, tabelasComissao, valoresCalculo: valCalc } = await import('../drizzle/schema');
       const { and, eq, like, sql } = await import('drizzle-orm');
-      // ChaveJ e empresa do agente logado
+      // ChaveJ, empresa e situacao do agente logado
       let chaveJLogado: string | null = null;
       let empresaAgente: string | null = null;
+      let situacaoAgente: string | null = null;
       if (ctx.user?.openId?.startsWith('agente_')) {
         const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
         const { agentes: agentesTable } = await import('../drizzle/schema');
-        const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ, nomeAgente: agentesTable.nomeAgente, empresa: agentesTable.empresa }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+        const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ, nomeAgente: agentesTable.nomeAgente, empresa: agentesTable.empresa, situacao: agentesTable.situacao }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
         chaveJLogado = agenteRow?.chaveJ ?? null;
         empresaAgente = agenteRow?.empresa ?? null;
+        situacaoAgente = agenteRow?.situacao ?? null;
       }
       // Mês atual no formato do banco (ex: '526' para 05/2026)
       const agora = new Date();
@@ -1323,14 +1325,28 @@ export const appRouter = router({
           metas[key] = parseFloat(String(valRow[key] ?? '0')) || 0;
         }
       }
-      // Determinar nível ativo: maior faixa que o agente atingiu
+      // Determinar nível ativo:
+      // 1. Usar o campo 'situacao' do cadastro do agente (ex: 'Ativo03' → 'ativo03')
+      // 2. Fallback: calcular pela produção Febraban vs metas
       let nivelAtivo: string | null = null;
       const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
-      for (let i = ativoKeys.length - 1; i >= 0; i--) {
-        const meta = metas[ativoKeys[i]] ?? 0;
-        if (meta > 0 && totalLiquidoSemSRCC >= meta) {
-          nivelAtivo = ativoKeys[i];
-          break;
+      if (situacaoAgente) {
+        // Converte 'Ativo03' → 'ativo03', 'Ativo3' → 'ativo03'
+        const match = situacaoAgente.match(/[Aa]tivo\s*(\d+)/i);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          const key = `ativo${String(num).padStart(2, '0')}`;
+          if (ativoKeys.includes(key)) nivelAtivo = key;
+        }
+      }
+      // Se não encontrou pelo cadastro, calcula pela produção
+      if (!nivelAtivo) {
+        for (let i = ativoKeys.length - 1; i >= 0; i--) {
+          const meta = metas[ativoKeys[i]] ?? 0;
+          if (meta > 0 && totalLiquidoSemSRCC >= meta) {
+            nivelAtivo = ativoKeys[i];
+            break;
+          }
         }
       }
       // Buscar tabela de comissão: FLEX e BMF compartilham a mesma tabela (BMF)
