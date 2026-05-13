@@ -124,13 +124,19 @@ export const proRataRouter = router({
       // dataFinal está no formato DD/MM/AAAA
       const mesAnteriorPattern = `%/${mmAnterior}/${yyyyAnterior}`;
 
-      const resultMesAnterior = await db
-        .select({
-          totalMesAnterior: sql<number>`COALESCE(SUM(CAST(comissao AS DECIMAL(10,4))), 0)`,
-          countMesAnterior: sql<number>`COUNT(*)`,
-        })
-        .from(proRata)
-        .where(eq(proRata.codEst, '1'));
+      // Somar comissão uma única vez por contrato (nrOperacao)
+      // para evitar duplicação quando há múltiplos lançamentos do mesmo contrato
+      const resultMesAnterior = await db.execute(sql`
+        SELECT
+          COALESCE(SUM(comissao_unica), 0) AS totalMesAnterior,
+          COUNT(*) AS countMesAnterior
+        FROM (
+          SELECT nrOperacao, MAX(CAST(comissao AS DECIMAL(15,4))) AS comissao_unica
+          FROM pro_rata
+          WHERE codEst = '1'
+          GROUP BY nrOperacao
+        ) sub
+      `);
 
       return {
         total: Number(result[0]?.total ?? 0),
@@ -138,8 +144,8 @@ export const proRataRouter = router({
         totalFinanciado: Number(result[0]?.totalFinanciado ?? 0),
         totalComissao: Number(result[0]?.totalComissao ?? 0),
         totalFalta: Number(result[0]?.totalFalta ?? 0),
-        totalMesAnterior: Number(resultMesAnterior[0]?.totalMesAnterior ?? 0),
-        countMesAnterior: Number(resultMesAnterior[0]?.countMesAnterior ?? 0),
+        totalMesAnterior: Number((resultMesAnterior as any)[0]?.totalMesAnterior ?? 0),
+        countMesAnterior: Number((resultMesAnterior as any)[0]?.countMesAnterior ?? 0),
         mesAnteriorLabel: `${mmAnterior}/${yyyyAnterior}`,
       };
     }),

@@ -388,3 +388,4 @@
 - [x] Tabela com colunas: Operação, Produto, Situação, ChaveJ, Data, Prazo, Líquido, Bruto, Perspectiva Comissão
 - [x] Rodapé com totais
 - [x] Mês atual (não mês anterior) como referência
+- [x] Card "A Receber — Mês Anterior": corrigida query para somar comissão uma única vez por contrato (GROUP BY nrOperacao), evitando duplicação por múltiplos lançamentos

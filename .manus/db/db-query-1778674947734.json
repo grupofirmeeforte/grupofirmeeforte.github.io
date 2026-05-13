@@ -1,0 +1,16 @@
+{
+  "query": "\nSELECT \n  COUNT(*) AS totalLinhas,\n  COUNT(DISTINCT nrOperacao) AS totalContratos,\n  COALESCE(SUM(CAST(comissao AS DECIMAL(15,4))), 0) AS somaTodas,\n  (SELECT COALESCE(SUM(comissao_unica), 0) FROM (\n    SELECT MAX(CAST(comissao AS DECIMAL(15,4))) AS comissao_unica\n    FROM pro_rata WHERE codEst = '1'\n    GROUP BY nrOperacao\n  ) sub2) AS somaUnicaPorContrato\nFROM pro_rata\nWHERE codEst = '1';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nSELECT \n  COUNT(*) AS totalLinhas,\n  COUNT(DISTINCT nrOperacao) AS totalContratos,\n  COALESCE(SUM(CAST(comissao AS DECIMAL(15,4))), 0) AS somaTodas,\n  (SELECT COALESCE(SUM(comissao_unica), 0) FROM (\n    SELECT MAX(CAST(comissao AS DECIMAL(15,4))) AS comissao_unica\n    FROM pro_rata WHERE codEst = '1'\n    GROUP BY nrOperacao\n  ) sub2) AS somaUnicaPorContrato\nFROM pro_rata\nWHERE codEst = '1';\n",
+  "rows": [
+    {
+      "totalLinhas": "15644",
+      "totalContratos": "15644",
+      "somaTodas": "101258.9700",
+      "somaUnicaPorContrato": "101258.9700"
+    }
+  ],
+  "messages": [],
+  "stdout": "totalLinhas\ttotalContratos\tsomaTodas\tsomaUnicaPorContrato\n15644\t15644\t101258.9700\t101258.9700\n",
+  "stderr": "",
+  "execution_time_ms": 403
+}
