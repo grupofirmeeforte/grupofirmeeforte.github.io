@@ -75,6 +75,7 @@ export const agentes = mysqlTable("agentes", {
   dataNascimento: varchar("dataNascimento", { length: 10 }), // YYYY-MM-DD format
   celular: varchar("celular", { length: 20 }),
   permissoes: varchar("permissoes", { length: 50 }).default("leitor"), // admin, editor, leitor, sem_acesso
+  permissoesModulos: text("permissoesModulos"), // JSON com permissoes por sub-aba: {modulo: {subaba: nivel}}
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({

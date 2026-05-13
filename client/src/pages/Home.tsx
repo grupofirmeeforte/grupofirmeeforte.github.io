@@ -7,6 +7,7 @@ import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
 import { ChatWidget } from "@/components/ChatWidget";
 import { useState } from "react";
+import { usePermissao } from "@/hooks/usePermissao";
 
 type SubModule = {
   title: string;
@@ -14,6 +15,7 @@ type SubModule = {
   icon: React.ElementType;
   color: string;
   path: string;
+  subKey?: string; // chave usada no mapa de permissões
 };
 
 type GroupModule = {
@@ -32,6 +34,7 @@ export default function Home() {
   const { user, loading, isAuthenticated, logout } = useAuth();
   const [, navigate] = useLocation();
   const [grupoAberto, setGrupoAberto] = useState<string | null>(null);
+  const { podeVer, isAdminOuCeo } = usePermissao();
 
   const handleLogout = async () => {
     await logout();
@@ -73,9 +76,9 @@ export default function Home() {
       borderColor: 'border-blue-200',
       bgColor: 'from-blue-50 to-indigo-50',
       subModules: [
-        { title: 'Agentes', description: 'Gerenciar agentes, dados pessoais e profissionais', icon: Users, color: 'bg-blue-500', path: '/agentes' },
-        { title: 'Certificações', description: 'Controlar certificações e alertas de vencimento', icon: FileCheck, color: 'bg-green-500', path: '/certificacoes' },
-        { title: 'Tabela Comissão', description: 'Faixas e percentuais de comissão por convênio', icon: TableProperties, color: 'bg-indigo-500', path: '/tabela-comissao' },
+        { title: 'Agentes', description: 'Gerenciar agentes, dados pessoais e profissionais', icon: Users, color: 'bg-blue-500', path: '/agentes', subKey: 'agentes' },
+        { title: 'Certificações', description: 'Controlar certificações e alertas de vencimento', icon: FileCheck, color: 'bg-green-500', path: '/certificacoes', subKey: 'certificacoes' },
+        { title: 'Tabela Comissão', description: 'Faixas e percentuais de comissão por convênio', icon: TableProperties, color: 'bg-indigo-500', path: '/tabela-comissao', subKey: 'tabela-comissao' },
       ],
     },
     {
@@ -99,13 +102,13 @@ export default function Home() {
       borderColor: 'border-emerald-200',
       bgColor: 'from-emerald-50 to-green-50',
       subModules: [
-        { title: 'Extrato Consignado', description: 'Extrato de operações consignadas', icon: FileText, color: 'bg-blue-600', path: '/extratos?aba=consignado' },
-        { title: 'Extrato C/C', description: 'Extrato de conta corrente', icon: FileText, color: 'bg-green-600', path: '/extratos?aba=cc' },
-        { title: 'Extrato Consórcio', description: 'Extrato de consórcio', icon: FileText, color: 'bg-purple-600', path: '/extratos?aba=consorcio' },
-        { title: 'Extrato Ourocap', description: 'Extrato de Ourocap', icon: FileText, color: 'bg-yellow-600', path: '/extratos?aba=ourocap' },
-        { title: 'Extrato Seguros', description: 'Extrato de seguros', icon: FileText, color: 'bg-red-600', path: '/extratos?aba=seguros' },
-        { title: 'Extrato BB Dental', description: 'Extrato BB Dental', icon: FileText, color: 'bg-teal-600', path: '/extratos?aba=bbdental' },
-        { title: 'Perspectiva de Ganho', description: 'Perspectiva de comissão do mês atual', icon: TrendingUp, color: 'bg-indigo-600', path: '/extratos?aba=perspectiva' },
+        { title: 'Extrato Consignado', description: 'Extrato de operações consignadas', icon: FileText, color: 'bg-blue-600', path: '/extratos?aba=consignado', subKey: 'consignado' },
+        { title: 'Extrato C/C', description: 'Extrato de conta corrente', icon: FileText, color: 'bg-green-600', path: '/extratos?aba=cc', subKey: 'cc' },
+        { title: 'Extrato Consórcio', description: 'Extrato de consórcio', icon: FileText, color: 'bg-purple-600', path: '/extratos?aba=consorcio', subKey: 'consorcio' },
+        { title: 'Extrato Ourocap', description: 'Extrato de Ourocap', icon: FileText, color: 'bg-yellow-600', path: '/extratos?aba=ourocap', subKey: 'ourocap' },
+        { title: 'Extrato Seguros', description: 'Extrato de seguros', icon: FileText, color: 'bg-red-600', path: '/extratos?aba=seguros', subKey: 'seguros' },
+        { title: 'Extrato BB Dental', description: 'Extrato BB Dental', icon: FileText, color: 'bg-teal-600', path: '/extratos?aba=bbdental', subKey: 'bbdental' },
+        { title: 'Perspectiva de Ganho', description: 'Perspectiva de comissão do mês atual', icon: TrendingUp, color: 'bg-indigo-600', path: '/extratos?aba=perspectiva', subKey: 'perspectiva' },
       ],
     },
     {
@@ -118,7 +121,7 @@ export default function Home() {
       borderColor: 'border-violet-200',
       bgColor: 'from-violet-50 to-purple-50',
       subModules: [
-        { title: 'Produção BB', description: 'Relatório de produção Febraban', icon: ShieldCheck, color: 'bg-violet-500', path: '/febraban' },
+        { title: 'Produção BB', description: 'Relatório de produção Febraban', icon: ShieldCheck, color: 'bg-violet-500', path: '/febraban', subKey: 'producao-bb' },
       ],
     },
     {
@@ -131,10 +134,10 @@ export default function Home() {
       borderColor: 'border-red-200',
       bgColor: 'from-red-50 to-orange-50',
       subModules: [
-        { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/calculo' },
-        { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos' },
-        { title: 'Despesas Fixas', description: 'Controle de despesas fixas', icon: Building2, color: 'bg-purple-500', path: '/fornecedores' },
-        { title: 'Pró Rata', description: 'Operações com controle de parcelas pagas e a receber', icon: DollarSign, color: 'bg-indigo-600', path: '/pro-rata' },
+        { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/calculo', subKey: 'calculo' },
+        { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos', subKey: 'pagamentos' },
+        { title: 'Despesas Fixas', description: 'Controle de despesas fixas', icon: Building2, color: 'bg-purple-500', path: '/fornecedores', subKey: 'despesas' },
+        { title: 'Pró Rata', description: 'Operações com controle de parcelas pagas e a receber', icon: DollarSign, color: 'bg-indigo-600', path: '/pro-rata', subKey: 'pro-rata' },
       ],
     },
     {
@@ -158,8 +161,8 @@ export default function Home() {
       borderColor: 'border-teal-200',
       bgColor: 'from-teal-50 to-cyan-50',
       subModules: [
-        { title: 'Consignado', description: 'Operações de crédito consignado', icon: Briefcase, color: 'bg-teal-600', path: '/consignado' },
-        { title: 'Conta Corrente', description: 'Operações de conta corrente', icon: DollarSign, color: 'bg-teal-500', path: '/conta-corrente' },
+        { title: 'Consignado', description: 'Operações de crédito consignado', icon: Briefcase, color: 'bg-teal-600', path: '/consignado', subKey: 'consignado-prod' },
+        { title: 'Conta Corrente', description: 'Operações de conta corrente', icon: DollarSign, color: 'bg-teal-500', path: '/conta-corrente', subKey: 'conta-corrente' },
       ],
     },
     {
@@ -183,8 +186,8 @@ export default function Home() {
       borderColor: 'border-slate-200',
       bgColor: 'from-slate-50 to-gray-50',
       subModules: [
-        { title: 'Logs de Acesso', description: 'Histórico de acessos ao sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria?aba=logs' },
-        { title: 'Feriados', description: 'Feriados nacionais e estaduais BA', icon: ClipboardList, color: 'bg-slate-500', path: '/auditoria?aba=feriados' },
+        { title: 'Logs de Acesso', description: 'Histórico de acessos ao sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria?aba=logs', subKey: 'logs' },
+        { title: 'Feriados', description: 'Feriados nacionais e estaduais BA', icon: ClipboardList, color: 'bg-slate-500', path: '/auditoria?aba=feriados', subKey: 'feriados' },
       ],
     },
   ];
@@ -240,16 +243,20 @@ export default function Home() {
                     </CardHeader>
                     <CardContent>
                       <CardDescription className="text-sm">{grupo.description}</CardDescription>
-                      {grupo.subModules.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-3">
-                          {grupo.subModules.map(m => (
-                            <span key={m.path} className="text-xs bg-white/70 text-slate-600 px-2 py-0.5 rounded-full border border-slate-200">{m.title}</span>
-                          ))}
-                        </div>
-                      )}
-                      {grupo.subModules.length === 0 && (
-                        <p className="text-xs text-slate-400 mt-2 italic">Abas em breve...</p>
-                      )}
+                      {(() => {
+                          const visibleSubs = isAdminOuCeo
+                            ? grupo.subModules
+                            : grupo.subModules.filter(m => !m.subKey || podeVer(grupo.key, m.subKey));
+                          return visibleSubs.length > 0 ? (
+                            <div className="flex flex-wrap gap-1 mt-3">
+                              {visibleSubs.map(m => (
+                                <span key={m.path} className="text-xs bg-white/70 text-slate-600 px-2 py-0.5 rounded-full border border-slate-200">{m.title}</span>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-slate-400 mt-2 italic">Abas em breve...</p>
+                          );
+                        })()}
                     </CardContent>
                   </Card>
                 );
@@ -332,14 +339,18 @@ export default function Home() {
               </button>
             </div>
 
-            {grupoAtual.subModules.length === 0 ? (
+            {(() => {
+              const visibleMods = isAdminOuCeo
+                ? grupoAtual.subModules
+                : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey));
+              return visibleMods.length === 0 ? (
               <div className="text-center py-12 text-slate-400">
                 <p className="text-lg font-medium">Em breve</p>
                 <p className="text-sm mt-1">As abas deste módulo serão adicionadas em breve.</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-4">
-                {grupoAtual.subModules.map((module) => {
+                {visibleMods.map((module) => {
                   const Icon = module.icon;
                   return (
                     <button
@@ -358,7 +369,8 @@ export default function Home() {
                   );
                 })}
               </div>
-            )}
+            );
+            })()}
           </div>
         </div>
       )}

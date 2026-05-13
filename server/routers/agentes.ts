@@ -30,6 +30,8 @@ const agenteSchema = z.object({
   pix: z.string().optional(),
   dataNascimento: z.string().optional(),
   celular: z.string().optional(),
+  permissoes: z.string().optional(),
+  permissoesModulos: z.string().optional(), // JSON string com permissoes por sub-aba
 });
 
 const agenteUpdateSchema = agenteSchema.partial();

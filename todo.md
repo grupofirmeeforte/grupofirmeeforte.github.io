@@ -389,3 +389,9 @@
 - [x] Rodapé com totais
 - [x] Mês atual (não mês anterior) como referência
 - [x] Card "A Receber — Mês Anterior": corrigida query para somar comissão uma única vez por contrato (GROUP BY nrOperacao), evitando duplicação por múltiplos lançamentos
+
+## FASE PERMISSÕES GRANULARES
+- [ ] Adicionar campo JSON `permissoesModulos` no schema de agentes (migração SQL)
+- [ ] Criar seção de permissões por sub-aba no formulário de cadastro/edição de agentes (visível apenas para admins)
+- [ ] Aplicar restrições de acesso no frontend por sub-aba conforme permissões do agente logado
+- [ ] Somente admins podem alterar permissões de outros agentes

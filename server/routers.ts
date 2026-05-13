@@ -23,7 +23,31 @@ export const appRouter = router({
   system: systemRouter,
   certificacoes: certificacoesRouter,
   auth: router({
-    me: publicProcedure.query(opts => opts.ctx.user),
+    me: publicProcedure.query(async (opts) => {
+      const user = opts.ctx.user;
+      if (!user) return null;
+      // Buscar permissoesModulos e cargo do agente logado
+      if (user.openId?.startsWith('agente_')) {
+        const agenteId = parseInt(user.openId.replace('agente_', ''), 10);
+        const db = await getDb();
+        if (db) {
+          const [agenteRow] = await db.select({
+            permissoes: agentes.permissoes,
+            permissoesModulos: agentes.permissoesModulos,
+            cargo: agentes.cargo,
+          }).from(agentes).where(eq(agentes.id, agenteId)).limit(1);
+          if (agenteRow) {
+            return {
+              ...user,
+              permissoes: agenteRow.permissoes ?? 'leitor',
+              permissoesModulos: agenteRow.permissoesModulos ?? null,
+              cargo: agenteRow.cargo ?? null,
+            };
+          }
+        }
+      }
+      return user;
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });

@@ -12,13 +12,64 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, Shield } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+
+// Definição dos módulos e sub-abas para permissões
+const MODULOS_PERMISSOES = [
+  { modulo: 'cadastros', label: 'Cadastros', subabas: [
+    { key: 'agentes', label: 'Agentes' },
+    { key: 'certificacoes', label: 'Certificações' },
+    { key: 'tabela-comissao', label: 'Tabela Comissão' },
+  ]},
+  { modulo: 'extratos', label: 'Extratos', subabas: [
+    { key: 'consignado', label: 'Extrato Consignado' },
+    { key: 'cc', label: 'Extrato C/C' },
+    { key: 'consorcio', label: 'Extrato Consórcio' },
+    { key: 'ourocap', label: 'Extrato Ourocap' },
+    { key: 'seguros', label: 'Extrato Seguros' },
+    { key: 'bbdental', label: 'Extrato BB Dental' },
+    { key: 'perspectiva', label: 'Perspectiva de Ganho' },
+  ]},
+  { modulo: 'financeiro', label: 'Financeiro', subabas: [
+    { key: 'calculo', label: 'Cálculo' },
+    { key: 'pagamentos', label: 'Pagamentos' },
+    { key: 'despesas', label: 'Despesas Fixas' },
+    { key: 'pro-rata', label: 'Pró Rata' },
+  ]},
+  { modulo: 'producao', label: 'Produção', subabas: [
+    { key: 'consignado-prod', label: 'Consignado' },
+    { key: 'conta-corrente', label: 'Conta Corrente' },
+  ]},
+  { modulo: 'febraban', label: 'Febraban', subabas: [
+    { key: 'producao-bb', label: 'Produção BB' },
+  ]},
+  { modulo: 'relatorios', label: 'Relatórios', subabas: [
+    { key: 'relatorios', label: 'Relatórios' },
+  ]},
+  { modulo: 'auditoria', label: 'Auditoria', subabas: [
+    { key: 'logs', label: 'Logs de Acesso' },
+    { key: 'feriados', label: 'Feriados' },
+  ]},
+];
+
+type NivelPermissao = 'sem_acesso' | 'leitura' | 'editar' | 'admin';
+type PermissoesMap = Record<string, Record<string, NivelPermissao>>;
+
+const NIVEIS: { value: NivelPermissao; label: string; color: string }[] = [
+  { value: 'sem_acesso', label: 'Sem Acesso', color: 'bg-red-100 text-red-700 border-red-300' },
+  { value: 'leitura', label: 'Leitura', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' },
+  { value: 'editar', label: 'Editar', color: 'bg-blue-100 text-blue-700 border-blue-300' },
+  { value: 'admin', label: 'Admin', color: 'bg-green-100 text-green-700 border-green-300' },
+];
 
 export default function AgentesFormPage() {
   const [, navigate] = useLocation();
   const [match, params] = useRoute("/agentes/:id");
   const agenteId = params?.id ? parseInt(params.id) : null;
+  const { user: currentUser } = useAuth();
+  const isAdmin = (currentUser as any)?.permissoes === 'admin' || (currentUser as any)?.cargo === 'CEO';
 
   const [formData, setFormData] = useState({
     numCadastro: "",
@@ -45,8 +96,10 @@ export default function AgentesFormPage() {
     pix: "",
     dataNascimento: "",
     celular: "",
+    permissoes: "leitor",
   });
 
+  const [permissoesModulos, setPermissoesModulos] = useState<PermissoesMap>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const { data: agente } = trpc.agentes.getById.useQuery(
@@ -139,6 +192,11 @@ export default function AgentesFormPage() {
       // Garantir que campos obrigatórios estejam presentes
       normalizedData.chaveJ = formData.chaveJ;
       normalizedData.nomeAgente = formData.nomeAgente;
+      // Incluir permissoesModulos como JSON string (apenas admin pode alterar)
+      if (isAdmin) {
+        normalizedData.permissoesModulos = JSON.stringify(permissoesModulos);
+        normalizedData.permissoes = formData.permissoes;
+      }
 
       if (agenteId) {
         await updateAgente.mutateAsync({
@@ -186,7 +244,14 @@ export default function AgentesFormPage() {
         pix: agente.pix || "",
         dataNascimento: agente.dataNascimento || "", // Manter como string YYYY-MM-DD
         celular: agente.celular || "",
+        permissoes: agente.permissoes || "leitor",
       });
+      // Carregar permissoesModulos do JSON
+      if ((agente as any).permissoesModulos) {
+        try {
+          setPermissoesModulos(JSON.parse((agente as any).permissoesModulos));
+        } catch {}
+      }
     }
   }, [agente]);
 
@@ -530,6 +595,73 @@ export default function AgentesFormPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Seção de Permissões — visível apenas para admin */}
+        {isAdmin && (
+          <Card className="border-2 border-indigo-200 bg-indigo-50/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-indigo-800">
+                <Shield className="w-5 h-5" />
+                Permissões de Acesso
+              </CardTitle>
+              <p className="text-sm text-slate-500">Defina o que este agente pode acessar em cada módulo do sistema.</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Nível geral */}
+              <div className="flex items-center gap-4 pb-4 border-b border-indigo-200">
+                <Label className="w-40 font-semibold text-slate-700">Nível Geral</Label>
+                <Select value={formData.permissoes} onValueChange={(v) => setFormData(prev => ({ ...prev, permissoes: v }))}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="sem_acesso">Sem Acesso</SelectItem>
+                    <SelectItem value="leitor">Leitor</SelectItem>
+                    <SelectItem value="editor">Editor</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span className="text-xs text-slate-400">Usado como padrão quando não há permissão específica por sub-aba</span>
+              </div>
+
+              {/* Permissões por módulo e sub-aba */}
+              {MODULOS_PERMISSOES.map(({ modulo, label, subabas }) => (
+                <div key={modulo} className="border border-slate-200 rounded-lg overflow-hidden">
+                  <div className="bg-slate-100 px-4 py-2 font-semibold text-slate-700 text-sm">{label}</div>
+                  <div className="divide-y divide-slate-100">
+                    {subabas.map(({ key, label: subLabel }) => {
+                      const nivel = (permissoesModulos[modulo]?.[key] ?? 'leitura') as NivelPermissao;
+                      return (
+                        <div key={key} className="flex items-center gap-3 px-4 py-2">
+                          <span className="w-48 text-sm text-slate-600">{subLabel}</span>
+                          <div className="flex gap-2">
+                            {NIVEIS.map(n => (
+                              <button
+                                key={n.value}
+                                type="button"
+                                onClick={() => setPermissoesModulos(prev => ({
+                                  ...prev,
+                                  [modulo]: { ...prev[modulo], [key]: n.value }
+                                }))}
+                                className={`px-3 py-1 rounded-full border text-xs font-medium transition-all ${
+                                  nivel === n.value
+                                    ? n.color + ' ring-2 ring-offset-1 ring-current'
+                                    : 'bg-white text-slate-400 border-slate-200 hover:border-slate-400'
+                                }`}
+                              >
+                                {n.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Botões */}
         <div className="flex gap-4 justify-end">
