@@ -442,3 +442,9 @@
 - [x] Corrigir servidor: usar campo 'situacao' do agente (ex: Ativo03) para determinar coluna de comissão a exibir
 - [x] Corrigir formatação das colunas no deploy publicado (ainda mostrando valores antigos faixa1-5)
 - [x] Garantir que a produção Febraban ainda seja exibida no painel de informações
+
+## FASE 27: DESLOGAMENTO FORÇADO PELO CEO/ADMIN
+- [x] Corrigir desconectarForcado: usar banco de dados em vez de API OAuth (que retorna erro 10002)
+- [x] Middleware de autenticação deve verificar se sessão foi invalidada no banco e redirecionar para login
+- [x] Promover todos os Ultramare a admin para ter autonomia de deslogar usuários
+- [x] Adicionar refetchInterval de 30s no useAuth para detectar deslogamento forçado automaticamente

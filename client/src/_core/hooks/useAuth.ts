@@ -15,7 +15,9 @@ export function useAuth(options?: UseAuthOptions) {
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
     retry: false,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
+    // Verifica a cada 30s se a sessão ainda está ativa (detecta deslogamento forçado pelo admin)
+    refetchInterval: 30_000,
   });
 
   const logoutMutation = trpc.auth.logout.useMutation({
