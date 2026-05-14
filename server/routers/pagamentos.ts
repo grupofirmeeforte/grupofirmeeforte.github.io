@@ -315,6 +315,7 @@ export const pagamentosRouter = {
       tipoPagto: z.string().optional(),
       pago: z.enum(["todos", "sim", "nao"]).default("todos"),
       chaveJ: z.string().optional(),
+      nome: z.string().optional(),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -327,6 +328,7 @@ export const pagamentosRouter = {
       if (input.empresa) condPag.push(eq(pagamentos.empresa, input.empresa));
       if (input.tipoPagto) condPag.push(eq(pagamentos.tipoPagto, input.tipoPagto));
       if (input.chaveJ) condPag.push(like(pagamentos.chaveJ, `%${input.chaveJ}%`));
+      if (input.nome) condPag.push(like(pagamentos.nomeFavorecido, `%${input.nome}%`));
       if (input.pago === "sim") condPag.push(eq(pagamentos.pago, true));
       if (input.pago === "nao") condPag.push(eq(pagamentos.pago, false));
       const rowsPag = await db.select().from(pagamentos)
@@ -338,6 +340,7 @@ export const pagamentosRouter = {
       if (input.mesAno) condDesp.push(eq(despesasFixas.mesAno, input.mesAno));
       if (input.empresa) condDesp.push(eq(despesasFixas.empresa, input.empresa));
       if (input.tipoPagto) condDesp.push(eq(despesasFixas.tipoPagto, input.tipoPagto));
+      if (input.nome) condDesp.push(like(despesasFixas.nome, `%${input.nome}%`));
       if (input.pago === "sim") condDesp.push(eq(despesasFixas.pago, true));
       if (input.pago === "nao") condDesp.push(eq(despesasFixas.pago, false));
       const rowsDesp = await db.select().from(despesasFixas)
@@ -390,9 +393,12 @@ export const pagamentosRouter = {
         if (v === hojeNum) return 1; // vence hoje
         return 2;                    // futuro
       };
+      // Considera como pago: campo pago=true OU dataPagto preenchido
+      const isPago = (row: { pago: boolean | number | null; dataPagto: string | null }) =>
+        !!(row.pago) || !!(row.dataPagto && row.dataPagto.length >= 8);
       const all = [...pagNorm, ...despNorm].sort((a, b) => {
-        const aPago = !!(a.pago);
-        const bPago = !!(b.pago);
+        const aPago = isPago(a);
+        const bPago = isPago(b);
         // Não pagos TODOS antes dos pagos
         if (aPago !== bPago) return aPago ? 1 : -1;
         if (!aPago) {

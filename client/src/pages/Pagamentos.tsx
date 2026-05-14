@@ -100,6 +100,7 @@ export default function PagamentosPage() {
   const [filtroTipo, setFiltroTipo] = useState("");
   const [filtroPago, setFiltroPago] = useState<"todos" | "sim" | "nao">("todos");
   const [filtroChaveJ, setFiltroChaveJ] = useState("");
+  const [filtroNome, setFiltroNome] = useState("");
   const [page, setPage] = useState(1);
 
   const [showModal, setShowModal] = useState(false);
@@ -107,6 +108,16 @@ export default function PagamentosPage() {
   const [form, setForm] = useState({ ...emptyForm });
   const [chaveJBusca, setChaveJBusca] = useState("");
   const [deletandoId, setDeletandoId] = useState<number | null>(null);
+  const [deletandoDespId, setDeletandoDespId] = useState<number | null>(null);
+  const [editandoDesp, setEditandoDesp] = useState<UnifiedRow | null>(null);
+  const [formDesp, setFormDesp] = useState<{
+    mesAno: string; tipoPagto: string; cidadeUF: string; empresa: string;
+    chaveResp: string; nome: string; banco: string; agencia: string; conta: string;
+    cpfCnpj: string; tipoConta: string; pix: string; valor: string;
+    pago: boolean; dataPagto: string; dataVencer: string;
+  }>({ mesAno: "", tipoPagto: "", cidadeUF: "", empresa: "", chaveResp: "", nome: "",
+    banco: "", agencia: "", conta: "", cpfCnpj: "", tipoConta: "", pix: "",
+    valor: "", pago: false, dataPagto: "", dataVencer: "" });
 
   const [editandoDtPagto, setEditandoDtPagto] = useState<number | null>(null);
   const [valorDtPagto, setValorDtPagto] = useState("");
@@ -114,6 +125,15 @@ export default function PagamentosPage() {
 
   const utils = trpc.useUtils();
   const { data: nextCodigo } = trpc.pagamentos.nextCodigo.useQuery();
+
+  const editarDespMutation = trpc.despesasFixas.editar.useMutation({
+    onSuccess: () => { toast.success("Despesa fixa atualizada!"); setEditandoDesp(null); utils.pagamentos.listUnificado.invalidate(); },
+    onError: (e) => toast.error(e.message),
+  });
+  const deletarDespMutation = trpc.despesasFixas.deletar.useMutation({
+    onSuccess: () => { toast.success("Despesa fixa excluída!"); setDeletandoDespId(null); utils.pagamentos.listUnificado.invalidate(); },
+    onError: (e) => toast.error(e.message),
+  });
 
   const editarDtPagtoMutation = trpc.pagamentos.editar.useMutation({
     onSuccess: () => { utils.pagamentos.listUnificado.invalidate(); setEditandoDtPagto(null); },
@@ -173,6 +193,7 @@ export default function PagamentosPage() {
     tipoPagto: filtroTipo || undefined,
     pago: filtroPago,
     chaveJ: filtroChaveJ || undefined,
+    nome: filtroNome || undefined,
   };
 
   const { data: unificadoData, refetch } = trpc.pagamentos.listUnificado.useQuery({ ...queryParams, page, limit: 100 });
@@ -343,10 +364,15 @@ export default function PagamentosPage() {
           <Input value={filtroChaveJ} onChange={e => { setFiltroChaveJ(e.target.value); setPage(1); }}
             placeholder="Chave J" className="bg-gray-800 border-gray-600 text-white w-28 h-8 text-sm" />
         </div>
-        {(filtroMesAno || filtroEmpresa || filtroTipo || filtroChaveJ || filtroPago !== "todos") && (
+        <div>
+          <Label className="text-xs text-gray-400">Nome</Label>
+          <Input value={filtroNome} onChange={e => { setFiltroNome(e.target.value); setPage(1); }}
+            placeholder="Buscar por nome" className="bg-gray-800 border-gray-600 text-white w-36 h-8 text-sm" />
+        </div>
+        {(filtroMesAno || filtroEmpresa || filtroTipo || filtroChaveJ || filtroNome || filtroPago !== "todos") && (
           <Button variant="ghost" size="sm" onClick={() => {
             setFiltroMesAno(""); setFiltroEmpresa(""); setFiltroTipo("");
-            setFiltroPago("todos"); setFiltroChaveJ(""); setPage(1);
+            setFiltroPago("todos"); setFiltroChaveJ(""); setFiltroNome(""); setPage(1);
           }} className="text-gray-400 hover:text-white h-8 text-xs">✕ Limpar</Button>
         )}
       </div>
@@ -472,7 +498,23 @@ export default function PagamentosPage() {
                           className="h-6 px-2 text-xs bg-red-900/40 border-red-700 text-red-300 hover:bg-red-800">Apagar</Button>
                       </>
                     ) : (
-                      <span className="text-xs text-gray-500 italic">Desp. Fixa</span>
+                      <>
+                        <Button size="sm" variant="outline" onClick={() => {
+                          setEditandoDesp(row);
+                          setFormDesp({
+                            mesAno: row.mesAno ?? "", tipoPagto: row.tipoPagto ?? "",
+                            cidadeUF: row.cidadeUF ?? "", empresa: row.empresa ?? "",
+                            chaveResp: row.chaveJResp ?? "", nome: row.nomeFavorecido ?? "",
+                            banco: row.banco ?? "", agencia: row.agencia ?? "",
+                            conta: row.conta ?? "", cpfCnpj: row.cpfCnpj ?? "",
+                            tipoConta: row.tipoConta ?? "", pix: row.pix ?? "",
+                            valor: row.valor ?? "", pago: row.pago,
+                            dataPagto: row.dataPagto ?? "", dataVencer: row.dataVencer ?? "",
+                          });
+                        }} className="h-6 px-2 text-xs bg-purple-900/40 border-purple-700 text-purple-300 hover:bg-purple-800">Editar</Button>
+                        <Button size="sm" variant="outline" onClick={() => setDeletandoDespId(row.id)}
+                          className="h-6 px-2 text-xs bg-red-900/40 border-red-700 text-red-300 hover:bg-red-800">Apagar</Button>
+                      </>
                     )}
                   </div>
                 </td>
@@ -642,6 +684,140 @@ export default function PagamentosPage() {
             <Button onClick={() => deletandoId && deletarMutation.mutate({ id: deletandoId })}
               disabled={deletarMutation.isPending} className="bg-red-700 hover:bg-red-600 text-white">
               {deletarMutation.isPending ? "Excluindo..." : "Excluir"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Editar Despesa Fixa */}
+      <Dialog open={editandoDesp !== null} onOpenChange={() => setEditandoDesp(null)}>
+        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-purple-300">Editar Despesa Fixa</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3 py-2">
+            <div>
+              <Label className="text-xs text-gray-400">Mês/Ano</Label>
+              <Input value={formDesp.mesAno} onChange={e => setFormDesp(f => ({ ...f, mesAno: maskMesAno(e.target.value) }))}
+                placeholder="MM/AAAA" maxLength={7} className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">Tipo Pagto</Label>
+              <Select value={formDesp.tipoPagto} onValueChange={v => setFormDesp(f => ({ ...f, tipoPagto: v }))}>
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white h-8 text-sm">
+                  <SelectValue placeholder="Selecione..." />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600">
+                  {TIPOS_PAGTO.map(t => <SelectItem key={t} value={t} className="text-white">{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">Empresa</Label>
+              <Input value={formDesp.empresa} onChange={e => setFormDesp(f => ({ ...f, empresa: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">Cidade/UF</Label>
+              <Input value={formDesp.cidadeUF} onChange={e => setFormDesp(f => ({ ...f, cidadeUF: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div className="col-span-2">
+              <Label className="text-xs text-gray-400">Nome</Label>
+              <Input value={formDesp.nome} onChange={e => setFormDesp(f => ({ ...f, nome: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">Banco</Label>
+              <Input value={formDesp.banco} onChange={e => setFormDesp(f => ({ ...f, banco: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">Agência</Label>
+              <Input value={formDesp.agencia} onChange={e => setFormDesp(f => ({ ...f, agencia: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">Conta</Label>
+              <Input value={formDesp.conta} onChange={e => setFormDesp(f => ({ ...f, conta: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">Tipo Conta</Label>
+              <Select value={formDesp.tipoConta} onValueChange={v => setFormDesp(f => ({ ...f, tipoConta: v }))}>
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white h-8 text-sm">
+                  <SelectValue placeholder="Selecione..." />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600">
+                  {TIPOS_CONTA.map(t => <SelectItem key={t} value={t} className="text-white">{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">CPF/CNPJ</Label>
+              <Input value={formDesp.cpfCnpj} onChange={e => setFormDesp(f => ({ ...f, cpfCnpj: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white h-8 text-sm font-mono" />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">Pix</Label>
+              <Input value={formDesp.pix} onChange={e => setFormDesp(f => ({ ...f, pix: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">Valor (R$)</Label>
+              <Input value={formDesp.valor} onChange={e => setFormDesp(f => ({ ...f, valor: e.target.value }))}
+                placeholder="0,00" className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">Data Vencer</Label>
+              <Input value={formDesp.dataVencer} onChange={e => setFormDesp(f => ({ ...f, dataVencer: maskData(e.target.value) }))}
+                placeholder="DD/MM/AAAA" maxLength={10} className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div className="flex items-center gap-3 pt-4">
+              <input type="checkbox" id="desp-pago-check" checked={formDesp.pago}
+                onChange={e => setFormDesp(f => ({ ...f, pago: e.target.checked }))} className="w-4 h-4 accent-green-500" />
+              <Label htmlFor="desp-pago-check" className="text-sm text-gray-300 cursor-pointer">Pago</Label>
+            </div>
+            {formDesp.pago && (
+              <div>
+                <Label className="text-xs text-gray-400">Data Pagto</Label>
+                <Input value={formDesp.dataPagto} onChange={e => setFormDesp(f => ({ ...f, dataPagto: maskData(e.target.value) }))}
+                  placeholder="DD/MM/AAAA" maxLength={10} className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+              </div>
+            )}
+            <div>
+              <Label className="text-xs text-gray-400">Chave Resp.</Label>
+              <Input value={formDesp.chaveResp} onChange={e => setFormDesp(f => ({ ...f, chaveResp: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditandoDesp(null)}
+              className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">Cancelar</Button>
+            <Button onClick={() => {
+              if (!editandoDesp) return;
+              editarDespMutation.mutate({ id: editandoDesp.id, ...formDesp });
+            }} disabled={editarDespMutation.isPending}
+              className="bg-purple-700 hover:bg-purple-600 text-white">
+              {editarDespMutation.isPending ? "Salvando..." : "Salvar Alterações"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Excluir Despesa Fixa */}
+      <Dialog open={deletandoDespId !== null} onOpenChange={() => setDeletandoDespId(null)}>
+        <DialogContent className="bg-gray-900 border-gray-700 text-white max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-red-400">Confirmar exclusão</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-gray-300">Tem certeza que deseja excluir esta despesa fixa? Esta ação não pode ser desfeita.</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletandoDespId(null)}
+              className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">Cancelar</Button>
+            <Button onClick={() => deletandoDespId && deletarDespMutation.mutate({ id: deletandoDespId })}
+              disabled={deletarDespMutation.isPending} className="bg-red-700 hover:bg-red-600 text-white">
+              {deletarDespMutation.isPending ? "Excluindo..." : "Excluir"}
             </Button>
           </DialogFooter>
         </DialogContent>
