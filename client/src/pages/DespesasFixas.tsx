@@ -324,14 +324,13 @@ export default function DespesasFixasPage() {
               <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Pix</th>
               <th className="px-1.5 py-1.5 text-right whitespace-nowrap">Valor</th>
               <th className="px-1.5 py-1.5 text-center whitespace-nowrap">Pago</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Dt.Pagto</th>
               <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Dt.Vencer</th>
               <th className="px-1.5 py-1.5 text-center whitespace-nowrap">Ações</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
-              <tr><td colSpan={18} className="text-center py-10 text-gray-500">Nenhum registro encontrado.</td></tr>
+              <tr><td colSpan={17} className="text-center py-10 text-gray-500">Nenhum registro encontrado.</td></tr>
             ) : rows.map((row, i) => {
               const sel = selecionados.has(row.id);
               return (
@@ -360,20 +359,6 @@ export default function DespesasFixasPage() {
                         : <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
                     }
                   </td>
-                  <td className="px-1.5 py-1 whitespace-nowrap">
-                    {editandoDtPagto === row.id ? (
-                      <input ref={dtPagtoRef} type="text" value={valorDtPagto} onChange={e => setValorDtPagto(e.target.value)}
-                        onBlur={() => salvarDtPagto(row.id)}
-                        onKeyDown={e => { if (e.key === "Enter") salvarDtPagto(row.id); if (e.key === "Escape") setEditandoDtPagto(null); }}
-                        placeholder="DD/MM/AAAA" maxLength={10}
-                        className="w-24 border border-blue-500 rounded px-1 py-0.5 text-[10px] focus:outline-none bg-gray-800 text-white" />
-                    ) : (
-                      <span onClick={() => iniciarEdicaoDtPagto(row as DespesaFixa)}
-                        className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[5rem] inline-block border border-transparent hover:border-blue-600 text-[10px]" title="Clique para editar">
-                        {row.dataPagto || <span className="text-gray-600 italic">DD/MM/AAAA</span>}
-                      </span>
-                    )}
-                  </td>
                   <td className="px-1.5 py-1 whitespace-nowrap text-[10px]">{row.dataVencer || "-"}</td>
                   <td className="px-1.5 py-1 text-center whitespace-nowrap">
                     <div className="flex gap-1 justify-center">
@@ -396,7 +381,7 @@ export default function DespesasFixasPage() {
               <tr className="bg-gray-800 font-semibold border-t-2 border-purple-600">
                 <td colSpan={13} className="px-1.5 py-1.5 text-right text-[10px] text-gray-400">Total:</td>
                 <td className="px-1.5 py-1.5 text-right text-green-400 text-[11px]">{totalValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
-                <td colSpan={4}></td>
+                <td colSpan={3}></td>
               </tr>
             </tfoot>
           )}
