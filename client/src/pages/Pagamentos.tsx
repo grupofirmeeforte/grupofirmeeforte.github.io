@@ -157,6 +157,12 @@ export default function PagamentosPage() {
   };
 
   const salvarDtPagto = (id: number) => {
+    // Só salva se a data estiver completa (DD/MM/AAAA = 10 chars) ou vazia (para desmarcar pago)
+    if (valorDtPagto && valorDtPagto.length < 10) {
+      // Data incompleta: cancela sem salvar
+      setEditandoDtPagto(null);
+      return;
+    }
     const pago = !!valorDtPagto;
     editarDtPagtoMutation.mutate({ id, dataPagto: valorDtPagto || undefined, pago });
   };
@@ -423,7 +429,15 @@ export default function PagamentosPage() {
                 <td className="px-2 py-1.5 whitespace-nowrap">
                   {editandoDtPagto === row.id && row._fonte === 'pagamento' ? (
                     <input ref={dtPagtoRef} type="text" value={valorDtPagto}
-                      onChange={(e) => setValorDtPagto(maskData(e.target.value))}
+                      onChange={(e) => {
+                        const v = maskData(e.target.value);
+                        setValorDtPagto(v);
+                        // Salva automaticamente quando a data estiver completa
+                        if (v.length === 10) {
+                          const pago = true;
+                          editarDtPagtoMutation.mutate({ id: row.id, dataPagto: v, pago });
+                        }
+                      }}
                       onBlur={() => salvarDtPagto(row.id)}
                       onKeyDown={(e) => { if (e.key === "Enter") salvarDtPagto(row.id); if (e.key === "Escape") setEditandoDtPagto(null); }}
                       placeholder="DD/MM/AAAA" maxLength={10}
