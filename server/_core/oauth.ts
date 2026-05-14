@@ -44,6 +44,37 @@ export function registerOAuthRoutes(app: Express) {
       const cookieOptions = getSessionCookieOptions(req);
       res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
 
+      // Registrar sessão ativa na tabela sessoes (para aparecer em Usuários Conectados)
+      try {
+        const ipAddress = ((req as any).ip || req.headers['x-forwarded-for'] || 'unknown') as string;
+        const userAgent = (req.headers['user-agent'] || 'unknown') as string;
+        const nomeAgente = userInfo.name || userInfo.email || userInfo.openId;
+
+        // Buscar agente pelo nome para associar o agenteId
+        const agente = await db.getAgenteByNome(nomeAgente);
+        const agenteId = agente?.id ?? 0;
+        const chaveJ = agente?.chaveJ ?? userInfo.openId;
+
+        const sessaoResult = await db.createSessao({
+          agenteId,
+          chaveJ,
+          nomeAgente,
+          ipAddress,
+          userAgent,
+        });
+
+        // Adicionar ID da sessão ao cookie para validação
+        if (sessaoResult && (sessaoResult as any).insertId) {
+          res.cookie('sessionId', String((sessaoResult as any).insertId), {
+            ...cookieOptions,
+            maxAge: ONE_YEAR_MS,
+          });
+        }
+      } catch (sessaoError) {
+        // Não bloquear o login se a criação da sessão falhar
+        console.error("[OAuth] Falha ao criar sessão:", sessaoError);
+      }
+
       res.redirect(302, "/");
     } catch (error) {
       console.error("[OAuth] Callback failed", error);

@@ -91,6 +91,13 @@ export async function getUserByOpenId(openId: string) {
 }
 
 // Queries para Agentes
+export async function getAgenteByNome(nomeAgente: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(agentes).where(eq(agentes.nomeAgente, nomeAgente)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function getAgenteByChaveJ(chaveJ: string) {
   const db = await getDb();
   if (!db) {
