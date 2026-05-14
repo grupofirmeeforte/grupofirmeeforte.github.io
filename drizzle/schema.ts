@@ -386,15 +386,16 @@ export const pagamentos = mysqlTable("pagamentos", {
   dataPagto: varchar("dataPagto", { length: 10 }),     // DD/MM/AAAA
   dataVencer: varchar("dataVencer", { length: 10 }),   // DD/MM/AAAA
   origem: varchar("origem", { length: 50 }).default("manual"), // manual | sistema
-  observacao: text("observacao"),
+   observacao: text("observacao"),
+  chaveJResp: varchar("chaveJResp", { length: 50 }), // Chave J do responsável pelo lançamento
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   mesAnoIdx: index("idx_pagamentos_mesAno").on(table.mesAno),
   chaveJIdx: index("idx_pagamentos_chaveJ").on(table.chaveJ),
   empresaIdx: index("idx_pagamentos_empresa").on(table.empresa),
+  chaveJRespIdx: index("idx_pagamentos_chaveJResp").on(table.chaveJResp),
 }));
-
 export type Pagamento = typeof pagamentos.$inferSelect;
 export type InsertPagamento = typeof pagamentos.$inferInsert;
 

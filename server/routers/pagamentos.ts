@@ -3,7 +3,7 @@ import { publicProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { pagamentos, agentes, despesasFixas } from "../../drizzle/schema";
-import { eq, and, like, desc, count, asc } from "drizzle-orm";
+import { eq, and, like, desc, count, asc, sql } from "drizzle-orm";
 
 export const TIPOS_PAGTO = [
   "Agua",
@@ -111,17 +111,42 @@ export const pagamentosRouter = {
       return rows[0] ?? null;
     }),
 
+  // Buscar agentes por chaveJ ou nome (para autocomplete do campo Chave J Responsável)
+  buscarAgenteResp: publicProcedure
+    .input(z.object({ termo: z.string() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db || input.termo.length < 2) return [];
+      const rows = await db
+        .select({
+          chaveJ: agentes.chaveJ,
+          nomeAgente: agentes.nomeAgente,
+          favorecido: agentes.favorecido,
+          empresa: agentes.empresa,
+          cidade: agentes.cidade,
+          uf: agentes.uf,
+        })
+        .from(agentes)
+        .where(
+          sql`(${agentes.chaveJ} LIKE ${`%${input.termo}%`} OR ${agentes.nomeAgente} LIKE ${`%${input.termo}%`} OR ${agentes.favorecido} LIKE ${`%${input.termo}%`})`
+        )
+        .orderBy(asc(agentes.chaveJ))
+        .limit(10);
+      return rows;
+    }),
+
   // Listar tipos de pagamento disponíveis
   tiposPagto: publicProcedure.query(() => [...TIPOS_PAGTO]),
 
   // Criar novo pagamento (com bloqueio de duplicatas)
   criar: publicProcedure
     .input(z.object({
-      mesAno: z.string().min(1, "Mês/Ano obrigatório"),
-      tipoPagto: z.string().min(1, "Tipo de pagamento obrigatório"),
+      mesAno: z.string().optional(),
+      tipoPagto: z.string().optional(),
       cidadeUF: z.string().optional(),
       empresa: z.string().optional(),
       chaveJ: z.string().optional(),
+      chaveJResp: z.string().optional(),
       cadastro: z.string().optional(),
       nomeFavorecido: z.string().optional(),
       banco: z.string().optional(),
@@ -185,6 +210,7 @@ export const pagamentosRouter = {
         cidadeUF: input.cidadeUF ?? null,
         empresa: input.empresa ?? null,
         chaveJ: input.chaveJ ?? null,
+        chaveJResp: input.chaveJResp ?? null,
         cadastro: input.cadastro ?? null,
         nomeFavorecido: input.nomeFavorecido ?? null,
         banco: input.banco ?? null,
@@ -213,6 +239,7 @@ export const pagamentosRouter = {
       cidadeUF: z.string().optional(),
       empresa: z.string().optional(),
       chaveJ: z.string().optional(),
+      chaveJResp: z.string().optional(),
       cadastro: z.string().optional(),
       nomeFavorecido: z.string().optional(),
       banco: z.string().optional(),
@@ -230,8 +257,7 @@ export const pagamentosRouter = {
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Banco indisponível" });
-
-      const { id, valor, ...rest } = input;
+      const { id, valor, ...rest } = input;;
       const updateData: Record<string, any> = {};
 
       // Só incluir campos definidos
@@ -326,6 +352,7 @@ export const pagamentosRouter = {
         cidadeUF: d.cidadeUF,
         empresa: d.empresa,
         chaveJ: d.chaveResp ?? null,
+        chaveJResp: d.chaveResp ?? null,
         cadastro: null as string | null,
         nomeFavorecido: d.nome,
         banco: d.banco,
@@ -343,7 +370,7 @@ export const pagamentosRouter = {
         _fonte: 'despesa_fixa' as const,
       }));
 
-      const pagNorm = rowsPag.map(p => ({ ...p, _fonte: 'pagamento' as const }));
+      const pagNorm = rowsPag.map(p => ({ ...p, chaveJResp: p.chaveJResp ?? null, _fonte: 'pagamento' as const }));
 
       // Unir e ordenar por mesAno desc, depois id desc
       const all = [...pagNorm, ...despNorm].sort((a, b) => {
@@ -388,4 +415,15 @@ export const pagamentosRouter = {
         .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(asc(pagamentos.empresa), asc(pagamentos.nomeFavorecido));
     }),
+
+  // Gerar próximo código automático para lançamento avulso (ex: 001A, 002A, ...)
+  nextCodigo: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return "001A";
+    // Busca o maior id existente para gerar um código único
+    const result = await db.select({ maxId: sql<number>`MAX(id)` }).from(pagamentos);
+    const maxId = result[0]?.maxId ?? 0;
+    const nextNum = (maxId + 1).toString().padStart(3, '0');
+    return `${nextNum}A`;
+  }),
 };

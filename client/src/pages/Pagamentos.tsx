@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import { ChaveJRespInput } from "@/components/ChaveJRespInput";
 
 const TIPOS_PAGTO = [
   "Adto", "Agua", "Ajuda de Custo", "Aluguel", "Cancelado", "Comissão",
@@ -49,6 +50,7 @@ type UnifiedRow = {
   dataVencer: string | null;
   origem: string | null;
   observacao: string | null;
+  chaveJResp: string | null;
   _fonte: 'pagamento' | 'despesa_fixa';
 };
 
@@ -73,13 +75,14 @@ type Pagamento = {
   dataVencer: string | null;
   origem: string | null;
   observacao: string | null;
+  chaveJResp: string | null;
 };
 
 const emptyForm = {
   mesAno: "", tipoPagto: "", cidadeUF: "", empresa: "", chaveJ: "",
   cadastro: "", nomeFavorecido: "", banco: "", agencia: "", conta: "",
   cpfCnpj: "", tipoConta: "", pix: "", valor: "", pago: false,
-  dataPagto: "", dataVencer: "", observacao: "",
+  dataPagto: "", dataVencer: "", observacao: "", chaveJResp: "",
 };
 
 function formatCurrency(v: string | null | undefined) {
@@ -110,6 +113,7 @@ export default function PagamentosPage() {
   const dtPagtoRef = useRef<HTMLInputElement>(null);
 
   const utils = trpc.useUtils();
+  const { data: nextCodigo } = trpc.pagamentos.nextCodigo.useQuery();
 
   const editarDtPagtoMutation = trpc.pagamentos.editar.useMutation({
     onSuccess: () => { utils.pagamentos.listUnificado.invalidate(); setEditandoDtPagto(null); },
@@ -194,7 +198,7 @@ export default function PagamentosPage() {
 
   function abrirNovo() {
     setEditando(null);
-    setForm({ ...emptyForm });
+    setForm({ ...emptyForm, chaveJ: nextCodigo ?? "" });
     setChaveJBusca("");
     setShowModal(true);
   }
@@ -214,7 +218,7 @@ export default function PagamentosPage() {
       cpfCnpj: row.cpfCnpj ?? "", tipoConta: row.tipoConta ?? "",
       pix: row.pix ?? "", valor: row.valor ?? "", pago: row.pago,
       dataPagto: row.dataPagto ?? "", dataVencer: row.dataVencer ?? "",
-      observacao: row.observacao ?? "",
+      observacao: row.observacao ?? "", chaveJResp: row.chaveJResp ?? "",
     });
     setChaveJBusca("");
     setShowModal(true);
@@ -228,7 +232,7 @@ export default function PagamentosPage() {
     if (editando) {
       editarMutation.mutate({ id: editando.id, ...form });
     } else {
-      criarMutation.mutate({ ...form, origem: "manual" });
+      criarMutation.mutate({ ...form, chaveJResp: form.chaveJResp || undefined, origem: "manual" });
     }
   }
 
@@ -563,6 +567,14 @@ export default function PagamentosPage() {
               <Label className="text-xs text-gray-400">Observação</Label>
               <Input value={form.observacao} onChange={e => setForm(f => ({ ...f, observacao: e.target.value }))}
                 className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+            </div>
+            <div className="col-span-2">
+              <ChaveJRespInput
+                label="Chave J Responsável (quem responde por este lançamento)"
+                value={form.chaveJResp}
+                onChange={(chaveJ) => setForm(f => ({ ...f, chaveJResp: chaveJ }))}
+                placeholder="Digite a Chave J ou nome do responsável..."
+              />
             </div>
           </div>
           <DialogFooter>
