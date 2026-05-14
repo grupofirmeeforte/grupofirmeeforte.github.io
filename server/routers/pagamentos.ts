@@ -372,17 +372,29 @@ export const pagamentosRouter = {
 
       const pagNorm = rowsPag.map(p => ({ ...p, chaveJResp: p.chaveJResp ?? null, _fonte: 'pagamento' as const }));
 
-      // Unir e ordenar por mesAno desc, depois id desc
+      // Ordenar: não pagos primeiro (vencimento mais próximo sobe), depois pagos (mais recentes primeiro)
+      const parseDataBR = (s: string | null | undefined): number => {
+        if (!s) return 99999999; // sem data vai para o fim dos não pagos
+        const p = s.split('/');
+        if (p.length !== 3) return 99999999;
+        return Number(p[2]) * 10000 + Number(p[1]) * 100 + Number(p[0]);
+      };
       const all = [...pagNorm, ...despNorm].sort((a, b) => {
-        const toSort = (s: string | null) => {
-          if (!s) return '';
-          const parts = s.split('/');
-          if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
-          return s;
-        };
-        const ma = toSort(a.mesAno) > toSort(b.mesAno) ? -1 : toSort(a.mesAno) < toSort(b.mesAno) ? 1 : 0;
-        if (ma !== 0) return ma;
-        return b.id - a.id;
+        const aPago = !!(a.pago);
+        const bPago = !!(b.pago);
+        // Não pagos antes dos pagos
+        if (aPago !== bPago) return aPago ? 1 : -1;
+        if (!aPago) {
+          // Entre não pagos: vencimento mais próximo (menor data) sobe; sem data vai para o fim
+          const aV = parseDataBR(a.dataVencer);
+          const bV = parseDataBR(b.dataVencer);
+          if (aV !== bV) return aV - bV;
+          // Mesmo vencimento: mais novo (maior id) sobe
+          return b.id - a.id;
+        } else {
+          // Entre pagos: mais recente (maior id) primeiro
+          return b.id - a.id;
+        }
       });
 
       const total = all.length;
