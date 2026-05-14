@@ -379,14 +379,28 @@ export const pagamentosRouter = {
         if (p.length !== 3) return 99999999;
         return Number(p[2]) * 10000 + Number(p[1]) * 100 + Number(p[0]);
       };
+      // Data de hoje como número AAAAMMDD
+      const hoje = new Date();
+      const hojeNum = hoje.getFullYear() * 10000 + (hoje.getMonth() + 1) * 100 + hoje.getDate();
+      // Prioridade dos não pagos: 0=atrasado, 1=hoje, 2=futuro, 3=sem data
+      const prioridade = (dataVencer: string | null | undefined): number => {
+        const v = parseDataBR(dataVencer);
+        if (v === 99999999) return 3; // sem data
+        if (v < hojeNum) return 0;   // atrasado
+        if (v === hojeNum) return 1; // vence hoje
+        return 2;                    // futuro
+      };
       const all = [...pagNorm, ...despNorm].sort((a, b) => {
         const aPago = !!(a.pago);
         const bPago = !!(b.pago);
         // Não pagos TODOS antes dos pagos
         if (aPago !== bPago) return aPago ? 1 : -1;
         if (!aPago) {
-          // Entre não pagos: data de vencimento crescente (menor data = vence mais cedo = sobe)
-          // Sem data (99999999) vai para o fim
+          const aPrio = prioridade(a.dataVencer);
+          const bPrio = prioridade(b.dataVencer);
+          // Primeiro por prioridade (atrasado=0 sobe, sem data=3 desce)
+          if (aPrio !== bPrio) return aPrio - bPrio;
+          // Dentro do mesmo grupo: data crescente (mais antigo/urgente primeiro)
           const aV = parseDataBR(a.dataVencer);
           const bV = parseDataBR(b.dataVencer);
           if (aV !== bV) return aV - bV;

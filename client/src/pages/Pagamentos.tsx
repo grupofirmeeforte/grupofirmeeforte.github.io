@@ -140,6 +140,21 @@ export default function PagamentosPage() {
     hoje.setHours(0, 0, 0, 0);
     return dt < hoje;
   };
+  const isHoje = (dataVencer: string | null) => {
+    if (!dataVencer) return false;
+    const partes = dataVencer.split("/");
+    if (partes.length !== 3) return false;
+    const [d, m, a] = partes;
+    const dt = new Date(Number(a), Number(m) - 1, Number(d));
+    const hoje = new Date();
+    return dt.getFullYear() === hoje.getFullYear() && dt.getMonth() === hoje.getMonth() && dt.getDate() === hoje.getDate();
+  };
+  const rowBgClass = (row: UnifiedRow): string => {
+    if (row.pago || row.dataPagto) return "";
+    if (isAtrasado(row.dataVencer)) return "bg-red-950/50 border-l-4 border-l-red-500";
+    if (isHoje(row.dataVencer)) return "bg-yellow-950/40 border-l-4 border-l-yellow-400";
+    return "";
+  };
 
   const salvarDtPagto = (id: number) => {
     const pago = !!valorDtPagto;
@@ -374,7 +389,7 @@ export default function PagamentosPage() {
               </tr>
             ) : rows.map((row, i) => (
               <tr key={`${row._fonte}-${row.id}`}
-                className={`border-b border-gray-800 hover:bg-gray-800/50 transition-colors ${i % 2 === 0 ? "bg-gray-900/60" : "bg-gray-900/30"}`}>
+                className={`border-b border-gray-800 hover:bg-gray-800/50 transition-colors ${rowBgClass(row) || (i % 2 === 0 ? "bg-gray-900/60" : "bg-gray-900/30")}`}>
                 <td className="px-2 py-1.5 whitespace-nowrap">
                   {row._fonte === 'despesa_fixa'
                     ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-purple-900/60 text-purple-300 border border-purple-700">Desp. Fixa</span>
@@ -399,8 +414,10 @@ export default function PagamentosPage() {
                   {row.dataPagto
                     ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-green-900/60 text-green-300 border border-green-700">Pago</span>
                     : isAtrasado(row.dataVencer)
-                      ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-900/60 text-orange-300 border border-orange-600">Atrasado</span>
-                      : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
+                      ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-700 text-white border border-red-500">Atrasado</span>
+                      : isHoje(row.dataVencer)
+                        ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-yellow-600 text-white border border-yellow-400">Hoje</span>
+                        : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
                   }
                 </td>
                 <td className="px-2 py-1.5 whitespace-nowrap">
@@ -419,7 +436,18 @@ export default function PagamentosPage() {
                     </span>
                   )}
                 </td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.dataVencer || "-"}</td>
+                <td className="px-2 py-1.5 whitespace-nowrap">
+                  {row.dataVencer
+                    ? (
+                      !row.pago && !row.dataPagto && isAtrasado(row.dataVencer)
+                        ? <span className="font-bold text-red-400">⚠ {row.dataVencer}</span>
+                        : !row.pago && !row.dataPagto && isHoje(row.dataVencer)
+                          ? <span className="font-bold text-yellow-300">🔔 {row.dataVencer}</span>
+                          : <span>{row.dataVencer}</span>
+                    )
+                    : <span className="text-gray-500">-</span>
+                  }
+                </td>
                 <td className="px-2 py-1.5 text-center whitespace-nowrap">
                   <div className="flex gap-1 justify-center">
                     {row._fonte === 'pagamento' ? (
