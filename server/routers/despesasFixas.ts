@@ -35,15 +35,17 @@ export const despesasFixasRouter = router({
         .limit(input.limit)
         .offset(offset);
 
-      // Ordenar no JS: MM/AAAA -> AAAA/MM para comparação
+      // Ordenar por dataVencer crescente: quem vence mais cedo aparece primeiro
       rows.sort((a, b) => {
-        const toSort = (s: string | null) => {
-          if (!s) return '';
+        const toISO = (s: string | null) => {
+          if (!s) return '9999/99/99';
           const parts = s.split('/');
-          if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
+          if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
           return s;
         };
-        return toSort(b.mesAno) > toSort(a.mesAno) ? 1 : -1;
+        const da = toISO(a.dataVencer);
+        const db2 = toISO(b.dataVencer);
+        return da < db2 ? -1 : da > db2 ? 1 : 0;
       });
       return rows;
     }),
