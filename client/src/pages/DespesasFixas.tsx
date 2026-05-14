@@ -27,6 +27,12 @@ type DespesaFixa = {
   dataVencer: string | null;
 };
 
+const TIPOS_PAGTO = [
+  "Adto", "Agua", "Ajuda de Custo", "Aluguel", "Cancelado", "Comissão",
+  "DespesasLoja", "DespesasViagem", "Energia", "Ferias", "Internet",
+  "Outros", "Pagto", "Propaganda", "Reajuste", "Reembolso", "Salário",
+];
+
 const EMPTY: Omit<DespesaFixa, "id" | "pago"> = {
   mesAno: "", tipoPagto: "", cidadeUF: "", empresa: "", chaveResp: "",
   nome: "", banco: "", agencia: "", conta: "", cpfCnpj: "",
@@ -51,15 +57,23 @@ function isAtrasado(dataVencer: string | null) {
   return dt < hoje;
 }
 
-function FormField({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
+function maskMesAno(value: string): string {
+  const digits = value.replace(/\D/g, '').slice(0, 6);
+  if (digits.length <= 2) return digits;
+  return digits.slice(0, 2) + '/' + digits.slice(2);
+}
+
+function FormField({ label, value, onChange, placeholder, isMesAno }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; isMesAno?: boolean }) {
   return (
     <div className="flex flex-col gap-0.5">
       <label className="text-[10px] text-gray-400 font-medium">{label}</label>
       <input
         type="text"
         value={value}
-        onChange={e => onChange(e.target.value)}
+        onChange={e => onChange(isMesAno ? maskMesAno(e.target.value) : e.target.value)}
         placeholder={placeholder ?? label}
+        maxLength={isMesAno ? 7 : undefined}
+        inputMode={isMesAno ? "numeric" : undefined}
         className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-purple-500"
       />
     </div>
@@ -270,7 +284,7 @@ export default function DespesasFixasPage() {
             <label className="text-[10px] text-gray-400 block mb-0.5">Tipo Pagto</label>
             <select value={filtroTipo} onChange={e => { setFiltroTipo(e.target.value); setPage(1); }} className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-32">
               <option value="">Todos</option>
-              {["Aluguel","DespesasLoja","Energia","Internet","Outros"].map(t => <option key={t} value={t}>{t}</option>)}
+              {TIPOS_PAGTO.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
           <div>
@@ -415,8 +429,18 @@ export default function DespesasFixasPage() {
               <button onClick={() => setModal(m => ({ ...m, open: false }))} className="text-gray-400 hover:text-white text-lg leading-none">×</button>
             </div>
             <div className="p-4 grid grid-cols-2 gap-3">
-              <FormField label="Mês Ano" value={modal.dados.mesAno ?? ""} onChange={v => setField("mesAno", v)} placeholder="MM/AAAA" />
-              <FormField label="Tipo Pagto" value={modal.dados.tipoPagto ?? ""} onChange={v => setField("tipoPagto", v)} />
+              <FormField label="Mês Ano" value={modal.dados.mesAno ?? ""} onChange={v => setField("mesAno", v)} placeholder="MM/AAAA" isMesAno />
+              <div className="flex flex-col gap-0.5">
+                <label className="text-[10px] text-gray-400 font-medium">Tipo Pagto</label>
+                <select
+                  value={modal.dados.tipoPagto ?? ""}
+                  onChange={e => setField("tipoPagto", e.target.value)}
+                  className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-purple-500 h-[26px]"
+                >
+                  <option value="">Selecione...</option>
+                  {TIPOS_PAGTO.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
               <FormField label="Cidade/UF" value={modal.dados.cidadeUF ?? ""} onChange={v => setField("cidadeUF", v)} />
               <FormField label="Empresa" value={modal.dados.empresa ?? ""} onChange={v => setField("empresa", v)} />
               <div className="col-span-1">
