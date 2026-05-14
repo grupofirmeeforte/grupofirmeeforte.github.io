@@ -14,8 +14,9 @@ import { despesasFixasRouter } from "./routers/despesasFixas";
 import { feriadosRouter } from "./routers/feriados";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
-import { users, agentes } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { users, agentes, despesasFixas, pagamentos } from "../drizzle/schema";
+import { eq, and, or, isNull } from "drizzle-orm";
+import { notifyOwner } from "./_core/notification";
 import { sdk } from "./_core/sdk";
 import { TRPCError } from "@trpc/server";
 
@@ -159,6 +160,89 @@ export const appRouter = router({
           });
         }
         
+        // ── Notificação de pagamentos do dia para Thiago V Ultramare ──
+        const parseDataBR2 = (s: string | null): Date | null => {
+          if (!s) return null;
+          const p = s.split('/');
+          if (p.length !== 3) return null;
+          return new Date(Number(p[2]), Number(p[1]) - 1, Number(p[0]));
+        };
+        const THIAGO_NOME = 'thiago v ultramare';
+        if (agente.nomeAgente?.toLowerCase().trim() === THIAGO_NOME) {
+          try {
+            const db2 = await getDb();
+            if (db2) {
+              const agora2 = new Date();
+              const brasilia = new Date(agora2.getTime() - 3 * 60 * 60 * 1000);
+              const dd = String(brasilia.getUTCDate()).padStart(2, '0');
+              const mm = String(brasilia.getUTCMonth() + 1).padStart(2, '0');
+              const aaaa = String(brasilia.getUTCFullYear());
+              const hoje2Str = `${dd}/${mm}/${aaaa}`;
+
+              // Buscar pagamentos não pagos de despesas fixas com vencimento hoje ou atrasados
+              const todasDespesas = await db2.select().from(despesasFixas)
+                .where(and(eq(despesasFixas.pago, false), isNull(despesasFixas.dataPagto)));
+              const todasPagamentos = await db2.select().from(pagamentos)
+                .where(and(eq(pagamentos.pago, false), isNull(pagamentos.dataPagto)));
+
+              const hojeDate = new Date(Number(aaaa), Number(mm) - 1, Number(dd));
+              hojeDate.setHours(0, 0, 0, 0);
+
+              type ItemPagto = { nome: string; valor: string; vencer: string; tipo: string; empresa: string };
+              const itens: ItemPagto[] = [];
+
+              for (const d of todasDespesas) {
+                const dt = parseDataBR2(d.dataVencer);
+                if (dt && dt <= hojeDate) {
+                  itens.push({
+                    nome: d.nome || d.chaveResp || '-',
+                    valor: d.valor ? `R$ ${parseFloat(String(d.valor)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-',
+                    vencer: d.dataVencer || '-',
+                    tipo: d.tipoPagto || 'Desp. Fixa',
+                    empresa: d.empresa || '-',
+                  });
+                }
+              }
+
+              for (const p of todasPagamentos) {
+                const dt = parseDataBR2(p.dataVencer);
+                if (dt && dt <= hojeDate) {
+                  itens.push({
+                    nome: p.nomeFavorecido || p.chaveJ || '-',
+                    valor: p.valor ? `R$ ${parseFloat(String(p.valor)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-',
+                    vencer: p.dataVencer || '-',
+                    tipo: p.tipoPagto || 'Pagamento',
+                    empresa: p.empresa || '-',
+                  });
+                }
+              }
+
+              if (itens.length > 0) {
+                const linhas = itens.slice(0, 20).map((it, i) =>
+                  `${i + 1}. ${it.nome} | ${it.tipo} | ${it.empresa} | ${it.valor} | Vence: ${it.vencer}`
+                ).join('\n');
+                const total = itens.reduce((acc, it) => {
+                  const v = parseFloat(it.valor.replace('R$ ', '').replace(/\./g, '').replace(',', '.'));
+                  return acc + (isNaN(v) ? 0 : v);
+                }, 0);
+                const totalStr = `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+                await notifyOwner({
+                  title: `📋 Pagamentos do dia ${hoje2Str} — ${itens.length} item(s)`,
+                  content: `Olá Thiago! Aqui está o que tem para pagar hoje (${hoje2Str}):\n\n${linhas}${itens.length > 20 ? `\n... e mais ${itens.length - 20} item(s)` : ''}\n\nTOTAL: ${totalStr}`,
+                });
+              } else {
+                await notifyOwner({
+                  title: `✅ Sem pagamentos pendentes em ${hoje2Str}`,
+                  content: `Olá Thiago! Não há pagamentos com vencimento hoje ou em atraso. Bom dia! 😊`,
+                });
+              }
+            }
+          } catch (e) {
+            console.warn('[Login] Erro ao enviar notificação de pagamentos:', e);
+          }
+        }
+        // ── Fim notificação ──
+
         // Verificar se hoje é aniversário do agente
         const hoje = new Date();
         const diaHoje = hoje.getDate();
