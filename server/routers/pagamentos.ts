@@ -379,36 +379,18 @@ export const pagamentosRouter = {
         if (p.length !== 3) return 99999999;
         return Number(p[2]) * 10000 + Number(p[1]) * 100 + Number(p[0]);
       };
-      // Data de hoje como número comparável (AAAAMMDD)
-      const hoje = new Date();
-      const hojeNum = hoje.getFullYear() * 10000 + (hoje.getMonth() + 1) * 100 + hoje.getDate();
       const all = [...pagNorm, ...despNorm].sort((a, b) => {
         const aPago = !!(a.pago);
         const bPago = !!(b.pago);
-        // Não pagos antes dos pagos
+        // Não pagos TODOS antes dos pagos
         if (aPago !== bPago) return aPago ? 1 : -1;
         if (!aPago) {
+          // Entre não pagos: data de vencimento crescente (menor data = vence mais cedo = sobe)
+          // Sem data (99999999) vai para o fim
           const aV = parseDataBR(a.dataVencer);
           const bV = parseDataBR(b.dataVencer);
-          // Sem data (99999999) vai para o fim dos não pagos
-          const aNoDate = aV === 99999999;
-          const bNoDate = bV === 99999999;
-          if (aNoDate !== bNoDate) return aNoDate ? 1 : -1;
-          if (aNoDate && bNoDate) return b.id - a.id;
-          // Classificar: hoje/futuro (>= hoje) vs atrasado (< hoje)
-          const aAtrasado = aV < hojeNum;
-          const bAtrasado = bV < hojeNum;
-          if (aAtrasado !== bAtrasado) {
-            // Hoje/futuro sobe, atrasado desce
-            return aAtrasado ? 1 : -1;
-          }
-          if (!aAtrasado) {
-            // Ambos hoje/futuro: vence mais cedo sobe (crescente)
-            return aV - bV;
-          } else {
-            // Ambos atrasados: menos atrasado (data mais recente) sobe
-            return bV - aV;
-          }
+          if (aV !== bV) return aV - bV;
+          return b.id - a.id;
         } else {
           // Entre pagos: mais recente (maior id) primeiro
           return b.id - a.id;
