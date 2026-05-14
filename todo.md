@@ -448,3 +448,7 @@
 - [x] Middleware de autenticação deve verificar se sessão foi invalidada no banco e redirecionar para login
 - [x] Promover todos os Ultramare a admin para ter autonomia de deslogar usuários
 - [x] Adicionar refetchInterval de 30s no useAuth para detectar deslogamento forçado automaticamente
+
+## FASE 28: DESLOGAMENTO FORÇADO + CAPTCHA MATEMÁTICO
+- [x] Corrigir deslogamento forçado: usuário deve ser redirecionado imediatamente para login
+- [x] Adicionar verificação matemática no formulário de login com ChaveJ

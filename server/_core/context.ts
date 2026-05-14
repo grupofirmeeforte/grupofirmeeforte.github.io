@@ -1,7 +1,9 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
 import { sdk } from "./sdk";
-import { getSessaoById } from "../db";
+import { getSessaoById, getSessaoByChaveJ, getDb } from "../db";
+import { sessoes } from "../../drizzle/schema";
+import { eq, and } from "drizzle-orm";
 
 export type DisconnectReason = {
   motivo: string;
@@ -13,6 +15,19 @@ export type TrpcContext = {
   user: User | null;
 };
 
+const cookieClearOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+};
+
+function clearSessionCookies(res: CreateExpressContextOptions["res"]) {
+  res.clearCookie('app_session_id', cookieClearOptions);
+  res.clearCookie('sessionId', cookieClearOptions);
+  res.setHeader('X-Disconnect-Reason', 'Sessão encerrada pelo administrador');
+}
+
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
@@ -23,31 +38,44 @@ export async function createContext(
     
     // Se usuário está autenticado, validar se a sessão ainda está ativa
     if (user) {
-      // Tentar extrair o ID da sessão do cookie customizado
       const cookies = opts.req.headers.cookie || "";
       const sessionIdMatch = cookies.match(/sessionId=(\d+)/);
       
       if (sessionIdMatch) {
+        // Verificar pelo ID da sessão (login com ChaveJ)
         const sessionId = parseInt(sessionIdMatch[1], 10);
-        
-        // Verificar se a sessão ainda está ativa
         const sessao = await getSessaoById(sessionId);
-        
-        // Se não há sessão ativa, desconectar o usuário
         if (!sessao) {
           user = null;
-          // Limpar cookies de sessão
-          const cookieOptions = {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax' as const,
-            path: '/',
-          };
-          opts.res.clearCookie('app_session_id', cookieOptions);
-          opts.res.clearCookie('sessionId', cookieOptions);
-          
-          // Enviar motivo de desconexão ao cliente
-          opts.res.setHeader('X-Disconnect-Reason', 'Você foi desconectado porque sua conta foi acessada em outro dispositivo');
+          clearSessionCookies(opts.res);
+        }
+      } else {
+        // Sem sessionId: verificar sessão pelo openId/nome (login OAuth via Safari/Apple/Google)
+        const openId = user.openId;
+        const db = await getDb();
+        if (db) {
+          let sessaoAtiva = false;
+          if (openId.startsWith('agente_')) {
+            // Login via ChaveJ customizado
+            const agenteId = parseInt(openId.replace('agente_', ''), 10);
+            const result = await db.select().from(sessoes)
+              .where(and(eq(sessoes.agenteId, agenteId), eq(sessoes.ativo, 1)))
+              .limit(1);
+            sessaoAtiva = result.length > 0;
+          } else if (user.name) {
+            // Login OAuth puro: verificar pelo nome do agente
+            const result = await db.select().from(sessoes)
+              .where(and(eq(sessoes.nomeAgente, user.name), eq(sessoes.ativo, 1)))
+              .limit(1);
+            sessaoAtiva = result.length > 0;
+          } else {
+            // Sem como verificar: permitir acesso
+            sessaoAtiva = true;
+          }
+          if (!sessaoAtiva) {
+            user = null;
+            clearSessionCookies(opts.res);
+          }
         }
       }
     }

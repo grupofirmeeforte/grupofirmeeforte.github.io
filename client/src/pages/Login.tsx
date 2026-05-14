@@ -1,11 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { trpc } from '@/lib/trpc';
-import { AlertCircle, Lock, PartyPopper, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Lock, PartyPopper, CheckCircle2, RefreshCw } from 'lucide-react';
 import type { TRPCClientErrorLike } from '@trpc/client';
+
+// Gera uma operação matemática simples
+function gerarOperacao() {
+  const ops = ['+', '-', '×'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let a: number, b: number, resultado: number;
+  if (op === '+') {
+    a = Math.floor(Math.random() * 9) + 1;
+    b = Math.floor(Math.random() * 9) + 1;
+    resultado = a + b;
+  } else if (op === '-') {
+    a = Math.floor(Math.random() * 9) + 2;
+    b = Math.floor(Math.random() * (a - 1)) + 1;
+    resultado = a - b;
+  } else {
+    a = Math.floor(Math.random() * 5) + 2;
+    b = Math.floor(Math.random() * 5) + 2;
+    resultado = a * b;
+  }
+  return { pergunta: `Quanto é ${a} ${op} ${b}?`, resultado };
+}
 
 export default function Login() {
   const [chaveJ, setChaveJ] = useState('');
@@ -19,6 +40,17 @@ export default function Login() {
   } | null>(null);
   const [, setLocation] = useLocation();
 
+  // Estado da verificação matemática
+  const [operacao, setOperacao] = useState(() => gerarOperacao());
+  const [respostaMath, setRespostaMath] = useState('');
+  const [mathError, setMathError] = useState(false);
+
+  const renovarOperacao = useCallback(() => {
+    setOperacao(gerarOperacao());
+    setRespostaMath('');
+    setMathError(false);
+  }, []);
+
   const loginMutation = trpc.auth.loginCustom.useMutation({
     onSuccess: (data) => {
       setWelcomeData({
@@ -31,6 +63,7 @@ export default function Login() {
     },
     onError: (err: TRPCClientErrorLike<any>) => {
       const message = err.message || '';
+      renovarOperacao();
       // Erros de horário/dia não consomem tentativas de senha
       if (
         message.includes('segunda a sexta') ||
@@ -61,7 +94,16 @@ export default function Login() {
     e.preventDefault();
     if (isBlocked) return;
 
+    // Validar resposta matemática
+    const respostaNum = parseInt(respostaMath.trim(), 10);
+    if (isNaN(respostaNum) || respostaNum !== operacao.resultado) {
+      setMathError(true);
+      renovarOperacao();
+      return;
+    }
+
     setError('');
+    setMathError(false);
     document.cookie = 'app_session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     document.cookie = 'sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     loginMutation.mutate({ chaveJ, senha });
@@ -176,6 +218,38 @@ export default function Login() {
                 data-1p-ignore="true"
                 data-bm-ignore="true"
               />
+            </div>
+
+            {/* Verificação Matemática */}
+            <div className={`rounded-lg border p-4 ${mathError ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Verificação de Segurança
+                </label>
+                <button
+                  type="button"
+                  onClick={renovarOperacao}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Nova operação"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </button>
+              </div>
+              <p className="text-sm font-semibold text-gray-800 mb-2">
+                {operacao.pergunta}
+              </p>
+              <Input
+                type="number"
+                placeholder="Digite o resultado"
+                value={respostaMath}
+                onChange={(e) => { setRespostaMath(e.target.value); setMathError(false); }}
+                disabled={isBlocked}
+                className={`w-full ${mathError ? 'border-red-400' : ''}`}
+                autoComplete="off"
+              />
+              {mathError && (
+                <p className="text-xs text-red-600 mt-1">Resposta incorreta. Tente a nova operação.</p>
+              )}
             </div>
 
             {error && (
