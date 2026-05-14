@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { ChaveJRespInput } from "@/components/ChaveJRespInput";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
@@ -98,7 +97,7 @@ export default function DespesasFixasPage() {
   const [repetirMeses, setRepetirMeses] = useState(1);
 
   // Modal editar/novo
-  const [chaveJRespBusca, setChaveJRespBusca] = useState("");
+
   const [modal, setModal] = useState<{ open: boolean; modo: "novo" | "editar"; dados: Omit<DespesaFixa, "id" | "pago"> & { id?: number } }>({
     open: false, modo: "novo", dados: { ...EMPTY },
   });
@@ -108,32 +107,7 @@ export default function DespesasFixasPage() {
   const [valorDtPagto, setValorDtPagto] = useState("");
   const dtPagtoRef = useRef<HTMLInputElement>(null);
   const utils = trpc.useUtils();
-  const { data: dadosAgenteResp } = trpc.pagamentos.buscarAgente.useQuery(
-    { chaveJ: chaveJRespBusca },
-    { enabled: chaveJRespBusca.length >= 3 }
-  );
 
-  useEffect(() => {
-    if (dadosAgenteResp && chaveJRespBusca && modal.open) {
-      setModal(prev => ({
-        ...prev,
-        dados: {
-          ...prev.dados,
-          empresa: dadosAgenteResp.empresa ?? prev.dados.empresa,
-          nome: dadosAgenteResp.favorecido || dadosAgenteResp.nomeAgente || prev.dados.nome,
-          banco: dadosAgenteResp.banco ?? prev.dados.banco,
-          agencia: dadosAgenteResp.agencia ?? prev.dados.agencia,
-          conta: dadosAgenteResp.conta ?? prev.dados.conta,
-          cpfCnpj: dadosAgenteResp.cpfAgente ?? prev.dados.cpfCnpj,
-          tipoConta: dadosAgenteResp.tipo ?? prev.dados.tipoConta,
-          pix: dadosAgenteResp.pix ?? prev.dados.pix,
-          cidadeUF: dadosAgenteResp.cidade && dadosAgenteResp.uf
-            ? `${dadosAgenteResp.cidade}/${dadosAgenteResp.uf}`
-            : dadosAgenteResp.cidade ?? prev.dados.cidadeUF,
-        }
-      }));
-    }
-  }, [dadosAgenteResp, chaveJRespBusca]);
 
   const queryParams = {
     mesAno: filtroMesAno || undefined,
@@ -443,17 +417,7 @@ export default function DespesasFixasPage() {
               </div>
               <FormField label="Cidade/UF" value={modal.dados.cidadeUF ?? ""} onChange={v => setField("cidadeUF", v)} />
               <FormField label="Empresa" value={modal.dados.empresa ?? ""} onChange={v => setField("empresa", v)} />
-              <div className="col-span-1">
-                <ChaveJRespInput
-                  label={`Chave Resp.${dadosAgenteResp && chaveJRespBusca ? " ✓ " + (dadosAgenteResp.favorecido || dadosAgenteResp.nomeAgente || "") : ""}`}
-                  value={modal.dados.chaveResp ?? ""}
-                  onChange={(chaveJ) => {
-                    setField("chaveResp", chaveJ);
-                    setChaveJRespBusca(chaveJ);
-                  }}
-                  placeholder="Chave J ou nome..."
-                />
-              </div>
+              <FormField label="Chave Resp." value={modal.dados.chaveResp ?? ""} onChange={v => setField("chaveResp", v)} placeholder="Ex: JJ123456" />
               <FormField label="Nome" value={modal.dados.nome ?? ""} onChange={v => setField("nome", v)} />
               <FormField label="Banco" value={modal.dados.banco ?? ""} onChange={v => setField("banco", v)} />
               <FormField label="Agência" value={modal.dados.agencia ?? ""} onChange={v => setField("agencia", v)} />
