@@ -323,14 +323,13 @@ export default function DespesasFixasPage() {
               <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Tp.Conta</th>
               <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Pix</th>
               <th className="px-1.5 py-1.5 text-right whitespace-nowrap">Valor</th>
-              <th className="px-1.5 py-1.5 text-center whitespace-nowrap">Pago</th>
               <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Dt.Vencer</th>
               <th className="px-1.5 py-1.5 text-center whitespace-nowrap">Ações</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
-              <tr><td colSpan={17} className="text-center py-10 text-gray-500">Nenhum registro encontrado.</td></tr>
+              <tr><td colSpan={16} className="text-center py-10 text-gray-500">Nenhum registro encontrado.</td></tr>
             ) : rows.map((row, i) => {
               const sel = selecionados.has(row.id);
               return (
@@ -351,14 +350,6 @@ export default function DespesasFixasPage() {
                   <td className="px-1.5 py-1 whitespace-nowrap">{row.tipoConta || "-"}</td>
                   <td className="px-1.5 py-1 whitespace-nowrap max-w-[90px] truncate" title={row.pix ?? ""}>{row.pix || "-"}</td>
                   <td className="px-1.5 py-1 text-right whitespace-nowrap font-medium text-green-400">{formatCurrency(row.valor)}</td>
-                  <td className="px-1.5 py-1 text-center">
-                    {row.dataPagto
-                      ? <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-green-900/60 text-green-300 border border-green-700">Pago</span>
-                      : isAtrasado(row.dataVencer)
-                        ? <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-orange-900/60 text-orange-300 border border-orange-600">Atrasado</span>
-                        : <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
-                    }
-                  </td>
                   <td className="px-1.5 py-1 whitespace-nowrap text-[10px]">{row.dataVencer || "-"}</td>
                   <td className="px-1.5 py-1 text-center whitespace-nowrap">
                     <div className="flex gap-1 justify-center">
@@ -381,7 +372,7 @@ export default function DespesasFixasPage() {
               <tr className="bg-gray-800 font-semibold border-t-2 border-purple-600">
                 <td colSpan={13} className="px-1.5 py-1.5 text-right text-[10px] text-gray-400">Total:</td>
                 <td className="px-1.5 py-1.5 text-right text-green-400 text-[11px]">{totalValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
-                <td colSpan={3}></td>
+                <td colSpan={2}></td>
               </tr>
             </tfoot>
           )}
