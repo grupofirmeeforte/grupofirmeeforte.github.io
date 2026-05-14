@@ -85,6 +85,7 @@ export const proRataRouter = router({
     .input(z.object({
       search: z.string().optional(),
       chaveJ: z.string().optional(),
+      empresa: z.string().optional(),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -94,6 +95,7 @@ export const proRataRouter = router({
       // Totais somam apenas operações ativas (codEst = 1)
       conditions.push(eq(proRata.codEst, '1'));
       if (input.chaveJ) conditions.push(like(proRata.chaveJ, `%${input.chaveJ}%`));
+      if (input.empresa) conditions.push(eq(proRata.empresa, input.empresa));
       if (input.search) {
         conditions.push(
           or(
@@ -126,6 +128,7 @@ export const proRataRouter = router({
 
       // Somar comissão uma única vez por contrato (nrOperacao)
       // para evitar duplicação quando há múltiplos lançamentos do mesmo contrato
+      const empresaFilter = input.empresa ? sql` AND empresa = ${input.empresa}` : sql``;
       const resultMesAnterior = await db.execute(sql`
         SELECT
           COALESCE(SUM(comissao_unica), 0) AS totalMesAnterior,
@@ -133,7 +136,7 @@ export const proRataRouter = router({
         FROM (
           SELECT nrOperacao, MAX(CAST(comissao AS DECIMAL(15,4))) AS comissao_unica
           FROM pro_rata
-          WHERE codEst = '1'
+          WHERE codEst = '1'${empresaFilter}
           GROUP BY nrOperacao
         ) sub
       `);
@@ -155,6 +158,7 @@ export const proRataRouter = router({
     .input(z.object({
       search: z.string().optional(),
       chaveJ: z.string().optional(),
+      empresa: z.string().optional(),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -162,6 +166,7 @@ export const proRataRouter = router({
 
       const conditions = [];
       if (input.chaveJ) conditions.push(like(proRata.chaveJ, `%${input.chaveJ}%`));
+      if (input.empresa) conditions.push(eq(proRata.empresa, input.empresa));
       if (input.search) {
         conditions.push(
           or(

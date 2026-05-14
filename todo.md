@@ -470,3 +470,10 @@
 - [x] Criar página CRM com 6 sub-abas: Clientes, Oportunidades, Atendimentos, Tarefas, Mailing, Relatórios
 - [x] Adicionar sub-módulos do CRM no menu da Home
 - [x] Rota /crm registrada no App.tsx
+
+## FASE 30: SEPARAÇÃO FLEX/BMF NO PRO RATA
+- [x] Adicionar filtro por empresa (Todas / FLEX / BMF) na tela Pro Rata
+- [x] Filtro aplicado nos totais (Total Registros, Total Financiado, Total a Receber, Parcelas Faltando)
+- [x] Filtro aplicado na listagem paginada
+- [x] Botões visuais com cores distintas: FLEX (azul), BMF (verde), Todas (cinza escuro)
+- [x] Router proRata atualizado: endpoints list, count e totais aceitam parâmetro empresa

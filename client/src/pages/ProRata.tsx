@@ -66,6 +66,7 @@ export default function ProRataPage() {
 
   const [aba, setAba] = useState<'operacoes' | 'encerradas'>('operacoes');
   const [search, setSearch] = useState('');
+  const [empresaFiltro, setEmpresaFiltro] = useState<string>(''); // '' = Todas, 'FLEX', 'BMF'
   const [page, setPage] = useState(0);
   const [showImport, setShowImport] = useState(false);
   const [importMode, setImportMode] = useState<'novo' | 'subscrever'>('subscrever');
@@ -80,15 +81,16 @@ export default function ProRataPage() {
   // ─── QUERIES ──────────────────────────────────────────────────────────────
   const { data: rows = [], isLoading } = trpc.proRata.list.useQuery({
     search: search || undefined,
+    empresa: empresaFiltro || undefined,
     limit: PAGE_SIZE,
     offset: page * PAGE_SIZE,
   });
 
-  const { data: countData } = trpc.proRata.count.useQuery({ search: search || undefined });
+  const { data: countData } = trpc.proRata.count.useQuery({ search: search || undefined, empresa: empresaFiltro || undefined });
   const total = countData?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const { data: totaisData } = trpc.proRata.totais.useQuery({ search: search || undefined });
+  const { data: totaisData } = trpc.proRata.totais.useQuery({ search: search || undefined, empresa: empresaFiltro || undefined });
 
   const { data: historicoData = [] } = trpc.proRata.historicoImportacoes.useQuery();
 
@@ -393,12 +395,32 @@ export default function ProRataPage() {
                 <Upload className="w-4 h-4 mr-2" />
                 Importar Excel
               </Button>
-              <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50" onClick={() => setShowDeleteAll(true)}>
+               <Button variant="outline" className="border-red-300 text-red-600 hover:bg-red-50" onClick={() => setShowDeleteAll(true)}>
                 <Trash2 className="w-4 h-4 mr-2" />
                 Limpar Tudo
               </Button>
             </div>
-
+            {/* Filtro por empresa */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500 font-medium">Empresa:</span>
+              {(['', 'FLEX', 'BMF'] as const).map(emp => (
+                <button
+                  key={emp}
+                  onClick={() => { setEmpresaFiltro(emp); setPage(0); }}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold border-2 transition-colors ${
+                    empresaFiltro === emp
+                      ? emp === 'FLEX'
+                        ? 'bg-blue-600 border-blue-600 text-white'
+                        : emp === 'BMF'
+                        ? 'bg-emerald-600 border-emerald-600 text-white'
+                        : 'bg-gray-800 border-gray-800 text-white'
+                      : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'
+                  }`}
+                >
+                  {emp === '' ? 'Todas' : emp}
+                </button>
+              ))}
+            </div>
             {/* Cards de resumo */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <Card className="border-indigo-100 bg-indigo-50">
