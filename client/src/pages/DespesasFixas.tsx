@@ -166,25 +166,42 @@ export default function DespesasFixasPage() {
     if (modal.modo === "editar" && d.id) {
       editarMutation.mutate({ id: d.id, mesAno: d.mesAno || undefined, tipoPagto: d.tipoPagto || undefined, cidadeUF: d.cidadeUF || undefined, empresa: d.empresa || undefined, chaveResp: d.chaveResp || undefined, nome: d.nome || undefined, banco: d.banco || undefined, agencia: d.agencia || undefined, conta: d.conta || undefined, cpfCnpj: d.cpfCnpj || undefined, tipoConta: d.tipoConta || undefined, pix: d.pix || undefined, valor: d.valor || undefined, dataPagto: d.dataPagto || undefined, dataVencer: d.dataVencer || undefined });
     } else {
+      // Função auxiliar: avança data DD/MM/AAAA por N meses
+      const avancarDataMeses = (data: string, meses: number): string => {
+        if (!data || data.length < 10) return data;
+        const [dd, mm2, aaaa2] = data.split("/");
+        let d2 = parseInt(dd, 10);
+        let m2 = parseInt(mm2, 10) + meses;
+        let a2 = parseInt(aaaa2, 10);
+        while (m2 > 12) { m2 -= 12; a2++; }
+        const maxDia = new Date(a2, m2, 0).getDate();
+        if (d2 > maxDia) d2 = maxDia;
+        return `${String(d2).padStart(2, "0")}/${String(m2).padStart(2, "0")}/${a2}`;
+      };
       // Gerar registros para cada mês
-      const mesesParaCriar: string[] = [];
+      type EntradaMes = { mesAno: string; dataVencer: string; dataPagto: string };
+      const mesesParaCriar: EntradaMes[] = [];
       if (d.mesAno && repetirMeses > 1) {
         const [mm, aaaa] = (d.mesAno ?? "").split("/");
         let m = parseInt(mm, 10);
         let a = parseInt(aaaa, 10);
         for (let i = 0; i < repetirMeses; i++) {
-          mesesParaCriar.push(`${String(m).padStart(2, "0")}/${a}`);
+          mesesParaCriar.push({
+            mesAno: `${String(m).padStart(2, "0")}/${a}`,
+            dataVencer: d.dataVencer ? avancarDataMeses(d.dataVencer, i) : "",
+            dataPagto: d.dataPagto ? avancarDataMeses(d.dataPagto, i) : "",
+          });
           m++;
           if (m > 12) { m = 1; a++; }
         }
       } else {
-        mesesParaCriar.push(d.mesAno ?? "");
+        mesesParaCriar.push({ mesAno: d.mesAno ?? "", dataVencer: d.dataVencer ?? "", dataPagto: d.dataPagto ?? "" });
       }
       // Criar um por um sequencialmente
       const criarTodos = async () => {
-        for (const mes of mesesParaCriar) {
+        for (const entry of mesesParaCriar) {
           await new Promise<void>((resolve, reject) => {
-            criarMutation.mutate({ mesAno: mes || undefined, tipoPagto: d.tipoPagto || undefined, cidadeUF: d.cidadeUF || undefined, empresa: d.empresa || undefined, chaveResp: d.chaveResp || undefined, nome: d.nome || undefined, banco: d.banco || undefined, agencia: d.agencia || undefined, conta: d.conta || undefined, cpfCnpj: d.cpfCnpj || undefined, tipoConta: d.tipoConta || undefined, pix: d.pix || undefined, valor: d.valor || undefined, dataPagto: d.dataPagto || undefined, dataVencer: d.dataVencer || undefined }, { onSuccess: () => resolve(), onError: (e) => reject(e) });
+            criarMutation.mutate({ mesAno: entry.mesAno || undefined, tipoPagto: d.tipoPagto || undefined, cidadeUF: d.cidadeUF || undefined, empresa: d.empresa || undefined, chaveResp: d.chaveResp || undefined, nome: d.nome || undefined, banco: d.banco || undefined, agencia: d.agencia || undefined, conta: d.conta || undefined, cpfCnpj: d.cpfCnpj || undefined, tipoConta: d.tipoConta || undefined, pix: d.pix || undefined, valor: d.valor || undefined, dataPagto: entry.dataPagto || undefined, dataVencer: entry.dataVencer || undefined }, { onSuccess: () => resolve(), onError: (e) => reject(e) });
           });
         }
         invalidate();
