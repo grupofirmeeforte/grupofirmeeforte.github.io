@@ -2,7 +2,7 @@ import { z } from "zod";
 import { publicProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
-import { pagamentos, agentes } from "../../drizzle/schema";
+import { pagamentos, agentes, despesasFixas } from "../../drizzle/schema";
 import { eq, and, like, desc, count, asc } from "drizzle-orm";
 
 export const TIPOS_PAGTO = [
@@ -278,6 +278,90 @@ export const pagamentosRouter = {
       .orderBy(asc(pagamentos.empresa));
     return rows.map((r: any) => r.empresa).filter(Boolean) as string[];
   }),
+
+  // Listar unificado: pagamentos + despesas fixas
+  listUnificado: publicProcedure
+    .input(z.object({
+      page: z.number().default(1),
+      limit: z.number().default(100),
+      mesAno: z.string().optional(),
+      empresa: z.string().optional(),
+      tipoPagto: z.string().optional(),
+      pago: z.enum(["todos", "sim", "nao"]).default("todos"),
+      chaveJ: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { rows: [], total: 0 };
+      const offset = (input.page - 1) * input.limit;
+
+      // Buscar pagamentos
+      const condPag: any[] = [];
+      if (input.mesAno) condPag.push(eq(pagamentos.mesAno, input.mesAno));
+      if (input.empresa) condPag.push(eq(pagamentos.empresa, input.empresa));
+      if (input.tipoPagto) condPag.push(eq(pagamentos.tipoPagto, input.tipoPagto));
+      if (input.chaveJ) condPag.push(like(pagamentos.chaveJ, `%${input.chaveJ}%`));
+      if (input.pago === "sim") condPag.push(eq(pagamentos.pago, true));
+      if (input.pago === "nao") condPag.push(eq(pagamentos.pago, false));
+      const rowsPag = await db.select().from(pagamentos)
+        .where(condPag.length > 0 ? and(...condPag) : undefined)
+        .orderBy(desc(pagamentos.id));
+
+      // Buscar despesas fixas
+      const condDesp: any[] = [];
+      if (input.mesAno) condDesp.push(eq(despesasFixas.mesAno, input.mesAno));
+      if (input.empresa) condDesp.push(eq(despesasFixas.empresa, input.empresa));
+      if (input.tipoPagto) condDesp.push(eq(despesasFixas.tipoPagto, input.tipoPagto));
+      if (input.pago === "sim") condDesp.push(eq(despesasFixas.pago, true));
+      if (input.pago === "nao") condDesp.push(eq(despesasFixas.pago, false));
+      const rowsDesp = await db.select().from(despesasFixas)
+        .where(condDesp.length > 0 ? and(...condDesp) : undefined)
+        .orderBy(desc(despesasFixas.id));
+
+      // Normalizar despesas fixas para o mesmo formato
+      const despNorm = rowsDesp.map(d => ({
+        id: d.id,
+        mesAno: d.mesAno,
+        tipoPagto: d.tipoPagto,
+        cidadeUF: d.cidadeUF,
+        empresa: d.empresa,
+        chaveJ: d.chaveResp ?? null,
+        cadastro: null as string | null,
+        nomeFavorecido: d.nome,
+        banco: d.banco,
+        agencia: d.agencia,
+        conta: d.conta,
+        cpfCnpj: d.cpfCnpj,
+        tipoConta: d.tipoConta,
+        pix: d.pix,
+        valor: d.valor != null ? String(d.valor) : null,
+        pago: d.pago ?? false,
+        dataPagto: d.dataPagto,
+        dataVencer: d.dataVencer,
+        origem: 'despesa_fixa' as string,
+        observacao: null as string | null,
+        _fonte: 'despesa_fixa' as const,
+      }));
+
+      const pagNorm = rowsPag.map(p => ({ ...p, _fonte: 'pagamento' as const }));
+
+      // Unir e ordenar por mesAno desc, depois id desc
+      const all = [...pagNorm, ...despNorm].sort((a, b) => {
+        const toSort = (s: string | null) => {
+          if (!s) return '';
+          const parts = s.split('/');
+          if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
+          return s;
+        };
+        const ma = toSort(a.mesAno) > toSort(b.mesAno) ? -1 : toSort(a.mesAno) < toSort(b.mesAno) ? 1 : 0;
+        if (ma !== 0) return ma;
+        return b.id - a.id;
+      });
+
+      const total = all.length;
+      const rows = all.slice(offset, offset + input.limit);
+      return { rows, total };
+    }),
 
   // Exportar todos os pagamentos filtrados (sem paginação)
   exportar: publicProcedure

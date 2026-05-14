@@ -477,3 +477,9 @@
 - [x] Filtro aplicado na listagem paginada
 - [x] Botões visuais com cores distintas: FLEX (azul), BMF (verde), Todas (cinza escuro)
 - [x] Router proRata atualizado: endpoints list, count e totais aceitam parâmetro empresa
+
+## FASE 31: PAGAMENTOS — DESPESAS FIXAS + LANÇAMENTO AVULSO
+- [ ] Incluir despesas fixas na listagem de Pagamentos (buscar tabela despesasFixas junto com pagamentos)
+- [ ] Mostrar totais unificados (pagamentos + despesas fixas) nos cards de resumo
+- [ ] Adicionar opção de lançamento avulso ("Outros") sem precisar cadastrar fornecedor/beneficiário
+- [ ] Formulário avulso: campos Nome, Valor, Tipo, Empresa, Mês/Ano, Observação
