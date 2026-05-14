@@ -87,7 +87,7 @@ export default function DespesasFixasPage() {
   const [filtroMesAno, setFiltroMesAno] = useState("");
   const [filtroEmpresa, setFiltroEmpresa] = useState("");
   const [filtroTipo, setFiltroTipo] = useState("");
-  const [filtroPago, setFiltroPago] = useState<"todos" | "sim" | "nao">("todos");
+
   const [filtroNome, setFiltroNome] = useState("");
   const [page, setPage] = useState(1);
 
@@ -114,7 +114,6 @@ export default function DespesasFixasPage() {
     mesAno: filtroMesAno || undefined,
     empresa: filtroEmpresa || undefined,
     tipoPagto: filtroTipo || undefined,
-    pago: filtroPago,
     nome: filtroNome || undefined,
   };
 
@@ -277,14 +276,6 @@ export default function DespesasFixasPage() {
             <select value={filtroTipo} onChange={e => { setFiltroTipo(e.target.value); setPage(1); }} className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-32">
               <option value="">Todos</option>
               {TIPOS_PAGTO.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="text-[10px] text-gray-400 block mb-0.5">Pago</label>
-            <select value={filtroPago} onChange={e => { setFiltroPago(e.target.value as any); setPage(1); }} className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-24">
-              <option value="todos">Todos</option>
-              <option value="sim">Pago</option>
-              <option value="nao">Não Pago</option>
             </select>
           </div>
           <div>
