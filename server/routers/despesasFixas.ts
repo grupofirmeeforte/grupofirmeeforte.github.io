@@ -134,7 +134,7 @@ export const despesasFixasRouter = router({
         cpfCnpj: input.cpfCnpj || null,
         tipoConta: input.tipoConta || null,
         pix: input.pix || null,
-        valor: input.valor || null,
+        valor: input.valor ? input.valor.replace(',', '.') : null,
         pago: input.pago ?? false,
         dataPagto: input.dataPagto || null,
         dataVencer: input.dataVencer || null,
@@ -179,7 +179,7 @@ export const despesasFixasRouter = router({
       if (rest.cpfCnpj !== undefined) update.cpfCnpj = rest.cpfCnpj || null;
       if (rest.tipoConta !== undefined) update.tipoConta = rest.tipoConta || null;
       if (rest.pix !== undefined) update.pix = rest.pix || null;
-      if (rest.valor !== undefined) update.valor = rest.valor || null;
+      if (rest.valor !== undefined) update.valor = rest.valor ? rest.valor.replace(',', '.') : null;
       if (rest.pago !== undefined) update.pago = rest.pago;
       if (rest.dataPagto !== undefined) update.dataPagto = rest.dataPagto || null;
       if (rest.dataVencer !== undefined) update.dataVencer = rest.dataVencer || null;
