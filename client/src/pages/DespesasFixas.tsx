@@ -324,7 +324,7 @@ export default function DespesasFixasPage() {
             ) : rows.map((row, i) => {
               const sel = selecionados.has(row.id);
               return (
-                <tr key={row.id} className={`border-b border-gray-800/60 hover:bg-gray-800/40 transition-colors ${sel ? "bg-purple-900/25" : i % 2 === 0 ? "bg-gray-900/50" : "bg-gray-900/20"}`}>
+                <tr key={row.id} className={`border-b border-gray-800/60 transition-colors ${sel ? "bg-purple-900/25 hover:bg-purple-900/35" : isAtrasado(row.dataVencer) && !row.dataPagto ? "bg-red-950/60 hover:bg-red-900/50 border-red-900/40" : i % 2 === 0 ? "bg-gray-900/50 hover:bg-gray-800/40" : "bg-gray-900/20 hover:bg-gray-800/40"}`}>
                   <td className="px-1.5 py-1 text-center">
                     <input type="checkbox" checked={sel} onChange={() => toggleSelecionado(row.id)} className="w-3 h-3 cursor-pointer accent-purple-400" />
                   </td>
