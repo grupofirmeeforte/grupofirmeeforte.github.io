@@ -140,14 +140,21 @@ export default function PagamentosPage() {
     onError: (e) => toast.error(e.message),
   });
 
+  const editarDtPagtoDesp = trpc.despesasFixas.editar.useMutation({
+    onSuccess: () => { utils.pagamentos.listUnificado.invalidate(); setEditandoDtPagto(null); },
+    onError: (e) => toast.error(e.message),
+  });
+
   const iniciarEdicaoDtPagto = (row: UnifiedRow) => {
-    if (row._fonte !== 'pagamento') {
-      toast.info("Para editar despesas fixas, acesse a tela de Despesas Fixas.");
-      return;
-    }
     setEditandoDtPagto(row.id);
     setValorDtPagto(row.dataPagto ?? "");
     setTimeout(() => dtPagtoRef.current?.focus(), 50);
+  };
+
+  const salvarDtPagtoDesp = (id: number) => {
+    if (valorDtPagto && valorDtPagto.length < 10) { setEditandoDtPagto(null); return; }
+    const pago = !!valorDtPagto;
+    editarDtPagtoDesp.mutate({ id, dataPagto: valorDtPagto || undefined, pago });
   };
 
   const isAtrasado = (dataVencer: string | null) => {
@@ -453,25 +460,31 @@ export default function PagamentosPage() {
                   }
                 </td>
                 <td className="px-2 py-1.5 whitespace-nowrap">
-                  {editandoDtPagto === row.id && row._fonte === 'pagamento' ? (
+                  {editandoDtPagto === row.id ? (
                     <input ref={dtPagtoRef} type="text" value={valorDtPagto}
                       onChange={(e) => {
                         const v = maskData(e.target.value);
                         setValorDtPagto(v);
-                        // Salva automaticamente quando a data estiver completa
                         if (v.length === 10) {
                           const pago = true;
-                          editarDtPagtoMutation.mutate({ id: row.id, dataPagto: v, pago });
+                          if (row._fonte === 'pagamento') {
+                            editarDtPagtoMutation.mutate({ id: row.id, dataPagto: v, pago });
+                          } else {
+                            editarDtPagtoDesp.mutate({ id: row.id, dataPagto: v, pago });
+                          }
                         }
                       }}
-                      onBlur={() => salvarDtPagto(row.id)}
-                      onKeyDown={(e) => { if (e.key === "Enter") salvarDtPagto(row.id); if (e.key === "Escape") setEditandoDtPagto(null); }}
+                      onBlur={() => row._fonte === 'pagamento' ? salvarDtPagto(row.id) : salvarDtPagtoDesp(row.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") row._fonte === 'pagamento' ? salvarDtPagto(row.id) : salvarDtPagtoDesp(row.id);
+                        if (e.key === "Escape") setEditandoDtPagto(null);
+                      }}
                       placeholder="DD/MM/AAAA" maxLength={10}
                       className="w-28 border border-blue-500 rounded px-1.5 py-0.5 text-xs focus:outline-none bg-gray-800 text-white" />
                   ) : (
                     <span onClick={() => iniciarEdicaoDtPagto(row)}
-                      className={`cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[6rem] inline-block border border-transparent hover:border-blue-600 ${row._fonte === 'despesa_fixa' ? 'opacity-50 cursor-default' : ''}`}
-                      title={row._fonte === 'pagamento' ? "Clique para editar" : "Edite na tela de Despesas Fixas"}>
+                      className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[6rem] inline-block border border-transparent hover:border-blue-600"
+                      title="Clique para editar">
                       {row.dataPagto || <span className="text-gray-500 italic text-xs">DD/MM/AAAA</span>}
                     </span>
                   )}

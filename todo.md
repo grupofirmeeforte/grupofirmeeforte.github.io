@@ -488,3 +488,4 @@
 - [x] CORRIGIR: Pagamentos — registros com pago=true (Despesas Fixas) aparecem antes dos não pagos quando filtro "Não Pago" está ativo (campo `pago` das despesas fixas pode estar sendo retornado como 1/0 em vez de true/false)
 - [x] CORRIGIR: Pagamentos — Despesas Fixas na listagem unificada não têm botões Editar/Apagar (coluna Ações mostra apenas "Desp. Fixa" como texto)
 - [x] ADICIONAR: filtro busca por Nome na barra de filtros de Pagamentos
+- [x] CORRIGIR: Campo DT. PAGTO nas Despesas Fixas da listagem unificada mostra mensagem de erro ao clicar — deve permitir edição inline igual aos Pagamentos
