@@ -816,3 +816,146 @@ export const proRataEncerradas = mysqlTable("pro_rata_encerradas", {
 }));
 export type ProRataEncerrada = typeof proRataEncerradas.$inferSelect;
 export type InsertProRataEncerrada = typeof proRataEncerradas.$inferInsert;
+
+// ============================================================================
+// MÓDULO CRM
+// ============================================================================
+
+/**
+ * Clientes CRM
+ */
+export const crmClientes = mysqlTable("crm_clientes", {
+  id: int("id").autoincrement().primaryKey(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  cpf: varchar("cpf", { length: 14 }),
+  dataNascimento: varchar("dataNascimento", { length: 10 }),
+  telefone: varchar("telefone", { length: 20 }),
+  telefone2: varchar("telefone2", { length: 20 }),
+  email: varchar("email", { length: 255 }),
+  endereco: varchar("endereco", { length: 255 }),
+  cidade: varchar("cidade", { length: 100 }),
+  uf: varchar("uf", { length: 2 }),
+  convenio: varchar("convenio", { length: 100 }),
+  matricula: varchar("matricula", { length: 50 }),
+  margemDisponivel: decimal("margemDisponivel", { precision: 15, scale: 2 }),
+  beneficio: varchar("beneficio", { length: 50 }),
+  banco: varchar("banco", { length: 100 }),
+  agencia: varchar("agencia", { length: 20 }),
+  conta: varchar("conta", { length: 30 }),
+  agenteResponsavel: varchar("agenteResponsavel", { length: 255 }),
+  chaveJAgente: varchar("chaveJAgente", { length: 50 }),
+  origem: varchar("origem", { length: 100 }), // indicação, mailing, ativo, etc
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  cpfIdx: index("idx_crm_clientes_cpf").on(table.cpf),
+  agenteIdx: index("idx_crm_clientes_agente").on(table.chaveJAgente),
+}));
+export type CrmCliente = typeof crmClientes.$inferSelect;
+export type InsertCrmCliente = typeof crmClientes.$inferInsert;
+
+/**
+ * Oportunidades CRM (Pipeline)
+ */
+export const crmOportunidades = mysqlTable("crm_oportunidades", {
+  id: int("id").autoincrement().primaryKey(),
+  clienteId: int("clienteId"),
+  clienteNome: varchar("clienteNome", { length: 255 }).notNull(),
+  produto: varchar("produto", { length: 100 }), // Consignado INSS, Público, Consórcio, etc
+  valorEstimado: decimal("valorEstimado", { precision: 15, scale: 2 }),
+  status: mysqlEnum("status", ["novo", "em_contato", "proposta_enviada", "aprovado", "fechado", "perdido"]).default("novo").notNull(),
+  motivoPerda: varchar("motivoPerda", { length: 255 }),
+  agenteResponsavel: varchar("agenteResponsavel", { length: 255 }),
+  chaveJAgente: varchar("chaveJAgente", { length: 50 }),
+  previsaoFechamento: date("previsaoFechamento"),
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  clienteIdx: index("idx_crm_op_cliente").on(table.clienteId),
+  statusIdx: index("idx_crm_op_status").on(table.status),
+  agenteIdx: index("idx_crm_op_agente").on(table.chaveJAgente),
+}));
+export type CrmOportunidade = typeof crmOportunidades.$inferSelect;
+export type InsertCrmOportunidade = typeof crmOportunidades.$inferInsert;
+
+/**
+ * Atendimentos CRM
+ */
+export const crmAtendimentos = mysqlTable("crm_atendimentos", {
+  id: int("id").autoincrement().primaryKey(),
+  clienteId: int("clienteId"),
+  clienteNome: varchar("clienteNome", { length: 255 }).notNull(),
+  oportunidadeId: int("oportunidadeId"),
+  canal: mysqlEnum("canal", ["telefone", "whatsapp", "presencial", "email", "outro"]).default("telefone").notNull(),
+  assunto: varchar("assunto", { length: 255 }),
+  descricao: text("descricao"),
+  resultado: mysqlEnum("resultado", ["contato_realizado", "sem_resposta", "retornar", "proposta_aceita", "proposta_recusada", "encerrado"]).default("contato_realizado").notNull(),
+  proximoPasso: varchar("proximoPasso", { length: 255 }),
+  dataAtendimento: timestamp("dataAtendimento").defaultNow().notNull(),
+  agenteResponsavel: varchar("agenteResponsavel", { length: 255 }),
+  chaveJAgente: varchar("chaveJAgente", { length: 50 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  clienteIdx: index("idx_crm_at_cliente").on(table.clienteId),
+  agenteIdx: index("idx_crm_at_agente").on(table.chaveJAgente),
+}));
+export type CrmAtendimento = typeof crmAtendimentos.$inferSelect;
+export type InsertCrmAtendimento = typeof crmAtendimentos.$inferInsert;
+
+/**
+ * Tarefas / Follow-up CRM
+ */
+export const crmTarefas = mysqlTable("crm_tarefas", {
+  id: int("id").autoincrement().primaryKey(),
+  clienteId: int("clienteId"),
+  clienteNome: varchar("clienteNome", { length: 255 }),
+  oportunidadeId: int("oportunidadeId"),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  tipo: mysqlEnum("tipo", ["ligar", "whatsapp", "email", "visita", "enviar_proposta", "outro"]).default("ligar").notNull(),
+  prioridade: mysqlEnum("prioridade", ["baixa", "media", "alta"]).default("media").notNull(),
+  status: mysqlEnum("status", ["pendente", "em_andamento", "concluida", "cancelada"]).default("pendente").notNull(),
+  dataVencimento: timestamp("dataVencimento"),
+  dataConclusao: timestamp("dataConclusao"),
+  agenteResponsavel: varchar("agenteResponsavel", { length: 255 }),
+  chaveJAgente: varchar("chaveJAgente", { length: 50 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  agenteIdx: index("idx_crm_tar_agente").on(table.chaveJAgente),
+  statusIdx: index("idx_crm_tar_status").on(table.status),
+  vencimentoIdx: index("idx_crm_tar_vencimento").on(table.dataVencimento),
+}));
+export type CrmTarefa = typeof crmTarefas.$inferSelect;
+export type InsertCrmTarefa = typeof crmTarefas.$inferInsert;
+
+/**
+ * Mailing CRM
+ */
+export const crmMailing = mysqlTable("crm_mailing", {
+  id: int("id").autoincrement().primaryKey(),
+  listaId: varchar("listaId", { length: 36 }).notNull(), // UUID da lista
+  listaNome: varchar("listaNome", { length: 255 }).notNull(),
+  nome: varchar("nome", { length: 255 }).notNull(),
+  cpf: varchar("cpf", { length: 14 }),
+  telefone: varchar("telefone", { length: 20 }),
+  telefone2: varchar("telefone2", { length: 20 }),
+  convenio: varchar("convenio", { length: 100 }),
+  beneficio: varchar("beneficio", { length: 50 }),
+  margemDisponivel: decimal("margemDisponivel", { precision: 15, scale: 2 }),
+  status: mysqlEnum("status", ["nao_contatado", "em_contato", "convertido", "sem_interesse", "invalido"]).default("nao_contatado").notNull(),
+  agenteResponsavel: varchar("agenteResponsavel", { length: 255 }),
+  chaveJAgente: varchar("chaveJAgente", { length: 50 }),
+  observacoes: text("observacoes"),
+  dataContato: timestamp("dataContato"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  listaIdx: index("idx_crm_mail_lista").on(table.listaId),
+  statusIdx: index("idx_crm_mail_status").on(table.status),
+  agenteIdx: index("idx_crm_mail_agente").on(table.chaveJAgente),
+}));
+export type CrmMailingItem = typeof crmMailing.$inferSelect;
+export type InsertCrmMailingItem = typeof crmMailing.$inferInsert;

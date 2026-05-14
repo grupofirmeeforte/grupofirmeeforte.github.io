@@ -5,6 +5,7 @@ import { publicProcedure, router, adminProcedure, protectedProcedure } from "./_
 import { agentesRouter } from "./routers/agentes";
 import { auditoriaRouter } from "./routers/auditoria";
 import { certificacoesRouter } from "./routers/certificacoes";
+import { crmRouter } from "./routers/crm";
 import { febrabanRouter } from "./routers/febraban";
 import { pagamentosRouter } from "./routers/pagamentos";
 import { proRataRouter } from "./routers/proRata";
@@ -246,6 +247,7 @@ export const appRouter = router({
     }),
   }),
   agentes: agentesRouter,
+  crm: crmRouter,
   despesasFixas: despesasFixasRouter,
   auditoria: auditoriaRouter,
   febraban: febrabanRouter,

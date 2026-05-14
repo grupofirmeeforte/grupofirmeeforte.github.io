@@ -20,6 +20,7 @@ import PagamentosPage from './pages/Pagamentos';
 import ExtratosPage from './pages/Extratos';
 import ProRataPage from './pages/ProRata';
 import DespesasFixasPage from './pages/DespesasFixas';
+import CRMPage from './pages/CRM';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -58,6 +59,7 @@ function RouterWithInactivity() {
       <Route path={"/febraban"} component={FebrabanPage} />
       <Route path={"/pagamentos"} component={PagamentosPage} />
       <Route path={"/fornecedores"} component={DespesasFixasPage} />
+      <Route path={"/crm"} component={CRMPage} />
       <Route path={"/extratos"} component={ExtratosPage} />
       <Route path={"/pro-rata"} component={ProRataPage} />
 

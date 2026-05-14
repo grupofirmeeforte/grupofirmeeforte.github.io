@@ -452,3 +452,21 @@
 ## FASE 28: DESLOGAMENTO FORÇADO + CAPTCHA MATEMÁTICO
 - [x] Corrigir deslogamento forçado: usuário deve ser redirecionado imediatamente para login
 - [x] Adicionar verificação matemática no formulário de login com ChaveJ
+
+## FASE 29: MÓDULO CRM
+- [ ] Schema banco: tabelas crmClientes, crmOportunidades, crmAtendimentos, crmTarefas, crmMailing
+- [ ] Procedures tRPC: CRUD para cada entidade do CRM
+- [ ] Página CRM com 6 sub-abas: Clientes, Oportunidades, Atendimentos, Tarefas, Mailing, Relatórios
+- [ ] Sub-aba Clientes: cadastro, busca, edição, histórico de operações
+- [ ] Sub-aba Oportunidades: pipeline kanban/lista, status, agente responsável
+- [ ] Sub-aba Atendimentos: registro de contatos, histórico por cliente
+- [ ] Sub-aba Tarefas/Follow-up: lista de tarefas com alertas de vencimento
+- [ ] Sub-aba Mailing: importação de listas, segmentação, controle de contatos
+- [ ] Sub-aba Relatórios: funil de conversão, produtividade por agente
+
+## FASE 29: MÓDULO CRM
+- [x] Criar tabelas no banco: crm_clientes, crm_oportunidades, crm_atendimentos, crm_tarefas, crm_mailing_listas, crm_mailing_contatos
+- [x] Criar procedures tRPC para CRUD de cada entidade
+- [x] Criar página CRM com 6 sub-abas: Clientes, Oportunidades, Atendimentos, Tarefas, Mailing, Relatórios
+- [x] Adicionar sub-módulos do CRM no menu da Home
+- [x] Rota /crm registrada no App.tsx
