@@ -396,14 +396,18 @@ export const febrabanRouter = {
       const result = [];
 
       for (const emp of empresas) {
-        // Determinar o mesano desta empresa (usa o filtro se fornecido, ou o mais recente da empresa)
+        // Determinar o mesano mais recente desta empresa
+        // MESANO formato MMAA (ex: 626=jun/2026, 1225=dez/2025)
+        // Para ordenar corretamente, converter para AAAAMM: ano=20+AA, mes=MM
+        // RIGHT(LPAD(mesano,6,'0'),2) = AA, LEFT(LPAD(mesano,6,'0'),4) = MMXX
+        // Ordem real: CONCAT('20',RIGHT(LPAD(mesano,6,'0'),2), LPAD(LEFT(LPAD(mesano,6,'0'),LENGTH(mesano)-2),2,'0'))
         let mesano: number | undefined = inputMesano;
         if (!mesano) {
           const latest = await db
             .select({ v: febraban.mesano })
             .from(febraban)
             .where(sql`empresa = ${emp} AND mesano IS NOT NULL`)
-            .orderBy(desc(febraban.mesano))
+            .orderBy(sql`CONCAT('20', RIGHT(LPAD(CAST(mesano AS CHAR),6,'0'),2), LPAD(FLOOR(mesano / 100),2,'0')) DESC`)
             .limit(1);
           mesano = latest[0]?.v ?? undefined;
         }
@@ -415,17 +419,7 @@ export const febrabanRouter = {
 
         const baseWhere = sql`empresa = ${emp} AND mesano = ${mesano}`;
         // ANO: soma todos os meses do mesmo ano do mesano mais recente desta empresa
-        // Buscar o maior mesano desta empresa para determinar o ano de referência
-        const latestMesanoRows = await db
-          .select({ v: febraban.mesano })
-          .from(febraban)
-          .where(sql`empresa = ${emp} AND mesano IS NOT NULL`)
-          .orderBy(desc(febraban.mesano))
-          .limit(1);
-        const latestMesano = latestMesanoRows[0]?.v ?? mesano;
-        const latestMesanoStr = String(latestMesano);
-        const latestAnoSuffix = latestMesanoStr.slice(-2);
-        const anoWhere = sql`empresa = ${emp} AND RIGHT(LPAD(CAST(mesano AS CHAR), 6, '0'), 2) = ${latestAnoSuffix}`;
+        const anoWhere = sql`empresa = ${emp} AND RIGHT(LPAD(CAST(mesano AS CHAR), 6, '0'), 2) = ${anoSuffix}`;
 
         const [contratado, pendente, diaAtual, diaAnterior, ano,
                qtdContratado, qtdPendente, qtdDiaAtual, qtdDiaAnterior, qtdAno] = await Promise.all([

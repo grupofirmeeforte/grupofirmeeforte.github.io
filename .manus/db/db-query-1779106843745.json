@@ -1,0 +1,66 @@
+{
+  "query": "SELECT mesano, \n  RIGHT(LPAD(CAST(mesano AS CHAR),6,'0'),2) as aa,\n  LEFT(LPAD(CAST(mesano AS CHAR),6,'0'),4) as mmxx,\n  CONCAT('20', RIGHT(LPAD(CAST(mesano AS CHAR),6,'0'),2), LEFT(LPAD(CAST(mesano AS CHAR),6,'0'),4)) as aaaamm_raw,\n  CONCAT('20', RIGHT(LPAD(CAST(mesano AS CHAR),6,'0'),2), LPAD(FLOOR(mesano / 100),2,'0')) as aaaamm_correct\nFROM febraban WHERE empresa='FLEX' GROUP BY mesano ORDER BY mesano DESC LIMIT 8;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT mesano, \n  RIGHT(LPAD(CAST(mesano AS CHAR),6,'0'),2) as aa,\n  LEFT(LPAD(CAST(mesano AS CHAR),6,'0'),4) as mmxx,\n  CONCAT('20', RIGHT(LPAD(CAST(mesano AS CHAR),6,'0'),2), LEFT(LPAD(CAST(mesano AS CHAR),6,'0'),4)) as aaaamm_raw,\n  CONCAT('20', RIGHT(LPAD(CAST(mesano AS CHAR),6,'0'),2), LPAD(FLOOR(mesano / 100),2,'0')) as aaaamm_correct\nFROM febraban WHERE empresa='FLEX' GROUP BY mesano ORDER BY mesano DESC LIMIT 8;",
+  "rows": [
+    {
+      "mesano": "1225",
+      "aa": "25",
+      "mmxx": "0012",
+      "aaaamm_raw": "20250012",
+      "aaaamm_correct": "202512"
+    },
+    {
+      "mesano": "1125",
+      "aa": "25",
+      "mmxx": "0011",
+      "aaaamm_raw": "20250011",
+      "aaaamm_correct": "202511"
+    },
+    {
+      "mesano": "1025",
+      "aa": "25",
+      "mmxx": "0010",
+      "aaaamm_raw": "20250010",
+      "aaaamm_correct": "202510"
+    },
+    {
+      "mesano": "925",
+      "aa": "25",
+      "mmxx": "0009",
+      "aaaamm_raw": "20250009",
+      "aaaamm_correct": "202509"
+    },
+    {
+      "mesano": "825",
+      "aa": "25",
+      "mmxx": "0008",
+      "aaaamm_raw": "20250008",
+      "aaaamm_correct": "202508"
+    },
+    {
+      "mesano": "725",
+      "aa": "25",
+      "mmxx": "0007",
+      "aaaamm_raw": "20250007",
+      "aaaamm_correct": "202507"
+    },
+    {
+      "mesano": "626",
+      "aa": "26",
+      "mmxx": "0006",
+      "aaaamm_raw": "20260006",
+      "aaaamm_correct": "202606"
+    },
+    {
+      "mesano": "625",
+      "aa": "25",
+      "mmxx": "0006",
+      "aaaamm_raw": "20250006",
+      "aaaamm_correct": "202506"
+    }
+  ],
+  "messages": [],
+  "stdout": "mesano\taa\tmmxx\taaaamm_raw\taaaamm_correct\n1225\t25\t0012\t20250012\t202512\n1125\t25\t0011\t20250011\t202511\n1025\t25\t0010\t20250010\t202510\n925\t25\t0009\t20250009\t202509\n825\t25\t0008\t20250008\t202508\n725\t25\t0007\t20250007\t202507\n626\t26\t0006\t20260006\t202606\n625\t25\t0006\t20250006\t202506\n",
+  "stderr": "",
+  "execution_time_ms": 267
+}
