@@ -81,7 +81,7 @@ type Pagamento = {
 const emptyForm = {
   mesAno: "", tipoPagto: "", cidadeUF: "", empresa: "", chaveJ: "",
   cadastro: "", nomeFavorecido: "", banco: "", agencia: "", conta: "",
-  cpfCnpj: "", tipoConta: "", pix: "", valor: "", pago: false,
+  cpfCnpj: "", tipoConta: "", pix: "", tipoChave: "pix", valor: "", pago: false,
   dataPagto: "", dataVencer: "", observacao: "", chaveJResp: "",
 };
 
@@ -265,7 +265,7 @@ export default function PagamentosPage() {
       nomeFavorecido: row.nomeFavorecido ?? "", banco: row.banco ?? "",
       agencia: row.agencia ?? "", conta: row.conta ?? "",
       cpfCnpj: row.cpfCnpj ?? "", tipoConta: row.tipoConta ?? "",
-      pix: row.pix ?? "", valor: row.valor ?? "", pago: row.pago,
+      pix: row.pix ?? "", tipoChave: "pix", valor: row.valor ?? "", pago: row.pago,
       dataPagto: row.dataPagto ?? "", dataVencer: row.dataVencer ?? "",
       observacao: row.observacao ?? "", chaveJResp: row.chaveJResp ?? "",
     });
@@ -634,8 +634,21 @@ export default function PagamentosPage() {
                 className="bg-gray-800 border-gray-600 text-white h-8 text-sm font-mono" />
             </div>
             <div>
-              <Label className="text-xs text-gray-400">Pix</Label>
+              <Label className="text-xs text-gray-400">Tipo Chave</Label>
+              <Select value={(form as any).tipoChave ?? 'pix'} onValueChange={v => setForm(f => ({ ...f, tipoChave: v } as any))}>
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white h-8 text-sm">
+                  <SelectValue placeholder="Selecione..." />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600">
+                  <SelectItem value="pix" className="text-white">Pix</SelectItem>
+                  <SelectItem value="boleto" className="text-white">Boleto</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400">{((form as any).tipoChave ?? 'pix') === 'boleto' ? 'Código de Barras' : 'Pix'}</Label>
               <Input value={form.pix} onChange={e => setForm(f => ({ ...f, pix: e.target.value }))}
+                placeholder={((form as any).tipoChave ?? 'pix') === 'boleto' ? 'Código de barras do boleto...' : ''}
                 className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
             </div>
             <div>

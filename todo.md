@@ -489,3 +489,4 @@
 - [x] CORRIGIR: Pagamentos — Despesas Fixas na listagem unificada não têm botões Editar/Apagar (coluna Ações mostra apenas "Desp. Fixa" como texto)
 - [x] ADICIONAR: filtro busca por Nome na barra de filtros de Pagamentos
 - [x] CORRIGIR: Campo DT. PAGTO nas Despesas Fixas da listagem unificada mostra mensagem de erro ao clicar — deve permitir edição inline igual aos Pagamentos
+- [ ] ADICIONAR: Modal Novo Lançamento em Pagamentos — campo Pix deve aceitar também formato Boleto (código de barras), com seletor Pix/Boleto
