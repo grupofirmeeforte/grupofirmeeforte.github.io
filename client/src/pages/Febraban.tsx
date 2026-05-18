@@ -97,7 +97,7 @@ export default function FebrabanPage() {
   const [mesano, setMesano] = useState<number | undefined>();
   const [situacao, setSituacao] = useState("__all__");
   const [operador, setOperador] = useState("__all__");
-  const [filtroPago, setFiltroPago] = useState<"todos" | "sim" | "nao">("todos");
+  const [filtroPago, setFiltroPago] = useState<"todos" | "sim" | "nao" | "srcc">("todos");
   const [page, setPage] = useState(0);
   const [exportandoNaoPagos, setExportandoNaoPagos] = useState(false);
   const [exportandoContratadas, setExportandoContratadas] = useState(false);
@@ -689,19 +689,20 @@ export default function FebrabanPage() {
 
             {/* Filtro Pago */}
             <div className="flex items-center gap-1 border rounded-md overflow-hidden h-10">
-              {(["todos", "sim", "nao"] as const).map((opt) => {
-                const labels: Record<string, string> = { todos: "Todos", sim: "Pagos", nao: "Não Pagos" };
+              {(["todos", "sim", "nao", "srcc"] as const).map((opt) => {
+                const labels: Record<string, string> = { todos: "Todos", sim: "Pagos", nao: "Não Pagos", srcc: "SRCC" };
                 const active = filtroPago === opt;
                 const colors: Record<string, string> = {
                   todos: active ? "bg-gray-700 text-white" : "bg-white text-gray-600 hover:bg-gray-50",
                   sim: active ? "bg-green-600 text-white" : "bg-white text-gray-600 hover:bg-green-50",
                   nao: active ? "bg-red-600 text-white" : "bg-white text-gray-600 hover:bg-red-50",
+                  srcc: active ? "bg-orange-500 text-white" : "bg-white text-gray-600 hover:bg-orange-50",
                 };
                 return (
                   <button
                     key={opt}
                     type="button"
-                    className={`flex-1 h-full text-xs font-medium px-1 transition-colors ${colors[opt]}`}
+                    className={`flex-1 h-full text-xs font-medium px-2 transition-colors ${colors[opt]}`}
                     onClick={() => { setFiltroPago(opt); setPage(0); }}
                   >
                     {labels[opt]}

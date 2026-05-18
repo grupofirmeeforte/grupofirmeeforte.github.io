@@ -507,3 +507,7 @@
 - [x] Campo pago na tabela febraban aceita 0=Não, 1=Sim, 2=SRCC (manual override)
 - [x] Lógica: se pago automático (consignados) = 1, exibe Sim; se pago manual = 2, exibe SRCC; senão exibe Não
 - [x] Resumo da Febraban: adicionar linha SRCC nos cards de totais por empresa (BMF e FLEX) com contagem e valor
+
+## FILTRO SRCC NA FEBRABAN
+- [x] Adicionar opção "SRCC" no filtro de pagamento da Febraban (ao lado de Todos/Pagos/Não Pagos)
+- [x] Backend: procedure list e count aceitam pago="srcc" e filtram por pago=2

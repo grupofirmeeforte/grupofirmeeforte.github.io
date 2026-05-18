@@ -22,7 +22,7 @@ export const febrabanRouter = {
       mesano: z.number().optional(),
       situacao: z.string().optional(),
       operador: z.string().optional(),
-      pago: z.enum(["todos", "sim", "nao"]).default("todos"),
+      pago: z.enum(["todos", "sim", "nao", "srcc"]).default("todos"),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -55,11 +55,13 @@ export const febrabanRouter = {
       if (input.operador && input.operador !== "__all__") {
         conditions.push(eq(febraban.operador, input.operador));
       }
-      // Filtro pago: "nao" = apenas não pagos, "sim" = apenas pagos
+      // Filtro pago: "nao" = apenas não pagos, "sim" = apenas pagos, "srcc" = apenas SRCC
       if (input.pago === "nao") {
-        conditions.push(sql`NOT EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
+        conditions.push(sql`${febraban.pago} != 2 AND NOT EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
       } else if (input.pago === "sim") {
-        conditions.push(sql`EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
+        conditions.push(sql`${febraban.pago} = 1 OR (${febraban.pago} = 0 AND EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta}))`);
+      } else if (input.pago === "srcc") {
+        conditions.push(eq(febraban.pago, 2));
       }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;
@@ -111,7 +113,7 @@ export const febrabanRouter = {
       mesano: z.number().optional(),
       situacao: z.string().optional(),
       operador: z.string().optional(),
-      pago: z.enum(["todos", "sim", "nao"]).default("todos"),
+      pago: z.enum(["todos", "sim", "nao", "srcc"]).default("todos"),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -143,9 +145,11 @@ export const febrabanRouter = {
         conditions.push(eq(febraban.operador, input.operador));
       }
       if (input.pago === "nao") {
-        conditions.push(sql`NOT EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
+        conditions.push(sql`${febraban.pago} != 2 AND NOT EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
       } else if (input.pago === "sim") {
-        conditions.push(sql`EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
+        conditions.push(sql`${febraban.pago} = 1 OR (${febraban.pago} = 0 AND EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta}))`);
+      } else if (input.pago === "srcc") {
+        conditions.push(eq(febraban.pago, 2));
       }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;
