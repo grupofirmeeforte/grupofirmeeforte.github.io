@@ -581,6 +581,15 @@ export default function FebrabanPage() {
                   </div>
                   <div className="text-[10px] text-orange-400 mt-0.5">{(emp as any).qtdSrcc ?? 0} op.</div>
                 </div>
+                {/* Canceladas no ano */}
+                <div className="px-3 py-2 text-center bg-red-50">
+                  <div className="text-[10px] text-red-600 font-medium uppercase tracking-wide leading-tight">Canceladas</div>
+                  <div className="text-[10px] text-red-400 mb-0.5">no ano</div>
+                  <div className="text-sm font-bold text-red-700">
+                    {((emp as any).canceladas ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                  </div>
+                  <div className="text-[10px] text-red-400 mt-0.5">{(emp as any).qtdCanceladas ?? 0} op.</div>
+                </div>
               </div>
             </div>
           ))}

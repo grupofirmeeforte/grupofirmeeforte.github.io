@@ -545,7 +545,7 @@ export const febrabanRouter = {
 
         const [contratado, pendente, diaAtual, diaAnterior, ano,
                qtdContratado, qtdPendente, qtdDiaAtual, qtdDiaAnterior, qtdAno,
-               srccValor, qtdSrcc] = await Promise.all([
+               srccValor, qtdSrcc, canceladasValor, qtdCanceladas] = await Promise.all([
           // Líquido contratado (situacao = Contratada)
           db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
             .from(febraban).where(sql`${baseWhere} AND situacao = 'Contratada'`),
@@ -596,6 +596,12 @@ export const febrabanRouter = {
                 AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
               )
             )`),
+          // Canceladas: valor troco do ANO VIGENTE
+          db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
+            .from(febraban).where(sql`${anoWhere} AND LOWER(situacao) LIKE '%cancel%'`),
+          // Canceladas: contagem do ANO VIGENTE
+          db.select({ cnt: sql<number>`COUNT(*)` })
+            .from(febraban).where(sql`${anoWhere} AND LOWER(situacao) LIKE '%cancel%'`),
         ]);
 
         result.push({
@@ -612,6 +618,8 @@ export const febrabanRouter = {
           qtdAno: Number(qtdAno[0]?.cnt ?? 0),
           srcc: Number(srccValor[0]?.total ?? 0),
           qtdSrcc: Number(qtdSrcc[0]?.cnt ?? 0),
+          canceladas: Number(canceladasValor[0]?.total ?? 0),
+          qtdCanceladas: Number(qtdCanceladas[0]?.cnt ?? 0),
           hojeStr,
           ontemStr,
           anoFull,
