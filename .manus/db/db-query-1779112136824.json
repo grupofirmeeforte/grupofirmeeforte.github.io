@@ -1,0 +1,28 @@
+{
+  "query": "SELECT f.empresa, f.mesano, COUNT(*) as qtd, SUM(CAST(f.financiado AS DECIMAL(15,2))) as total_financiado FROM febraban f INNER JOIN consignados c ON c.nrOperacao = f.proposta WHERE LOWER(TRIM(c.restricaoSRCC)) = 'sim' GROUP BY f.empresa, f.mesano ORDER BY f.empresa, f.mesano DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT f.empresa, f.mesano, COUNT(*) as qtd, SUM(CAST(f.financiado AS DECIMAL(15,2))) as total_financiado FROM febraban f INNER JOIN consignados c ON c.nrOperacao = f.proposta WHERE LOWER(TRIM(c.restricaoSRCC)) = 'sim' GROUP BY f.empresa, f.mesano ORDER BY f.empresa, f.mesano DESC;",
+  "rows": [
+    {
+      "empresa": "BMF",
+      "mesano": "426",
+      "qtd": "3",
+      "total_financiado": "29500.00"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "326",
+      "qtd": "1",
+      "total_financiado": "1550.00"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "226",
+      "qtd": "6",
+      "total_financiado": "19417.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "empresa\tmesano\tqtd\ttotal_financiado\nBMF\t426\t3\t29500.00\nBMF\t326\t1\t1550.00\nBMF\t226\t6\t19417.00\n",
+  "stderr": "",
+  "execution_time_ms": 271
+}

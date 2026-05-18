@@ -521,3 +521,4 @@
 ## PAGO AUTOMÁTICO NA IMPORTAÇÃO DA FEBRABAN
 - [x] Durante importação do Excel, consultar tabela consignados por nrOperacao e preencher pago=2 (SRCC), pago=1 (Sim) ou pago=0 (Não) automaticamente
 - [x] Na importação, se o registro já existe e pago foi marcado manualmente (pagoManual != 0), não alterar o valor — só alterar se for 0 (automático/não definido)
+- [x] Card SRCC no resumo BMF/FLEX: somar o ano vigente (anoWhere) e usar campo financiado (valor líquido)

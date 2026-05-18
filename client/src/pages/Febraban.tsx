@@ -575,7 +575,7 @@ export default function FebrabanPage() {
                 {/* SRCC */}
                 <div className="px-3 py-2 text-center bg-orange-50">
                   <div className="text-[10px] text-orange-600 font-medium uppercase tracking-wide leading-tight">SRCC</div>
-                  <div className="text-[10px] text-orange-400 mb-0.5">no mês</div>
+                  <div className="text-[10px] text-orange-400 mb-0.5">no ano</div>
                   <div className="text-sm font-bold text-orange-700">
                     {((emp as any).srcc ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
                   </div>

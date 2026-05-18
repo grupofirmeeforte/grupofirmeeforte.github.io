@@ -576,9 +576,9 @@ export const febrabanRouter = {
           // Contagem do ano
           db.select({ cnt: sql<number>`COUNT(*)` })
             .from(febraban).where(sql`${anoWhere} AND situacao = 'Contratada'`),
-          // SRCC: valor total (manual pago=2 OU auto via restricaoSRCC=Sim no consignado)
-          db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
-            .from(febraban).where(sql`${baseWhere} AND (
+          // SRCC: valor total do ANO VIGENTE (manual pago=2 OU auto via restricaoSRCC=Sim) usando financiado
+          db.select({ total: sql<string>`COALESCE(SUM(CAST(financiado AS DECIMAL(15,2))), 0)` })
+            .from(febraban).where(sql`${anoWhere} AND (
               pago = 2
               OR EXISTS (
                 SELECT 1 FROM consignados c
@@ -586,9 +586,9 @@ export const febrabanRouter = {
                 AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
               )
             )`),
-          // SRCC: contagem (manual pago=2 OU auto via restricaoSRCC=Sim)
+          // SRCC: contagem do ANO VIGENTE (manual pago=2 OU auto via restricaoSRCC=Sim)
           db.select({ cnt: sql<number>`COUNT(*)` })
-            .from(febraban).where(sql`${baseWhere} AND (
+            .from(febraban).where(sql`${anoWhere} AND (
               pago = 2
               OR EXISTS (
                 SELECT 1 FROM consignados c
