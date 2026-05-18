@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { febraban, consignados } from "../../drizzle/schema";
+import { febraban, consignados, feriados } from "../../drizzle/schema";
 import { eq, and, like, or, desc, asc, sql, isNotNull, isNull, ne } from "drizzle-orm";
 
 // Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
@@ -378,13 +378,33 @@ export const febrabanRouter = {
       const anoSuffix = mesanoStr.slice(-2); // "26"
       const anoFull = "20" + anoSuffix; // "2026"
 
-      // Data de hoje e ontem no formato DD/MM/AAAA
-      const hoje = new Date();
-      const ontem = new Date(hoje);
-      ontem.setDate(ontem.getDate() - 1);
+      // Data de hoje e último dia útil anterior no formato DD/MM/AAAA
       const pad = (n: number) => String(n).padStart(2, "0");
       const fmtDate = (d: Date) => `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+      const hoje = new Date();
       const hojeStr = fmtDate(hoje);
+
+      // Buscar feriados do banco para os anos relevantes (ano atual e anterior)
+      const anoAtual = hoje.getFullYear();
+      const feriadosRows = await db
+        .select({ data: feriados.data })
+        .from(feriados)
+        .where(sql`ano IN (${anoAtual - 1}, ${anoAtual})`);
+      const feriadosSet = new Set(feriadosRows.map((f: any) => f.data as string));
+
+      // Retroceder até encontrar o último dia útil (não é sáb/dom/feriado)
+      const ultimoDiaUtil = (ref: Date): Date => {
+        const d = new Date(ref);
+        d.setDate(d.getDate() - 1);
+        while (true) {
+          const dow = d.getDay(); // 0=dom, 6=sáb
+          const ds = fmtDate(d);
+          if (dow !== 0 && dow !== 6 && !feriadosSet.has(ds)) break;
+          d.setDate(d.getDate() - 1);
+        }
+        return d;
+      };
+      const ontem = ultimoDiaUtil(hoje);
       const ontemStr = fmtDate(ontem);
 
       const empresas = ["BMF", "FLEX"];
