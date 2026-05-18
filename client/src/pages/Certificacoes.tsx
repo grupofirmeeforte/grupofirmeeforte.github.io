@@ -315,25 +315,17 @@ export default function Certificacoes() {
                   <TableCell className="font-mono text-sm">{c.cpf || '-'}</TableCell>
                   <TableCell>{c.situacao || '-'}</TableCell>
                   {/* CONSIG */}
-                  {(c.id ?? 0) < 0 ? (
-                    <TableCell colSpan={10} className="text-center text-amber-600 font-medium text-xs italic">
-                      Iremos na certificação e atualizaremos
-                    </TableCell>
-                  ) : (
-                    <>
-                      <TableCell>{fmtDate(c.dataCertif)}</TableCell>
-                      <TableCell>{fmtDate(c.ventoCertif)}</TableCell>
-                      <TableCell className="text-center">{c.diasFaltando ?? '-'}</TableCell>
-                      <TableCell className={situacaoColor(c.situacaoCertif)}>{c.situacaoCertif || '-'}</TableCell>
-                      <TableCell className="font-mono text-xs">{c.nrCertificadoConsig || '-'}</TableCell>
-                      {/* LGPD */}
-                      <TableCell>{fmtDate(c.dataCertif2)}</TableCell>
-                      <TableCell>{fmtDate(c.ventoCertif3)}</TableCell>
-                      <TableCell className="text-center">{c.diasFaltando2 ?? '-'}</TableCell>
-                      <TableCell className={situacaoColor(c.situacaoCertif3)}>{c.situacaoCertif3 || '-'}</TableCell>
-                      <TableCell className="font-mono text-xs">{c.nrCertificadoPldft || '-'}</TableCell>
-                    </>
-                  )}
+                  <TableCell>{fmtDate(c.dataCertif)}</TableCell>
+                  <TableCell>{fmtDate(c.ventoCertif)}</TableCell>
+                  <TableCell className="text-center">{c.diasFaltando ?? '-'}</TableCell>
+                  <TableCell className={situacaoColor(c.situacaoCertif)}>{c.situacaoCertif || '-'}</TableCell>
+                  <TableCell className="font-mono text-xs">{c.nrCertificadoConsig || '-'}</TableCell>
+                  {/* LGPD */}
+                  <TableCell>{fmtDate(c.dataCertif2)}</TableCell>
+                  <TableCell>{fmtDate(c.ventoCertif3)}</TableCell>
+                  <TableCell className="text-center">{c.diasFaltando2 ?? '-'}</TableCell>
+                  <TableCell className={situacaoColor(c.situacaoCertif3)}>{c.situacaoCertif3 || '-'}</TableCell>
+                  <TableCell className="font-mono text-xs">{c.nrCertificadoPldft || '-'}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       {c.cpf && (
@@ -349,12 +341,29 @@ export default function Certificacoes() {
                           <ExternalLink className="w-3 h-3 text-blue-600" />
                         </Button>
                       )}
-                      <Button variant="ghost" size="sm" onClick={() => abrirEditar(c as Cert)}>
+                      <Button variant="ghost" size="sm" title="Editar certificação" onClick={() => {
+                        if ((c.id ?? 0) < 0) {
+                          // Sintético: abrir modal de criação pré-preenchido com dados do agente
+                          setEditandoId(null);
+                          setForm({
+                            empresa: (c as any).empresa || '',
+                            chaveJ: c.chaveJ || '',
+                            nomeAgente: c.nomeAgente || '',
+                            cpf: c.cpf || '',
+                            situacao: c.situacao || '',
+                          });
+                          setModalAberto(true);
+                        } else {
+                          abrirEditar(c as Cert);
+                        }
+                      }}>
                         <Pencil className="w-3 h-3" />
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700" onClick={() => setConfirmandoExclusao(c.id)}>
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
+                      {(c.id ?? 0) >= 0 && (
+                        <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700" onClick={() => setConfirmandoExclusao(c.id)}>
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
