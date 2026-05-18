@@ -234,12 +234,38 @@ export default function AcompanhamentoDiario() {
                     <th className="px-2 py-2 text-gray-400 font-medium min-w-[55px]">Aprov.</th>
                     <th className="px-2 py-2 text-gray-400 font-medium min-w-[55px]">Média/DU</th>
                     <th className="px-2 py-2 text-green-400 font-bold min-w-[80px]">Total</th>
-                    {dias.map(d => (
-                      <th key={d} className={`px-1 py-1 text-center min-w-[44px] ${isWeekend(ano, mes, d) ? "bg-gray-800/50 text-gray-600" : "text-gray-400"}`}>
-                        <div>{d}</div>
-                        <div className="text-[9px]">{getDayOfWeek(ano, mes, d)}</div>
-                      </th>
-                    ))}
+                    {dias.map(d => {
+                      const dow = new Date(ano, mes - 1, d).getDay();
+                      const isSab = dow === 6;
+                      const isDom = dow === 0;
+                      const isFer = !!feriadosNome[d];
+                      const isWkd = isSab || isDom;
+                      return (
+                        <th key={d} className={`px-1 py-1 text-center min-w-[52px] ${isWkd || isFer ? "bg-red-950/40" : ""}`}>
+                          {isFer ? (
+                            <>
+                              <div className="text-red-400 font-bold text-[9px] leading-tight">{d}</div>
+                              <div className="text-red-400 font-bold text-[9px] leading-tight">Feriado</div>
+                            </>
+                          ) : isSab ? (
+                            <>
+                              <div className="text-red-400 font-bold text-[9px] leading-tight">{d}</div>
+                              <div className="text-red-400 font-bold text-[9px] leading-tight">Sábado</div>
+                            </>
+                          ) : isDom ? (
+                            <>
+                              <div className="text-red-400 font-bold text-[9px] leading-tight">{d}</div>
+                              <div className="text-red-400 font-bold text-[9px] leading-tight">Domingo</div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="text-gray-400">{d}</div>
+                              <div className="text-[9px] text-gray-400">{getDayOfWeek(ano, mes, d)}</div>
+                            </>
+                          )}
+                        </th>
+                      );
+                    })}
                   </tr>
                 </thead>
                 <tbody>
@@ -265,10 +291,19 @@ export default function AcompanhamentoDiario() {
                       <td className="px-2 py-2 text-center font-bold text-green-400">{fmt(a.total)}</td>
                       {dias.map(d => {
                         const val = a.producaoPorDia[d] ?? 0;
-                        const weekend = isWeekend(ano, mes, d);
+                        const dow = new Date(ano, mes - 1, d).getDay();
+                        const isSab = dow === 6;
+                        const isDom = dow === 0;
+                        const isFer = !!feriadosNome[d];
+                        const isWkd = isSab || isDom;
+                        const label = isFer ? "Feriado" : isSab ? "Sábado" : isDom ? "Domingo" : null;
                         return (
-                          <td key={d} className={`px-1 py-2 text-center ${weekend ? "bg-gray-800/30 text-gray-600" : val > 0 ? "text-white" : "text-gray-700"}`}>
-                            {val > 0 ? fmt(val) : weekend ? "—" : "·"}
+                          <td key={d} className={`px-1 py-2 text-center ${isWkd || isFer ? "bg-red-950/20" : val > 0 ? "text-white" : "text-gray-700"}`}>
+                            {val > 0 ? (
+                              <span className={isWkd || isFer ? "text-red-300" : "text-white"}>{fmt(val)}</span>
+                            ) : label ? (
+                              <span className="text-red-500 font-bold text-[8px] leading-tight block">{label}</span>
+                            ) : "·"}
                           </td>
                         );
                       })}
@@ -281,10 +316,19 @@ export default function AcompanhamentoDiario() {
                     <td className="px-2 py-2 text-center text-green-400">{fmt(totalGeral)}</td>
                     {dias.map(d => {
                       const val = totalPorDia[d] ?? 0;
-                      const weekend = isWeekend(ano, mes, d);
+                      const dow = new Date(ano, mes - 1, d).getDay();
+                      const isSab = dow === 6;
+                      const isDom = dow === 0;
+                      const isFer = !!feriadosNome[d];
+                      const isWkd = isSab || isDom;
+                      const label = isFer ? "Feriado" : isSab ? "Sábado" : isDom ? "Domingo" : null;
                       return (
-                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${weekend ? "bg-gray-800/30 text-gray-600" : val > 0 ? "text-green-300" : "text-gray-700"}`}>
-                          {val > 0 ? fmt(val) : "·"}
+                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd || isFer ? "bg-red-950/20" : val > 0 ? "text-green-300" : "text-gray-700"}`}>
+                          {val > 0 ? (
+                            <span className={isWkd || isFer ? "text-red-300" : "text-green-300"}>{fmt(val)}</span>
+                          ) : label ? (
+                            <span className="text-red-500 font-bold text-[8px]">{label}</span>
+                          ) : "·"}
                         </td>
                       );
                     })}
