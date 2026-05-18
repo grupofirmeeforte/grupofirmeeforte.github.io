@@ -1,0 +1,22 @@
+{
+  "query": "SELECT DISTINCT situacao, COUNT(*) as qtd FROM agentes GROUP BY situacao ORDER BY qtd DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT DISTINCT situacao, COUNT(*) as qtd FROM agentes GROUP BY situacao ORDER BY qtd DESC;",
+  "rows": [
+    {
+      "situacao": "Ativo",
+      "qtd": "44"
+    },
+    {
+      "situacao": "Ativo03",
+      "qtd": "7"
+    },
+    {
+      "situacao": "Ativo04",
+      "qtd": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "situacao\tqtd\nAtivo\t44\nAtivo03\t7\nAtivo04\t3\n",
+  "stderr": "",
+  "execution_time_ms": 261
+}

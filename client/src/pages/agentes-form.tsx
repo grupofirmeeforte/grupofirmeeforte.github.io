@@ -384,6 +384,7 @@ export default function AgentesFormPage() {
                     <SelectItem value="Admin">Admin</SelectItem>
                     <SelectItem value="Comercial">Comercial</SelectItem>
                     <SelectItem value="Promotor">Promotor</SelectItem>
+                    <SelectItem value="Vendas">Vendas</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

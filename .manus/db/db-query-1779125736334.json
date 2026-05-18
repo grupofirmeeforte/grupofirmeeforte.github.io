@@ -1,0 +1,30 @@
+{
+  "query": "SELECT chaveJ, nomeAgente, empresa, situacao FROM agentes WHERE chaveJ IN ('JH306647','J9666994','J9663603','JI827175');\nSELECT chaveJ, nomeAgente, empresa FROM certificacoes WHERE chaveJ IN ('JH306647','J9666994','J9663603','JI827175','JJ726228');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT chaveJ, nomeAgente, empresa, situacao FROM agentes WHERE chaveJ IN ('JH306647','J9666994','J9663603','JI827175');\nSELECT chaveJ, nomeAgente, empresa FROM certificacoes WHERE chaveJ IN ('JH306647','J9666994','J9663603','JI827175','JJ726228');",
+  "rows": [
+    {
+      "chaveJ": "JH306647",
+      "nomeAgente": "NULL",
+      "empresa": "NULL"
+    },
+    {
+      "chaveJ": "J9666994",
+      "nomeAgente": "NULL",
+      "empresa": "NULL"
+    },
+    {
+      "chaveJ": "J9663603",
+      "nomeAgente": "NULL",
+      "empresa": "NULL"
+    },
+    {
+      "chaveJ": "JI827175",
+      "nomeAgente": "NULL",
+      "empresa": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\tnomeAgente\tempresa\nJH306647\tNULL\tNULL\nJ9666994\tNULL\tNULL\nJ9663603\tNULL\tNULL\nJI827175\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 266
+}

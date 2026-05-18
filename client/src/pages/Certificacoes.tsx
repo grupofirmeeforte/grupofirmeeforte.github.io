@@ -315,17 +315,25 @@ export default function Certificacoes() {
                   <TableCell className="font-mono text-sm">{c.cpf || '-'}</TableCell>
                   <TableCell>{c.situacao || '-'}</TableCell>
                   {/* CONSIG */}
-                  <TableCell>{fmtDate(c.dataCertif)}</TableCell>
-                  <TableCell>{fmtDate(c.ventoCertif)}</TableCell>
-                  <TableCell className="text-center">{c.diasFaltando ?? '-'}</TableCell>
-                  <TableCell className={situacaoColor(c.situacaoCertif)}>{c.situacaoCertif || '-'}</TableCell>
-                  <TableCell className="font-mono text-xs">{c.nrCertificadoConsig || '-'}</TableCell>
-                  {/* LGPD */}
-                  <TableCell>{fmtDate(c.dataCertif2)}</TableCell>
-                  <TableCell>{fmtDate(c.ventoCertif3)}</TableCell>
-                  <TableCell className="text-center">{c.diasFaltando2 ?? '-'}</TableCell>
-                  <TableCell className={situacaoColor(c.situacaoCertif3)}>{c.situacaoCertif3 || '-'}</TableCell>
-                  <TableCell className="font-mono text-xs">{c.nrCertificadoPldft || '-'}</TableCell>
+                  {c.id === -1 ? (
+                    <TableCell colSpan={10} className="text-center text-amber-600 font-medium text-xs italic">
+                      Iremos na certificação e atualizaremos
+                    </TableCell>
+                  ) : (
+                    <>
+                      <TableCell>{fmtDate(c.dataCertif)}</TableCell>
+                      <TableCell>{fmtDate(c.ventoCertif)}</TableCell>
+                      <TableCell className="text-center">{c.diasFaltando ?? '-'}</TableCell>
+                      <TableCell className={situacaoColor(c.situacaoCertif)}>{c.situacaoCertif || '-'}</TableCell>
+                      <TableCell className="font-mono text-xs">{c.nrCertificadoConsig || '-'}</TableCell>
+                      {/* LGPD */}
+                      <TableCell>{fmtDate(c.dataCertif2)}</TableCell>
+                      <TableCell>{fmtDate(c.ventoCertif3)}</TableCell>
+                      <TableCell className="text-center">{c.diasFaltando2 ?? '-'}</TableCell>
+                      <TableCell className={situacaoColor(c.situacaoCertif3)}>{c.situacaoCertif3 || '-'}</TableCell>
+                      <TableCell className="font-mono text-xs">{c.nrCertificadoPldft || '-'}</TableCell>
+                    </>
+                  )}
                   <TableCell>
                     <div className="flex gap-1">
                       {c.cpf && (
