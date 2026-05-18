@@ -329,15 +329,17 @@ export const febrabanRouter = {
       troco: z.number().optional().nullable(),
       financiado: z.number().optional().nullable(),
       situacao2: z.string().optional(),
+      pago: z.number().optional(),
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
-      const { id, troco, financiado, ...rest } = input;
+      const { id, troco, financiado, pago, ...rest } = input;
       await db.update(febraban).set({
         ...rest,
         troco: troco != null ? String(troco) : undefined,
         financiado: financiado != null ? String(financiado) : undefined,
+        ...(pago !== undefined ? { pago } : {}),
       }).where(eq(febraban.id, id));
       return { success: true };
     }),

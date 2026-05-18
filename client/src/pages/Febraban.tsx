@@ -484,6 +484,7 @@ export default function FebrabanPage() {
       troco: editRow.troco ? parseFloat(editRow.troco) : null,
       financiado: editRow.financiado ? parseFloat(editRow.financiado) : null,
       situacao2: editRow.situacao2 || undefined,
+      pago: editRow.pago ?? 0,
     });
   }
 
@@ -983,6 +984,16 @@ export default function FebrabanPage() {
               <div className="col-span-2">
                 <Label className="text-xs">Situação 2</Label>
                 <Input value={editRow.situacao2 || ""} onChange={e => setEditRow(r => r ? { ...r, situacao2: e.target.value } : r)} />
+              </div>
+              <div className="col-span-2 flex items-center gap-3 pt-2">
+                <input
+                  type="checkbox"
+                  id="edit-pago-check"
+                  checked={!!editRow.pago}
+                  onChange={e => setEditRow(r => r ? { ...r, pago: e.target.checked ? 1 : 0 } : r)}
+                  className="w-4 h-4 accent-green-500"
+                />
+                <Label htmlFor="edit-pago-check" className="text-sm cursor-pointer">Pago</Label>
               </div>
             </div>
           )}

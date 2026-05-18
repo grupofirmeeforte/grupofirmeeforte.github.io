@@ -490,3 +490,9 @@
 - [x] ADICIONAR: filtro busca por Nome na barra de filtros de Pagamentos
 - [x] CORRIGIR: Campo DT. PAGTO nas Despesas Fixas da listagem unificada mostra mensagem de erro ao clicar — deve permitir edição inline igual aos Pagamentos
 - [ ] ADICIONAR: Modal Novo Lançamento em Pagamentos — campo Pix deve aceitar também formato Boleto (código de barras), com seletor Pix/Boleto
+
+## CAMPO PAGO NO MODAL DE EDIÇÃO DA FEBRABAN
+- [x] Adicionar checkbox Pago no modal de edição da Febraban (frontend Febraban.tsx)
+- [x] Adicionar campo pago: z.number().optional() no schema do update procedure (febraban.ts)
+- [x] Extrair pago do input e persistir no banco com ...(pago !== undefined ? { pago } : {})
+- [x] Corrigir erro TypeScript TS2353 no Febraban.tsx
