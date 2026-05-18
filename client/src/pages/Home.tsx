@@ -79,8 +79,9 @@ export default function Home() {
       borderColor: 'border-slate-200',
       bgColor: 'from-slate-50 to-gray-50',
       subModules: [
-        { title: 'Logs de Acesso', description: 'Histórico de acessos ao sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria?aba=logs', subKey: 'logs' },
+        { title: 'Crédito x Despesas', description: 'Comparação entre créditos e despesas', icon: BarChart2, color: 'bg-slate-700', path: '/auditoria?aba=credito-despesas', subKey: 'credito-despesas' },
         { title: 'Feriados', description: 'Feriados nacionais e estaduais BA', icon: ClipboardList, color: 'bg-slate-500', path: '/auditoria?aba=feriados', subKey: 'feriados' },
+        { title: 'Logs de Acesso', description: 'Histórico de acessos ao sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria?aba=logs', subKey: 'logs' },
       ],
     },
 
