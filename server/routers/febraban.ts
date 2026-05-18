@@ -360,23 +360,8 @@ export const febrabanRouter = {
       const db = await getDb();
       if (!db) return { empresas: [], mesanoAtual: null };
 
-      // Determinar mesano a usar
-      let mesano = input.mesano;
-      if (!mesano) {
-        const latest = await db
-          .select({ v: febraban.mesano })
-          .from(febraban)
-          .where(sql`mesano IS NOT NULL`)
-          .orderBy(desc(febraban.mesano))
-          .limit(1);
-        mesano = latest[0]?.v ?? undefined;
-      }
-      if (!mesano) return { empresas: [], mesanoAtual: null };
-
-      // Determinar o ano do mesano (ex: 426 → 2026, 126 → 2026)
-      const mesanoStr = String(mesano);
-      const anoSuffix = mesanoStr.slice(-2); // "26"
-      const anoFull = "20" + anoSuffix; // "2026"
+      // Determinar mesano a usar (por empresa, cada uma usa o seu mês mais recente)
+      const inputMesano = input.mesano;
 
       // Data de hoje e último dia útil anterior no formato DD/MM/AAAA
       const pad = (n: number) => String(n).padStart(2, "0");
@@ -411,8 +396,36 @@ export const febrabanRouter = {
       const result = [];
 
       for (const emp of empresas) {
+        // Determinar o mesano desta empresa (usa o filtro se fornecido, ou o mais recente da empresa)
+        let mesano: number | undefined = inputMesano;
+        if (!mesano) {
+          const latest = await db
+            .select({ v: febraban.mesano })
+            .from(febraban)
+            .where(sql`empresa = ${emp} AND mesano IS NOT NULL`)
+            .orderBy(desc(febraban.mesano))
+            .limit(1);
+          mesano = latest[0]?.v ?? undefined;
+        }
+        if (!mesano) continue;
+
+        const mesanoStr = String(mesano);
+        const anoSuffix = mesanoStr.slice(-2);
+        const anoFull = "20" + anoSuffix;
+
         const baseWhere = sql`empresa = ${emp} AND mesano = ${mesano}`;
-        const anoWhere = sql`empresa = ${emp} AND RIGHT(LPAD(CAST(mesano AS CHAR), 6, '0'), 2) = ${anoSuffix}`;
+        // ANO: soma todos os meses do mesmo ano do mesano mais recente desta empresa
+        // Buscar o maior mesano desta empresa para determinar o ano de referência
+        const latestMesanoRows = await db
+          .select({ v: febraban.mesano })
+          .from(febraban)
+          .where(sql`empresa = ${emp} AND mesano IS NOT NULL`)
+          .orderBy(desc(febraban.mesano))
+          .limit(1);
+        const latestMesano = latestMesanoRows[0]?.v ?? mesano;
+        const latestMesanoStr = String(latestMesano);
+        const latestAnoSuffix = latestMesanoStr.slice(-2);
+        const anoWhere = sql`empresa = ${emp} AND RIGHT(LPAD(CAST(mesano AS CHAR), 6, '0'), 2) = ${latestAnoSuffix}`;
 
         const [contratado, pendente, diaAtual, diaAnterior, ano,
                qtdContratado, qtdPendente, qtdDiaAtual, qtdDiaAnterior, qtdAno] = await Promise.all([
@@ -466,7 +479,7 @@ export const febrabanRouter = {
         });
       }
 
-      return { empresas: result, mesanoAtual: mesano };
+      return { empresas: result, mesanoAtual: inputMesano ?? null };
     }),
 
   // Perspectiva de Ganho: registros do usuário logado filtrados pela data do mês atual
