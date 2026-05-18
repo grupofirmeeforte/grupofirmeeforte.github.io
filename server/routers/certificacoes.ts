@@ -57,6 +57,7 @@ export const certificacoesRouter = router({
         nomeAgente: agentes.nomeAgente,
         empresa: agentes.empresa,
         situacao: agentes.situacao,
+        cpf: agentes.cpfAgente,
       }).from(agentes);
 
       // Montar lista unificada: certificações existentes + agentes sem certificação
@@ -71,7 +72,7 @@ export const certificacoesRouter = router({
         nomeAgente: a.nomeAgente,
         empresa: a.empresa,
         situacao: a.situacao,
-        cpf: null,
+        cpf: a.cpf ?? null,
         dataCertif: null, ventoCertif: null, nrCertif: null,
         dataCertif3: null, ventoCertif3: null, nrCertif3: null,
         dataCertif2: null, ventoCertif2: null, nrCertif2: null,
