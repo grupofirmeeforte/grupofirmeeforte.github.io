@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2 } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -15,8 +15,8 @@ type SubModule = {
   icon: React.ElementType;
   color: string;
   path: string;
-  subKey?: string; // chave usada no mapa de permissões
-  ceoOnly?: boolean; // somente CEO pode ver
+  subKey?: string;
+  ceoOnly?: boolean;
 };
 
 type GroupModule = {
@@ -67,7 +67,33 @@ export default function Home() {
     );
   }
 
+  // Grupos em ordem alfabética
   const grupos: GroupModule[] = [
+    {
+      type: 'group',
+      key: 'auditoria',
+      title: 'Auditoria',
+      description: 'Logs de acesso e feriados nacionais e estaduais',
+      icon: ClipboardList,
+      color: 'bg-slate-700',
+      borderColor: 'border-slate-200',
+      bgColor: 'from-slate-50 to-gray-50',
+      subModules: [
+        { title: 'Logs de Acesso', description: 'Histórico de acessos ao sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria?aba=logs', subKey: 'logs' },
+        { title: 'Feriados', description: 'Feriados nacionais e estaduais BA', icon: ClipboardList, color: 'bg-slate-500', path: '/auditoria?aba=feriados', subKey: 'feriados' },
+      ],
+    },
+    {
+      type: 'group',
+      key: 'bbdental',
+      title: 'BB Dental',
+      description: 'Gestão de planos odontológicos BB Dental',
+      icon: Stethoscope,
+      color: 'bg-cyan-600',
+      borderColor: 'border-cyan-200',
+      bgColor: 'from-cyan-50 to-teal-50',
+      subModules: [],
+    },
     {
       type: 'group',
       key: 'cadastros',
@@ -82,6 +108,17 @@ export default function Home() {
         { title: 'Certificações', description: 'Controlar certificações e alertas de vencimento', icon: FileCheck, color: 'bg-green-500', path: '/certificacoes', subKey: 'certificacoes' },
         { title: 'Tabela Comissão', description: 'Faixas e percentuais de comissão por convênio', icon: TableProperties, color: 'bg-indigo-500', path: '/tabela-comissao', subKey: 'tabela-comissao' },
       ],
+    },
+    {
+      type: 'group',
+      key: 'consorcio',
+      title: 'Consórcio',
+      description: 'Gestão de operações de consórcio',
+      icon: Coins,
+      color: 'bg-orange-600',
+      borderColor: 'border-orange-200',
+      bgColor: 'from-orange-50 to-amber-50',
+      subModules: [],
     },
     {
       type: 'group',
@@ -164,6 +201,17 @@ export default function Home() {
     },
     {
       type: 'group',
+      key: 'ourocap',
+      title: 'OuroCap',
+      description: 'Gestão de títulos de capitalização OuroCap',
+      icon: Gem,
+      color: 'bg-yellow-600',
+      borderColor: 'border-yellow-200',
+      bgColor: 'from-yellow-50 to-amber-50',
+      subModules: [],
+    },
+    {
+      type: 'group',
       key: 'producao',
       title: 'Produção',
       description: 'Consignado e demais operações de produção',
@@ -189,17 +237,14 @@ export default function Home() {
     },
     {
       type: 'group',
-      key: 'auditoria',
-      title: 'Auditoria',
-      description: 'Logs de acesso e feriados nacionais e estaduais',
-      icon: ClipboardList,
-      color: 'bg-slate-700',
-      borderColor: 'border-slate-200',
-      bgColor: 'from-slate-50 to-gray-50',
-      subModules: [
-        { title: 'Logs de Acesso', description: 'Histórico de acessos ao sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria?aba=logs', subKey: 'logs' },
-        { title: 'Feriados', description: 'Feriados nacionais e estaduais BA', icon: ClipboardList, color: 'bg-slate-500', path: '/auditoria?aba=feriados', subKey: 'feriados' },
-      ],
+      key: 'seguros',
+      title: 'Seguros',
+      description: 'Gestão de seguros e apólices',
+      icon: ShieldPlus,
+      color: 'bg-indigo-600',
+      borderColor: 'border-indigo-200',
+      bgColor: 'from-indigo-50 to-blue-50',
+      subModules: [],
     },
   ];
 
@@ -351,39 +396,37 @@ export default function Home() {
               </button>
             </div>
 
-            {(() => {
-              const visibleMods = (isAdminOuCeo
-                ? grupoAtual.subModules
-                : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
-                .filter(m => !m.ceoOnly || isCEO);
-              return visibleMods.length === 0 ? (
-              <div className="text-center py-12 text-slate-400">
+            {grupoAtual.subModules.length === 0 ? (
+              <div className="text-center py-8 text-slate-400">
                 <p className="text-lg font-medium">Em breve</p>
-                <p className="text-sm mt-1">As abas deste módulo serão adicionadas em breve.</p>
+                <p className="text-sm mt-1">Este módulo está em desenvolvimento.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4">
-                {visibleMods.map((module) => {
-                  const Icon = module.icon;
-                  return (
-                    <button
-                      key={module.path}
-                      className="flex items-start gap-4 p-4 rounded-xl border-2 border-slate-100 hover:border-blue-300 hover:bg-blue-50 transition-all text-left group"
-                      onClick={() => { setGrupoAberto(null); navigate(module.path); }}
-                    >
-                      <div className={`${module.color} w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`}>
-                        <Icon className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-slate-900 group-hover:text-blue-700">{module.title}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">{module.description}</p>
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {(isAdminOuCeo
+                  ? grupoAtual.subModules
+                  : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
+                  .filter(m => !m.ceoOnly || isCEO)
+                  .map((sub) => {
+                    const SubIcon = sub.icon;
+                    return (
+                      <button
+                        key={sub.path}
+                        onClick={() => { setGrupoAberto(null); navigate(sub.path); }}
+                        className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-all text-left"
+                      >
+                        <div className={`${sub.color} w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                          <SubIcon className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-900 text-sm">{sub.title}</p>
+                          <p className="text-xs text-slate-500 mt-0.5">{sub.description}</p>
+                        </div>
+                      </button>
+                    );
+                  })}
               </div>
-            );
-            })()}
+            )}
           </div>
         </div>
       )}
