@@ -526,3 +526,13 @@
 ## CARD CANCELADAS E CORREÇÃO CONTRATADO
 - [x] Verificar e corrigir query Contratado no mês (garantir que só inclui situacao='Contratada', sem canceladas)
 - [x] Adicionar card Canceladas no ano vigente nos resumos BMF e FLEX (valor troco + contagem)
+
+## ACOMPANHAMENTO DIÁRIO (FEBRABAN)
+- [x] Procedure backend: buscar operadores únicos da Febraban por empresa e mesano
+- [x] Procedure backend: calcular produção por dia via Febraban (solicitacao + troco)
+- [x] Procedure backend: calcular métricas por agente (dias com/sem produção, índice, total, média/dia útil)
+- [x] Página AcompanhamentoDiario.tsx: seletor de mês/ano, abas BMF/FLEX
+- [x] Tabela com colunas por dia do mês, valor por dia, total, aproveitamento
+- [x] Ranking destacando agentes com maior aproveitamento (≥50%)
+- [x] Rota /febraban/acompanhamento-diario registrada no App.tsx
+- [x] Botão de acesso na página da Febraban

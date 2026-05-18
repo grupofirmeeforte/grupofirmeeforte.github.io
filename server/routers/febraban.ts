@@ -714,6 +714,138 @@ export const febrabanRouter = {
       return { rows: result, chaveJ: chaveJ ?? '', percentualAgente };
     }),
 
+  // Acompanhamento Diário: produção por agente por dia no mês selecionado
+  acompanhamentoDiario: protectedProcedure
+    .input(z.object({
+      empresa: z.enum(['BMF', 'FLEX']),
+      mes: z.number().min(1).max(12),
+      ano: z.number().min(2026),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { agentes: [], dias: [], totalPorDia: {} };
+
+      const { agentes: agentesTable } = await import('../../drizzle/schema');
+
+      // Calcular mesano no formato usado na Febraban (ex: 526 para maio/2026)
+      const anoSuffix = String(input.ano).slice(-2);
+      const mesano = Number(`${input.mes}${anoSuffix}`);
+
+      // Buscar operadores únicos da Febraban para este mesano e empresa
+      const operadoresFebraban = await db
+        .selectDistinct({ operador: febraban.operador })
+        .from(febraban)
+        .where(sql`empresa = ${input.empresa} AND mesano = ${mesano} AND operador IS NOT NULL AND operador != ''`)
+        .orderBy(asc(febraban.operador));
+
+      const operadorList = operadoresFebraban.map(r => r.operador).filter(Boolean) as string[];
+      if (operadorList.length === 0) return { agentes: [], dias: [], totalPorDia: {} };
+
+      // Buscar dados dos agentes no cadastro
+      const agentesInfo = await db
+        .select({ chaveJ: agentesTable.chaveJ, nomeAgente: agentesTable.nomeAgente, situacao: agentesTable.situacao })
+        .from(agentesTable)
+        .where(sql`empresa = ${input.empresa} AND chaveJ IN (${sql.raw(operadorList.map(o => `'${o.replace(/'/g, "''")}'`).join(','))})`);
+
+      const agentesMap = new Map(agentesInfo.map(a => [a.chaveJ?.toUpperCase(), a]));
+
+      // Calcular dias do mês
+      const daysInMonth = new Date(input.ano, input.mes, 0).getDate();
+      const dias: number[] = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+      // Buscar produção por operador e dia (apenas Contratadas)
+      const producaoRows = await db
+        .select({
+          operador: febraban.operador,
+          solicitacao: febraban.solicitacao,
+          troco: febraban.troco,
+        })
+        .from(febraban)
+        .where(sql`empresa = ${input.empresa} AND mesano = ${mesano} AND situacao = 'Contratada' AND operador IS NOT NULL`);
+
+      // Montar mapa: operador -> dia -> soma troco
+      const prodMap = new Map<string, Map<number, number>>();
+      const totalPorDia: Record<number, number> = {};
+
+      for (const row of producaoRows) {
+        if (!row.operador || !row.solicitacao) continue;
+        const op = row.operador.toUpperCase();
+        // Parse DD/MM/YYYY
+        const parts = String(row.solicitacao).split('/');
+        if (parts.length < 3) continue;
+        const dia = parseInt(parts[0], 10);
+        const mes = parseInt(parts[1], 10);
+        const ano = parseInt(parts[2], 10);
+        if (mes !== input.mes || ano !== input.ano) continue;
+        const valor = parseFloat(String(row.troco ?? 0)) || 0;
+
+        if (!prodMap.has(op)) prodMap.set(op, new Map());
+        const diaMap = prodMap.get(op)!;
+        diaMap.set(dia, (diaMap.get(dia) ?? 0) + valor);
+
+        totalPorDia[dia] = (totalPorDia[dia] ?? 0) + valor;
+      }
+
+      // Calcular dias úteis do mês (seg-sex, excluindo feriados)
+      // Buscar feriados do mês
+      const feriadosRows = await db
+        .select({ data: feriados.data })
+        .from(feriados)
+        .where(sql`MONTH(STR_TO_DATE(data, '%d/%m/%Y')) = ${input.mes} AND YEAR(STR_TO_DATE(data, '%d/%m/%Y')) = ${input.ano}`);
+      const feriadosSet = new Set(feriadosRows.map(f => {
+        const p = String(f.data).split('/');
+        return p.length === 3 ? parseInt(p[0], 10) : -1;
+      }));
+
+      let diasUteisTotal = 0;
+      for (const d of dias) {
+        const dow = new Date(input.ano, input.mes - 1, d).getDay();
+        if (dow !== 0 && dow !== 6 && !feriadosSet.has(d)) diasUteisTotal++;
+      }
+
+      // Montar resultado por agente
+      const agentesResult = operadorList.map(op => {
+        const opUpper = op.toUpperCase();
+        const diaMap = prodMap.get(opUpper) ?? new Map<number, number>();
+        const info = agentesMap.get(opUpper);
+
+        const producaoPorDia: Record<number, number> = {};
+        let total = 0;
+        let diasComProducao = 0;
+
+        for (const d of dias) {
+          const dow = new Date(input.ano, input.mes - 1, d).getDay();
+          const isUtil = dow !== 0 && dow !== 6 && !feriadosSet.has(d);
+          const val = diaMap.get(d) ?? 0;
+          producaoPorDia[d] = val;
+          total += val;
+          if (val > 0 && isUtil) diasComProducao++;
+        }
+
+        const diasSemProducao = diasUteisTotal - diasComProducao;
+        const aproveitamento = diasUteisTotal > 0 ? diasComProducao / diasUteisTotal : 0;
+        const mediaPorDiaUtil = diasComProducao > 0 ? total / diasComProducao : 0;
+
+        return {
+          chaveJ: op,
+          nome: info?.nomeAgente ?? op,
+          situacao: info?.situacao ?? 'Ativo',
+          total,
+          diasComProducao,
+          diasSemProducao,
+          diasUteisTotal,
+          aproveitamento,
+          mediaPorDiaUtil,
+          producaoPorDia,
+        };
+      });
+
+      // Ordenar por total decrescente
+      agentesResult.sort((a, b) => b.total - a.total);
+
+      return { agentes: agentesResult, dias, totalPorDia, diasUteisTotal };
+    }),
+
   // Retorna valores únicos para filtros
   filtros: protectedProcedure.query(async () => {
     const db = await getDb();

@@ -1,0 +1,50 @@
+{
+  "query": "SELECT operador, solicitacao, troco, situacao, empresa, mesano FROM febraban WHERE empresa = 'BMF' AND mesano = 526 AND situacao = 'Contratada' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT operador, solicitacao, troco, situacao, empresa, mesano FROM febraban WHERE empresa = 'BMF' AND mesano = 526 AND situacao = 'Contratada' LIMIT 5;",
+  "rows": [
+    {
+      "operador": "JJ602263",
+      "solicitacao": "04/05/2026",
+      "troco": "1400.00",
+      "situacao": "Contratada",
+      "empresa": "BMF",
+      "mesano": "526"
+    },
+    {
+      "operador": "JH016470",
+      "solicitacao": "04/05/2026",
+      "troco": "1000.00",
+      "situacao": "Contratada",
+      "empresa": "BMF",
+      "mesano": "526"
+    },
+    {
+      "operador": "JJ613947",
+      "solicitacao": "04/05/2026",
+      "troco": "1794.42",
+      "situacao": "Contratada",
+      "empresa": "BMF",
+      "mesano": "526"
+    },
+    {
+      "operador": "JJ610167",
+      "solicitacao": "04/05/2026",
+      "troco": "3750.00",
+      "situacao": "Contratada",
+      "empresa": "BMF",
+      "mesano": "526"
+    },
+    {
+      "operador": "J9660864",
+      "solicitacao": "04/05/2026",
+      "troco": "3691.34",
+      "situacao": "Contratada",
+      "empresa": "BMF",
+      "mesano": "526"
+    }
+  ],
+  "messages": [],
+  "stdout": "operador\tsolicitacao\ttroco\tsituacao\tempresa\tmesano\nJJ602263\t04/05/2026\t1400.00\tContratada\tBMF\t526\nJH016470\t04/05/2026\t1000.00\tContratada\tBMF\t526\nJJ613947\t04/05/2026\t1794.42\tContratada\tBMF\t526\nJJ610167\t04/05/2026\t3750.00\tContratada\tBMF\t526\nJ9660864\t04/05/2026\t3691.34\tContratada\tBMF\t526\n",
+  "stderr": "",
+  "execution_time_ms": 262
+}

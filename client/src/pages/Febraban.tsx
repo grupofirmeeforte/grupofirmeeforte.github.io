@@ -19,7 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Upload, Edit2, Trash2, ArrowLeft, Download } from "lucide-react";
+import { Search, Upload, Edit2, Trash2, ArrowLeft, Download, BarChart2 } from "lucide-react";
 import * as XLSX from "xlsx";
 
 // Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
@@ -640,6 +640,14 @@ export default function FebrabanPage() {
           >
             <Upload className="w-4 h-4" />
             Importar Excel
+          </Button>
+          <Button
+            variant="outline"
+            className="gap-2 border-purple-500 text-purple-700 hover:bg-purple-50"
+            onClick={() => navigate("/febraban/acompanhamento-diario")}
+          >
+            <BarChart2 className="w-4 h-4" />
+            Acomp. Diário
           </Button>
         </div>
       </div>
