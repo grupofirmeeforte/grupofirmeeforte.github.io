@@ -1,0 +1,85 @@
+{
+  "query": "SELECT mesano, COUNT(*) as qtd, SUM(CAST(troco AS DECIMAL(15,2))) as total_troco FROM febraban WHERE empresa = 'FLEX' GROUP BY mesano ORDER BY mesano DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT mesano, COUNT(*) as qtd, SUM(CAST(troco AS DECIMAL(15,2))) as total_troco FROM febraban WHERE empresa = 'FLEX' GROUP BY mesano ORDER BY mesano DESC;",
+  "rows": [
+    {
+      "mesano": "1225",
+      "qtd": "330",
+      "total_troco": "3294118.86"
+    },
+    {
+      "mesano": "1125",
+      "qtd": "352",
+      "total_troco": "3244136.16"
+    },
+    {
+      "mesano": "1025",
+      "qtd": "364",
+      "total_troco": "3232986.96"
+    },
+    {
+      "mesano": "925",
+      "qtd": "305",
+      "total_troco": "3006797.00"
+    },
+    {
+      "mesano": "825",
+      "qtd": "210",
+      "total_troco": "2353667.46"
+    },
+    {
+      "mesano": "725",
+      "qtd": "177",
+      "total_troco": "1717672.67"
+    },
+    {
+      "mesano": "626",
+      "qtd": "6",
+      "total_troco": "62844.47"
+    },
+    {
+      "mesano": "625",
+      "qtd": "85",
+      "total_troco": "1024233.89"
+    },
+    {
+      "mesano": "526",
+      "qtd": "134",
+      "total_troco": "1232926.79"
+    },
+    {
+      "mesano": "525",
+      "qtd": "102",
+      "total_troco": "1093921.19"
+    },
+    {
+      "mesano": "426",
+      "qtd": "277",
+      "total_troco": "2656513.00"
+    },
+    {
+      "mesano": "425",
+      "qtd": "97",
+      "total_troco": "1038215.20"
+    },
+    {
+      "mesano": "326",
+      "qtd": "445",
+      "total_troco": "3841617.29"
+    },
+    {
+      "mesano": "226",
+      "qtd": "513",
+      "total_troco": "3237059.59"
+    },
+    {
+      "mesano": "126",
+      "qtd": "316",
+      "total_troco": "2590461.56"
+    }
+  ],
+  "messages": [],
+  "stdout": "mesano\tqtd\ttotal_troco\n1225\t330\t3294118.86\n1125\t352\t3244136.16\n1025\t364\t3232986.96\n925\t305\t3006797.00\n825\t210\t2353667.46\n725\t177\t1717672.67\n626\t6\t62844.47\n625\t85\t1024233.89\n526\t134\t1232926.79\n525\t102\t1093921.19\n426\t277\t2656513.00\n425\t97\t1038215.20\n326\t445\t3841617.29\n226\t513\t3237059.59\n126\t316\t2590461.56\n",
+  "stderr": "",
+  "execution_time_ms": 272
+}
