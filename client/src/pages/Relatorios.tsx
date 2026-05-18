@@ -124,16 +124,14 @@ export default function Relatorios() {
       <div className="max-w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Button onClick={handleCancel} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Button>
-            <div>
-              <h1 className="text-4xl font-bold text-slate-900">Cálculo</h1>
-              <p className="text-sm text-slate-600">Cálculo de comissões por Chave J</p>
-            </div>
+          <div>
+            <h1 className="text-4xl font-bold text-slate-900">Cálculo</h1>
+            <p className="text-sm text-slate-600">Cálculo de comissões por Chave J</p>
           </div>
+          <Button onClick={handleCancel} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
+            <ArrowLeft className="w-4 h-4" />
+            Voltar
+          </Button>
         </div>
 
         {/* Filtros */}

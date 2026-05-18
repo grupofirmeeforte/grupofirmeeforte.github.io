@@ -831,14 +831,14 @@ export default function CRMPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
-        <Button variant="outline" size="sm" onClick={() => navigate("/")} className="gap-1 bg-gray-800 text-white hover:bg-gray-700 border-gray-800">
-          <ArrowLeft className="w-4 h-4" /> Voltar
-        </Button>
+      <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-gray-900">CRM</h1>
           <p className="text-xs text-gray-500">Gestão de Relacionamento com Clientes</p>
         </div>
+        <Button variant="outline" size="sm" onClick={() => navigate("/")} className="gap-1 bg-gray-800 text-white hover:bg-gray-700 border-gray-800">
+          <ArrowLeft className="w-4 h-4" /> Voltar
+        </Button>
       </div>
 
       {/* Abas */}

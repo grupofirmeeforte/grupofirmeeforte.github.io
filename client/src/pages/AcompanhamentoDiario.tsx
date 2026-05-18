@@ -118,45 +118,47 @@ export default function AcompanhamentoDiario() {
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-6 py-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-xl font-bold">Acompanhamento Diário</h1>
+            <p className="text-xs text-gray-400">Produção por agente — Febraban BB</p>
+          </div>
+
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Seletor de mês */}
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" onClick={prevMes} className="text-gray-400 hover:text-white">
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <div className="text-center min-w-[120px]">
+                <div className="font-bold text-lg">{MESES[mes - 1]}</div>
+                <div className="text-xs text-gray-400">{ano}</div>
+              </div>
+              <Button variant="ghost" size="icon" onClick={nextMes} className="text-gray-400 hover:text-white">
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Abas BMF / FLEX */}
+            <div className="flex gap-2">
+              {(["BMF","FLEX"] as Empresa[]).map(e => (
+                <button key={e} onClick={() => setEmpresa(e)}
+                  className={`px-5 py-2 rounded-lg font-bold text-sm transition-all ${
+                    empresa === e
+                      ? e === "BMF"
+                        ? "bg-blue-600 text-white shadow-lg"
+                        : "bg-green-600 text-white shadow-lg"
+                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  }`}>
+                  {e}
+                </button>
+              ))}
+            </div>
+
+            {/* Botão Voltar */}
             <Button variant="ghost" size="sm" onClick={() => navigate("/febraban")}
-              className="text-gray-400 hover:text-white">
+              className="text-gray-400 hover:text-white border border-gray-700">
               <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
             </Button>
-            <div>
-              <h1 className="text-xl font-bold">Acompanhamento Diário</h1>
-              <p className="text-xs text-gray-400">Produção por agente — Febraban BB</p>
-            </div>
-          </div>
-
-          {/* Seletor de mês */}
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={prevMes} className="text-gray-400 hover:text-white">
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <div className="text-center min-w-[120px]">
-              <div className="font-bold text-lg">{MESES[mes - 1]}</div>
-              <div className="text-xs text-gray-400">{ano}</div>
-            </div>
-            <Button variant="ghost" size="icon" onClick={nextMes} className="text-gray-400 hover:text-white">
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Abas BMF / FLEX */}
-          <div className="flex gap-2">
-            {(["BMF","FLEX"] as Empresa[]).map(e => (
-              <button key={e} onClick={() => setEmpresa(e)}
-                className={`px-5 py-2 rounded-lg font-bold text-sm transition-all ${
-                  empresa === e
-                    ? e === "BMF"
-                      ? "bg-blue-600 text-white shadow-lg"
-                      : "bg-green-600 text-white shadow-lg"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-                }`}>
-                {e}
-              </button>
-            ))}
           </div>
         </div>
       </div>

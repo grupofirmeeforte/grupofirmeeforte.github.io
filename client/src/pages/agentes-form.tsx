@@ -260,19 +260,19 @@ export default function AgentesFormPage() {
   return (
     <div className="space-y-6 p-6 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <Button
-          className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800"
-          onClick={() => navigate("/agentes")}
-        >
-          <ArrowLeft className="w-4 h-4" /> Voltar
-        </Button>
+      <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold">
             {agenteId ? "Editar Agente" : "Novo Agente"}
           </h1>
           <p className="text-gray-600 text-sm mt-1">Preencha os campos obrigatórios (*)</p>
         </div>
+        <Button
+          className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800"
+          onClick={() => navigate("/agentes")}
+        >
+          <ArrowLeft className="w-4 h-4" /> Voltar
+        </Button>
       </div>
 
       {/* Formulário */}
