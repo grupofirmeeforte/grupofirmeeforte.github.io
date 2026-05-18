@@ -85,6 +85,7 @@ type FebRow = {
   financiado: string | null;
   situacao2: string | null;
   pago: number | null;
+  pagoManual: number | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -155,9 +156,27 @@ export default function FebrabanPage() {
       setEditModal(false);
       setEditRow(null);
       utils.febraban.list.invalidate();
+      utils.febraban.resumo.invalidate();
     },
     onError: (err) => alert(`Erro ao salvar: ${err.message}`),
   });
+
+  const togglePagoMutation = trpc.febraban.update.useMutation({
+    onSuccess: () => {
+      utils.febraban.list.invalidate();
+      utils.febraban.resumo.invalidate();
+    },
+    onError: (err) => alert(`Erro ao alterar status: ${err.message}`),
+  });
+
+  function handleTogglePago(row: FebRow) {
+    // Ciclo: 0 (Não) -> 1 (Sim) -> 2 (SRCC) -> 0 (Não)
+    // Se pago automático (via consignados) e pagoManual=0, o pago exibido é 1, mas manual é 0
+    // O toggle usa o valor manual atual para decidir o próximo estado
+    const manualAtual = row.pagoManual ?? 0;
+    const proximo = manualAtual === 0 ? 1 : manualAtual === 1 ? 2 : 0;
+    togglePagoMutation.mutate({ id: row.id, pago: proximo });
+  }
 
   const deleteMutation = trpc.febraban.delete.useMutation({
     onSuccess: () => {
@@ -507,7 +526,7 @@ export default function FebrabanPage() {
                 <span className="text-white/70 text-xs ml-auto">{mesanoToStr(resumo.mesanoAtual ?? undefined)}</span>
               </div>
               {/* Cards de métricas */}
-              <div className="grid grid-cols-5 divide-x">
+              <div className="grid grid-cols-6 divide-x">
                 {/* Dia anterior */}
                 <div className="px-3 py-2 text-center">
                   <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Dia Anterior</div>
@@ -552,6 +571,15 @@ export default function FebrabanPage() {
                     {emp.ano.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdAno} op.</div>
+                </div>
+                {/* SRCC */}
+                <div className="px-3 py-2 text-center bg-orange-50">
+                  <div className="text-[10px] text-orange-600 font-medium uppercase tracking-wide leading-tight">SRCC</div>
+                  <div className="text-[10px] text-orange-400 mb-0.5">no mês</div>
+                  <div className="text-sm font-bold text-orange-700">
+                    {((emp as any).srcc ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                  </div>
+                  <div className="text-[10px] text-orange-400 mt-0.5">{(emp as any).qtdSrcc ?? 0} op.</div>
                 </div>
               </div>
             </div>
@@ -743,10 +771,24 @@ export default function FebrabanPage() {
                       <td className="px-3 py-2 text-center">
                         {row.situacao && row.situacao.toLowerCase().includes("cancel") ? (
                           <span className="px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-300">Cancelado</span>
-                        ) : row.pago ? (
-                          <span className="px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800 border border-green-300">Pago</span>
+                        ) : row.pago === 2 ? (
+                          <button
+                            onClick={() => handleTogglePago(row as FebRow)}
+                            title="Clique para alterar: SRCC → Não"
+                            className="px-2 py-0.5 rounded text-xs font-semibold bg-orange-100 text-orange-800 border border-orange-400 cursor-pointer hover:bg-orange-200 transition-colors"
+                          >SRCC</button>
+                        ) : row.pago === 1 ? (
+                          <button
+                            onClick={() => handleTogglePago(row as FebRow)}
+                            title="Clique para alterar: Sim → SRCC"
+                            className="px-2 py-0.5 rounded text-xs font-semibold bg-green-100 text-green-800 border border-green-300 cursor-pointer hover:bg-green-200 transition-colors"
+                          >Sim</button>
                         ) : (
-                          <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700 border border-red-300">Não</span>
+                          <button
+                            onClick={() => handleTogglePago(row as FebRow)}
+                            title="Clique para alterar: Não → Sim"
+                            className="px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-700 border border-red-300 cursor-pointer hover:bg-red-200 transition-colors"
+                          >Não</button>
                         )}
                       </td>
                       <td className="px-3 py-2">

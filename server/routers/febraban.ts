@@ -81,10 +81,14 @@ export const febrabanRouter = {
           ordemExcel: febraban.ordemExcel,
           createdAt: febraban.createdAt,
           updatedAt: febraban.updatedAt,
-          // pago: existe nrOperacao igual na tabela consignados
-          pago: sql<number>`CASE WHEN EXISTS (
-            SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta}
-          ) THEN 1 ELSE 0 END`,
+          // pago: 2=SRCC (manual), 1=Sim (manual ou auto via consignados), 0=Não
+          pagoManual: febraban.pago,
+          pago: sql<number>`CASE
+            WHEN ${febraban.pago} = 2 THEN 2
+            WHEN ${febraban.pago} = 1 THEN 1
+            WHEN EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta}) THEN 1
+            ELSE 0
+          END`,
         })
         .from(febraban)
         .where(where)
@@ -424,7 +428,8 @@ export const febrabanRouter = {
         const anoWhere = sql`empresa = ${emp} AND RIGHT(LPAD(CAST(mesano AS CHAR), 6, '0'), 2) = ${anoSuffix}`;
 
         const [contratado, pendente, diaAtual, diaAnterior, ano,
-               qtdContratado, qtdPendente, qtdDiaAtual, qtdDiaAnterior, qtdAno] = await Promise.all([
+               qtdContratado, qtdPendente, qtdDiaAtual, qtdDiaAnterior, qtdAno,
+               srccValor, qtdSrcc] = await Promise.all([
           // Líquido contratado (situacao = Contratada)
           db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
             .from(febraban).where(sql`${baseWhere} AND situacao = 'Contratada'`),
@@ -455,6 +460,12 @@ export const febrabanRouter = {
           // Contagem do ano
           db.select({ cnt: sql<number>`COUNT(*)` })
             .from(febraban).where(sql`${anoWhere} AND situacao = 'Contratada'`),
+          // SRCC: valor total das operações marcadas como SRCC (pago=2)
+          db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
+            .from(febraban).where(sql`${baseWhere} AND pago = 2`),
+          // SRCC: contagem de operações marcadas como SRCC
+          db.select({ cnt: sql<number>`COUNT(*)` })
+            .from(febraban).where(sql`${baseWhere} AND pago = 2`),
         ]);
 
         result.push({
@@ -469,6 +480,8 @@ export const febrabanRouter = {
           qtdDiaAtual: Number(qtdDiaAtual[0]?.cnt ?? 0),
           qtdDiaAnterior: Number(qtdDiaAnterior[0]?.cnt ?? 0),
           qtdAno: Number(qtdAno[0]?.cnt ?? 0),
+          srcc: Number(srccValor[0]?.total ?? 0),
+          qtdSrcc: Number(qtdSrcc[0]?.cnt ?? 0),
           hojeStr,
           ontemStr,
           anoFull,

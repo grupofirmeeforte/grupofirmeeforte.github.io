@@ -496,3 +496,14 @@
 - [x] Adicionar campo pago: z.number().optional() no schema do update procedure (febraban.ts)
 - [x] Extrair pago do input e persistir no banco com ...(pago !== undefined ? { pago } : {})
 - [x] Corrigir erro TypeScript TS2353 no Febraban.tsx
+
+## EDIÇÃO INLINE DA COLUNA PAGO NA FEBRABAN
+- [ ] Coluna PAGO na tabela Febraban: clique no badge Sim/Não alterna o valor diretamente (sem abrir modal)
+- [ ] Lógica: pago automático (via consignados) continua como fonte primária; campo manual pago da tabela febraban sobrepõe quando preenchido
+- [ ] Badge clicável com cursor pointer e feedback visual ao salvar
+
+## SRCC NA FEBRABAN
+- [x] Coluna PAGO na tabela Febraban: badge clicável inline com 3 estados — Sim (verde), Não (vermelho), SRCC (laranja)
+- [x] Campo pago na tabela febraban aceita 0=Não, 1=Sim, 2=SRCC (manual override)
+- [x] Lógica: se pago automático (consignados) = 1, exibe Sim; se pago manual = 2, exibe SRCC; senão exibe Não
+- [x] Resumo da Febraban: adicionar linha SRCC nos cards de totais por empresa (BMF e FLEX) com contagem e valor
