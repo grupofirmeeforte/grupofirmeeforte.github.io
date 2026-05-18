@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Download, Search, ArrowLeft, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Download, Search, ArrowLeft, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { toast } from 'sonner';
 
@@ -33,15 +33,30 @@ export default function AuditoriaPage() {
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const abaParam = searchParams.get('aba');
-  const [aba, setAba] = useState<'logs' | 'feriados'>(abaParam === 'feriados' ? 'feriados' : 'logs');
+  const [aba, setAba] = useState<'logs' | 'feriados' | 'credito-despesas'>(
+    abaParam === 'feriados' ? 'feriados' : abaParam === 'credito-despesas' ? 'credito-despesas' : 'logs'
+  );
 
   // Atualiza aba quando o parâmetro de URL muda
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const p = params.get('aba');
     if (p === 'feriados') setAba('feriados');
+    else if (p === 'credito-despesas') setAba('credito-despesas');
     else setAba('logs');
   }, [window.location.search]);
+
+  // ── CRÉDITO x DESPESAS ──
+  const [cdMesAno, setCdMesAno] = useState('');
+  const [cdChaveJ, setCdChaveJ] = useState('');
+  const { data: cdMeses } = trpc.auditoria.creditoDespesasMeses.useQuery();
+  const { data: cdDados, isLoading: cdLoading } = trpc.auditoria.creditoDespesas.useQuery({
+    mesAno: cdMesAno || undefined,
+    chaveJ: cdChaveJ || undefined,
+  });
+
+  const fmtCD = (v: number | undefined) =>
+    v == null ? '-' : v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   // ── LOGS ──
   const [filtroChaveJ, setFiltroChaveJ] = useState('');
@@ -179,6 +194,12 @@ export default function AuditoriaPage() {
           className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'feriados' ? 'bg-white border border-b-white border-gray-200 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
         >
           <CalendarDays className="w-4 h-4" /> Feriados
+        </button>
+        <button
+          onClick={() => setAba('credito-despesas')}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'credito-despesas' ? 'bg-white border border-b-white border-gray-200 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
+        >
+          <BarChart2 className="w-4 h-4" /> Crédito x Despesas
         </button>
       </div>
 
@@ -461,6 +482,122 @@ export default function AuditoriaPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* ── ABA CRÉDITO x DESPESAS ───────────────────────────────────── */}
+      {aba === 'credito-despesas' && (
+        <div className="space-y-4">
+          {/* Filtros */}
+          <div className="flex flex-wrap gap-3 items-end">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-gray-600">Mês/Ano</label>
+              <Select value={cdMesAno || 'todos'} onValueChange={v => setCdMesAno(v === 'todos' ? '' : v)}>
+                <SelectTrigger className="w-40">
+                  <SelectValue placeholder="Todos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  {(cdMeses || []).map(m => (
+                    <SelectItem key={m} value={m}>{m}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-gray-600">Chave J</label>
+              <Input
+                placeholder="Filtrar por Chave J"
+                value={cdChaveJ}
+                onChange={e => setCdChaveJ(e.target.value)}
+                className="w-44"
+              />
+            </div>
+            <p className="text-sm text-gray-500 ml-auto">{cdDados ? `${cdDados.length} registro(s)` : ''}</p>
+          </div>
+
+          {/* Tabela */}
+          <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+            <table className="min-w-max text-xs border-collapse">
+              <thead>
+                <tr className="bg-blue-700 text-white">
+                  {/* Identificação */}
+                  <th className="px-2 py-2 text-left whitespace-nowrap border-r border-blue-600">Mês/Ano</th>
+                  <th className="px-2 py-2 text-left whitespace-nowrap border-r border-blue-600">Chave J</th>
+                  <th className="px-2 py-2 text-left whitespace-nowrap border-r border-blue-600">Empresa</th>
+                  <th className="px-2 py-2 text-left whitespace-nowrap border-r border-blue-600">Agente</th>
+                  <th className="px-2 py-2 text-left whitespace-nowrap border-r border-blue-600">Cidade</th>
+                  {/* RBM */}
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-blue-800">RBM Total</th>
+                  {/* Créditos */}
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-green-700">Comissão</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-green-700">Ajuda Custo</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-green-700">Créditos</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-green-800 font-bold">Total Créditos</th>
+                  {/* Despesas */}
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-700">Aluguel</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-700">Internet</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-700">Energia</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-700">Água</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-700">Propaganda</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-700">Despesas Loja</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-700">Reembolso</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-700">Reajuste</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-700">Desp. Bancária</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-700">Outros</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-red-800 font-bold">Total Despesas</th>
+                  {/* Saldo */}
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-yellow-700 font-bold">Saldo</th>
+                  {/* RBM por produto */}
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-purple-700">RBM Total 2</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-purple-700">RBM Crédito</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-purple-700">RBM C/C</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-purple-700">RBM Consórcio</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap border-r border-blue-600 bg-purple-700">RBM OuroCap</th>
+                  <th className="px-2 py-2 text-right whitespace-nowrap bg-purple-700">RBM Seguros</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cdLoading ? (
+                  <tr><td colSpan={28} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                ) : !cdDados || cdDados.length === 0 ? (
+                  <tr><td colSpan={28} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
+                ) : (
+                  cdDados.map((row, i) => (
+                    <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
+                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-200 font-medium">{row.mesAno}</td>
+                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-200">{row.chaveJ}</td>
+                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-200">{row.empresa}</td>
+                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-200 max-w-[180px] truncate">{row.agente}</td>
+                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-200">{row.cidade}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 font-medium text-blue-800">{fmtCD(row.rbmTotal)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-green-700">{fmtCD(row.comissao)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-green-700">{fmtCD(row.ajudaCusto)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-green-700">{fmtCD(row.creditos)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 font-bold text-green-800">{fmtCD(row.totalCreditos)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.aluguel)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.internet)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.energia)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.agua)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.propaganda)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.despesasLoja)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.reembolso)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.reajuste)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.despesaBancaria)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.outros)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 font-bold text-red-800">{fmtCD(row.totalDespesas)}</td>
+                      <td className={`px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 font-bold ${row.saldo >= 0 ? 'text-green-700' : 'text-red-700'}`}>{fmtCD(row.saldo)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-purple-700">{fmtCD(row.rbmTotal2)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-purple-700">{fmtCD(row.rbmCredito)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-purple-700">{fmtCD(row.rbmCC)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-purple-700">{fmtCD(row.rbmConsorcio)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-purple-700">{fmtCD(row.rbmOurocap)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap text-purple-700">{fmtCD(row.rbmSeguros)}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
