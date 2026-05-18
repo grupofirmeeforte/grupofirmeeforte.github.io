@@ -536,3 +536,8 @@
 - [x] Ranking destacando agentes com maior aproveitamento (≥50%)
 - [x] Rota /febraban/acompanhamento-diario registrada no App.tsx
 - [x] Botão de acesso na página da Febraban
+
+## CONTROLE DE ACESSO - ACOMPANHAMENTO DIÁRIO
+- [x] Admin sempre tem acesso total ao Acompanhamento Diário
+- [x] Demais usuários bloqueados por padrão (acesso liberado individualmente depois)
+- [x] Usar campo permissoesModulos.febraban.acompanhamento-diario para controle granular (já disponível no cadastro de agentes)

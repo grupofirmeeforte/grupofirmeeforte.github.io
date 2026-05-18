@@ -3,7 +3,8 @@ import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ChevronLeft, ChevronRight, Trophy, TrendingUp } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Trophy, Lock } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const MESES = [
   "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
@@ -29,12 +30,37 @@ function isWeekend(ano: number, mes: number, dia: number) {
 
 type Empresa = "BMF" | "FLEX";
 
+function hasAcompanhamentoAccess(user: any): boolean {
+  if (!user) return false;
+  // Admin do sistema sempre tem acesso
+  if (user.role === 'admin') return true;
+  // Cargo admin/CEO/ADM
+  const cargo = (user.cargo ?? '').toUpperCase();
+  if (['CEO', 'ADM', 'ADMIN'].includes(cargo)) return true;
+  // permissoes = admin
+  if ((user.permissoes ?? '') === 'admin') return true;
+  // permissoesModulos: febraban.acompanhamento-diario >= leitura
+  if (user.permissoesModulos) {
+    try {
+      const mods = typeof user.permissoesModulos === 'string'
+        ? JSON.parse(user.permissoesModulos)
+        : user.permissoesModulos;
+      const nivel = mods?.febraban?.['acompanhamento-diario'];
+      if (nivel && nivel !== 'sem_acesso') return true;
+    } catch {}
+  }
+  return false;
+}
+
 export default function AcompanhamentoDiario() {
   const [, navigate] = useLocation();
+  const { user, loading: authLoading } = useAuth();
   const hoje = new Date();
   const [mes, setMes] = useState(hoje.getMonth() + 1);
   const [ano, setAno] = useState(hoje.getFullYear());
   const [empresa, setEmpresa] = useState<Empresa>("BMF");
+
+  const temAcesso = hasAcompanhamentoAccess(user);
 
   const { data, isLoading } = trpc.febraban.acompanhamentoDiario.useQuery(
     { empresa, mes, ano }
@@ -61,6 +87,31 @@ export default function AcompanhamentoDiario() {
   }
 
   const totalGeral = agentes.reduce((s, a) => s + a.total, 0);
+
+  // Tela de carregamento
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="text-gray-400">Carregando...</div>
+      </div>
+    );
+  }
+
+  // Sem acesso
+  if (!temAcesso) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center gap-4">
+        <div className="bg-gray-900 border border-gray-700 rounded-2xl p-10 flex flex-col items-center gap-4 max-w-sm text-center">
+          <Lock className="w-12 h-12 text-red-400" />
+          <h2 className="text-xl font-bold text-white">Acesso Restrito</h2>
+          <p className="text-gray-400 text-sm">Você não tem permissão para acessar o Acompanhamento Diário.<br/>Solicite ao administrador.</p>
+          <Button variant="ghost" onClick={() => navigate("/febraban")} className="text-gray-400 hover:text-white">
+            <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">

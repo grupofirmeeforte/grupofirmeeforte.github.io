@@ -45,6 +45,7 @@ const MODULOS_PERMISSOES = [
   ]},
   { modulo: 'febraban', label: 'Febraban', subabas: [
     { key: 'producao-bb', label: 'Produção BB' },
+    { key: 'acompanhamento-diario', label: 'Acompanhamento Diário' },
   ]},
   { modulo: 'relatorios', label: 'Relatórios', subabas: [
     { key: 'relatorios', label: 'Relatórios' },
