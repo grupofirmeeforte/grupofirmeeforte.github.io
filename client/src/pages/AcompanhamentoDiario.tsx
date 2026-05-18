@@ -13,7 +13,7 @@ const MESES = [
 
 function fmt(v: number) {
   if (!v) return "-";
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 function pct(v: number) {
   return (v * 100).toFixed(0) + "%";
@@ -260,6 +260,19 @@ export default function AcompanhamentoDiario() {
                         </th>
                       );
                     })}
+                    {/* Colunas de resumo fixas no final */}
+                    <th className="px-2 py-1 text-center min-w-[80px] bg-blue-950/40 text-blue-300 font-bold border-l border-blue-800/40">
+                      <div>Total</div>
+                      <div className="text-[9px]">Líquido</div>
+                    </th>
+                    <th className="px-2 py-1 text-center min-w-[60px] bg-blue-950/40 text-blue-300 font-bold">
+                      <div>Qtd.</div>
+                      <div className="text-[9px]">Operações</div>
+                    </th>
+                    <th className="px-2 py-1 text-center min-w-[70px] bg-blue-950/40 text-blue-300 font-bold">
+                      <div>Média</div>
+                      <div className="text-[9px]">/Dia Trab.</div>
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -300,6 +313,10 @@ export default function AcompanhamentoDiario() {
                           </td>
                         );
                       })}
+                      {/* Colunas de resumo */}
+                      <td className="px-2 py-2 text-center font-bold text-blue-300 bg-blue-950/20 border-l border-blue-800/40">{fmt(a.total)}</td>
+                      <td className="px-2 py-2 text-center text-blue-200 bg-blue-950/20">{a.diasComProducao}</td>
+                      <td className="px-2 py-2 text-center text-blue-200 bg-blue-950/20">{a.diasComProducao > 0 ? fmt(Math.round(a.total / a.diasComProducao)) : '-'}</td>
                     </tr>
                   ))}
                   {/* Linha de totais por dia */}
@@ -324,6 +341,14 @@ export default function AcompanhamentoDiario() {
                         </td>
                       );
                     })}
+                    {/* Totais das colunas de resumo */}
+                    <td className="px-2 py-2 text-center font-bold text-blue-300 bg-blue-950/30 border-l border-blue-800/40">{fmt(totalGeral)}</td>
+                    <td className="px-2 py-2 text-center text-blue-200 bg-blue-950/30">
+                      {agentes.reduce((s, a) => s + a.diasComProducao, 0)}
+                    </td>
+                    <td className="px-2 py-2 text-center text-blue-200 bg-blue-950/30">
+                      {(() => { const totalOps = agentes.reduce((s, a) => s + a.diasComProducao, 0); return totalOps > 0 ? fmt(Math.round(totalGeral / totalOps)) : '-'; })()}
+                    </td>
                   </tr>
                 </tbody>
               </table>
