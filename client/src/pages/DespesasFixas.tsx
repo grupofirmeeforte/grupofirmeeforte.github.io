@@ -43,7 +43,7 @@ function formatCurrency(v: string | null | undefined) {
   if (!v) return "-";
   const n = parseFloat(v);
   if (isNaN(n)) return "-";
-  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function isAtrasado(dataVencer: string | null) {
@@ -362,7 +362,7 @@ export default function DespesasFixasPage() {
             <tfoot>
               <tr className="bg-gray-800 font-semibold border-t-2 border-purple-600">
                 <td colSpan={13} className="px-1.5 py-1.5 text-right text-[10px] text-gray-400">Total:</td>
-                <td className="px-1.5 py-1.5 text-right text-green-400 text-[11px]">{totalValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+                <td className="px-1.5 py-1.5 text-right text-green-400 text-[11px]">{totalValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 <td colSpan={2}></td>
               </tr>
             </tfoot>

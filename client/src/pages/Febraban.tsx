@@ -35,7 +35,7 @@ function formatCurrency(val: string | number | null | undefined): string {
   if (val == null || val === "") return "-";
   const n = typeof val === "string" ? parseFloat(val) : val;
   if (isNaN(n)) return "-";
-  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function tipoBadge(situacao: string | null | undefined, troco: string | number | null | undefined, financiado: string | number | null | undefined) {
@@ -532,7 +532,7 @@ export default function FebrabanPage() {
                   <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Dia Anterior</div>
                   <div className="text-[10px] text-gray-400 mb-0.5">{emp.ontemStr}</div>
                   <div className="text-sm font-bold text-gray-800">
-                    {emp.diaAnterior.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                    {emp.diaAnterior.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdDiaAnterior} op.</div>
                 </div>
@@ -541,7 +541,7 @@ export default function FebrabanPage() {
                   <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Dia Atual</div>
                   <div className="text-[10px] text-gray-400 mb-0.5">{emp.hojeStr}</div>
                   <div className="text-sm font-bold text-blue-700">
-                    {emp.diaAtual.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                    {emp.diaAtual.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdDiaAtual} op.</div>
                 </div>
@@ -550,7 +550,7 @@ export default function FebrabanPage() {
                   <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Contratado</div>
                   <div className="text-[10px] text-gray-400 mb-0.5">no mês</div>
                   <div className="text-sm font-bold text-green-700">
-                    {emp.contratado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                    {emp.contratado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdContratado} op.</div>
                 </div>
@@ -559,7 +559,7 @@ export default function FebrabanPage() {
                   <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Pendente</div>
                   <div className="text-[10px] text-gray-400 mb-0.5">no mês</div>
                   <div className="text-sm font-bold text-orange-600">
-                    {emp.pendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                    {emp.pendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdPendente} op.</div>
                 </div>
@@ -568,7 +568,7 @@ export default function FebrabanPage() {
                   <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Ano {emp.anoFull}</div>
                   <div className="text-[10px] text-gray-400 mb-0.5">contratado</div>
                   <div className="text-sm font-bold text-purple-700">
-                    {emp.ano.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                    {emp.ano.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdAno} op.</div>
                 </div>
@@ -577,7 +577,7 @@ export default function FebrabanPage() {
                   <div className="text-[10px] text-orange-600 font-medium uppercase tracking-wide leading-tight">SRCC</div>
                   <div className="text-[10px] text-orange-400 mb-0.5">no ano</div>
                   <div className="text-sm font-bold text-orange-700">
-                    {((emp as any).srcc ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                    {((emp as any).srcc ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="text-[10px] text-orange-400 mt-0.5">{(emp as any).qtdSrcc ?? 0} op.</div>
                 </div>
@@ -586,7 +586,7 @@ export default function FebrabanPage() {
                   <div className="text-[10px] text-red-600 font-medium uppercase tracking-wide leading-tight">Canceladas</div>
                   <div className="text-[10px] text-red-400 mb-0.5">no ano</div>
                   <div className="text-sm font-bold text-red-700">
-                    {((emp as any).canceladas ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })}
+                    {((emp as any).canceladas ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="text-[10px] text-red-400 mt-0.5">{(emp as any).qtdCanceladas ?? 0} op.</div>
                 </div>

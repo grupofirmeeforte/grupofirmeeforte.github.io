@@ -52,7 +52,7 @@ function moeda(val: string | number | null | undefined) {
   if (val === null || val === undefined || val === '') return '-';
   const n = typeof val === 'number' ? val : parseFloat(String(val));
   if (isNaN(n)) return String(val);
-  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function pct(val: string | number | null | undefined) {

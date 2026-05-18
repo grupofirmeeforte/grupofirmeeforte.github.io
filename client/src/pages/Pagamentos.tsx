@@ -89,7 +89,7 @@ function formatCurrency(v: string | null | undefined) {
   if (!v) return "-";
   const n = parseFloat(v);
   if (isNaN(n)) return "-";
-  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 export default function PagamentosPage() {

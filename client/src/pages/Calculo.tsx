@@ -9,7 +9,7 @@ const fmtMoeda = (v: any) => {
   if (v === null || v === undefined || v === "" || v === "NULL") return "-";
   const n = parseFloat(String(v));
   if (isNaN(n)) return "-";
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(n);
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 };
 
 const fmtPerc = (v: any) => {

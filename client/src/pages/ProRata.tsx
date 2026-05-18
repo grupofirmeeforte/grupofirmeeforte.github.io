@@ -26,7 +26,7 @@ function fmt(v: string | number | null | undefined): string {
   if (v == null) return '—';
   const n = parseFloat(String(v));
   if (isNaN(n)) return '—';
-  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function fmtNum(v: string | number | null | undefined): string {

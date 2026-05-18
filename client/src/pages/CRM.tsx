@@ -57,7 +57,7 @@ const CANAL_ICONS: Record<string, any> = {
 
 function fmtMoeda(v: any) {
   if (!v) return "—";
-  return Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return Number(v).toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function fmtData(v: any) {

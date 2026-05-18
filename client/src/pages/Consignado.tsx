@@ -73,7 +73,7 @@ function moeda(val: string | null | undefined) {
   if (!val) return '-';
   const n = parseFloat(val);
   if (isNaN(n)) return val;
-  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // Para valores que já são percentuais (ex: 2.40 = 2,40%)
