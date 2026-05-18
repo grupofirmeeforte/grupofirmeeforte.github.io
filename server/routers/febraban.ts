@@ -355,12 +355,44 @@ export const febrabanRouter = {
       let atualizados = 0;
       let ignorados = 0;
 
+      // Buscar todas as propostas de uma vez para evitar N+1 queries
+      const todasPropostas = input.registros
+        .map(r => r.proposta?.trim())
+        .filter(Boolean) as string[];
+
+      // Consultar consignados para todas as propostas em batch
+      const consignadosMap = new Map<string, { srcc: boolean }>();
+      if (todasPropostas.length > 0) {
+        const consignadosRows = await db
+          .select({ nrOperacao: consignados.nrOperacao, restricaoSRCC: consignados.restricaoSRCC })
+          .from(consignados)
+          .where(sql`${consignados.nrOperacao} IN (${sql.join(todasPropostas.map(p => sql`${p}`), sql`, `)})`)
+
+        for (const row of consignadosRows) {
+          if (!row.nrOperacao) continue;
+          const chave = row.nrOperacao.trim();
+          const jaTem = consignadosMap.get(chave);
+          const isSrcc = row.restricaoSRCC != null && row.restricaoSRCC.trim().toLowerCase() === 'sim';
+          // Se já existe entrada, só atualiza se for SRCC (prioridade SRCC > Sim)
+          if (!jaTem || isSrcc) {
+            consignadosMap.set(chave, { srcc: isSrcc });
+          }
+        }
+      }
+
       for (let idx = 0; idx < input.registros.length; idx++) {
         const reg = input.registros[idx];
         if (!reg.proposta || reg.proposta.trim() === "") { ignorados++; continue; }
 
         const ordemExcel = input.offsetInicial + idx;
         const toStr = (v: number | undefined | null) => v != null ? String(v) : undefined;
+
+        // Calcular pago automaticamente via consignados
+        const consigInfo = consignadosMap.get(reg.proposta.trim());
+        let pagoAuto = 0;
+        if (consigInfo) {
+          pagoAuto = consigInfo.srcc ? 2 : 1;
+        }
 
         const values = {
           empresa: reg.empresa,
@@ -374,18 +406,22 @@ export const febrabanRouter = {
           financiado: toStr(reg.financiado),
           situacao2: reg.situacao2,
           ordemExcel,
+          pago: pagoAuto,
         };
 
         // Verificar se já existe
         const existing = await db
-          .select({ id: febraban.id })
+          .select({ id: febraban.id, pago: febraban.pago })
           .from(febraban)
           .where(eq(febraban.proposta, reg.proposta))
           .limit(1);
 
         if (existing.length > 0) {
           if (input.modo === "subscrever") {
-            await db.update(febraban).set(values).where(eq(febraban.proposta, reg.proposta));
+            // Preservar pago manual: só atualiza pago se o valor atual for 0 (não foi definido manualmente)
+            const pagoAtual = existing[0].pago ?? 0;
+            const pagoFinal = pagoAtual !== 0 ? pagoAtual : pagoAuto;
+            await db.update(febraban).set({ ...values, pago: pagoFinal }).where(eq(febraban.proposta, reg.proposta));
             atualizados++;
           } else {
             ignorados++;

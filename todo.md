@@ -517,3 +517,7 @@
 - [x] Filtro SRCC inclui operações automáticas (restricaoSRCC=Sim) e manuais (pago=2)
 - [x] Card SRCC no resumo por empresa inclui operações automáticas e manuais
 - [x] Override manual via clique no badge continua funcionando
+
+## PAGO AUTOMÁTICO NA IMPORTAÇÃO DA FEBRABAN
+- [x] Durante importação do Excel, consultar tabela consignados por nrOperacao e preencher pago=2 (SRCC), pago=1 (Sim) ou pago=0 (Não) automaticamente
+- [x] Na importação, se o registro já existe e pago foi marcado manualmente (pagoManual != 0), não alterar o valor — só alterar se for 0 (automático/não definido)
