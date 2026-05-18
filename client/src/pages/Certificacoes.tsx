@@ -307,15 +307,15 @@ export default function Certificacoes() {
                     Nenhum registro encontrado. Importe um arquivo ou cadastre manualmente.
                   </TableCell>
                 </TableRow>
-              ) : registros.map((c) => (
-                <TableRow key={c.id} className="hover:bg-slate-50">
+              ) : registros.map((c, idx) => (
+                <TableRow key={c.id != null ? c.id : `sint-${idx}`} className="hover:bg-slate-50">
                   <TableCell>{(c as any).empresa || '-'}</TableCell>
                   <TableCell className="font-mono text-sm">{c.chaveJ || '-'}</TableCell>
                   <TableCell>{c.nomeAgente || '-'}</TableCell>
                   <TableCell className="font-mono text-sm">{c.cpf || '-'}</TableCell>
                   <TableCell>{c.situacao || '-'}</TableCell>
                   {/* CONSIG */}
-                  {c.id === -1 ? (
+                  {(c.id ?? 0) < 0 ? (
                     <TableCell colSpan={10} className="text-center text-amber-600 font-medium text-xs italic">
                       Iremos na certificação e atualizaremos
                     </TableCell>

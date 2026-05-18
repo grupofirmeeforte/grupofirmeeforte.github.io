@@ -1,4 +1,4 @@
-import { eq, like, and, desc, isNotNull, sql } from "drizzle-orm";
+import { eq, like, and, asc, desc, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { agentes, certificacoes } from "../../drizzle/schema";
 import { protectedProcedure, router } from "../_core/trpc";
@@ -95,7 +95,7 @@ export const agentesRouter = router({
         .select()
         .from(agentes)
         .where(whereClause)
-        .orderBy(desc(agentes.createdAt))
+        .orderBy(asc(agentes.empresa), asc(agentes.nomeAgente))
         .limit(input.limit)
         .offset(input.offset);
 

@@ -64,8 +64,9 @@ export const certificacoesRouter = router({
       const agentesSemCert = agenteRows.filter(a => a.chaveJ && !certChaves.has(a.chaveJ.toUpperCase()));
 
       // Criar registros sintéticos para agentes sem certificação
-      const sinteticos = agentesSemCert.map(a => ({
-        id: -1,
+      // IDs negativos únicos para evitar conflito de key no React
+      const sinteticos = agentesSemCert.map((a, idx) => ({
+        id: -(idx + 1),
         chaveJ: a.chaveJ,
         nomeAgente: a.nomeAgente,
         empresa: a.empresa,
@@ -96,11 +97,11 @@ export const certificacoesRouter = router({
         return r;
       });
 
-      // Ordenar por empresa e nome
+      // Ordenar por empresa e depois por nome (ordem alfabética)
       rows.sort((a, b) => {
-        const ea = (a.empresa || '').localeCompare(b.empresa || '');
+        const ea = (a.empresa || '').localeCompare(b.empresa || '', 'pt-BR', { sensitivity: 'base' });
         if (ea !== 0) return ea;
-        return (a.nomeAgente || '').localeCompare(b.nomeAgente || '');
+        return (a.nomeAgente || '').localeCompare(b.nomeAgente || '', 'pt-BR', { sensitivity: 'base' });
       });
 
       if (input?.busca) {
