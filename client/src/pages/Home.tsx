@@ -83,17 +83,7 @@ export default function Home() {
         { title: 'Feriados', description: 'Feriados nacionais e estaduais BA', icon: ClipboardList, color: 'bg-slate-500', path: '/auditoria?aba=feriados', subKey: 'feriados' },
       ],
     },
-    {
-      type: 'group',
-      key: 'bbdental',
-      title: 'BB Dental',
-      description: 'Gestão de planos odontológicos BB Dental',
-      icon: Stethoscope,
-      color: 'bg-cyan-600',
-      borderColor: 'border-cyan-200',
-      bgColor: 'from-cyan-50 to-teal-50',
-      subModules: [],
-    },
+
     {
       type: 'group',
       key: 'cadastros',
@@ -109,17 +99,7 @@ export default function Home() {
         { title: 'Tabela Comissão', description: 'Faixas e percentuais de comissão por convênio', icon: TableProperties, color: 'bg-indigo-500', path: '/tabela-comissao', subKey: 'tabela-comissao' },
       ],
     },
-    {
-      type: 'group',
-      key: 'consorcio',
-      title: 'Consórcio',
-      description: 'Gestão de operações de consórcio',
-      icon: Coins,
-      color: 'bg-orange-600',
-      borderColor: 'border-orange-200',
-      bgColor: 'from-orange-50 to-amber-50',
-      subModules: [],
-    },
+
     {
       type: 'group',
       key: 'crm',
@@ -199,17 +179,7 @@ export default function Home() {
       bgColor: 'from-rose-50 to-pink-50',
       subModules: [],
     },
-    {
-      type: 'group',
-      key: 'ourocap',
-      title: 'OuroCap',
-      description: 'Gestão de títulos de capitalização OuroCap',
-      icon: Gem,
-      color: 'bg-yellow-600',
-      borderColor: 'border-yellow-200',
-      bgColor: 'from-yellow-50 to-amber-50',
-      subModules: [],
-    },
+
     {
       type: 'group',
       key: 'producao',
@@ -220,8 +190,12 @@ export default function Home() {
       borderColor: 'border-teal-200',
       bgColor: 'from-teal-50 to-cyan-50',
       subModules: [
+        { title: 'BB Dental', description: 'Planos odontológicos BB Dental', icon: Stethoscope, color: 'bg-cyan-600', path: '/producao/bbdental', subKey: 'bbdental' },
         { title: 'Consignado', description: 'Operações de crédito consignado', icon: Briefcase, color: 'bg-teal-600', path: '/consignado', subKey: 'consignado-prod' },
+        { title: 'Consórcio', description: 'Operações de consórcio', icon: Coins, color: 'bg-orange-600', path: '/producao/consorcio', subKey: 'consorcio-prod' },
         { title: 'Conta Corrente', description: 'Operações de conta corrente', icon: DollarSign, color: 'bg-teal-500', path: '/conta-corrente', subKey: 'conta-corrente' },
+        { title: 'OuroCap', description: 'Títulos de capitalização OuroCap', icon: Gem, color: 'bg-yellow-600', path: '/producao/ourocap', subKey: 'ourocap-prod' },
+        { title: 'Seguros', description: 'Seguros e apólices', icon: ShieldPlus, color: 'bg-indigo-600', path: '/producao/seguros', subKey: 'seguros-prod' },
       ],
     },
     {
@@ -235,17 +209,7 @@ export default function Home() {
       bgColor: 'from-amber-50 to-yellow-50',
       subModules: [],
     },
-    {
-      type: 'group',
-      key: 'seguros',
-      title: 'Seguros',
-      description: 'Gestão de seguros e apólices',
-      icon: ShieldPlus,
-      color: 'bg-indigo-600',
-      borderColor: 'border-indigo-200',
-      bgColor: 'from-indigo-50 to-blue-50',
-      subModules: [],
-    },
+
   ];
 
   const grupoAtual = grupos.find(g => g.key === grupoAberto);
