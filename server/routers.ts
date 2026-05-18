@@ -28,6 +28,11 @@ export const appRouter = router({
     me: publicProcedure.query(async (opts) => {
       const user = opts.ctx.user;
       if (!user) return null;
+      // Owner do projeto sempre tem acesso admin
+      const ownerOpenId = process.env.OWNER_OPEN_ID;
+      if (ownerOpenId && user.openId === ownerOpenId) {
+        return { ...user, permissoes: 'admin', cargo: 'CEO', permissoesModulos: null };
+      }
       // Buscar permissoesModulos e cargo do agente logado
       if (user.openId?.startsWith('agente_')) {
         const agenteId = parseInt(user.openId.replace('agente_', ''), 10);

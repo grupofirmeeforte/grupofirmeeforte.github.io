@@ -132,6 +132,7 @@ export default function Home() {
       bgColor: 'from-violet-50 to-purple-50',
       subModules: [
         { title: 'Produção BB', description: 'Relatório de produção Febraban', icon: ShieldCheck, color: 'bg-violet-500', path: '/febraban', subKey: 'producao-bb' },
+        { title: 'Acompanhamento Diário', description: 'Produção diária por agente (BMF e FLEX)', icon: ShieldCheck, color: 'bg-violet-700', path: '/febraban/acompanhamento-diario', subKey: 'acompanhamento-diario' },
       ],
     },
     {
