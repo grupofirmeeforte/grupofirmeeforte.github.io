@@ -447,10 +447,10 @@ export default function PagamentosPage() {
                 <td className="px-2 py-1.5 whitespace-nowrap">{row.conta || "-"}</td>
                 <td className="px-2 py-1.5 whitespace-nowrap font-mono">{row.cpfCnpj || "-"}</td>
                 <td className="px-2 py-1.5 whitespace-nowrap">{row.tipoConta || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap max-w-[120px]">
+                <td className="px-2 py-1.5 whitespace-nowrap max-w-[180px]">
                   {row.pix ? (
                     <span className="flex items-center gap-1 group">
-                      <span className="truncate max-w-[90px] block" title={row.pix}>{row.pix}</span>
+                      <span className="truncate max-w-[155px] block" title={row.pix}>{row.pix.replace(/^\+55/, '')}</span>
                       <button
                         onClick={() => { navigator.clipboard.writeText(row.pix!); toast.success("Copiado!"); }}
                         className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-gray-600 text-gray-400 hover:text-white flex-shrink-0"
