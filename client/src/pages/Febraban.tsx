@@ -604,8 +604,15 @@ export default function FebrabanPage() {
             {total != null ? `Total: ${total.toLocaleString("pt-BR")} registros` : "Carregando..."}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800" onClick={() => navigate("/")}><ArrowLeft className="w-4 h-4" /> Voltar</Button>
+          <Button
+            className="gap-2 bg-purple-600 text-white hover:bg-purple-700"
+            onClick={() => navigate("/febraban/acompanhamento-diario")}
+          >
+            <BarChart2 className="w-4 h-4" />
+            Acomp. Diário
+          </Button>
           <Button
             variant="outline"
             className="gap-2 border-green-500 text-green-700 hover:bg-green-50"
@@ -641,14 +648,7 @@ export default function FebrabanPage() {
             <Upload className="w-4 h-4" />
             Importar Excel
           </Button>
-          <Button
-            variant="outline"
-            className="gap-2 border-purple-500 text-purple-700 hover:bg-purple-50"
-            onClick={() => navigate("/febraban/acompanhamento-diario")}
-          >
-            <BarChart2 className="w-4 h-4" />
-            Acomp. Diário
-          </Button>
+
         </div>
       </div>
 
