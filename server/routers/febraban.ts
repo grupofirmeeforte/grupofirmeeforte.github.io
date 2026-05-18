@@ -55,13 +55,48 @@ export const febrabanRouter = {
       if (input.operador && input.operador !== "__all__") {
         conditions.push(eq(febraban.operador, input.operador));
       }
-      // Filtro pago: "nao" = apenas não pagos, "sim" = apenas pagos, "srcc" = apenas SRCC
+      // Filtro pago: "nao" = apenas não pagos, "sim" = apenas pagos, "srcc" = apenas SRCC (manual ou auto)
       if (input.pago === "nao") {
-        conditions.push(sql`${febraban.pago} != 2 AND NOT EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
+        // Não pago: pago manual=0, sem SRCC auto, sem consignado
+        conditions.push(sql`
+          ${febraban.pago} != 2
+          AND NOT EXISTS (
+            SELECT 1 FROM consignados c
+            WHERE c.nrOperacao = ${febraban.proposta}
+            AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM consignados c
+            WHERE c.nrOperacao = ${febraban.proposta}
+          )
+        `);
       } else if (input.pago === "sim") {
-        conditions.push(sql`${febraban.pago} = 1 OR (${febraban.pago} = 0 AND EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta}))`);
+        // Pago: manual=1 OU (existe no consignado sem SRCC)
+        conditions.push(sql`
+          ${febraban.pago} = 1
+          OR (
+            ${febraban.pago} != 2
+            AND NOT EXISTS (
+              SELECT 1 FROM consignados c
+              WHERE c.nrOperacao = ${febraban.proposta}
+              AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
+            )
+            AND EXISTS (
+              SELECT 1 FROM consignados c
+              WHERE c.nrOperacao = ${febraban.proposta}
+            )
+          )
+        `);
       } else if (input.pago === "srcc") {
-        conditions.push(eq(febraban.pago, 2));
+        // SRCC: manual=2 OU auto via restricaoSRCC=Sim
+        conditions.push(sql`
+          ${febraban.pago} = 2
+          OR EXISTS (
+            SELECT 1 FROM consignados c
+            WHERE c.nrOperacao = ${febraban.proposta}
+            AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
+          )
+        `);
       }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;
@@ -83,12 +118,21 @@ export const febrabanRouter = {
           ordemExcel: febraban.ordemExcel,
           createdAt: febraban.createdAt,
           updatedAt: febraban.updatedAt,
-          // pago: 2=SRCC (manual), 1=Sim (manual ou auto via consignados), 0=Não
+          // pago: 2=SRCC, 1=Sim, 0=Não
+          // Prioridade: manual (pago=1 ou pago=2) > auto SRCC (restricaoSRCC=Sim) > auto Sim (existe no consignado) > Não
           pagoManual: febraban.pago,
           pago: sql<number>`CASE
             WHEN ${febraban.pago} = 2 THEN 2
             WHEN ${febraban.pago} = 1 THEN 1
-            WHEN EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta}) THEN 1
+            WHEN EXISTS (
+              SELECT 1 FROM consignados c
+              WHERE c.nrOperacao = ${febraban.proposta}
+              AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
+            ) THEN 2
+            WHEN EXISTS (
+              SELECT 1 FROM consignados c
+              WHERE c.nrOperacao = ${febraban.proposta}
+            ) THEN 1
             ELSE 0
           END`,
         })
@@ -145,11 +189,43 @@ export const febrabanRouter = {
         conditions.push(eq(febraban.operador, input.operador));
       }
       if (input.pago === "nao") {
-        conditions.push(sql`${febraban.pago} != 2 AND NOT EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta})`);
+        conditions.push(sql`
+          ${febraban.pago} != 2
+          AND NOT EXISTS (
+            SELECT 1 FROM consignados c
+            WHERE c.nrOperacao = ${febraban.proposta}
+            AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
+          )
+          AND NOT EXISTS (
+            SELECT 1 FROM consignados c
+            WHERE c.nrOperacao = ${febraban.proposta}
+          )
+        `);
       } else if (input.pago === "sim") {
-        conditions.push(sql`${febraban.pago} = 1 OR (${febraban.pago} = 0 AND EXISTS (SELECT 1 FROM consignados c WHERE c.nrOperacao = ${febraban.proposta}))`);
+        conditions.push(sql`
+          ${febraban.pago} = 1
+          OR (
+            ${febraban.pago} != 2
+            AND NOT EXISTS (
+              SELECT 1 FROM consignados c
+              WHERE c.nrOperacao = ${febraban.proposta}
+              AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
+            )
+            AND EXISTS (
+              SELECT 1 FROM consignados c
+              WHERE c.nrOperacao = ${febraban.proposta}
+            )
+          )
+        `);
       } else if (input.pago === "srcc") {
-        conditions.push(eq(febraban.pago, 2));
+        conditions.push(sql`
+          ${febraban.pago} = 2
+          OR EXISTS (
+            SELECT 1 FROM consignados c
+            WHERE c.nrOperacao = ${febraban.proposta}
+            AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
+          )
+        `);
       }
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;
@@ -464,12 +540,26 @@ export const febrabanRouter = {
           // Contagem do ano
           db.select({ cnt: sql<number>`COUNT(*)` })
             .from(febraban).where(sql`${anoWhere} AND situacao = 'Contratada'`),
-          // SRCC: valor total das operações marcadas como SRCC (pago=2)
+          // SRCC: valor total (manual pago=2 OU auto via restricaoSRCC=Sim no consignado)
           db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
-            .from(febraban).where(sql`${baseWhere} AND pago = 2`),
-          // SRCC: contagem de operações marcadas como SRCC
+            .from(febraban).where(sql`${baseWhere} AND (
+              pago = 2
+              OR EXISTS (
+                SELECT 1 FROM consignados c
+                WHERE c.nrOperacao = proposta
+                AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
+              )
+            )`),
+          // SRCC: contagem (manual pago=2 OU auto via restricaoSRCC=Sim)
           db.select({ cnt: sql<number>`COUNT(*)` })
-            .from(febraban).where(sql`${baseWhere} AND pago = 2`),
+            .from(febraban).where(sql`${baseWhere} AND (
+              pago = 2
+              OR EXISTS (
+                SELECT 1 FROM consignados c
+                WHERE c.nrOperacao = proposta
+                AND LOWER(TRIM(c.restricaoSRCC)) = 'sim'
+              )
+            )`),
         ]);
 
         result.push({

@@ -511,3 +511,9 @@
 ## FILTRO SRCC NA FEBRABAN
 - [x] Adicionar opção "SRCC" no filtro de pagamento da Febraban (ao lado de Todos/Pagos/Não Pagos)
 - [x] Backend: procedure list e count aceitam pago="srcc" e filtram por pago=2
+
+## SRCC AUTOMÁTICO VIA CONSIGNADO
+- [x] Campo PAGO na Febraban: SRCC automático quando proposta existe no Consignado com restricaoSRCC=Sim
+- [x] Filtro SRCC inclui operações automáticas (restricaoSRCC=Sim) e manuais (pago=2)
+- [x] Card SRCC no resumo por empresa inclui operações automáticas e manuais
+- [x] Override manual via clique no badge continua funcionando
