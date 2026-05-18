@@ -238,16 +238,10 @@ export default function AcompanhamentoDiario() {
                       const dow = new Date(ano, mes - 1, d).getDay();
                       const isSab = dow === 6;
                       const isDom = dow === 0;
-                      const isFer = !!feriadosNome[d];
                       const isWkd = isSab || isDom;
                       return (
-                        <th key={d} className={`px-1 py-1 text-center min-w-[52px] ${isWkd || isFer ? "bg-red-950/40" : ""}`}>
-                          {isFer ? (
-                            <>
-                              <div className="text-red-400 font-bold text-[9px] leading-tight">{d}</div>
-                              <div className="text-red-400 font-bold text-[9px] leading-tight">Feriado</div>
-                            </>
-                          ) : isSab ? (
+                        <th key={d} className={`px-1 py-1 text-center min-w-[52px] ${isWkd ? "bg-red-950/40" : ""}`}>
+                          {isSab ? (
                             <>
                               <div className="text-red-400 font-bold text-[9px] leading-tight">{d}</div>
                               <div className="text-red-400 font-bold text-[9px] leading-tight">Sábado</div>
@@ -294,13 +288,12 @@ export default function AcompanhamentoDiario() {
                         const dow = new Date(ano, mes - 1, d).getDay();
                         const isSab = dow === 6;
                         const isDom = dow === 0;
-                        const isFer = !!feriadosNome[d];
                         const isWkd = isSab || isDom;
-                        const label = isFer ? "Feriado" : isSab ? "Sábado" : isDom ? "Domingo" : null;
+                        const label = isSab ? "Sábado" : isDom ? "Domingo" : null;
                         return (
-                          <td key={d} className={`px-1 py-2 text-center ${isWkd || isFer ? "bg-red-950/20" : val > 0 ? "text-white" : "text-gray-700"}`}>
+                          <td key={d} className={`px-1 py-2 text-center ${isWkd ? "bg-red-950/20" : val > 0 ? "text-white" : "text-gray-700"}`}>
                             {val > 0 ? (
-                              <span className={isWkd || isFer ? "text-red-300" : "text-white"}>{fmt(val)}</span>
+                              <span className={isWkd ? "text-red-300" : "text-white"}>{fmt(val)}</span>
                             ) : label ? (
                               <span className="text-red-500 font-bold text-[8px] leading-tight block">{label}</span>
                             ) : "·"}
@@ -319,13 +312,12 @@ export default function AcompanhamentoDiario() {
                       const dow = new Date(ano, mes - 1, d).getDay();
                       const isSab = dow === 6;
                       const isDom = dow === 0;
-                      const isFer = !!feriadosNome[d];
                       const isWkd = isSab || isDom;
-                      const label = isFer ? "Feriado" : isSab ? "Sábado" : isDom ? "Domingo" : null;
+                      const label = isSab ? "Sábado" : isDom ? "Domingo" : null;
                       return (
-                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd || isFer ? "bg-red-950/20" : val > 0 ? "text-green-300" : "text-gray-700"}`}>
+                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd ? "bg-red-950/20" : val > 0 ? "text-green-300" : "text-gray-700"}`}>
                           {val > 0 ? (
-                            <span className={isWkd || isFer ? "text-red-300" : "text-green-300"}>{fmt(val)}</span>
+                            <span className={isWkd ? "text-red-300" : "text-green-300"}>{fmt(val)}</span>
                           ) : label ? (
                             <span className="text-red-500 font-bold text-[8px]">{label}</span>
                           ) : "·"}
