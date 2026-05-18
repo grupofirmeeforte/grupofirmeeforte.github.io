@@ -70,6 +70,7 @@ export default function AcompanhamentoDiario() {
   const dias = data?.dias ?? [];
   const totalPorDia: Record<number, number> = (data?.totalPorDia ?? {}) as Record<number, number>;
   const diasUteisTotal = data?.diasUteisTotal ?? 0;
+  const feriadosNome: Record<number, string> = (data?.feriadosNome ?? {}) as Record<number, string>;
 
   // Ranking: agentes com aproveitamento >= 50%, ordenados por total
   const ranking = useMemo(() =>
@@ -233,12 +234,30 @@ export default function AcompanhamentoDiario() {
                     <th className="px-2 py-2 text-gray-400 font-medium min-w-[55px]">Aprov.</th>
                     <th className="px-2 py-2 text-gray-400 font-medium min-w-[55px]">Média/DU</th>
                     <th className="px-2 py-2 text-green-400 font-bold min-w-[80px]">Total</th>
-                    {dias.map(d => (
-                      <th key={d} className={`px-1 py-1 text-center min-w-[44px] ${isWeekend(ano, mes, d) ? "bg-gray-800/50 text-gray-600" : "text-gray-400"}`}>
-                        <div>{d}</div>
-                        <div className="text-[9px]">{getDayOfWeek(ano, mes, d)}</div>
-                      </th>
-                    ))}
+                    {dias.map(d => {
+                      const isFeriado = !!feriadosNome[d];
+                      const nomeFeriado = feriadosNome[d];
+                      const weekend = isWeekend(ano, mes, d);
+                      return (
+                        <th key={d} title={isFeriado ? nomeFeriado : undefined}
+                          className={`px-1 py-1 text-center min-w-[44px] ${
+                            isFeriado ? "bg-amber-900/40 text-amber-400" :
+                            weekend ? "bg-gray-800/50 text-gray-600" : "text-gray-400"
+                          }`}>
+                          {isFeriado ? (
+                            <>
+                              <div className="text-[9px] font-bold leading-tight">Fer.</div>
+                              <div className="text-[8px] leading-tight opacity-70">{getDayOfWeek(ano, mes, d)}</div>
+                            </>
+                          ) : (
+                            <>
+                              <div>{d}</div>
+                              <div className="text-[9px]">{getDayOfWeek(ano, mes, d)}</div>
+                            </>
+                          )}
+                        </th>
+                      );
+                    })}
                   </tr>
                 </thead>
                 <tbody>
@@ -265,9 +284,15 @@ export default function AcompanhamentoDiario() {
                       {dias.map(d => {
                         const val = a.producaoPorDia[d] ?? 0;
                         const weekend = isWeekend(ano, mes, d);
+                        const isFeriado = !!feriadosNome[d];
                         return (
-                          <td key={d} className={`px-1 py-2 text-center ${weekend ? "bg-gray-800/30 text-gray-600" : val > 0 ? "text-white" : "text-gray-700"}`}>
-                            {val > 0 ? fmt(val) : weekend ? "—" : "·"}
+                          <td key={d} title={isFeriado ? feriadosNome[d] : undefined}
+                            className={`px-1 py-2 text-center ${
+                              isFeriado ? "bg-amber-900/20 text-amber-500" :
+                              weekend ? "bg-gray-800/30 text-gray-600" :
+                              val > 0 ? "text-white" : "text-gray-700"
+                            }`}>
+                            {isFeriado ? (val > 0 ? fmt(val) : "★") : val > 0 ? fmt(val) : weekend ? "—" : "·"}
                           </td>
                         );
                       })}
@@ -281,9 +306,15 @@ export default function AcompanhamentoDiario() {
                     {dias.map(d => {
                       const val = totalPorDia[d] ?? 0;
                       const weekend = isWeekend(ano, mes, d);
+                      const isFeriado = !!feriadosNome[d];
                       return (
-                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${weekend ? "bg-gray-800/30 text-gray-600" : val > 0 ? "text-green-300" : "text-gray-700"}`}>
-                          {val > 0 ? fmt(val) : "·"}
+                        <td key={d} title={isFeriado ? feriadosNome[d] : undefined}
+                          className={`px-1 py-2 text-center text-[10px] ${
+                            isFeriado ? "bg-amber-900/20 text-amber-400" :
+                            weekend ? "bg-gray-800/30 text-gray-600" :
+                            val > 0 ? "text-green-300" : "text-gray-700"
+                          }`}>
+                          {val > 0 ? fmt(val) : isFeriado ? "★" : "·"}
                         </td>
                       );
                     })}

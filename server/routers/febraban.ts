@@ -789,13 +789,20 @@ export const febrabanRouter = {
       // Calcular dias úteis do mês (seg-sex, excluindo feriados)
       // Buscar feriados do mês
       const feriadosRows = await db
-        .select({ data: feriados.data })
+        .select({ data: feriados.data, nome: feriados.nome })
         .from(feriados)
         .where(sql`MONTH(STR_TO_DATE(data, '%d/%m/%Y')) = ${input.mes} AND YEAR(STR_TO_DATE(data, '%d/%m/%Y')) = ${input.ano}`);
-      const feriadosSet = new Set(feriadosRows.map(f => {
+      const feriadosSet = new Set<number>();
+      const feriadosNome: Record<number, string> = {};
+      for (const f of feriadosRows) {
         const p = String(f.data).split('/');
-        return p.length === 3 ? parseInt(p[0], 10) : -1;
-      }));
+        if (p.length === 3) {
+          const dia = parseInt(p[0], 10);
+          feriadosSet.add(dia);
+          // Usa o primeiro nome encontrado para o dia (pode haver múltiplos feriados no mesmo dia)
+          if (!feriadosNome[dia]) feriadosNome[dia] = f.nome;
+        }
+      }
 
       let diasUteisTotal = 0;
       for (const d of dias) {
@@ -840,10 +847,9 @@ export const febrabanRouter = {
         };
       });
 
-      // Ordenar por total decrescente
+       // Ordenar por total decrescente
       agentesResult.sort((a, b) => b.total - a.total);
-
-      return { agentes: agentesResult, dias, totalPorDia, diasUteisTotal };
+      return { agentes: agentesResult, dias, totalPorDia, diasUteisTotal, feriadosNome };
     }),
 
   // Retorna valores únicos para filtros
