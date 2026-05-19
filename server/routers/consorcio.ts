@@ -574,9 +574,28 @@ export const consorcioRouter = router({
         qtd: number;
       }>();
 
+      // Helper: converte "05/2026" ou "05/26" → "526", "426" → "426"
+      const normalizarMes = (m: string): string => {
+        if (!m) return m;
+        // Formato MM/AAAA → MMAA (ex: "05/2026" → "526")
+        const matchLong = m.match(/^(\d{1,2})\/(\d{4})$/);
+        if (matchLong) {
+          const mm = parseInt(matchLong[1], 10);
+          const aa = matchLong[2].slice(2); // últimos 2 dígitos do ano
+          return `${mm}${aa}`;
+        }
+        // Formato MM/AA → MMAA (ex: "05/26" → "526")
+        const matchShort = m.match(/^(\d{1,2})\/(\d{2})$/);
+        if (matchShort) {
+          const mm = parseInt(matchShort[1], 10);
+          return `${mm}${matchShort[2]}`;
+        }
+        return m; // já no formato correto (ex: "526", "426")
+      };
+
       for (const r of registros) {
         const chave = (r.chaveJ ?? '').trim().toUpperCase();
-        const mes = r.mesAno ?? '';
+        const mes = normalizarMes(r.mesAno ?? '');
         if (!chave) continue;
         const mapKey = `${chave}||${mes}`;
         const comissao = parseFloat((r.comissao ?? '0').replace(',', '.')) || 0;
