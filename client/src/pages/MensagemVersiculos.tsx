@@ -1,8 +1,7 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, BookMarked, Share2, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, BookMarked, Share2 } from "lucide-react";
 
 const VERSICULOS = [
   { texto: "Tudo posso naquele que me fortalece.", referencia: "Filipenses 4:13" },
@@ -37,22 +36,19 @@ const VERSICULOS = [
   { texto: "Pois o Senhor teu Deus está contigo aonde quer que fores.", referencia: "Josué 1:9" },
 ];
 
-function sortear(max: number) {
-  return Math.floor(Math.random() * max);
+function getDailyIndex(total: number): number {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now.getTime() - start.getTime()) / 86400000);
+  return dayOfYear % total;
 }
 
 export default function MensagemVersiculos() {
   const [, navigate] = useLocation();
-  const [indice, setIndice] = useState(() => sortear(VERSICULOS.length));
 
-  const versiculo = VERSICULOS[indice];
+  const idx = getDailyIndex(VERSICULOS.length);
+  const versiculo = VERSICULOS[idx];
   const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-  function novoVersiculo() {
-    let novo = sortear(VERSICULOS.length);
-    while (novo === indice) novo = sortear(VERSICULOS.length);
-    setIndice(novo);
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
@@ -72,10 +68,10 @@ export default function MensagemVersiculos() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-10 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 py-10">
         <Card className="border-0 shadow-2xl overflow-hidden">
           <div className="px-8 py-3 text-center" style={{ background: 'linear-gradient(135deg, #9f1239, #c8960c)' }}>
-            <p className="text-yellow-200 text-xs font-bold tracking-widest uppercase">Versículo Aleatório</p>
+            <p className="text-yellow-200 text-xs font-bold tracking-widest uppercase">Versículo do Dia</p>
           </div>
           <CardContent className="p-10 bg-white text-center">
             <BookMarked className="w-12 h-12 text-rose-400 mx-auto mb-6" />
@@ -83,11 +79,7 @@ export default function MensagemVersiculos() {
               "{versiculo.texto}"
             </blockquote>
             <p className="text-rose-600 font-bold text-lg">{versiculo.referencia}</p>
-            <div className="mt-8 flex justify-center gap-3 flex-wrap">
-              <Button variant="outline" size="sm" className="gap-2" onClick={novoVersiculo}>
-                <RefreshCw className="w-4 h-4" />
-                Novo Versículo
-              </Button>
+            <div className="mt-8 flex justify-center">
               <Button
                 variant="outline"
                 size="sm"
@@ -105,16 +97,9 @@ export default function MensagemVersiculos() {
           </CardContent>
         </Card>
 
-        {/* Navegação */}
-        <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={() => setIndice(i => (i - 1 + VERSICULOS.length) % VERSICULOS.length)} className="gap-2">
-            <ChevronLeft className="w-4 h-4" /> Anterior
-          </Button>
-          <span className="text-sm text-slate-500">{indice + 1} de {VERSICULOS.length}</span>
-          <Button variant="outline" onClick={() => setIndice(i => (i + 1) % VERSICULOS.length)} className="gap-2">
-            Próximo <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
+        <p className="text-center text-slate-400 text-xs mt-6">
+          O versículo muda automaticamente a cada novo dia
+        </p>
       </div>
     </div>
   );

@@ -1,8 +1,7 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, BookOpen, Share2, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, BookOpen, Share2 } from "lucide-react";
 
 const SALMOS = [
   { numero: 1, titulo: "O Homem Feliz", texto: "Bem-aventurado o homem que não anda no conselho dos ímpios, nem se detém no caminho dos pecadores, nem se assenta na roda dos escarnecedores. Antes tem o seu prazer na lei do Senhor, e na sua lei medita de dia e de noite. Será como a árvore plantada junto a ribeiros de águas, a qual dá o seu fruto no tempo certo; as suas folhas não cairão, e tudo quanto fizer prosperará." },
@@ -15,7 +14,7 @@ const SALMOS = [
   { numero: 37, titulo: "Não Invejes os Maus", texto: "Não te indignes por causa dos malfeitores, nem tenhas inveja dos que praticam a iniquidade. Porque serão ceifados como a erva, e murcharão como a erva verde. Confia no Senhor e faz o bem; habitarás na terra e serás alimentado com fidelidade. Deleita-te também no Senhor, e ele te concederá os desejos do teu coração. Entrega o teu caminho ao Senhor; confia nele, e ele tudo fará." },
   { numero: 46, titulo: "Deus é Nosso Refúgio", texto: "Deus é o nosso refúgio e força, socorro bem presente na angústia. Portanto não temeremos, ainda que a terra se mude, e ainda que os montes se transportem para o meio dos mares. Ainda que as suas águas rujam e se perturbem, e os montes se abalam com a sua braveza. Há um rio cujas correntes alegram a cidade de Deus, o santuário das moradas do Altíssimo." },
   { numero: 51, titulo: "Oração de Arrependimento", texto: "Tem misericórdia de mim, ó Deus, segundo a tua benignidade; apaga as minhas transgressões, segundo a multidão das tuas misericórdias. Lava-me completamente da minha iniquidade, e purifica-me do meu pecado. Cria em mim, ó Deus, um coração puro, e renova em mim um espírito reto. Não me lances fora da tua presença, e não retires de mim o teu Espírito Santo." },
-  { numero: 62, titulo: "Repouso em Deus", texto: "A minha alma repousa somente em Deus; dele vem a minha salvação. Somente ele é a minha rocha e a minha salvação; ele é o meu alto refúgio; não serei muito abalado. Até quando atacareis um homem? Sereis todos destruídos como parede inclinada, como cerca que está para cair. Repousa somente em Deus, ó minha alma, porque dele vem a minha esperança." },
+  { numero: 62, titulo: "Repouso em Deus", texto: "A minha alma repousa somente em Deus; dele vem a minha salvação. Somente ele é a minha rocha e a minha salvação; ele é o meu alto refúgio; não serei muito abalado. Repousa somente em Deus, ó minha alma, porque dele vem a minha esperança. Somente ele é a minha rocha e a minha salvação; ele é o meu alto refúgio; não serei abalado." },
   { numero: 91, titulo: "Proteção Divina", texto: "Aquele que habita no esconderijo do Altíssimo, e descansa à sombra do Onipotente, diz ao Senhor: Ele é o meu refúgio, o meu Deus, em quem confio. Porque ele te livrará do laço do passarinheiro, e da peste perniciosa. Ele te cobrirá com as suas penas, e debaixo das suas asas te refugiarás; a sua verdade será o teu escudo e broquel." },
   { numero: 100, titulo: "Louvor ao Senhor", texto: "Celebrai ao Senhor com alegria, toda a terra. Servi ao Senhor com alegria; entrai na sua presença com cântico. Sabei que o Senhor é Deus; foi ele quem nos fez, e não nós a nós mesmos; somos o seu povo e ovelhas do seu pasto. Entrai pelas suas portas com ação de graças, e nos seus átrios com louvor; dai-lhe graças e bendizei o seu nome." },
   { numero: 103, titulo: "Louvor pela Bondade de Deus", texto: "Bendize, ó minha alma, ao Senhor, e tudo o que há em mim bendiga o seu santo nome. Bendize, ó minha alma, ao Senhor, e não te esqueças de nenhum dos seus benefícios. Ele é quem perdoa todas as tuas iniquidades, quem sara todas as tuas enfermidades, quem redime a tua vida da cova, quem te coroa de benignidade e de misericórdias." },
@@ -25,22 +24,19 @@ const SALMOS = [
   { numero: 150, titulo: "Louvor Final", texto: "Louvai a Deus no seu santuário; louvai-o no firmamento do seu poder. Louvai-o pelos seus atos poderosos; louvai-o segundo a sua excelente grandeza. Louvai-o com o som de trombeta; louvai-o com saltério e harpa. Louvai-o com adufes e danças; louvai-o com instrumentos de cordas e flauta. Tudo quanto tem fôlego louve ao Senhor! Aleluia!" },
 ];
 
-function sortear(max: number) {
-  return Math.floor(Math.random() * max);
+function getDailyIndex(total: number): number {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now.getTime() - start.getTime()) / 86400000);
+  return dayOfYear % total;
 }
 
 export default function MensagemSalmos() {
   const [, navigate] = useLocation();
-  const [indice, setIndice] = useState(() => sortear(SALMOS.length));
 
-  const salmo = SALMOS[indice];
+  const idx = getDailyIndex(SALMOS.length);
+  const salmo = SALMOS[idx];
   const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-  function novoSalmo() {
-    let novo = sortear(SALMOS.length);
-    while (novo === indice) novo = sortear(SALMOS.length);
-    setIndice(novo);
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
@@ -60,10 +56,10 @@ export default function MensagemSalmos() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-10 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 py-10">
         <Card className="border-0 shadow-2xl overflow-hidden">
           <div className="px-8 py-3 text-center" style={{ background: 'linear-gradient(135deg, #92400e, #c8960c)' }}>
-            <p className="text-yellow-200 text-xs font-bold tracking-widest uppercase">Salmo Aleatório</p>
+            <p className="text-yellow-200 text-xs font-bold tracking-widest uppercase">Salmo do Dia</p>
           </div>
           <CardContent className="p-10 bg-white">
             <div className="text-center mb-6">
@@ -74,11 +70,7 @@ export default function MensagemSalmos() {
             <blockquote className="text-lg font-serif text-slate-700 leading-relaxed italic text-center border-l-4 border-amber-400 pl-6 py-2">
               {salmo.texto}
             </blockquote>
-            <div className="mt-8 flex justify-center gap-3 flex-wrap">
-              <Button variant="outline" size="sm" className="gap-2" onClick={novoSalmo}>
-                <RefreshCw className="w-4 h-4" />
-                Novo Salmo
-              </Button>
+            <div className="mt-8 flex justify-center">
               <Button
                 variant="outline"
                 size="sm"
@@ -96,34 +88,9 @@ export default function MensagemSalmos() {
           </CardContent>
         </Card>
 
-        {/* Navegação */}
-        <div className="flex items-center justify-between">
-          <Button variant="outline" onClick={() => setIndice(i => (i - 1 + SALMOS.length) % SALMOS.length)} className="gap-2">
-            <ChevronLeft className="w-4 h-4" /> Anterior
-          </Button>
-          <span className="text-sm text-slate-500">{indice + 1} de {SALMOS.length}</span>
-          <Button variant="outline" onClick={() => setIndice(i => (i + 1) % SALMOS.length)} className="gap-2">
-            Próximo <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {/* Grade de salmos */}
-        <div>
-          <h3 className="text-base font-bold text-slate-600 mb-3">Todos os Salmos disponíveis</h3>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-            {SALMOS.map((s, i) => (
-              <button
-                key={s.numero}
-                onClick={() => setIndice(i)}
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
-                  i === indice ? 'bg-amber-500 text-white shadow-md' : 'bg-white border border-amber-200 text-amber-700 hover:bg-amber-50'
-                }`}
-              >
-                Salmo {s.numero}
-              </button>
-            ))}
-          </div>
-        </div>
+        <p className="text-center text-slate-400 text-xs mt-6">
+          O salmo muda automaticamente a cada novo dia
+        </p>
       </div>
     </div>
   );
