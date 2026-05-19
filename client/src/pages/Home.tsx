@@ -244,43 +244,49 @@ export default function Home() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex flex-col gap-4">
               {grupos.map((grupo) => {
                 const Icon = grupo.icon;
+                const visibleSubs = (isAdminOuCeo
+                  ? grupo.subModules
+                  : grupo.subModules.filter(m => !m.subKey || podeVer(grupo.key, m.subKey)))
+                  .filter(m => !m.ceoOnly || isCEO)
+                  .slice()
+                  .sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'));
                 return (
-                  <Card
+                  <div
                     key={grupo.key}
-                    className={`hover:shadow-lg transition-shadow cursor-pointer border-2 ${grupo.borderColor} bg-gradient-to-br ${grupo.bgColor}`}
-                    onClick={() => setGrupoAberto(grupo.key)}
+                    className={`flex items-stretch rounded-xl border-2 ${grupo.borderColor} bg-gradient-to-br ${grupo.bgColor} overflow-hidden shadow-sm hover:shadow-md transition-shadow`}
                   >
-                    <CardHeader>
-                      <div className={`${grupo.color} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
+                    {/* Bloco esquerdo: ícone + nome do módulo */}
+                    <div className="flex flex-col items-center justify-center gap-2 px-5 py-4 min-w-[110px] max-w-[130px] border-r border-slate-200/60">
+                      <div className={`${grupo.color} w-12 h-12 rounded-xl flex items-center justify-center`}>
                         <Icon className="w-6 h-6 text-white" />
                       </div>
-                      <CardTitle className="text-2xl font-bold flex items-center justify-between">
-                        {grupo.title}
-                        <ChevronRight className="w-5 h-5 text-slate-400" />
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-sm">{grupo.description}</CardDescription>
-                      {(() => {
-                          const visibleSubs = (isAdminOuCeo
-                            ? grupo.subModules
-                            : grupo.subModules.filter(m => !m.subKey || podeVer(grupo.key, m.subKey)))
-                            .filter(m => !m.ceoOnly || isCEO);
-                          return visibleSubs.length > 0 ? (
-                            <div className="flex flex-wrap gap-1 mt-3">
-                              {visibleSubs.map(m => (
-                                <span key={m.path} className="text-xs bg-white/70 text-slate-600 px-2 py-0.5 rounded-full border border-slate-200">{m.title}</span>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-xs text-slate-400 mt-2 italic">Abas em breve...</p>
+                      <span className="text-sm font-bold text-slate-800 text-center leading-tight">{grupo.title}</span>
+                    </div>
+
+                    {/* Sub-abas à direita em ordem alfabética */}
+                    <div className="flex flex-wrap gap-2 items-center px-4 py-3 flex-1">
+                      {visibleSubs.length > 0 ? (
+                        visibleSubs.map(sub => {
+                          const SubIcon = sub.icon;
+                          return (
+                            <button
+                              key={sub.path}
+                              onClick={() => navigate(sub.path)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 hover:bg-white border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all text-sm font-medium text-slate-700 hover:text-slate-900"
+                            >
+                              <SubIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                              {sub.title}
+                            </button>
                           );
-                        })()}
-                    </CardContent>
-                  </Card>
+                        })
+                      ) : (
+                        <span className="text-xs text-slate-400 italic">Em breve...</span>
+                      )}
+                    </div>
+                  </div>
                 );
               })}
             </div>
