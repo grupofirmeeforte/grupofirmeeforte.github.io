@@ -395,14 +395,22 @@ export const consorcioRouter = router({
   // Salvar configurações de comissão
   saveConfig: protectedProcedure
     .input(z.object({
-      pctComissaoPadrao1: z.string().optional(),
-      qtdParcPadrao1: z.string().optional(),
-      pctComissaoPadrao2: z.string().optional(),
-      qtdParcPadrao2: z.string().optional(),
-      pctComissaoEspecial1: z.string().optional(),
-      qtdParcEspecial1: z.string().optional(),
-      pctComissaoEspecial2: z.string().optional(),
-      qtdParcEspecial2: z.string().optional(),
+      pctPadraoDemais1: z.string().optional(),
+      qtdPadraoDemaisParc1: z.string().optional(),
+      pctPadraoDemais2: z.string().optional(),
+      qtdPadraoDemaisParc2: z.string().optional(),
+      pctPadraoImovel1: z.string().optional(),
+      qtdPadraoImovelParc1: z.string().optional(),
+      pctPadraoImovel2: z.string().optional(),
+      qtdPadraoImovelParc2: z.string().optional(),
+      pctEspecialDemais1: z.string().optional(),
+      qtdEspecialDemaisParc1: z.string().optional(),
+      pctEspecialDemais2: z.string().optional(),
+      qtdEspecialDemaisParc2: z.string().optional(),
+      pctEspecialImovel1: z.string().optional(),
+      qtdEspecialImovelParc1: z.string().optional(),
+      pctEspecialImovel2: z.string().optional(),
+      qtdEspecialImovelParc2: z.string().optional(),
       agentesEspeciais: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
