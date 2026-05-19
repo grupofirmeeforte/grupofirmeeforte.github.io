@@ -278,9 +278,6 @@ export default function TabelaComissao() {
       {/* Header */}
       <div className="bg-white border-b shadow-sm px-6 py-4">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => setLocation('/')}>
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
           <div>
             <h1 className="text-lg font-bold text-gray-800">Tabela de Comissão</h1>
             <p className="text-xs text-gray-500">{filteredRows.length} registros</p>
@@ -288,6 +285,9 @@ export default function TabelaComissao() {
           <div className="ml-auto flex items-center gap-2">
             <Button onClick={openNovo} className="flex items-center gap-2" style={{ backgroundColor: '#002776' }}>
               <Plus className="w-4 h-4" /> Novo
+            </Button>
+            <Button size="sm" onClick={() => setLocation('/')} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+              <ArrowLeft className="w-4 h-4" /> Voltar
             </Button>
           </div>
         </div>

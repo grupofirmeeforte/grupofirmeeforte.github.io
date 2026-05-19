@@ -627,9 +627,8 @@ export default function ExtratosPage() {
           <h1 className="text-2xl font-bold text-gray-900">Extratos</h1>
           <p className="text-sm text-gray-500 mt-0.5">{subtituloPagina}</p>
         </div>
-        <Button variant="default" className="bg-gray-900 hover:bg-gray-800" onClick={() => navigate('/')}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Voltar
+        <Button size="sm" onClick={() => navigate('/')} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+          <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
       </div>
 

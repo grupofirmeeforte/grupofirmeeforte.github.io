@@ -130,9 +130,8 @@ export default function Relatorios() {
             <h1 className="text-4xl font-bold text-slate-900">Cálculo</h1>
             <p className="text-sm text-slate-600">Cálculo de comissões por Chave J</p>
           </div>
-          <Button onClick={handleCancel} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
+          <Button size="sm" onClick={handleCancel} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+            <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
         </div>
 

@@ -690,7 +690,7 @@ function AbaMailing() {
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-3 flex-wrap">
-          <Button variant="outline" size="sm" onClick={() => { setListaAtiva(null); setBusca(""); setFiltroStatus("todos"); setPagina(1); }} className="gap-1 bg-gray-800 text-white hover:bg-gray-700 border-gray-800"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
+          <Button size="sm" onClick={() => { setListaAtiva(null); setBusca(""); setFiltroStatus("todos"); setPagina(1); }} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
           <h3 className="font-semibold text-gray-800">{listaNomeAtiva}</h3>
           <span className="text-sm text-gray-500">{contatos?.total ?? 0} contatos</span>
         </div>
@@ -836,7 +836,7 @@ export default function CRMPage() {
           <h1 className="text-lg font-bold text-gray-900">CRM</h1>
           <p className="text-xs text-gray-500">Gestão de Relacionamento com Clientes</p>
         </div>
-        <Button variant="outline" size="sm" onClick={() => navigate("/")} className="gap-1 bg-gray-800 text-white hover:bg-gray-700 border-gray-800">
+        <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
           <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
       </div>

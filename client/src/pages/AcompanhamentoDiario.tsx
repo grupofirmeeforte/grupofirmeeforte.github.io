@@ -106,8 +106,8 @@ export default function AcompanhamentoDiario() {
           <Lock className="w-12 h-12 text-red-400" />
           <h2 className="text-xl font-bold text-white">Acesso Restrito</h2>
           <p className="text-gray-400 text-sm">Você não tem permissão para acessar o Acompanhamento Diário.<br/>Solicite ao administrador.</p>
-          <Button variant="ghost" onClick={() => navigate("/febraban")} className="text-gray-400 hover:text-white">
-            <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
+          <Button size="sm" onClick={() => navigate("/febraban")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+            <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
         </div>
       </div>
@@ -156,9 +156,8 @@ export default function AcompanhamentoDiario() {
             </div>
 
             {/* Botão Voltar */}
-            <Button variant="ghost" size="sm" onClick={() => navigate("/febraban")}
-              className="text-gray-400 hover:text-white border border-gray-700">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
+            <Button size="sm" onClick={() => navigate("/febraban")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+              <ArrowLeft className="w-4 h-4" /> Voltar
             </Button>
           </div>
         </div>

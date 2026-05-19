@@ -235,9 +235,6 @@ export default function Certificacoes() {
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="bg-white border-b px-6 py-3 flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setLocation('/')}>
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
         <div>
           <h1 className="text-lg font-bold text-slate-800">Certificações</h1>
           <p className="text-xs text-slate-500">Controle de certificações dos agentes (CONSIG e LGPD)</p>
@@ -255,6 +252,9 @@ export default function Certificacoes() {
           <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImport} />
           <Button size="sm" onClick={abrirNovo} className="gap-1">
             <Plus className="w-4 h-4" /> Novo
+          </Button>
+          <Button size="sm" onClick={() => setLocation('/')} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+            <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
         </div>
       </div>

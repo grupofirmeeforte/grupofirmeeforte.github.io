@@ -299,9 +299,6 @@ export default function ContaCorrente() {
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #e8eeff 50%, #f5f0ff 100%)' }}>
       {/* Header */}
       <div className="bg-white border-b px-6 py-3 flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => setLocation('/')}>
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
         <div>
           <h1 className="text-lg font-bold text-gray-800">Conta Corrente</h1>
           <p className="text-xs text-gray-500">Operações de conta corrente</p>
@@ -314,6 +311,9 @@ export default function ContaCorrente() {
             <Plus className="w-4 h-4" /> Novo
           </Button>
           <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportar} />
+          <Button size="sm" onClick={() => setLocation('/')} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+            <ArrowLeft className="w-4 h-4" /> Voltar
+          </Button>
         </div>
       </div>
 

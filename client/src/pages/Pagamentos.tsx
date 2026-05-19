@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
+import { ArrowLeft } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -321,8 +322,9 @@ export default function PagamentosPage() {
         <div className="flex gap-2">
           <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white">Exportar Excel</Button>
           <Button onClick={abrirNovo} size="sm" className="bg-blue-700 hover:bg-blue-600 text-white">+ Novo Lançamento</Button>
-          <Button variant="outline" size="sm" onClick={() => navigate("/")}
-            className="bg-gray-800 text-white border-gray-600 hover:bg-gray-700">← Voltar</Button>
+          <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+            <ArrowLeft className="w-4 h-4" /> Voltar
+          </Button>
         </div>
       </div>
 

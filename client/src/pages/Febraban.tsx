@@ -613,7 +613,7 @@ export default function FebrabanPage() {
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800" onClick={() => navigate("/")}><ArrowLeft className="w-4 h-4" /> Voltar</Button>
+          <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
           <Button
             className="gap-2 bg-purple-600 text-white hover:bg-purple-700"
             onClick={() => navigate("/febraban/acompanhamento-diario")}

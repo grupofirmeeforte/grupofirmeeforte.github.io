@@ -106,12 +106,6 @@ export default function AgentesPage() {
         </div>
         <div className="flex gap-2">
           <Button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800"
-          >
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
-          <Button
             variant="outline"
             onClick={() => setShowDuplicatas(!showDuplicatas)}
             className="gap-2 border-orange-400 text-orange-700 hover:bg-orange-50"
@@ -125,6 +119,9 @@ export default function AgentesPage() {
           >
             <Plus className="w-4 h-4" />
             Novo Agente
+          </Button>
+          <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+            <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
         </div>
       </div>

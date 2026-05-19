@@ -340,7 +340,7 @@ export default function Consorcio() {
             <Send className={`w-4 h-4 ${enviarCalculoMutation.isPending ? 'animate-pulse' : ''}`} />
             {enviarCalculoMutation.isPending ? 'Enviando...' : `Enviar para Cálculo${selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}`}
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1 text-gray-600 hover:text-gray-900">
+          <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
             <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
         </div>
