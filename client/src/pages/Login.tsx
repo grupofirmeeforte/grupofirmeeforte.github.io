@@ -112,8 +112,16 @@ export default function Login() {
   // Tela de boas-vindas após login bem-sucedido
   if (welcomeData) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#002776' }}>
-        <Card className="w-full max-w-lg bg-white shadow-2xl animate-in fade-in zoom-in duration-500">
+      <div
+        className="min-h-screen flex items-center justify-center relative overflow-hidden"
+        style={{
+          backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663564665591/SMgJn6AGQCNfDq7mPzPqc9/coban-bg-972o7wqxPoimymB3vuTFrF.webp')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-black/55" />
+        <Card className="relative z-10 w-full max-w-lg bg-white shadow-2xl animate-in fade-in zoom-in duration-500">
           <div className="p-10 text-center">
             {welcomeData.isAniversario ? (
               <>
@@ -167,9 +175,17 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-end p-6" style={{ backgroundColor: '#002776' }}>
+    <div
+      className="min-h-screen flex items-center justify-end p-6 relative overflow-hidden"
+      style={{
+        backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663564665591/SMgJn6AGQCNfDq7mPzPqc9/coban-bg-972o7wqxPoimymB3vuTFrF.webp')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="absolute inset-0 bg-black/50" />
       {/* Card de login - Canto direito */}
-      <Card className="w-full max-w-md bg-white shadow-2xl">
+      <Card className="relative z-10 w-full max-w-md bg-white shadow-2xl">
         <div className="p-8">
           {/* Logo/Título */}
           <div className="text-center mb-8">
