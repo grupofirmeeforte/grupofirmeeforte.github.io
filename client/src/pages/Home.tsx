@@ -55,11 +55,26 @@ export default function Home() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
-        <div className="text-center text-white">
-          <h1 className="text-3xl font-bold mb-4">Grupo Firme & Forte</h1>
-          <p className="text-slate-300 mb-8">Sistema de Gestão</p>
-          <Button onClick={() => window.location.href = getLoginUrl()} className="bg-blue-600 hover:bg-blue-700">
+      <div
+        className="min-h-screen flex items-center justify-center relative overflow-hidden"
+        style={{
+          backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663564665591/SMgJn6AGQCNfDq7mPzPqc9/coban-bg-972o7wqxPoimymB3vuTFrF.webp')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        {/* Overlay escuro para garantir legibilidade */}
+        <div className="absolute inset-0 bg-black/50" />
+        <div className="relative z-10 text-center text-white px-8 py-12 rounded-2xl backdrop-blur-sm bg-white/5 border border-white/10 shadow-2xl">
+          <div className="mb-2">
+            <span className="text-yellow-400 text-xs font-semibold tracking-widest uppercase">Sistema de Gestão</span>
+          </div>
+          <h1 className="text-4xl font-bold mb-2 text-white drop-shadow-lg">Grupo Firme & Forte</h1>
+          <p className="text-slate-300 mb-8 text-sm">Coban — Banco do Brasil</p>
+          <Button
+            onClick={() => window.location.href = getLoginUrl()}
+            className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold px-8 py-3 text-base shadow-lg"
+          >
             Entrar no Sistema
           </Button>
         </div>
