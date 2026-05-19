@@ -580,28 +580,28 @@ export default function Consorcio() {
               <h3 className="font-semibold text-sm text-green-800 mb-3">Comissão Padrão — DEMAIS</h3>
               <div className="grid grid-cols-4 gap-2">
                 <div>
-                  <Label className="text-xs text-gray-600">% Comissão 1</Label>
+                  <Label className="text-xs text-gray-600">% Demais</Label>
                   <div className="relative">
                     <Input className="pr-6" placeholder="ex: 0,65" value={cfgPadraoDemais1} onChange={e => setCfgPadraoDemais1(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.1</Label>
+                  <Label className="text-xs text-gray-600">Qtd. Demais</Label>
                   <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoDemaisParc1} onChange={e => setCfgPadraoDemaisParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
                   </select>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">% Comissão 2</Label>
+                  <Label className="text-xs text-gray-600">% Imóvel</Label>
                   <div className="relative">
                     <Input className="pr-6" placeholder="ex: 0,50" value={cfgPadraoDemais2} onChange={e => setCfgPadraoDemais2(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.2</Label>
+                  <Label className="text-xs text-gray-600">Qtd. Imóvel</Label>
                   <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoDemaisParc2} onChange={e => setCfgPadraoDemaisParc2(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -615,28 +615,28 @@ export default function Consorcio() {
               <h3 className="font-semibold text-sm text-green-800 mb-3">Comissão Padrão — IMÓVEL</h3>
               <div className="grid grid-cols-4 gap-2">
                 <div>
-                  <Label className="text-xs text-gray-600">% Comissão 1</Label>
+                  <Label className="text-xs text-gray-600">% Demais</Label>
                   <div className="relative">
                     <Input className="pr-6" placeholder="ex: 0,65" value={cfgPadraoImovel1} onChange={e => setCfgPadraoImovel1(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.1</Label>
+                  <Label className="text-xs text-gray-600">Qtd. Demais</Label>
                   <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoImovelParc1} onChange={e => setCfgPadraoImovelParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
                   </select>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">% Comissão 2</Label>
+                  <Label className="text-xs text-gray-600">% Imóvel</Label>
                   <div className="relative">
                     <Input className="pr-6" placeholder="ex: 0,50" value={cfgPadraoImovel2} onChange={e => setCfgPadraoImovel2(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.2</Label>
+                  <Label className="text-xs text-gray-600">Qtd. Imóvel</Label>
                   <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoImovelParc2} onChange={e => setCfgPadraoImovelParc2(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -650,28 +650,28 @@ export default function Consorcio() {
               <h3 className="font-semibold text-sm text-blue-800 mb-3">Comissão Especial — DEMAIS</h3>
               <div className="grid grid-cols-4 gap-2 mb-3">
                 <div>
-                  <Label className="text-xs text-gray-600">% Comissão 1</Label>
+                  <Label className="text-xs text-gray-600">% Demais</Label>
                   <div className="relative">
                     <Input className="pr-6" placeholder="ex: 1,00" value={cfgEspecialDemais1} onChange={e => setCfgEspecialDemais1(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.1</Label>
+                  <Label className="text-xs text-gray-600">Qtd. Demais</Label>
                   <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialDemaisParc1} onChange={e => setCfgEspecialDemaisParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
                   </select>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">% Comissão 2</Label>
+                  <Label className="text-xs text-gray-600">% Imóvel</Label>
                   <div className="relative">
                     <Input className="pr-6" placeholder="ex: 0,75" value={cfgEspecialDemais2} onChange={e => setCfgEspecialDemais2(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.2</Label>
+                  <Label className="text-xs text-gray-600">Qtd. Imóvel</Label>
                   <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialDemaisParc2} onChange={e => setCfgEspecialDemaisParc2(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -685,28 +685,28 @@ export default function Consorcio() {
               <h3 className="font-semibold text-sm text-blue-800 mb-3">Comissão Especial — IMÓVEL</h3>
               <div className="grid grid-cols-4 gap-2 mb-3">
                 <div>
-                  <Label className="text-xs text-gray-600">% Comissão 1</Label>
+                  <Label className="text-xs text-gray-600">% Demais</Label>
                   <div className="relative">
                     <Input className="pr-6" placeholder="ex: 1,00" value={cfgEspecialImovel1} onChange={e => setCfgEspecialImovel1(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.1</Label>
+                  <Label className="text-xs text-gray-600">Qtd. Demais</Label>
                   <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialImovelParc1} onChange={e => setCfgEspecialImovelParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
                   </select>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">% Comissão 2</Label>
+                  <Label className="text-xs text-gray-600">% Imóvel</Label>
                   <div className="relative">
                     <Input className="pr-6" placeholder="ex: 0,75" value={cfgEspecialImovel2} onChange={e => setCfgEspecialImovel2(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.2</Label>
+                  <Label className="text-xs text-gray-600">Qtd. Imóvel</Label>
                   <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialImovelParc2} onChange={e => setCfgEspecialImovelParc2(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
