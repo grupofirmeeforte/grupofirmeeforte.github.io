@@ -23,6 +23,9 @@ import DespesasFixasPage from './pages/DespesasFixas';
 import CRMPage from './pages/CRM';
 import AcompanhamentoDiario from './pages/AcompanhamentoDiario';
 import Consorcio from './pages/Consorcio';
+import MensagemVersiculos from './pages/MensagemVersiculos';
+import MensagemSalmos from './pages/MensagemSalmos';
+import MensagemMinutosSabedoria from './pages/MensagemMinutosSabedoria';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -66,6 +69,9 @@ function RouterWithInactivity() {
       <Route path={"/extratos"} component={ExtratosPage} />
       <Route path={"/pro-rata"} component={ProRataPage} />
       <Route path={"/producao/consorcio"} component={Consorcio} />
+      <Route path={"/mensagem-do-dia/versiculos"} component={MensagemVersiculos} />
+      <Route path={"/mensagem-do-dia/salmos"} component={MensagemSalmos} />
+      <Route path={"/mensagem-do-dia/minutos-sabedoria"} component={MensagemMinutosSabedoria} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />

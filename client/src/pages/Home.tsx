@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -130,7 +130,6 @@ export default function Home() {
         { title: 'Oportunidades', description: 'Pipeline de negócios', icon: TrendingUp, color: 'bg-blue-600', path: '/crm?aba=oportunidades', subKey: 'oportunidades' },
         { title: 'Atendimentos', description: 'Histórico de contatos', icon: Phone, color: 'bg-indigo-600', path: '/crm?aba=atendimentos', subKey: 'atendimentos' },
         { title: 'Tarefas / Follow-up', description: 'Lembretes e tarefas', icon: CheckSquare, color: 'bg-violet-600', path: '/crm?aba=tarefas', subKey: 'tarefas' },
-        { title: 'Mailing', description: 'Listas de contato ativo', icon: Mail, color: 'bg-cyan-600', path: '/crm?aba=mailing', subKey: 'mailing' },
         { title: 'Relatórios CRM', description: 'Funil e produtividade', icon: BarChart2, color: 'bg-teal-600', path: '/crm?aba=relatorios', subKey: 'relatorios' },
       ],
     },
@@ -187,13 +186,17 @@ export default function Home() {
     {
       type: 'group',
       key: 'mailing',
-      title: 'Mailing',
-      description: 'Gestão de listas de contatos e campanhas',
+      title: 'Mensagem do Dia',
+      description: 'Versículos e Salmos do dia',
       icon: Mail,
       color: 'bg-rose-600',
       borderColor: 'border-rose-200',
       bgColor: 'from-rose-50 to-pink-50',
-      subModules: [],
+      subModules: [
+        { title: 'Minutos de Sabedoria', description: 'Reflexões diárias de sabedoria', icon: Sparkles, color: 'bg-purple-600', path: '/mensagem-do-dia/minutos-sabedoria', subKey: 'minutos-sabedoria' },
+        { title: 'Salmos', description: 'Salmos do dia', icon: BookOpen, color: 'bg-amber-600', path: '/mensagem-do-dia/salmos', subKey: 'salmos' },
+        { title: 'Versículos', description: 'Versículos motivacionais do dia', icon: BookMarked, color: 'bg-rose-600', path: '/mensagem-do-dia/versiculos', subKey: 'versiculos' },
+      ],
     },
 
     {
