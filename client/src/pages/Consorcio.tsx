@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Upload, Edit2, Trash2, Search, Settings, RefreshCw, Calculator } from "lucide-react";
+import { ArrowLeft, Upload, Edit2, Trash2, Search, Settings, RefreshCw, Calculator, Send } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
@@ -170,6 +170,12 @@ export default function Consorcio() {
   const excluirMutation = trpc.consorcio.excluir.useMutation({
     onSuccess: () => { utils.consorcio.list.invalidate(); setDeleteId(null); },
   });
+  const enviarCalculoMutation = trpc.consorcio.enviarParaCalculo.useMutation({
+    onSuccess: (res) => {
+      toast.success(`Enviado para Cálculo! ${res.inseridos} novo(s) inserido(s), ${res.atualizados} atualizado(s).`);
+    },
+    onError: (err) => toast.error(`Erro ao enviar: ${err.message}`),
+  });
 
   // ── Parser Excel ──────────────────────────────────────────────
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -304,6 +310,22 @@ export default function Consorcio() {
           </Button>
           <Button size="sm" onClick={() => setImportModal(true)} className="gap-1">
             <Upload className="w-4 h-4" /> Importar Excel
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => {
+              if (mesAno === '__all__') {
+                toast.error('Selecione um mês específico antes de enviar para Cálculo');
+                return;
+              }
+              enviarCalculoMutation.mutate({ mesAno });
+            }}
+            disabled={enviarCalculoMutation.isPending}
+            className="gap-1 bg-blue-600 hover:bg-blue-700 text-white"
+            title="Envia os valores consolidados por agente para Financeiro → Cálculo"
+          >
+            <Send className={`w-4 h-4 ${enviarCalculoMutation.isPending ? 'animate-pulse' : ''}`} />
+            {enviarCalculoMutation.isPending ? 'Enviando...' : 'Enviar para Cálculo'}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1 text-gray-600 hover:text-gray-900">
             <ArrowLeft className="w-4 h-4" /> Voltar

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { consorcios, agentes } from "../../drizzle/schema";
+import { consorcios, agentes, calculos } from "../../drizzle/schema";
 import { eq, and, like, desc, asc, sql, or } from "drizzle-orm";
 
 export const consorcioRouter = router({
@@ -539,6 +539,102 @@ export const consorcioRouter = router({
       if (!db) throw new Error("Banco não disponível");
       await db.delete(consorcios).where(eq(consorcios.id, input.id));
       return { ok: true };
+    }),
+
+  // Enviar dados consolidados de consórcio para Financeiro → Cálculo
+  enviarParaCalculo: protectedProcedure
+    .input(z.object({
+      mesAno: z.string(), // MM/AAAA do mês a enviar
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Banco não disponível');
+
+      // 1. Buscar todos os registros do mês informado
+      const registros = await db.select({
+        chaveJ: consorcios.chaveJ,
+        nomeAgente: consorcios.nomeAgente,
+        empresa: consorcios.empresa,
+        comissao: consorcios.comissao,
+        rbm: consorcios.rbm,
+      }).from(consorcios).where(eq(consorcios.mesAno, input.mesAno));
+
+      if (registros.length === 0) throw new Error('Nenhum registro encontrado para o mês informado');
+
+      // 2. Agrupar por ChaveJ: somar comissao (Comissão 2) e rbm, contar qtd
+      const agrupado = new Map<string, {
+        chaveJ: string;
+        nomeAgente: string;
+        empresa: string;
+        comissaoConsorcio: number;
+        rbmTotal: number;
+        qtd: number;
+      }>();
+
+      for (const r of registros) {
+        const chave = (r.chaveJ ?? '').trim().toUpperCase();
+        if (!chave) continue;
+        const comissao = parseFloat((r.comissao ?? '0').replace(',', '.')) || 0;
+        const rbm = parseFloat((r.rbm ?? '0').replace(',', '.')) || 0;
+        if (agrupado.has(chave)) {
+          const entry = agrupado.get(chave)!;
+          entry.comissaoConsorcio += comissao;
+          entry.rbmTotal += rbm;
+          entry.qtd += 1;
+        } else {
+          agrupado.set(chave, {
+            chaveJ: chave,
+            nomeAgente: r.nomeAgente ?? '',
+            empresa: r.empresa ?? '',
+            comissaoConsorcio: comissao,
+            rbmTotal: rbm,
+            qtd: 1,
+          });
+        }
+      }
+
+      let inseridos = 0;
+      let atualizados = 0;
+
+      // 3. Para cada ChaveJ agrupada: upsert na tabela calculos
+      for (const entry of Array.from(agrupado.values())) {
+        // Verificar se já existe registro para esta ChaveJ + mês
+        const existente = await db.select({ id: calculos.id })
+          .from(calculos)
+          .where(and(
+            eq(calculos.chaveJ, entry.chaveJ),
+            eq(calculos.mesRef, input.mesAno)
+          ))
+          .limit(1);
+
+        const comissaoStr = entry.comissaoConsorcio.toFixed(2);
+        const rbmStr = entry.rbmTotal.toFixed(2);
+
+        if (existente.length > 0) {
+          // Já existe: atualiza apenas comissaoConsorcio e rbmTotal
+          await db.update(calculos)
+            .set({
+              comissaoConsorcio: comissaoStr,
+              rbmTotal: rbmStr,
+            })
+            .where(eq(calculos.id, existente[0].id));
+          atualizados++;
+        } else {
+          // Não existe: insere nova linha
+          await db.insert(calculos).values({
+            mesRef: input.mesAno,
+            tipoPagamento: 'Comissão',
+            empresa: entry.empresa,
+            chaveJ: entry.chaveJ,
+            nomeAgente: entry.nomeAgente,
+            comissaoConsorcio: comissaoStr,
+            rbmTotal: rbmStr,
+          });
+          inseridos++;
+        }
+      }
+
+      return { ok: true, inseridos, atualizados, total: agrupado.size };
     }),
 
   // Atualizar registro
