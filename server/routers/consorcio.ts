@@ -441,14 +441,22 @@ export const consorcioRouter = router({
         cfgData.forEach((r: any) => { if (r.chave) cfg[r.chave] = r.valor ?? ''; });
       }
 
-      const pct1Padrao   = parseFloat(cfg['pctComissaoPadrao1']   || '0') / 100;
-      const pct2Padrao   = parseFloat(cfg['pctComissaoPadrao2']   || '0') / 100;
-      const parc1Padrao  = parseInt(cfg['qtdParcPadrao1']         || '3');
-      const parc2Padrao  = parseInt(cfg['qtdParcPadrao2']         || '3');
-      const pct1Especial = parseFloat(cfg['pctComissaoEspecial1'] || '0') / 100;
-      const pct2Especial = parseFloat(cfg['pctComissaoEspecial2'] || '0') / 100;
-      const parc1Especial= parseInt(cfg['qtdParcEspecial1']       || '4');
-      const parc2Especial= parseInt(cfg['qtdParcEspecial2']       || '4');
+      // Padrão
+      const pctPadraoDemais   = parseFloat(cfg['pctPadraoDemais1']       || '0') / 100;
+      const parcPadraoDemaisDe = parseInt(cfg['qtdPadraoDemaisParc1']    || '1');
+      const parcPadraoDemaisAte= parseInt(cfg['qtdPadraoDemaisParc1Ate'] || '0');
+      const pctPadraoImovel   = parseFloat(cfg['pctPadraoDemais2']       || '0') / 100;
+      const parcPadraoImovelDe = parseInt(cfg['qtdPadraoImovelParc1']    || '1');
+      const parcPadraoImovelAte= parseInt(cfg['qtdPadraoImovelParc2']    || '0');
+
+      // Especial
+      const pctEspecialDemais   = parseFloat(cfg['pctEspecialDemais1']       || '0') / 100;
+      const parcEspecialDemaisDe = parseInt(cfg['qtdEspecialDemaisParc1']    || '1');
+      const parcEspecialDemaisAte= parseInt(cfg['qtdEspecialDemaisParc1Ate'] || '0');
+      const pctEspecialImovel   = parseFloat(cfg['pctEspecialDemais2']       || '0') / 100;
+      const parcEspecialImovelDe = parseInt(cfg['qtdEspecialImovelParc1']    || '1');
+      const parcEspecialImovelAte= parseInt(cfg['qtdEspecialImovelParc2']    || '0');
+
       const agentesEspeciaisStr = cfg['agentesEspeciais'] || '';
       const agentesEspeciais = new Set(
         agentesEspeciaisStr.split('\n').map((s: string) => s.trim().toUpperCase()).filter(Boolean)
@@ -473,53 +481,47 @@ export const consorcioRouter = router({
 
       for (const r of registros) {
         const valorBem = parseFloat(r.valorBem ?? '0') || 0;
+        // Extrai número da parcela (ex: "PARC3" → 3, "3" → 3)
         const parcNum = parseInt((r.parcLiberada ?? '').replace(/\D/g, '')) || 0;
-        const isImovel = (r.segmento ?? '').toUpperCase().includes('IMOVEL') ||
-                         (r.segmento ?? '').toUpperCase().includes('IMÓVEL');
+
+        // Passo 1: verificar segmento
+        const segUpper = (r.segmento ?? '').toUpperCase();
+        const isImovel = segUpper.includes('IMOVEL') || segUpper.includes('IMÓVEL');
+
+        // Passo 2: verificar se é agente especial
         const isEspecial = agentesEspeciais.has((r.chaveJ ?? '').toUpperCase());
 
-        // Determinar limites de parcelas para este agente/segmento
-        let limParc1: number;
-        let limParc2: number;
-        let pct1: number;
+        // Passo 3: selecionar percentual e intervalo de parcelas conforme segmento + tipo
         let pct2: number;
+        let parcDe: number;
+        let parcAte: number;
 
         if (isImovel) {
-          // IMÓVEL: paga até 10 parcelas para ambos padrão e especial
-          limParc1 = 10;
-          limParc2 = 10;
-          pct1 = isEspecial ? pct1Especial : pct1Padrao;
-          pct2 = isEspecial ? pct2Especial : pct2Padrao;
+          pct2    = isEspecial ? pctEspecialImovel   : pctPadraoImovel;
+          parcDe  = isEspecial ? parcEspecialImovelDe : parcPadraoImovelDe;
+          parcAte = isEspecial ? parcEspecialImovelAte: parcPadraoImovelAte;
         } else {
           // DEMAIS
-          if (isEspecial) {
-            limParc1 = parc1Especial; // configurado (padrão 4)
-            limParc2 = parc2Especial;
-            pct1 = pct1Especial;
-            pct2 = pct2Especial;
-          } else {
-            limParc1 = parc1Padrao; // configurado (padrão 3)
-            limParc2 = parc2Padrao;
-            pct1 = pct1Padrao;
-            pct2 = pct2Padrao;
-          }
+          pct2    = isEspecial ? pctEspecialDemais   : pctPadraoDemais;
+          parcDe  = isEspecial ? parcEspecialDemaisDe : parcPadraoDemaisDe;
+          parcAte = isEspecial ? parcEspecialDemaisAte: parcPadraoDemaisAte;
         }
 
-        // RBM: zera se parcela acima do limite de Com.1
-        const rbmVal = parcNum <= limParc1 ? +(valorBem * pct1).toFixed(2) : 0;
-        // Comissão: zera se parcela acima do limite de Com.2
-        const comissaoVal = parcNum <= limParc2 ? +(valorBem * pct2).toFixed(2) : 0;
+        // Passo 4: verificar se a parcela está dentro do intervalo autorizado
+        const dentroDoIntervalo = parcAte > 0 && parcNum >= parcDe && parcNum <= parcAte;
+        const comissaoVal = dentroDoIntervalo ? +(valorBem * pct2).toFixed(2) : 0;
+        const pct2Str = dentroDoIntervalo ? String(pct2) : '0';
 
-        // pctComissao1 e rbm são fixos do Excel - não alterar
         // Apenas pctComissao2 e comissao são calculados pelo sistema
+        // pctComissao1 e rbm são fixos do Excel - não alterar
         await db.update(consorcios)
           .set({
-            pctComissao2: String(pct2),
+            pctComissao2: pct2Str,
             comissao: String(comissaoVal),
           })
           .where(eq(consorcios.id, r.id));
 
-        if (rbmVal === 0 && comissaoVal === 0) zerados++;
+        if (comissaoVal === 0) zerados++;
         else calculados++;
       }
 
