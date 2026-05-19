@@ -94,26 +94,20 @@ export default function Consorcio() {
 
   // Configuração de comissões
   const [configAberta, setConfigAberta] = useState(false);
-  // Padrão DEMAIS
-  const [cfgPadraoDemais1, setCfgPadraoDemais1] = useState("");
-  const [cfgPadraoDemaisParc1, setCfgPadraoDemaisParc1] = useState("");
-  const [cfgPadraoDemais2, setCfgPadraoDemais2] = useState("");
-  const [cfgPadraoDemaisParc2, setCfgPadraoDemaisParc2] = useState("");
-  // Padrão IMÓVEL
-  const [cfgPadraoImovel1, setCfgPadraoImovel1] = useState("");
-  const [cfgPadraoImovelParc1, setCfgPadraoImovelParc1] = useState("");
-  const [cfgPadraoImovel2, setCfgPadraoImovel2] = useState("");
-  const [cfgPadraoImovelParc2, setCfgPadraoImovelParc2] = useState("");
-  // Especial DEMAIS
-  const [cfgEspecialDemais1, setCfgEspecialDemais1] = useState("");
-  const [cfgEspecialDemaisParc1, setCfgEspecialDemaisParc1] = useState("");
-  const [cfgEspecialDemais2, setCfgEspecialDemais2] = useState("");
-  const [cfgEspecialDemaisParc2, setCfgEspecialDemaisParc2] = useState("");
-  // Especial IMÓVEL
-  const [cfgEspecialImovel1, setCfgEspecialImovel1] = useState("");
-  const [cfgEspecialImovelParc1, setCfgEspecialImovelParc1] = useState("");
-  const [cfgEspecialImovel2, setCfgEspecialImovel2] = useState("");
-  const [cfgEspecialImovelParc2, setCfgEspecialImovelParc2] = useState("");
+  // Comissão Padrão
+  const [cfgPadraoDemais1, setCfgPadraoDemais1] = useState("");       // % Demais
+  const [cfgPadraoDemaisParc1, setCfgPadraoDemaisParc1] = useState(""); // Parc. Demais De
+  const [cfgPadraoDemaisParc1Ate, setCfgPadraoDemaisParc1Ate] = useState(""); // Parc. Demais Até
+  const [cfgPadraoDemais2, setCfgPadraoDemais2] = useState("");       // % Imóvel
+  const [cfgPadraoImovelParc1, setCfgPadraoImovelParc1] = useState(""); // Parc. Imóvel De
+  const [cfgPadraoImovelParc2, setCfgPadraoImovelParc2] = useState(""); // Parc. Imóvel Até
+  // Comissão Especial
+  const [cfgEspecialDemais1, setCfgEspecialDemais1] = useState("");       // % Demais
+  const [cfgEspecialDemaisParc1, setCfgEspecialDemaisParc1] = useState(""); // Parc. Demais De
+  const [cfgEspecialDemaisParc1Ate, setCfgEspecialDemaisParc1Ate] = useState(""); // Parc. Demais Até
+  const [cfgEspecialDemais2, setCfgEspecialDemais2] = useState("");       // % Imóvel
+  const [cfgEspecialImovelParc1, setCfgEspecialImovelParc1] = useState(""); // Parc. Imóvel De
+  const [cfgEspecialImovelParc2, setCfgEspecialImovelParc2] = useState(""); // Parc. Imóvel Até
   const [cfgAgentesEspeciais, setCfgAgentesEspeciais] = useState("");
 
   const utils = trpc.useUtils();
@@ -123,21 +117,19 @@ export default function Consorcio() {
   // Preencher campos ao carregar config
   useEffect(() => {
     if (!configData) return;
+    // Padrão
     if (configData.pctPadraoDemais1) setCfgPadraoDemais1(configData.pctPadraoDemais1);
     if (configData.qtdPadraoDemaisParc1) setCfgPadraoDemaisParc1(configData.qtdPadraoDemaisParc1);
+    if (configData.qtdPadraoDemaisParc1Ate) setCfgPadraoDemaisParc1Ate(configData.qtdPadraoDemaisParc1Ate);
     if (configData.pctPadraoDemais2) setCfgPadraoDemais2(configData.pctPadraoDemais2);
-    if (configData.qtdPadraoDemaisParc2) setCfgPadraoDemaisParc2(configData.qtdPadraoDemaisParc2);
-    if (configData.pctPadraoImovel1) setCfgPadraoImovel1(configData.pctPadraoImovel1);
     if (configData.qtdPadraoImovelParc1) setCfgPadraoImovelParc1(configData.qtdPadraoImovelParc1);
-    if (configData.pctPadraoImovel2) setCfgPadraoImovel2(configData.pctPadraoImovel2);
     if (configData.qtdPadraoImovelParc2) setCfgPadraoImovelParc2(configData.qtdPadraoImovelParc2);
+    // Especial
     if (configData.pctEspecialDemais1) setCfgEspecialDemais1(configData.pctEspecialDemais1);
     if (configData.qtdEspecialDemaisParc1) setCfgEspecialDemaisParc1(configData.qtdEspecialDemaisParc1);
+    if (configData.qtdEspecialDemaisParc1Ate) setCfgEspecialDemaisParc1Ate(configData.qtdEspecialDemaisParc1Ate);
     if (configData.pctEspecialDemais2) setCfgEspecialDemais2(configData.pctEspecialDemais2);
-    if (configData.qtdEspecialDemaisParc2) setCfgEspecialDemaisParc2(configData.qtdEspecialDemaisParc2);
-    if (configData.pctEspecialImovel1) setCfgEspecialImovel1(configData.pctEspecialImovel1);
     if (configData.qtdEspecialImovelParc1) setCfgEspecialImovelParc1(configData.qtdEspecialImovelParc1);
-    if (configData.pctEspecialImovel2) setCfgEspecialImovel2(configData.pctEspecialImovel2);
     if (configData.qtdEspecialImovelParc2) setCfgEspecialImovelParc2(configData.qtdEspecialImovelParc2);
     if (configData.agentesEspeciais) setCfgAgentesEspeciais(configData.agentesEspeciais);
   }, [configData]);
@@ -570,39 +562,61 @@ export default function Consorcio() {
 
       {/* Modal Configuração de Comissões */}
       <Dialog open={configAberta} onOpenChange={setConfigAberta}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Configuração de Comissões</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
-            {/* Comissão Padrão DEMAIS */}
+          <div className="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
+
+            {/* Helper para select de parcelas */}
+            {/* Card Padrão */}
             <div className="p-4 border rounded-lg bg-green-50 border-green-200">
-              <h3 className="font-semibold text-sm text-green-800 mb-3">Comissão Padrão — DEMAIS</h3>
-              <div className="grid grid-cols-4 gap-2">
+              <h3 className="font-semibold text-sm text-green-800 mb-3">Comissão Padrão</h3>
+              <div className="grid grid-cols-6 gap-2 items-end">
+                {/* % Demais */}
                 <div>
                   <Label className="text-xs text-gray-600">% Demais</Label>
                   <div className="relative">
-                    <Input className="pr-6" placeholder="ex: 0,65" value={cfgPadraoDemais1} onChange={e => setCfgPadraoDemais1(e.target.value)} />
-                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
+                    <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,65" value={cfgPadraoDemais1} onChange={e => setCfgPadraoDemais1(e.target.value)} />
+                    <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
                   </div>
                 </div>
+                {/* Parc. Demais De */}
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Demais</Label>
-                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoDemaisParc1} onChange={e => setCfgPadraoDemaisParc1(e.target.value)}>
+                  <Label className="text-xs text-gray-600">Parc. Demais De</Label>
+                  <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoDemaisParc1} onChange={e => setCfgPadraoDemaisParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
                   </select>
                 </div>
+                {/* Parc. Demais Até */}
+                <div>
+                  <Label className="text-xs text-gray-600">Até</Label>
+                  <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoDemaisParc1Ate} onChange={e => setCfgPadraoDemaisParc1Ate(e.target.value)}>
+                    <option value="">--</option>
+                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
+                  </select>
+                </div>
+                {/* % Imóvel */}
                 <div>
                   <Label className="text-xs text-gray-600">% Imóvel</Label>
                   <div className="relative">
-                    <Input className="pr-6" placeholder="ex: 0,50" value={cfgPadraoDemais2} onChange={e => setCfgPadraoDemais2(e.target.value)} />
-                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
+                    <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,20" value={cfgPadraoDemais2} onChange={e => setCfgPadraoDemais2(e.target.value)} />
+                    <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
                   </div>
                 </div>
+                {/* Parc. Imóvel De */}
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Imóvel</Label>
-                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoDemaisParc2} onChange={e => setCfgPadraoDemaisParc2(e.target.value)}>
+                  <Label className="text-xs text-gray-600">Parc. Imóvel De</Label>
+                  <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoImovelParc1} onChange={e => setCfgPadraoImovelParc1(e.target.value)}>
+                    <option value="">--</option>
+                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
+                  </select>
+                </div>
+                {/* Parc. Imóvel Até */}
+                <div>
+                  <Label className="text-xs text-gray-600">Até</Label>
+                  <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoImovelParc2} onChange={e => setCfgPadraoImovelParc2(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
                   </select>
@@ -610,110 +624,60 @@ export default function Consorcio() {
               </div>
             </div>
 
-            {/* Comissão Padrão IMÓVEL */}
-            <div className="p-4 border rounded-lg bg-green-50 border-green-200">
-              <h3 className="font-semibold text-sm text-green-800 mb-3">Comissão Padrão — IMÓVEL</h3>
-              <div className="grid grid-cols-4 gap-2">
-                <div>
-                  <Label className="text-xs text-gray-600">% Demais</Label>
-                  <div className="relative">
-                    <Input className="pr-6" placeholder="ex: 0,65" value={cfgPadraoImovel1} onChange={e => setCfgPadraoImovel1(e.target.value)} />
-                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">Qtd. Demais</Label>
-                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoImovelParc1} onChange={e => setCfgPadraoImovelParc1(e.target.value)}>
-                    <option value="">--</option>
-                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">% Imóvel</Label>
-                  <div className="relative">
-                    <Input className="pr-6" placeholder="ex: 0,50" value={cfgPadraoImovel2} onChange={e => setCfgPadraoImovel2(e.target.value)} />
-                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">Qtd. Imóvel</Label>
-                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoImovelParc2} onChange={e => setCfgPadraoImovelParc2(e.target.value)}>
-                    <option value="">--</option>
-                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Comissão Especial DEMAIS */}
+            {/* Card Especial */}
             <div className="p-4 border rounded-lg bg-blue-50 border-blue-200">
-              <h3 className="font-semibold text-sm text-blue-800 mb-3">Comissão Especial — DEMAIS</h3>
-              <div className="grid grid-cols-4 gap-2 mb-3">
+              <h3 className="font-semibold text-sm text-blue-800 mb-3">Comissão Especial</h3>
+              <div className="grid grid-cols-6 gap-2 items-end">
+                {/* % Demais */}
                 <div>
                   <Label className="text-xs text-gray-600">% Demais</Label>
                   <div className="relative">
-                    <Input className="pr-6" placeholder="ex: 1,00" value={cfgEspecialDemais1} onChange={e => setCfgEspecialDemais1(e.target.value)} />
-                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
+                    <Input className="pr-6 h-9 text-sm" placeholder="ex: 1,00" value={cfgEspecialDemais1} onChange={e => setCfgEspecialDemais1(e.target.value)} />
+                    <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
                   </div>
                 </div>
+                {/* Parc. Demais De */}
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Demais</Label>
-                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialDemaisParc1} onChange={e => setCfgEspecialDemaisParc1(e.target.value)}>
+                  <Label className="text-xs text-gray-600">Parc. Demais De</Label>
+                  <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialDemaisParc1} onChange={e => setCfgEspecialDemaisParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
                   </select>
                 </div>
+                {/* Parc. Demais Até */}
+                <div>
+                  <Label className="text-xs text-gray-600">Até</Label>
+                  <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialDemaisParc1Ate} onChange={e => setCfgEspecialDemaisParc1Ate(e.target.value)}>
+                    <option value="">--</option>
+                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
+                  </select>
+                </div>
+                {/* % Imóvel */}
                 <div>
                   <Label className="text-xs text-gray-600">% Imóvel</Label>
                   <div className="relative">
-                    <Input className="pr-6" placeholder="ex: 0,75" value={cfgEspecialDemais2} onChange={e => setCfgEspecialDemais2(e.target.value)} />
-                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
+                    <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,75" value={cfgEspecialDemais2} onChange={e => setCfgEspecialDemais2(e.target.value)} />
+                    <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
                   </div>
                 </div>
+                {/* Parc. Imóvel De */}
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Imóvel</Label>
-                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialDemaisParc2} onChange={e => setCfgEspecialDemaisParc2(e.target.value)}>
+                  <Label className="text-xs text-gray-600">Parc. Imóvel De</Label>
+                  <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialImovelParc1} onChange={e => setCfgEspecialImovelParc1(e.target.value)}>
+                    <option value="">--</option>
+                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
+                  </select>
+                </div>
+                {/* Parc. Imóvel Até */}
+                <div>
+                  <Label className="text-xs text-gray-600">Até</Label>
+                  <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialImovelParc2} onChange={e => setCfgEspecialImovelParc2(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
                   </select>
                 </div>
               </div>
-            </div>
-
-            {/* Comissão Especial IMÓVEL */}
-            <div className="p-4 border rounded-lg bg-blue-50 border-blue-200">
-              <h3 className="font-semibold text-sm text-blue-800 mb-3">Comissão Especial — IMÓVEL</h3>
-              <div className="grid grid-cols-4 gap-2 mb-3">
-                <div>
-                  <Label className="text-xs text-gray-600">% Demais</Label>
-                  <div className="relative">
-                    <Input className="pr-6" placeholder="ex: 1,00" value={cfgEspecialImovel1} onChange={e => setCfgEspecialImovel1(e.target.value)} />
-                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">Qtd. Demais</Label>
-                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialImovelParc1} onChange={e => setCfgEspecialImovelParc1(e.target.value)}>
-                    <option value="">--</option>
-                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">% Imóvel</Label>
-                  <div className="relative">
-                    <Input className="pr-6" placeholder="ex: 0,75" value={cfgEspecialImovel2} onChange={e => setCfgEspecialImovel2(e.target.value)} />
-                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs text-gray-600">Qtd. Imóvel</Label>
-                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialImovelParc2} onChange={e => setCfgEspecialImovelParc2(e.target.value)}>
-                    <option value="">--</option>
-                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div>
+              <div className="mt-3">
                 <Label className="text-xs text-gray-600">Agentes com comissão especial (ChaveJ, um por linha)</Label>
                 <textarea
                   className="w-full mt-1 p-2 border rounded text-xs font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-300"
@@ -732,19 +696,15 @@ export default function Consorcio() {
               onClick={() => saveConfigMutation.mutate({
                 pctPadraoDemais1: cfgPadraoDemais1,
                 qtdPadraoDemaisParc1: cfgPadraoDemaisParc1,
+                qtdPadraoDemaisParc1Ate: cfgPadraoDemaisParc1Ate,
                 pctPadraoDemais2: cfgPadraoDemais2,
-                qtdPadraoDemaisParc2: cfgPadraoDemaisParc2,
-                pctPadraoImovel1: cfgPadraoImovel1,
                 qtdPadraoImovelParc1: cfgPadraoImovelParc1,
-                pctPadraoImovel2: cfgPadraoImovel2,
                 qtdPadraoImovelParc2: cfgPadraoImovelParc2,
                 pctEspecialDemais1: cfgEspecialDemais1,
                 qtdEspecialDemaisParc1: cfgEspecialDemaisParc1,
+                qtdEspecialDemaisParc1Ate: cfgEspecialDemaisParc1Ate,
                 pctEspecialDemais2: cfgEspecialDemais2,
-                qtdEspecialDemaisParc2: cfgEspecialDemaisParc2,
-                pctEspecialImovel1: cfgEspecialImovel1,
                 qtdEspecialImovelParc1: cfgEspecialImovelParc1,
-                pctEspecialImovel2: cfgEspecialImovel2,
                 qtdEspecialImovelParc2: cfgEspecialImovelParc2,
                 agentesEspeciais: cfgAgentesEspeciais,
               })}

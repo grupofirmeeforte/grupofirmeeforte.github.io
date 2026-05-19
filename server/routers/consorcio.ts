@@ -395,22 +395,20 @@ export const consorcioRouter = router({
   // Salvar configurações de comissão
   saveConfig: protectedProcedure
     .input(z.object({
-      pctPadraoDemais1: z.string().optional(),
-      qtdPadraoDemaisParc1: z.string().optional(),
-      pctPadraoDemais2: z.string().optional(),
-      qtdPadraoDemaisParc2: z.string().optional(),
-      pctPadraoImovel1: z.string().optional(),
-      qtdPadraoImovelParc1: z.string().optional(),
-      pctPadraoImovel2: z.string().optional(),
-      qtdPadraoImovelParc2: z.string().optional(),
-      pctEspecialDemais1: z.string().optional(),
-      qtdEspecialDemaisParc1: z.string().optional(),
-      pctEspecialDemais2: z.string().optional(),
-      qtdEspecialDemaisParc2: z.string().optional(),
-      pctEspecialImovel1: z.string().optional(),
-      qtdEspecialImovelParc1: z.string().optional(),
-      pctEspecialImovel2: z.string().optional(),
-      qtdEspecialImovelParc2: z.string().optional(),
+      // Padrão
+      pctPadraoDemais1: z.string().optional(),        // % Demais
+      qtdPadraoDemaisParc1: z.string().optional(),    // Parc. Demais De
+      qtdPadraoDemaisParc1Ate: z.string().optional(), // Parc. Demais Até
+      pctPadraoDemais2: z.string().optional(),        // % Imóvel
+      qtdPadraoImovelParc1: z.string().optional(),    // Parc. Imóvel De
+      qtdPadraoImovelParc2: z.string().optional(),    // Parc. Imóvel Até
+      // Especial
+      pctEspecialDemais1: z.string().optional(),        // % Demais
+      qtdEspecialDemaisParc1: z.string().optional(),    // Parc. Demais De
+      qtdEspecialDemaisParc1Ate: z.string().optional(), // Parc. Demais Até
+      pctEspecialDemais2: z.string().optional(),        // % Imóvel
+      qtdEspecialImovelParc1: z.string().optional(),    // Parc. Imóvel De
+      qtdEspecialImovelParc2: z.string().optional(),    // Parc. Imóvel Até
       agentesEspeciais: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
