@@ -544,28 +544,31 @@ export const consorcioRouter = router({
   // Enviar dados consolidados de consórcio para Financeiro → Cálculo
   enviarParaCalculo: protectedProcedure
     .input(z.object({
-      mesAno: z.string(), // MM/AAAA do mês a enviar
+      ids: z.array(z.number()), // IDs dos registros selecionados
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error('Banco não disponível');
+      if (input.ids.length === 0) throw new Error('Nenhum registro selecionado');
 
-      // 1. Buscar todos os registros do mês informado
+      // 1. Buscar os registros selecionados
       const registros = await db.select({
         chaveJ: consorcios.chaveJ,
         nomeAgente: consorcios.nomeAgente,
         empresa: consorcios.empresa,
+        mesAno: consorcios.mesAno,
         comissao: consorcios.comissao,
         rbm: consorcios.rbm,
-      }).from(consorcios).where(eq(consorcios.mesAno, input.mesAno));
+      }).from(consorcios).where(sql`${consorcios.id} IN (${sql.join(input.ids.map(id => sql`${id}`), sql`, `)})`);
 
-      if (registros.length === 0) throw new Error('Nenhum registro encontrado para o mês informado');
+      if (registros.length === 0) throw new Error('Nenhum registro encontrado');
 
-      // 2. Agrupar por ChaveJ: somar comissao (Comissão 2) e rbm, contar qtd
+      // 2. Agrupar por ChaveJ+MesAno: somar comissao (Comissão 2) e rbm
       const agrupado = new Map<string, {
         chaveJ: string;
         nomeAgente: string;
         empresa: string;
+        mesAno: string;
         comissaoConsorcio: number;
         rbmTotal: number;
         qtd: number;
@@ -573,19 +576,22 @@ export const consorcioRouter = router({
 
       for (const r of registros) {
         const chave = (r.chaveJ ?? '').trim().toUpperCase();
+        const mes = r.mesAno ?? '';
         if (!chave) continue;
+        const mapKey = `${chave}||${mes}`;
         const comissao = parseFloat((r.comissao ?? '0').replace(',', '.')) || 0;
         const rbm = parseFloat((r.rbm ?? '0').replace(',', '.')) || 0;
-        if (agrupado.has(chave)) {
-          const entry = agrupado.get(chave)!;
+        if (agrupado.has(mapKey)) {
+          const entry = agrupado.get(mapKey)!;
           entry.comissaoConsorcio += comissao;
           entry.rbmTotal += rbm;
           entry.qtd += 1;
         } else {
-          agrupado.set(chave, {
+          agrupado.set(mapKey, {
             chaveJ: chave,
             nomeAgente: r.nomeAgente ?? '',
             empresa: r.empresa ?? '',
+            mesAno: mes,
             comissaoConsorcio: comissao,
             rbmTotal: rbm,
             qtd: 1,
@@ -603,7 +609,7 @@ export const consorcioRouter = router({
           .from(calculos)
           .where(and(
             eq(calculos.chaveJ, entry.chaveJ),
-            eq(calculos.mesRef, input.mesAno)
+            eq(calculos.mesRef, entry.mesAno)
           ))
           .limit(1);
 
@@ -622,7 +628,7 @@ export const consorcioRouter = router({
         } else {
           // Não existe: insere nova linha
           await db.insert(calculos).values({
-            mesRef: input.mesAno,
+            mesRef: entry.mesAno,
             tipoPagamento: 'Comissão',
             empresa: entry.empresa,
             chaveJ: entry.chaveJ,

@@ -92,6 +92,18 @@ export default function Consorcio() {
   // Exclusão
   const [deleteId, setDeleteId] = useState<number|null>(null);
 
+  // Seleção de linhas para envio
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const toggleSelect = (id: number) => setSelectedIds(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+  const toggleSelectAll = () => {
+    if (selectedIds.size === rows.length && rows.length > 0) setSelectedIds(new Set());
+    else setSelectedIds(new Set(rows.map((r: any) => r.id)));
+  };
+
   // Configuração de comissões
   const [configAberta, setConfigAberta] = useState(false);
   // Comissão Padrão
@@ -172,6 +184,7 @@ export default function Consorcio() {
   });
   const enviarCalculoMutation = trpc.consorcio.enviarParaCalculo.useMutation({
     onSuccess: (res) => {
+      setSelectedIds(new Set());
       toast.success(`Enviado para Cálculo! ${res.inseridos} novo(s) inserido(s), ${res.atualizados} atualizado(s).`);
     },
     onError: (err) => toast.error(`Erro ao enviar: ${err.message}`),
@@ -314,18 +327,18 @@ export default function Consorcio() {
           <Button
             size="sm"
             onClick={() => {
-              if (mesAno === '__all__') {
-                toast.error('Selecione um mês específico antes de enviar para Cálculo');
+              if (selectedIds.size === 0) {
+                toast.error('Selecione ao menos um registro antes de enviar para Cálculo');
                 return;
               }
-              enviarCalculoMutation.mutate({ mesAno });
+              enviarCalculoMutation.mutate({ ids: Array.from(selectedIds) });
             }}
             disabled={enviarCalculoMutation.isPending}
-            className="gap-1 bg-blue-600 hover:bg-blue-700 text-white"
-            title="Envia os valores consolidados por agente para Financeiro → Cálculo"
+            className={`gap-1 text-white ${selectedIds.size > 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-300 cursor-not-allowed'}`}
+            title={selectedIds.size > 0 ? `Enviar ${selectedIds.size} registro(s) selecionado(s) para Cálculo` : 'Selecione registros para enviar'}
           >
             <Send className={`w-4 h-4 ${enviarCalculoMutation.isPending ? 'animate-pulse' : ''}`} />
-            {enviarCalculoMutation.isPending ? 'Enviando...' : 'Enviar para Cálculo'}
+            {enviarCalculoMutation.isPending ? 'Enviando...' : `Enviar para Cálculo${selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}`}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1 text-gray-600 hover:text-gray-900">
             <ArrowLeft className="w-4 h-4" /> Voltar
@@ -381,6 +394,15 @@ export default function Consorcio() {
         <table className="w-full text-xs border-collapse">
           <thead>
             <tr className="bg-slate-800 text-white">
+              <th className="px-2 py-2 border-r border-slate-700">
+                <input
+                  type="checkbox"
+                  checked={rows.length > 0 && selectedIds.size === rows.length}
+                  onChange={toggleSelectAll}
+                  className="cursor-pointer"
+                  title="Selecionar todos"
+                />
+              </th>
               {["Empresa","Mês/Ano","Proposta","Data","Segmento","Valor Bem","Parc. Lib.","% Com. 1","RBM","% Com. 2","Comissão","ChaveJ","Agente","Ações"].map(h => (
                 <th key={h} className="px-2 py-2 text-left font-semibold whitespace-nowrap border-r border-slate-700 last:border-0">{h}</th>
               ))}
@@ -388,11 +410,19 @@ export default function Consorcio() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={14} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+              <tr><td colSpan={15} className="text-center py-8 text-gray-400">Carregando...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={14} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
+              <tr><td colSpan={15} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
             ) : rows.map((row, i) => (
-              <tr key={row.id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+              <tr key={row.id} className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50"} ${selectedIds.has(row.id) ? "ring-1 ring-inset ring-blue-400" : ""}`}>
+                <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(row.id)}
+                    onChange={() => toggleSelect(row.id)}
+                    className="cursor-pointer"
+                  />
+                </td>
                 <td className="px-2 py-1.5 border-r border-gray-200 font-medium">{row.empresa ?? "-"}</td>
                 <td className="px-2 py-1.5 border-r border-gray-200">{row.mesAno ?? "-"}</td>
                 <td className="px-2 py-1.5 border-r border-gray-200 font-mono">{row.proposta ?? "-"}</td>
