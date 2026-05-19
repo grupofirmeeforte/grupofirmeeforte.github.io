@@ -22,6 +22,7 @@ import ProRataPage from './pages/ProRata';
 import DespesasFixasPage from './pages/DespesasFixas';
 import CRMPage from './pages/CRM';
 import AcompanhamentoDiario from './pages/AcompanhamentoDiario';
+import Consorcio from './pages/Consorcio';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -64,6 +65,7 @@ function RouterWithInactivity() {
       <Route path={"/crm"} component={CRMPage} />
       <Route path={"/extratos"} component={ExtratosPage} />
       <Route path={"/pro-rata"} component={ProRataPage} />
+      <Route path={"/producao/consorcio"} component={Consorcio} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />

@@ -286,18 +286,25 @@ export type InsertContaCorrente = typeof contasCorrentes.$inferInsert;
  */
 export const consorcios = mysqlTable("consorcios", {
   id: int("id").autoincrement().primaryKey(),
-  mesAno: varchar("mesAno", { length: 10 }),
+  empresa: varchar("empresa", { length: 20 }),          // BMF | FLEX
+  mesAno: varchar("mesAno", { length: 10 }),             // MM/AAAA
+  proposta: varchar("proposta", { length: 50 }),         // Número da proposta
+  data: varchar("data", { length: 12 }),                 // DD/MM/AAAA
+  segmento: varchar("segmento", { length: 50 }),         // DEMAIS | IMOVEL
+  valorBem: decimal("valorBem", { precision: 15, scale: 2 }),
+  parcLiberada: varchar("parcLiberada", { length: 20 }), // PARC1..PARC9
+  pctComissao1: decimal("pctComissao1", { precision: 10, scale: 6 }),
+  rbm: decimal("rbm", { precision: 15, scale: 2 }),
+  pctComissao2: decimal("pctComissao2", { precision: 10, scale: 6 }),
+  comissao: decimal("comissao", { precision: 15, scale: 2 }),
   chaveJ: varchar("chaveJ", { length: 50 }),
   nomeAgente: varchar("nomeAgente", { length: 255 }),
-  nrOperacao: varchar("nrOperacao", { length: 100 }),
-  parcelas: int("parcelas"),
-  segmento: varchar("segmento", { length: 100 }),
-  valorBem: decimal("valorBem", { precision: 15, scale: 2 }),
-  comissao: decimal("comissao", { precision: 15, scale: 2 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   mesAnoIdx: index("idx_consorcios_mesAno").on(table.mesAno),
+  empresaIdx: index("idx_consorcios_empresa").on(table.empresa),
+  propostaIdx: index("idx_consorcios_proposta").on(table.proposta),
 }));
 
 export type Consorcio = typeof consorcios.$inferSelect;
