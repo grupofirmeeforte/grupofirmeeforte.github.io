@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { consorcios } from "../../drizzle/schema";
+import { consorcios, agentes } from "../../drizzle/schema";
 import { eq, and, like, desc, asc, sql, or } from "drizzle-orm";
 
 export const consorcioRouter = router({
@@ -149,8 +149,75 @@ export const consorcioRouter = router({
       let atualizados = 0;
       let erros = 0;
 
+      // ── REGRA 1: Para PARC1, buscar nome do agente pelo ChaveJ no cadastro ──
+      // Coletar todos os ChaveJ únicos das PARC1
+      const chaveJsParc1 = Array.from(new Set(
+        rows.filter(r => r.parcLiberada === 'PARC1' && r.chaveJ)
+            .map(r => r.chaveJ!.toUpperCase())
+      ));
+
+      const nomesPorChaveJ = new Map<string, string>();
+      if (chaveJsParc1.length > 0) {
+        const CHUNK_AG = 200;
+        for (let i = 0; i < chaveJsParc1.length; i += CHUNK_AG) {
+          const chunk = chaveJsParc1.slice(i, i + CHUNK_AG);
+          const found = await db.select({ chaveJ: agentes.chaveJ, nomeAgente: agentes.nomeAgente })
+            .from(agentes)
+            .where(sql`chaveJ IN (${sql.raw(chunk.map(c => `'${c.replace(/'/g, "''")}'`).join(','))})`);
+          found.forEach(a => { if (a.chaveJ && a.nomeAgente) nomesPorChaveJ.set(a.chaveJ.toUpperCase(), a.nomeAgente); });
+        }
+      }
+
+      // ── REGRA 2: Para PARC2+, buscar ChaveJ e nome da PARC1 da mesma proposta ──
+      // Primeiro checar no próprio lote de importação
+      const parc1NoBatch = new Map<string, { chaveJ: string; nomeAgente: string }>();
+      for (const r of rows) {
+        if (r.parcLiberada === 'PARC1' && r.proposta && r.chaveJ) {
+          const nome = nomesPorChaveJ.get(r.chaveJ.toUpperCase()) || r.nomeAgente || '';
+          parc1NoBatch.set(r.proposta, { chaveJ: r.chaveJ.toUpperCase(), nomeAgente: nome });
+        }
+      }
+
+      // Para propostas não encontradas no lote, buscar no banco
+      const propostasParc2Plus = Array.from(new Set(
+        rows.filter(r => r.parcLiberada && r.parcLiberada !== 'PARC1' && r.proposta && !parc1NoBatch.has(r.proposta!))
+            .map(r => r.proposta!)
+      ));
+
+      if (propostasParc2Plus.length > 0) {
+        const CHUNK_P = 200;
+        for (let i = 0; i < propostasParc2Plus.length; i += CHUNK_P) {
+          const chunk = propostasParc2Plus.slice(i, i + CHUNK_P);
+          const found = await db.select({ proposta: consorcios.proposta, chaveJ: consorcios.chaveJ, nomeAgente: consorcios.nomeAgente })
+            .from(consorcios)
+            .where(sql`proposta IN (${sql.raw(chunk.map(p => `'${p.replace(/'/g, "''")}'`).join(','))}) AND parcLiberada = 'PARC1'`);
+          found.forEach(f => {
+            if (f.proposta && f.chaveJ) {
+              parc1NoBatch.set(f.proposta, { chaveJ: f.chaveJ, nomeAgente: f.nomeAgente || '' });
+            }
+          });
+        }
+      }
+
+      // Enriquecer cada row com o agente correto
+      const rowsEnriquecidos = rows.map(r => {
+        if (!r.proposta) return r;
+        if (r.parcLiberada === 'PARC1' && r.chaveJ) {
+          // PARC1: buscar nome no cadastro
+          const nomeDosCadastro = nomesPorChaveJ.get(r.chaveJ.toUpperCase());
+          return { ...r, chaveJ: r.chaveJ.toUpperCase(), nomeAgente: nomeDosCadastro || r.nomeAgente || '' };
+        } else if (r.parcLiberada && r.parcLiberada !== 'PARC1') {
+          // PARC2+: copiar da PARC1 da mesma proposta
+          const parc1 = parc1NoBatch.get(r.proposta);
+          if (parc1) {
+            return { ...r, chaveJ: parc1.chaveJ, nomeAgente: parc1.nomeAgente };
+          }
+        }
+        return r;
+      });
+
       // Buscar propostas existentes em batch
-      const propostas = rows.map(r => r.proposta).filter(Boolean);
+      const propostas = rowsEnriquecidos.map(r => r.proposta).filter(Boolean);
       const existentes = new Set<string>();
 
       if (propostas.length > 0) {
@@ -231,6 +298,68 @@ export const consorcioRouter = router({
 
       return { inseridos, atualizados, erros, total: rows.length };
     }),
+
+  // Recalcular agentes nos registros já importados
+  recalcularAgentes: protectedProcedure.mutation(async () => {
+    const db = await getDb();
+    if (!db) throw new Error('Banco não disponível');
+
+    // 1. Buscar todas as PARC1 com chaveJ
+    const parc1s = await db.select({
+      proposta: consorcios.proposta,
+      chaveJ: consorcios.chaveJ,
+      nomeAgente: consorcios.nomeAgente,
+    }).from(consorcios).where(sql`parcLiberada = 'PARC1' AND chaveJ IS NOT NULL AND chaveJ != ''`);
+
+    // 2. Para cada PARC1, buscar nome no cadastro
+    const chaveJsUnicos = Array.from(new Set(parc1s.map(r => r.chaveJ!.toUpperCase())));
+    const nomesPorChaveJ = new Map<string, string>();
+    if (chaveJsUnicos.length > 0) {
+      const CHUNK = 200;
+      for (let i = 0; i < chaveJsUnicos.length; i += CHUNK) {
+        const chunk = chaveJsUnicos.slice(i, i + CHUNK);
+        const found = await db.select({ chaveJ: agentes.chaveJ, nomeAgente: agentes.nomeAgente })
+          .from(agentes)
+          .where(sql`chaveJ IN (${sql.raw(chunk.map(c => `'${c.replace(/'/g, "''")}'`).join(','))})`);
+        found.forEach(a => { if (a.chaveJ && a.nomeAgente) nomesPorChaveJ.set(a.chaveJ.toUpperCase(), a.nomeAgente); });
+      }
+    }
+
+    // 3. Atualizar PARC1 com nome do cadastro
+    let atualizadosParc1 = 0;
+    for (const p of parc1s) {
+      const nome = nomesPorChaveJ.get(p.chaveJ!.toUpperCase());
+      if (nome && nome !== p.nomeAgente) {
+        await db.update(consorcios)
+          .set({ nomeAgente: nome, chaveJ: p.chaveJ!.toUpperCase() })
+          .where(sql`proposta = '${sql.raw(p.proposta!.replace(/'/g, "''"))}' AND parcLiberada = 'PARC1'`);
+        atualizadosParc1++;
+      }
+    }
+
+    // 4. Atualizar PARC2+ copiando da PARC1
+    const parc1Map = new Map<string, { chaveJ: string; nomeAgente: string }>();
+    for (const p of parc1s) {
+      if (p.proposta && p.chaveJ) {
+        const nome = nomesPorChaveJ.get(p.chaveJ.toUpperCase()) || p.nomeAgente || '';
+        parc1Map.set(p.proposta, { chaveJ: p.chaveJ.toUpperCase(), nomeAgente: nome });
+      }
+    }
+
+    let atualizadosParcMais = 0;
+    const propostas = Array.from(parc1Map.keys());
+    for (const proposta of propostas) {
+      const parc1 = parc1Map.get(proposta)!;
+      try {
+        await db.update(consorcios)
+          .set({ chaveJ: parc1.chaveJ, nomeAgente: parc1.nomeAgente })
+          .where(sql`proposta = '${sql.raw(proposta.replace(/'/g, "''"))}' AND (parcLiberada != 'PARC1' OR parcLiberada IS NULL)`);
+        atualizadosParcMais++;
+      } catch { /* ignora */ }
+    }
+
+    return { atualizadosParc1, atualizadosParcMais, total: atualizadosParc1 + atualizadosParcMais };
+  }),
 
   // Ler configurações de comissão
   getConfig: protectedProcedure.query(async () => {
