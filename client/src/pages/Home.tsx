@@ -231,18 +231,29 @@ export default function Home() {
   const grupoAtual = grupos.find(g => g.key === grupoAberto);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663564665591/SMgJn6AGQCNfDq7mPzPqc9/home-bg-EBTQH2Xfk3kEiR2R9PayJu.webp')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      {/* Header com gradiente azul escuro + dourado */}
+      <header
+        className="shadow-lg"
+        style={{ background: 'linear-gradient(135deg, #002776 0%, #003d99 60%, #c8960c 100%)' }}
+      >
+        <div className="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Grupo Firme & Forte</h1>
-            <p className="text-sm text-slate-600 mt-1">Bem-vindo, {user?.name || "Usuário"}</p>
+            <h1 className="text-2xl font-bold text-white tracking-wide">Grupo Firme &amp; Forte</h1>
+            <p className="text-xs text-yellow-300 mt-0.5 font-medium tracking-widest uppercase">Coban — Banco do Brasil &nbsp;|&nbsp; Bem-vindo, {user?.name || "Usuário"}</p>
           </div>
           <Button
             variant="outline"
             onClick={handleLogout}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-yellow-400 text-yellow-300 hover:bg-yellow-400/20 bg-transparent"
           >
             <LogOut className="w-4 h-4" />
             Sair
