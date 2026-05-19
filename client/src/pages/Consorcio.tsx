@@ -280,9 +280,6 @@ export default function Consorcio() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
         <div>
           <h1 className="text-lg font-bold text-gray-800">Produção — Consórcio</h1>
           <p className="text-xs text-gray-500">{total.toLocaleString("pt-BR")} registros</p>
@@ -307,6 +304,9 @@ export default function Consorcio() {
           </Button>
           <Button size="sm" onClick={() => setImportModal(true)} className="gap-1">
             <Upload className="w-4 h-4" /> Importar Excel
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="gap-1 text-gray-600 hover:text-gray-900">
+            <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
         </div>
       </div>
