@@ -402,6 +402,108 @@ export const consorcioRouter = router({
       return { ok: true };
     }),
 
+  // Calcular RBM e Comissão
+  calcular: protectedProcedure
+    .input(z.object({
+      mesAno: z.string().optional(), // se vazio, calcula todos
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Banco não disponível');
+
+      // 1. Ler configurações de comissão
+      const cfgRows = await db.execute(sql`SELECT chave, valor FROM consorcio_config`) as any;
+      const cfgData = Array.isArray(cfgRows) ? cfgRows[0] : cfgRows;
+      const cfg: Record<string, string> = {};
+      if (Array.isArray(cfgData)) {
+        cfgData.forEach((r: any) => { if (r.chave) cfg[r.chave] = r.valor ?? ''; });
+      }
+
+      const pct1Padrao   = parseFloat(cfg['pctComissaoPadrao1']   || '0') / 100;
+      const pct2Padrao   = parseFloat(cfg['pctComissaoPadrao2']   || '0') / 100;
+      const parc1Padrao  = parseInt(cfg['qtdParcPadrao1']         || '3');
+      const parc2Padrao  = parseInt(cfg['qtdParcPadrao2']         || '3');
+      const pct1Especial = parseFloat(cfg['pctComissaoEspecial1'] || '0') / 100;
+      const pct2Especial = parseFloat(cfg['pctComissaoEspecial2'] || '0') / 100;
+      const parc1Especial= parseInt(cfg['qtdParcEspecial1']       || '4');
+      const parc2Especial= parseInt(cfg['qtdParcEspecial2']       || '4');
+      const agentesEspeciaisStr = cfg['agentesEspeciais'] || '';
+      const agentesEspeciais = new Set(
+        agentesEspeciaisStr.split('\n').map((s: string) => s.trim().toUpperCase()).filter(Boolean)
+      );
+
+      // 2. Buscar registros do mês (ou todos)
+      const conditions: any[] = [];
+      if (input.mesAno) conditions.push(eq(consorcios.mesAno, input.mesAno));
+      const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+      const registros = await db.select({
+        id: consorcios.id,
+        segmento: consorcios.segmento,
+        valorBem: consorcios.valorBem,
+        parcLiberada: consorcios.parcLiberada,
+        chaveJ: consorcios.chaveJ,
+      }).from(consorcios).where(where);
+
+      // 3. Calcular e atualizar cada registro
+      let calculados = 0;
+      let zerados = 0;
+
+      for (const r of registros) {
+        const valorBem = parseFloat(r.valorBem ?? '0') || 0;
+        const parcNum = parseInt((r.parcLiberada ?? '').replace(/\D/g, '')) || 0;
+        const isImovel = (r.segmento ?? '').toUpperCase().includes('IMOVEL') ||
+                         (r.segmento ?? '').toUpperCase().includes('IMÓVEL');
+        const isEspecial = agentesEspeciais.has((r.chaveJ ?? '').toUpperCase());
+
+        // Determinar limites de parcelas para este agente/segmento
+        let limParc1: number;
+        let limParc2: number;
+        let pct1: number;
+        let pct2: number;
+
+        if (isImovel) {
+          // IMÓVEL: paga até 10 parcelas para ambos padrão e especial
+          limParc1 = 10;
+          limParc2 = 10;
+          pct1 = isEspecial ? pct1Especial : pct1Padrao;
+          pct2 = isEspecial ? pct2Especial : pct2Padrao;
+        } else {
+          // DEMAIS
+          if (isEspecial) {
+            limParc1 = parc1Especial; // configurado (padrão 4)
+            limParc2 = parc2Especial;
+            pct1 = pct1Especial;
+            pct2 = pct2Especial;
+          } else {
+            limParc1 = parc1Padrao; // configurado (padrão 3)
+            limParc2 = parc2Padrao;
+            pct1 = pct1Padrao;
+            pct2 = pct2Padrao;
+          }
+        }
+
+        // RBM: sempre calculado (valor que a empresa recebe), nunca zera
+        const rbmVal = +(valorBem * pct1).toFixed(2);
+        // Comissão: zera se parcela acima do limite
+        const comissaoVal = parcNum <= limParc2 ? +(valorBem * pct2).toFixed(2) : 0;
+
+        await db.update(consorcios)
+          .set({
+            pctComissao1: String(pct1),
+            rbm: String(rbmVal),
+            pctComissao2: String(pct2),
+            comissao: String(comissaoVal),
+          })
+          .where(eq(consorcios.id, r.id));
+
+        if (rbmVal === 0 && comissaoVal === 0) zerados++;
+        else calculados++;
+      }
+
+      return { calculados, zerados, total: registros.length };
+    }),
+
   // Excluir registro
   excluir: protectedProcedure
     .input(z.object({ id: z.number() }))

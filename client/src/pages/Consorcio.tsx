@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Upload, Edit2, Trash2, Search, Settings, RefreshCw } from "lucide-react";
+import { ArrowLeft, Upload, Edit2, Trash2, Search, Settings, RefreshCw, Calculator } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
@@ -137,6 +137,13 @@ export default function Consorcio() {
 
   const importarMutation = trpc.consorcio.importar.useMutation({
     onSuccess: () => { utils.consorcio.list.invalidate(); utils.consorcio.filtros.invalidate(); },
+  });
+  const calcularMutation = trpc.consorcio.calcular.useMutation({
+    onSuccess: (res) => {
+      utils.consorcio.list.invalidate();
+      toast.success(`Cálculo concluído! ${res.calculados} com comissão, ${res.zerados} zerados.`);
+    },
+    onError: () => toast.error("Erro ao calcular comissões"),
   });
   const recalcularMutation = trpc.consorcio.recalcularAgentes.useMutation({
     onSuccess: (res) => {
@@ -271,6 +278,17 @@ export default function Consorcio() {
         <div className="ml-auto flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => setConfigAberta(true)} className="gap-1">
             <Settings className="w-4 h-4" /> Comissões
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => calcularMutation.mutate({ mesAno: mesAno !== '__all__' ? mesAno : undefined })}
+            disabled={calcularMutation.isPending}
+            className="gap-1 border-green-500 text-green-700 hover:bg-green-50"
+            title={mesAno !== '__all__' ? `Calcular comissões de ${mesAno}` : 'Calcular comissões de todos os meses'}
+          >
+            <Calculator className={`w-4 h-4 ${calcularMutation.isPending ? 'animate-pulse' : ''}`} />
+            {calcularMutation.isPending ? 'Calculando...' : 'Calcular'}
           </Button>
           <Button size="sm" variant="outline" onClick={() => recalcularMutation.mutate()} disabled={recalcularMutation.isPending} className="gap-1" title="Recalcular agentes: PARC1 busca no cadastro, PARC2+ copia da PARC1">
             <RefreshCw className={`w-4 h-4 ${recalcularMutation.isPending ? 'animate-spin' : ''}`} /> Recalcular Agentes
