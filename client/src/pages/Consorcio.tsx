@@ -96,8 +96,10 @@ export default function Consorcio() {
   const [configAberta, setConfigAberta] = useState(false);
   const [cfgPadrao1, setCfgPadrao1] = useState("");
   const [cfgPadrao2, setCfgPadrao2] = useState("");
+  const [cfgPadraoParc, setCfgPadraoParc] = useState("");
   const [cfgEspecial1, setCfgEspecial1] = useState("");
   const [cfgEspecial2, setCfgEspecial2] = useState("");
+  const [cfgEspecialParc, setCfgEspecialParc] = useState("");
   const [cfgAgentesEspeciais, setCfgAgentesEspeciais] = useState("");
 
   const utils = trpc.useUtils();
@@ -109,8 +111,10 @@ export default function Consorcio() {
     if (!configData) return;
     if (configData.pctComissaoPadrao1) setCfgPadrao1(configData.pctComissaoPadrao1);
     if (configData.pctComissaoPadrao2) setCfgPadrao2(configData.pctComissaoPadrao2);
+    if (configData.qtdParcPadrao) setCfgPadraoParc(configData.qtdParcPadrao);
     if (configData.pctComissaoEspecial1) setCfgEspecial1(configData.pctComissaoEspecial1);
     if (configData.pctComissaoEspecial2) setCfgEspecial2(configData.pctComissaoEspecial2);
+    if (configData.qtdParcEspecial) setCfgEspecialParc(configData.qtdParcEspecial);
     if (configData.agentesEspeciais) setCfgAgentesEspeciais(configData.agentesEspeciais);
   }, [configData]);
   const saveConfigMutation = trpc.consorcio.saveConfig.useMutation({
@@ -249,15 +253,17 @@ export default function Consorcio() {
         <Button variant="ghost" size="icon" onClick={() => navigate("/producao")}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <Button size="sm" onClick={() => setImportModal(true)} className="gap-1">
-          <Upload className="w-4 h-4" /> Importar Excel
-        </Button>
-        <Button size="sm" variant="outline" onClick={() => setConfigAberta(true)} className="gap-1">
-          <Settings className="w-4 h-4" /> Comissões
-        </Button>
-        <div className="ml-2">
+        <div>
           <h1 className="text-lg font-bold text-gray-800">Produção — Consórcio</h1>
           <p className="text-xs text-gray-500">{total.toLocaleString("pt-BR")} registros</p>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => setConfigAberta(true)} className="gap-1">
+            <Settings className="w-4 h-4" /> Comissões
+          </Button>
+          <Button size="sm" onClick={() => setImportModal(true)} className="gap-1">
+            <Upload className="w-4 h-4" /> Importar Excel
+          </Button>
         </div>
       </div>
 
@@ -520,7 +526,7 @@ export default function Consorcio() {
             {/* Comissão Padrão */}
             <div className="p-4 border rounded-lg bg-green-50 border-green-200">
               <h3 className="font-semibold text-sm text-green-800 mb-3">Comissão Padrão (para todos)</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <Label className="text-xs text-gray-600">% Comissão 1</Label>
                   <div className="relative">
@@ -545,13 +551,26 @@ export default function Consorcio() {
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
+                <div>
+                  <Label className="text-xs text-gray-600">Qtd. Parcelas</Label>
+                  <select
+                    className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300"
+                    value={cfgPadraoParc}
+                    onChange={e => setCfgPadraoParc(e.target.value)}
+                  >
+                    <option value="">-- Selecione --</option>
+                    {Array.from({length: 10}, (_, i) => i + 1).map(n => (
+                      <option key={n} value={String(n)}>{n}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
             {/* Comissão Especial */}
             <div className="p-4 border rounded-lg bg-blue-50 border-blue-200">
               <h3 className="font-semibold text-sm text-blue-800 mb-3">Comissão Especial</h3>
-              <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="grid grid-cols-3 gap-3 mb-3">
                 <div>
                   <Label className="text-xs text-gray-600">% Comissão 1</Label>
                   <div className="relative">
@@ -576,6 +595,19 @@ export default function Consorcio() {
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
+                <div>
+                  <Label className="text-xs text-gray-600">Qtd. Parcelas</Label>
+                  <select
+                    className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    value={cfgEspecialParc}
+                    onChange={e => setCfgEspecialParc(e.target.value)}
+                  >
+                    <option value="">-- Selecione --</option>
+                    {Array.from({length: 10}, (_, i) => i + 1).map(n => (
+                      <option key={n} value={String(n)}>{n}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div>
                 <Label className="text-xs text-gray-600">Agentes com comissão especial (ChaveJ, um por linha)</Label>
@@ -596,8 +628,10 @@ export default function Consorcio() {
               onClick={() => saveConfigMutation.mutate({
                 pctComissaoPadrao1: cfgPadrao1,
                 pctComissaoPadrao2: cfgPadrao2,
+                qtdParcPadrao: cfgPadraoParc,
                 pctComissaoEspecial1: cfgEspecial1,
                 pctComissaoEspecial2: cfgEspecial2,
+                qtdParcEspecial: cfgEspecialParc,
                 agentesEspeciais: cfgAgentesEspeciais,
               })}
               disabled={saveConfigMutation.isPending}

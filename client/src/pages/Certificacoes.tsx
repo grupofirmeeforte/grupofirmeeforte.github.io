@@ -234,34 +234,33 @@ export default function Certificacoes() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="bg-white border-b px-6 py-4 flex items-center gap-4">
+      <div className="bg-white border-b px-6 py-3 flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => setLocation('/')}>
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Certificações</h1>
-          <p className="text-sm text-slate-500">Controle de certificações dos agentes (CONSIG e LGPD)</p>
+          <h1 className="text-lg font-bold text-slate-800">Certificações</h1>
+          <p className="text-xs text-slate-500">Controle de certificações dos agentes (CONSIG e LGPD)</p>
         </div>
-      </div>
-
-      <div className="p-6">
-        {/* Barra de ações */}
-        <div className="flex flex-wrap gap-3 mb-4 items-center">
+        <div className="ml-auto flex items-center gap-2">
           <Input
             placeholder="Buscar por ChaveJ, Nome ou CPF..."
             value={busca}
             onChange={e => setBusca(e.target.value)}
-            className="max-w-xs"
+            className="h-8 w-56 text-sm"
           />
-          <div className="flex-1" />
-          <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-            <Upload className="w-4 h-4 mr-2" /> Importar CSV/Excel
+          <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-1">
+            <Upload className="w-4 h-4" /> Importar
           </Button>
           <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImport} />
-          <Button onClick={abrirNovo}>
-            <Plus className="w-4 h-4 mr-2" /> Novo
-          </Button>
-          <Button onClick={() => setLocation('/')} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900">
-            <ArrowLeft className="w-4 h-4" /> Voltar
+          <Button size="sm" onClick={abrirNovo} className="gap-1">
+            <Plus className="w-4 h-4" /> Novo
           </Button>
         </div>
+      </div>
+
+      <div className="p-6">
+        {/* Tabela */}
 
         {/* Tabela */}
         <div className="bg-white rounded-lg border overflow-x-auto">

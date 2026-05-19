@@ -467,15 +467,15 @@ export default function Consignado() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b shadow-sm px-6 py-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setLocation('/')}>
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
           <div>
-            <h1 className="text-4xl font-bold text-gray-800">Consignado</h1>
-            <p className="text-sm text-gray-500">Operações de crédito consignado</p>
+            <h1 className="text-lg font-bold text-gray-800">Consignado</h1>
+            <p className="text-xs text-gray-500">Operações de crédito consignado</p>
           </div>
-          <div className="flex gap-2">
-            <Button onClick={() => setLocation('/')} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
-              <ArrowLeft className="w-4 h-4" /> Voltar
-            </Button>
+          <div className="ml-auto flex gap-2">
             <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 border-green-500 text-green-700 hover:bg-green-50">
               <Upload className="w-4 h-4" /> Importar
             </Button>

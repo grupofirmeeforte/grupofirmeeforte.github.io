@@ -298,24 +298,22 @@ export default function ContaCorrente() {
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #e8eeff 50%, #f5f0ff 100%)' }}>
       {/* Header */}
-      <div className="px-6 py-4 border-b" style={{ background: 'linear-gradient(90deg, #002776 0%, #1a6ed8 60%, #003399 100%)' }}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-white">Conta Corrente</h1>
-            <p className="text-blue-200 text-sm">Operações de conta corrente</p>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={() => setLocation('/')} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
-              <ArrowLeft className="w-4 h-4" /> Voltar
-            </Button>
-            <Button variant="outline" className="bg-emerald-500/80 text-white border-emerald-400 hover:bg-emerald-600" onClick={() => fileInputRef.current?.click()}>
-              <Upload className="w-4 h-4 mr-2" /> Importar
-            </Button>
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={openNovo}>
-              <Plus className="w-4 h-4 mr-2" /> Novo
-            </Button>
-            <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportar} />
-          </div>
+      <div className="bg-white border-b px-6 py-3 flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => setLocation('/')}>
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
+        <div>
+          <h1 className="text-lg font-bold text-gray-800">Conta Corrente</h1>
+          <p className="text-xs text-gray-500">Operações de conta corrente</p>
+        </div>
+        <div className="ml-auto flex gap-2">
+          <Button variant="outline" className="border-green-500 text-green-700 hover:bg-green-50 flex items-center gap-2" onClick={() => fileInputRef.current?.click()}>
+            <Upload className="w-4 h-4" /> Importar
+          </Button>
+          <Button className="bg-blue-700 hover:bg-blue-800 flex items-center gap-2" onClick={openNovo}>
+            <Plus className="w-4 h-4" /> Novo
+          </Button>
+          <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportar} />
         </div>
       </div>
 

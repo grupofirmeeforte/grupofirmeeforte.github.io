@@ -326,15 +326,14 @@ export default function ProRataPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Cabeçalho */}
-      <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Pró Rata</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Operações com controle de parcelas pagas e a receber</p>
-        </div>
-        <Button variant="default" className="bg-gray-900 hover:bg-gray-800" onClick={() => navigate('/')}>
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Voltar
+      <div className="bg-white border-b px-6 py-3 flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+          <ArrowLeft className="w-4 h-4" />
         </Button>
+        <div>
+          <h1 className="text-lg font-bold text-gray-800">Pró Rata</h1>
+          <p className="text-xs text-gray-500">Operações com controle de parcelas pagas e a receber</p>
+        </div>
       </div>
 
       {/* Abas */}

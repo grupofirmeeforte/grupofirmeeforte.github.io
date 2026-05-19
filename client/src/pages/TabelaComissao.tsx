@@ -277,21 +277,17 @@ export default function TabelaComissao() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b shadow-sm px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-bold text-gray-900">Tabela de Comissão</h1>
-            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-              {filteredRows.length} registros
-            </span>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => setLocation('/')}>
+            <ArrowLeft className="w-4 h-4" />
+          </Button>
+          <div>
+            <h1 className="text-lg font-bold text-gray-800">Tabela de Comissão</h1>
+            <p className="text-xs text-gray-500">{filteredRows.length} registros</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button onClick={() => setLocation('/')} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900 border-gray-800">
-              <ArrowLeft className="w-4 h-4" />
-              Voltar
-            </Button>
+          <div className="ml-auto flex items-center gap-2">
             <Button onClick={openNovo} className="flex items-center gap-2" style={{ backgroundColor: '#002776' }}>
-              <Plus className="w-4 h-4" />
-              Novo
+              <Plus className="w-4 h-4" /> Novo
             </Button>
           </div>
         </div>

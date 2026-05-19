@@ -234,7 +234,10 @@ export default function Calculo() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 bg-white border-b border-slate-200">
+      <div className="flex items-center gap-3 px-3 py-2 bg-white border-b border-slate-200">
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => navigate("/")}>
+          <ArrowLeft className="w-3 h-3" />
+        </Button>
         <div>
           <h1 className="text-base font-bold text-slate-800">Cálculo</h1>
           <p className="text-[10px] text-slate-500">
@@ -244,7 +247,7 @@ export default function Calculo() {
             )}
           </p>
         </div>
-        <div className="flex gap-1.5">
+        <div className="ml-auto flex gap-1.5">
           <Button onClick={handleExportar} size="sm" className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1 h-7 px-2 text-xs">
             <Download className="w-3 h-3" /> Excel
           </Button>
@@ -255,9 +258,6 @@ export default function Calculo() {
             className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1 h-7 px-2 text-xs disabled:opacity-60"
           >
             <Send className="w-3 h-3" /> Enviar Para Pagto
-          </Button>
-          <Button onClick={() => navigate("/")} size="sm" className="bg-gray-800 hover:bg-gray-900 text-white flex items-center gap-1 h-7 px-2 text-xs">
-            <ArrowLeft className="w-3 h-3" /> Voltar
           </Button>
         </div>
       </div>

@@ -252,9 +252,11 @@ export const consorcioRouter = router({
     .input(z.object({
       pctComissaoPadrao1: z.string().optional(),
       pctComissaoPadrao2: z.string().optional(),
+      qtdParcPadrao: z.string().optional(),
       pctComissaoEspecial1: z.string().optional(),
       pctComissaoEspecial2: z.string().optional(),
-      agentesEspeciais: z.string().optional(), // JSON array de chaveJ
+      qtdParcEspecial: z.string().optional(),
+      agentesEspeciais: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();
