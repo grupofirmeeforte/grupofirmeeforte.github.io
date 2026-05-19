@@ -126,9 +126,7 @@ export default function Login() {
             {welcomeData.isAniversario ? (
               <>
                 <div className="flex justify-center mb-4">
-                  <div className="w-20 h-20 rounded-full bg-yellow-100 flex items-center justify-center">
-                    <PartyPopper className="w-10 h-10 text-yellow-500" />
-                  </div>
+                  <img src="/manus-storage/logo-firme-forte-escolhida_014167fb.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                   🎂 Feliz Aniversário!
@@ -148,9 +146,7 @@ export default function Login() {
             ) : (
               <>
                 <div className="flex justify-center mb-4">
-                  <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center">
-                    <CheckCircle2 className="w-10 h-10 text-blue-700" />
-                  </div>
+                  <img src="/manus-storage/logo-firme-forte-escolhida_014167fb.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                   Seja bem-vindo(a)!
@@ -189,6 +185,9 @@ export default function Login() {
         <div className="p-8">
           {/* Logo/Título */}
           <div className="text-center mb-8">
+            <div className="flex justify-center mb-3">
+              <img src="/manus-storage/logo-firme-forte-escolhida_014167fb.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
+            </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Grupo Firme & Forte
             </h1>

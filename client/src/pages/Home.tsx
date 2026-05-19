@@ -66,6 +66,9 @@ export default function Home() {
         {/* Overlay escuro para garantir legibilidade */}
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 text-center text-white px-8 py-12 rounded-2xl backdrop-blur-sm bg-white/5 border border-white/10 shadow-2xl">
+          <div className="flex justify-center mb-4">
+            <img src="/manus-storage/logo-firme-forte-escolhida_014167fb.png" alt="Grupo Firme & Forte" className="w-40 h-40 object-contain drop-shadow-xl" />
+          </div>
           <div className="mb-2">
             <span className="text-yellow-400 text-xs font-semibold tracking-widest uppercase">Sistema de Gestão</span>
           </div>
