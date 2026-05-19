@@ -441,21 +441,24 @@ export const consorcioRouter = router({
         cfgData.forEach((r: any) => { if (r.chave) cfg[r.chave] = r.valor ?? ''; });
       }
 
+      // Helper: aceita vírgula ou ponto como separador decimal
+      const parsePct = (v: string) => parseFloat((v || '0').replace(',', '.'));
+
       // Padrão
-      const pctPadraoDemais   = parseFloat(cfg['pctPadraoDemais1']       || '0') / 100;
-      const parcPadraoDemaisDe = parseInt(cfg['qtdPadraoDemaisParc1']    || '1');
-      const parcPadraoDemaisAte= parseInt(cfg['qtdPadraoDemaisParc1Ate'] || '0');
-      const pctPadraoImovel   = parseFloat(cfg['pctPadraoDemais2']       || '0') / 100;
-      const parcPadraoImovelDe = parseInt(cfg['qtdPadraoImovelParc1']    || '1');
-      const parcPadraoImovelAte= parseInt(cfg['qtdPadraoImovelParc2']    || '0');
+      const pctPadraoDemais    = parsePct(cfg['pctPadraoDemais1']       || '0') / 100;
+      const parcPadraoDemaisDe = parseInt(cfg['qtdPadraoDemaisParc1']   || '1');
+      const parcPadraoDemaisAte= parseInt(cfg['qtdPadraoDemaisParc1Ate']|| '0');
+      const pctPadraoImovel    = parsePct(cfg['pctPadraoDemais2']       || '0') / 100;
+      const parcPadraoImovelDe = parseInt(cfg['qtdPadraoImovelParc1']   || '1');
+      const parcPadraoImovelAte= parseInt(cfg['qtdPadraoImovelParc2']   || '0');
 
       // Especial
-      const pctEspecialDemais   = parseFloat(cfg['pctEspecialDemais1']       || '0') / 100;
-      const parcEspecialDemaisDe = parseInt(cfg['qtdEspecialDemaisParc1']    || '1');
-      const parcEspecialDemaisAte= parseInt(cfg['qtdEspecialDemaisParc1Ate'] || '0');
-      const pctEspecialImovel   = parseFloat(cfg['pctEspecialDemais2']       || '0') / 100;
-      const parcEspecialImovelDe = parseInt(cfg['qtdEspecialImovelParc1']    || '1');
-      const parcEspecialImovelAte= parseInt(cfg['qtdEspecialImovelParc2']    || '0');
+      const pctEspecialDemais    = parsePct(cfg['pctEspecialDemais1']       || '0') / 100;
+      const parcEspecialDemaisDe = parseInt(cfg['qtdEspecialDemaisParc1']   || '1');
+      const parcEspecialDemaisAte= parseInt(cfg['qtdEspecialDemaisParc1Ate']|| '0');
+      const pctEspecialImovel    = parsePct(cfg['pctEspecialDemais2']       || '0') / 100;
+      const parcEspecialImovelDe = parseInt(cfg['qtdEspecialImovelParc1']   || '1');
+      const parcEspecialImovelAte= parseInt(cfg['qtdEspecialImovelParc2']   || '0');
 
       const agentesEspeciaisStr = cfg['agentesEspeciais'] || '';
       const agentesEspeciais = new Set(
