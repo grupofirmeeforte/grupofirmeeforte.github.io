@@ -95,11 +95,13 @@ export default function Consorcio() {
   // Configuração de comissões
   const [configAberta, setConfigAberta] = useState(false);
   const [cfgPadrao1, setCfgPadrao1] = useState("");
+  const [cfgPadraoParc1, setCfgPadraoParc1] = useState("");
   const [cfgPadrao2, setCfgPadrao2] = useState("");
-  const [cfgPadraoParc, setCfgPadraoParc] = useState("");
+  const [cfgPadraoParc2, setCfgPadraoParc2] = useState("");
   const [cfgEspecial1, setCfgEspecial1] = useState("");
+  const [cfgEspecialParc1, setCfgEspecialParc1] = useState("");
   const [cfgEspecial2, setCfgEspecial2] = useState("");
-  const [cfgEspecialParc, setCfgEspecialParc] = useState("");
+  const [cfgEspecialParc2, setCfgEspecialParc2] = useState("");
   const [cfgAgentesEspeciais, setCfgAgentesEspeciais] = useState("");
 
   const utils = trpc.useUtils();
@@ -110,11 +112,13 @@ export default function Consorcio() {
   useEffect(() => {
     if (!configData) return;
     if (configData.pctComissaoPadrao1) setCfgPadrao1(configData.pctComissaoPadrao1);
+    if (configData.qtdParcPadrao1) setCfgPadraoParc1(configData.qtdParcPadrao1);
     if (configData.pctComissaoPadrao2) setCfgPadrao2(configData.pctComissaoPadrao2);
-    if (configData.qtdParcPadrao) setCfgPadraoParc(configData.qtdParcPadrao);
+    if (configData.qtdParcPadrao2) setCfgPadraoParc2(configData.qtdParcPadrao2);
     if (configData.pctComissaoEspecial1) setCfgEspecial1(configData.pctComissaoEspecial1);
+    if (configData.qtdParcEspecial1) setCfgEspecialParc1(configData.qtdParcEspecial1);
     if (configData.pctComissaoEspecial2) setCfgEspecial2(configData.pctComissaoEspecial2);
-    if (configData.qtdParcEspecial) setCfgEspecialParc(configData.qtdParcEspecial);
+    if (configData.qtdParcEspecial2) setCfgEspecialParc2(configData.qtdParcEspecial2);
     if (configData.agentesEspeciais) setCfgAgentesEspeciais(configData.agentesEspeciais);
   }, [configData]);
   const saveConfigMutation = trpc.consorcio.saveConfig.useMutation({
@@ -526,42 +530,33 @@ export default function Consorcio() {
             {/* Comissão Padrão */}
             <div className="p-4 border rounded-lg bg-green-50 border-green-200">
               <h3 className="font-semibold text-sm text-green-800 mb-3">Comissão Padrão (para todos)</h3>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-4 gap-2">
                 <div>
                   <Label className="text-xs text-gray-600">% Comissão 1</Label>
                   <div className="relative">
-                    <Input
-                      className="pr-6"
-                      placeholder="ex: 0,76"
-                      value={cfgPadrao1}
-                      onChange={e => setCfgPadrao1(e.target.value)}
-                    />
+                    <Input className="pr-6" placeholder="ex: 0,76" value={cfgPadrao1} onChange={e => setCfgPadrao1(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.1</Label>
+                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoParc1} onChange={e => setCfgPadraoParc1(e.target.value)}>
+                    <option value="">--</option>
+                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
+                  </select>
                 </div>
                 <div>
                   <Label className="text-xs text-gray-600">% Comissão 2</Label>
                   <div className="relative">
-                    <Input
-                      className="pr-6"
-                      placeholder="ex: 0,50"
-                      value={cfgPadrao2}
-                      onChange={e => setCfgPadrao2(e.target.value)}
-                    />
+                    <Input className="pr-6" placeholder="ex: 0,50" value={cfgPadrao2} onChange={e => setCfgPadrao2(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Parcelas</Label>
-                  <select
-                    className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300"
-                    value={cfgPadraoParc}
-                    onChange={e => setCfgPadraoParc(e.target.value)}
-                  >
-                    <option value="">-- Selecione --</option>
-                    {Array.from({length: 10}, (_, i) => i + 1).map(n => (
-                      <option key={n} value={String(n)}>{n}</option>
-                    ))}
+                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.2</Label>
+                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoParc2} onChange={e => setCfgPadraoParc2(e.target.value)}>
+                    <option value="">--</option>
+                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
                   </select>
                 </div>
               </div>
@@ -570,42 +565,33 @@ export default function Consorcio() {
             {/* Comissão Especial */}
             <div className="p-4 border rounded-lg bg-blue-50 border-blue-200">
               <h3 className="font-semibold text-sm text-blue-800 mb-3">Comissão Especial</h3>
-              <div className="grid grid-cols-3 gap-3 mb-3">
+              <div className="grid grid-cols-4 gap-2 mb-3">
                 <div>
                   <Label className="text-xs text-gray-600">% Comissão 1</Label>
                   <div className="relative">
-                    <Input
-                      className="pr-6"
-                      placeholder="ex: 1,00"
-                      value={cfgEspecial1}
-                      onChange={e => setCfgEspecial1(e.target.value)}
-                    />
+                    <Input className="pr-6" placeholder="ex: 1,00" value={cfgEspecial1} onChange={e => setCfgEspecial1(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.1</Label>
+                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialParc1} onChange={e => setCfgEspecialParc1(e.target.value)}>
+                    <option value="">--</option>
+                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
+                  </select>
                 </div>
                 <div>
                   <Label className="text-xs text-gray-600">% Comissão 2</Label>
                   <div className="relative">
-                    <Input
-                      className="pr-6"
-                      placeholder="ex: 0,75"
-                      value={cfgEspecial2}
-                      onChange={e => setCfgEspecial2(e.target.value)}
-                    />
+                    <Input className="pr-6" placeholder="ex: 0,75" value={cfgEspecial2} onChange={e => setCfgEspecial2(e.target.value)} />
                     <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs text-gray-600">Qtd. Parcelas</Label>
-                  <select
-                    className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    value={cfgEspecialParc}
-                    onChange={e => setCfgEspecialParc(e.target.value)}
-                  >
-                    <option value="">-- Selecione --</option>
-                    {Array.from({length: 10}, (_, i) => i + 1).map(n => (
-                      <option key={n} value={String(n)}>{n}</option>
-                    ))}
+                  <Label className="text-xs text-gray-600">Qtd. Parc. Com.2</Label>
+                  <select className="w-full h-10 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialParc2} onChange={e => setCfgEspecialParc2(e.target.value)}>
+                    <option value="">--</option>
+                    {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
                   </select>
                 </div>
               </div>
@@ -627,11 +613,13 @@ export default function Consorcio() {
             <Button
               onClick={() => saveConfigMutation.mutate({
                 pctComissaoPadrao1: cfgPadrao1,
+                qtdParcPadrao1: cfgPadraoParc1,
                 pctComissaoPadrao2: cfgPadrao2,
-                qtdParcPadrao: cfgPadraoParc,
+                qtdParcPadrao2: cfgPadraoParc2,
                 pctComissaoEspecial1: cfgEspecial1,
+                qtdParcEspecial1: cfgEspecialParc1,
                 pctComissaoEspecial2: cfgEspecial2,
-                qtdParcEspecial: cfgEspecialParc,
+                qtdParcEspecial2: cfgEspecialParc2,
                 agentesEspeciais: cfgAgentesEspeciais,
               })}
               disabled={saveConfigMutation.isPending}

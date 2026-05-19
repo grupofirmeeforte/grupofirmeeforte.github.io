@@ -251,11 +251,13 @@ export const consorcioRouter = router({
   saveConfig: protectedProcedure
     .input(z.object({
       pctComissaoPadrao1: z.string().optional(),
+      qtdParcPadrao1: z.string().optional(),
       pctComissaoPadrao2: z.string().optional(),
-      qtdParcPadrao: z.string().optional(),
+      qtdParcPadrao2: z.string().optional(),
       pctComissaoEspecial1: z.string().optional(),
+      qtdParcEspecial1: z.string().optional(),
       pctComissaoEspecial2: z.string().optional(),
-      qtdParcEspecial: z.string().optional(),
+      qtdParcEspecial2: z.string().optional(),
       agentesEspeciais: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
