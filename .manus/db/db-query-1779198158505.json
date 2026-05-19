@@ -1,0 +1,70 @@
+{
+  "query": "SELECT COUNT(*) as total FROM febraban; SELECT mesano, COUNT(*) as qtd FROM febraban GROUP BY mesano ORDER BY mesano DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COUNT(*) as total FROM febraban; SELECT mesano, COUNT(*) as qtd FROM febraban GROUP BY mesano ORDER BY mesano DESC LIMIT 20;",
+  "rows": [
+    {
+      "total": "8744"
+    },
+    {
+      "total": "mesano\tqtd"
+    },
+    {
+      "total": "1225\t514"
+    },
+    {
+      "total": "1125\t545"
+    },
+    {
+      "total": "1025\t651"
+    },
+    {
+      "total": "925\t592"
+    },
+    {
+      "total": "825\t558"
+    },
+    {
+      "total": "725\t647"
+    },
+    {
+      "total": "625\t463"
+    },
+    {
+      "total": "526\t272"
+    },
+    {
+      "total": "525\t450"
+    },
+    {
+      "total": "426\t463"
+    },
+    {
+      "total": "425\t583"
+    },
+    {
+      "total": "326\t653"
+    },
+    {
+      "total": "325\t291"
+    },
+    {
+      "total": "226\t869"
+    },
+    {
+      "total": "225\t339"
+    },
+    {
+      "total": "126\t477"
+    },
+    {
+      "total": "125\t376"
+    },
+    {
+      "total": "NULL\t1"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n8744\nmesano\tqtd\n1225\t514\n1125\t545\n1025\t651\n925\t592\n825\t558\n725\t647\n625\t463\n526\t272\n525\t450\n426\t463\n425\t583\n326\t653\n325\t291\n226\t869\n225\t339\n126\t477\n125\t376\nNULL\t1\n",
+  "stderr": "",
+  "execution_time_ms": 272
+}

@@ -21,15 +21,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { Search, Upload, Edit2, Trash2, ArrowLeft, Download, BarChart2 } from "lucide-react";
 import * as XLSX from "xlsx";
+import { formatMesAno } from "@/lib/mesano";
 
-// Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
-function mesanoToStr(mesano: number | null | undefined): string {
-  if (!mesano) return "-";
-  const s = String(mesano);
-  const mes = s.slice(0, s.length - 2).padStart(2, "0");
-  const ano = "20" + s.slice(-2);
-  return `${mes}/${ano}`;
-}
+// Alias para compatibilidade com código existente
+const mesanoToStr = formatMesAno;
 
 function formatCurrency(val: string | number | null | undefined): string {
   if (val == null || val === "") return "-";
@@ -348,6 +343,7 @@ export default function FebrabanPage() {
         };
 
         // Data: cellDates:true entrega Date do JS → formata DD/MM/AAAA
+        // Também trata número serial do Excel (ex: 46146 = 04/05/2026)
         const toDate = (v: any): string | undefined => {
           if (!v) return undefined;
           if (v instanceof Date && !isNaN(v.getTime())) {
@@ -356,8 +352,20 @@ export default function FebrabanPage() {
             const y = v.getFullYear();
             return `${d}/${m}/${y}`;
           }
-          // fallback: string já formatada
-          return String(v).trim() || undefined;
+          // Número serial do Excel: inteiro >= 40000 (datas a partir de ~2009)
+          if (typeof v === "number" && Number.isInteger(v) && v >= 40000 && v <= 60000) {
+            // Excel serial: dias desde 01/01/1900 (com bug do ano 1900)
+            const excelEpoch = new Date(1899, 11, 30); // 30/12/1899
+            const date = new Date(excelEpoch.getTime() + v * 86400000);
+            const d = String(date.getDate()).padStart(2, "0");
+            const m = String(date.getMonth() + 1).padStart(2, "0");
+            const y = date.getFullYear();
+            return `${d}/${m}/${y}`;
+          }
+          // string já formatada DD/MM/AAAA
+          const s = String(v).trim();
+          if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
+          return s || undefined;
         };
 
             // Detectar formato: novo (Operação/Produto/ChaveJ/Data/Liquido/Bruto) ou antigo (PROPOSTA/LINHA/OPERADOR/SOLICITACAO/TROCO/FINANCIADO)

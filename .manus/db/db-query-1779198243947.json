@@ -1,0 +1,60 @@
+{
+  "query": "SELECT solicitacao, troco, operador FROM febraban WHERE mesano = '526' AND situacao = 'Contratada' AND empresa = 'BMF' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT solicitacao, troco, operador FROM febraban WHERE mesano = '526' AND situacao = 'Contratada' AND empresa = 'BMF' LIMIT 10;",
+  "rows": [
+    {
+      "solicitacao": "46146",
+      "troco": "1400.00",
+      "operador": "JJ602263"
+    },
+    {
+      "solicitacao": "46146",
+      "troco": "1000.00",
+      "operador": "JH016470"
+    },
+    {
+      "solicitacao": "46146",
+      "troco": "1794.42",
+      "operador": "JJ613947"
+    },
+    {
+      "solicitacao": "46146",
+      "troco": "3750.00",
+      "operador": "JJ610167"
+    },
+    {
+      "solicitacao": "46146",
+      "troco": "3691.34",
+      "operador": "J9660864"
+    },
+    {
+      "solicitacao": "46146",
+      "troco": "5000.00",
+      "operador": "J9670438"
+    },
+    {
+      "solicitacao": "46146",
+      "troco": "1500.00",
+      "operador": "JJ610159"
+    },
+    {
+      "solicitacao": "46146",
+      "troco": "6000.00",
+      "operador": "JH299827"
+    },
+    {
+      "solicitacao": "46146",
+      "troco": "1500.00",
+      "operador": "J9661460"
+    },
+    {
+      "solicitacao": "46147",
+      "troco": "21000.00",
+      "operador": "J9661460"
+    }
+  ],
+  "messages": [],
+  "stdout": "solicitacao\ttroco\toperador\n46146\t1400.00\tJJ602263\n46146\t1000.00\tJH016470\n46146\t1794.42\tJJ613947\n46146\t3750.00\tJJ610167\n46146\t3691.34\tJ9660864\n46146\t5000.00\tJ9670438\n46146\t1500.00\tJJ610159\n46146\t6000.00\tJH299827\n46146\t1500.00\tJ9661460\n46147\t21000.00\tJ9661460\n",
+  "stderr": "",
+  "execution_time_ms": 266
+}
