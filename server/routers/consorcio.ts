@@ -43,10 +43,15 @@ export const consorcioRouter = router({
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;
 
+      // Ordenar por mês/ano do mais novo para o mais antigo (MM/AAAA → AAAA/MM)
       const [rows, countResult] = await Promise.all([
         db.select().from(consorcios)
           .where(where)
-          .orderBy(desc(consorcios.mesAno), asc(consorcios.empresa), asc(consorcios.nomeAgente))
+          .orderBy(
+            desc(sql`CONCAT(SUBSTRING(mesAno, 4, 4), SUBSTRING(mesAno, 1, 2))`),
+            asc(consorcios.empresa),
+            asc(consorcios.nomeAgente)
+          )
           .limit(input.limit)
           .offset(input.page * input.limit),
         db.select({ count: sql<number>`COUNT(*)` }).from(consorcios).where(where),
@@ -66,7 +71,7 @@ export const consorcioRouter = router({
         .orderBy(asc(consorcios.empresa)),
       db.selectDistinct({ v: consorcios.mesAno }).from(consorcios)
         .where(sql`mesAno IS NOT NULL AND mesAno != ''`)
-        .orderBy(desc(consorcios.mesAno)),
+        .orderBy(desc(sql`CONCAT(SUBSTRING(mesAno, 4, 4), SUBSTRING(mesAno, 1, 2))`)),
       db.selectDistinct({ v: consorcios.segmento }).from(consorcios)
         .where(sql`segmento IS NOT NULL AND segmento != ''`)
         .orderBy(asc(consorcios.segmento)),
@@ -225,6 +230,43 @@ export const consorcioRouter = router({
       }
 
       return { inseridos, atualizados, erros, total: rows.length };
+    }),
+
+  // Ler configurações de comissão
+  getConfig: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return null;
+    const rows = await db.execute(
+      sql`SELECT chave, valor FROM consorcio_config`
+    ) as any;
+    const result: Record<string, string> = {};
+    const data = Array.isArray(rows) ? rows[0] : rows;
+    if (Array.isArray(data)) {
+      data.forEach((r: any) => { if (r.chave) result[r.chave] = r.valor ?? ''; });
+    }
+    return result;
+  }),
+
+  // Salvar configurações de comissão
+  saveConfig: protectedProcedure
+    .input(z.object({
+      pctComissaoPadrao1: z.string().optional(),
+      pctComissaoPadrao2: z.string().optional(),
+      pctComissaoEspecial1: z.string().optional(),
+      pctComissaoEspecial2: z.string().optional(),
+      agentesEspeciais: z.string().optional(), // JSON array de chaveJ
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Banco não disponível');
+      const entries = Object.entries(input) as [string, string][];
+      for (const [chave, valor] of entries) {
+        await db.execute(
+          sql`INSERT INTO consorcio_config (chave, valor) VALUES (${chave}, ${valor ?? ''})
+              ON DUPLICATE KEY UPDATE valor = ${valor ?? ''}`
+        );
+      }
+      return { ok: true };
     }),
 
   // Excluir registro

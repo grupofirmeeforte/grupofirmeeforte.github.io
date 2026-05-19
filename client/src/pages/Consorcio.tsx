@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Upload, Edit2, Trash2, Search } from "lucide-react";
+import { ArrowLeft, Upload, Edit2, Trash2, Search, Settings } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
@@ -92,7 +92,30 @@ export default function Consorcio() {
   // Exclusão
   const [deleteId, setDeleteId] = useState<number|null>(null);
 
+  // Configuração de comissões
+  const [configAberta, setConfigAberta] = useState(false);
+  const [cfgPadrao1, setCfgPadrao1] = useState("");
+  const [cfgPadrao2, setCfgPadrao2] = useState("");
+  const [cfgEspecial1, setCfgEspecial1] = useState("");
+  const [cfgEspecial2, setCfgEspecial2] = useState("");
+  const [cfgAgentesEspeciais, setCfgAgentesEspeciais] = useState("");
+
   const utils = trpc.useUtils();
+
+  const { data: configData } = trpc.consorcio.getConfig.useQuery();
+
+  // Preencher campos ao carregar config
+  useEffect(() => {
+    if (!configData) return;
+    if (configData.pctComissaoPadrao1) setCfgPadrao1(configData.pctComissaoPadrao1);
+    if (configData.pctComissaoPadrao2) setCfgPadrao2(configData.pctComissaoPadrao2);
+    if (configData.pctComissaoEspecial1) setCfgEspecial1(configData.pctComissaoEspecial1);
+    if (configData.pctComissaoEspecial2) setCfgEspecial2(configData.pctComissaoEspecial2);
+    if (configData.agentesEspeciais) setCfgAgentesEspeciais(configData.agentesEspeciais);
+  }, [configData]);
+  const saveConfigMutation = trpc.consorcio.saveConfig.useMutation({
+    onSuccess: () => { toast.success("Configurações salvas!"); utils.consorcio.getConfig.invalidate(); }
+  });
 
   const { data: filtros } = trpc.consorcio.filtros.useQuery();
   const { data, isLoading } = trpc.consorcio.list.useQuery({
@@ -226,14 +249,15 @@ export default function Consorcio() {
         <Button variant="ghost" size="icon" onClick={() => navigate("/producao")}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
-        <div>
+        <Button size="sm" onClick={() => setImportModal(true)} className="gap-1">
+          <Upload className="w-4 h-4" /> Importar Excel
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => setConfigAberta(true)} className="gap-1">
+          <Settings className="w-4 h-4" /> Comissões
+        </Button>
+        <div className="ml-2">
           <h1 className="text-lg font-bold text-gray-800">Produção — Consórcio</h1>
           <p className="text-xs text-gray-500">{total.toLocaleString("pt-BR")} registros</p>
-        </div>
-        <div className="ml-auto">
-          <Button size="sm" onClick={() => setImportModal(true)} className="gap-1">
-            <Upload className="w-4 h-4" /> Importar Excel
-          </Button>
         </div>
       </div>
 
@@ -485,6 +509,104 @@ export default function Consorcio() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Modal Configuração de Comissões */}
+      <Dialog open={configAberta} onOpenChange={setConfigAberta}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Configuração de Comissões</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5">
+            {/* Comissão Padrão */}
+            <div className="p-4 border rounded-lg bg-green-50 border-green-200">
+              <h3 className="font-semibold text-sm text-green-800 mb-3">Comissão Padrão (para todos)</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs text-gray-600">% Comissão 1</Label>
+                  <div className="relative">
+                    <Input
+                      className="pr-6"
+                      placeholder="ex: 0,76"
+                      value={cfgPadrao1}
+                      onChange={e => setCfgPadrao1(e.target.value)}
+                    />
+                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-600">% Comissão 2</Label>
+                  <div className="relative">
+                    <Input
+                      className="pr-6"
+                      placeholder="ex: 0,50"
+                      value={cfgPadrao2}
+                      onChange={e => setCfgPadrao2(e.target.value)}
+                    />
+                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Comissão Especial */}
+            <div className="p-4 border rounded-lg bg-blue-50 border-blue-200">
+              <h3 className="font-semibold text-sm text-blue-800 mb-3">Comissão Especial</h3>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <Label className="text-xs text-gray-600">% Comissão 1</Label>
+                  <div className="relative">
+                    <Input
+                      className="pr-6"
+                      placeholder="ex: 1,00"
+                      value={cfgEspecial1}
+                      onChange={e => setCfgEspecial1(e.target.value)}
+                    />
+                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs text-gray-600">% Comissão 2</Label>
+                  <div className="relative">
+                    <Input
+                      className="pr-6"
+                      placeholder="ex: 0,75"
+                      value={cfgEspecial2}
+                      onChange={e => setCfgEspecial2(e.target.value)}
+                    />
+                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">%</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs text-gray-600">Agentes com comissão especial (ChaveJ, um por linha)</Label>
+                <textarea
+                  className="w-full mt-1 p-2 border rounded text-xs font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  rows={4}
+                  placeholder="J9670438&#10;J1234567&#10;J9999999"
+                  value={cfgAgentesEspeciais}
+                  onChange={e => setCfgAgentesEspeciais(e.target.value)}
+                />
+                <p className="text-xs text-gray-400 mt-1">Digite um ChaveJ por linha. Esses agentes usarão as taxas especiais no cálculo.</p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfigAberta(false)}>Cancelar</Button>
+            <Button
+              onClick={() => saveConfigMutation.mutate({
+                pctComissaoPadrao1: cfgPadrao1,
+                pctComissaoPadrao2: cfgPadrao2,
+                pctComissaoEspecial1: cfgEspecial1,
+                pctComissaoEspecial2: cfgEspecial2,
+                agentesEspeciais: cfgAgentesEspeciais,
+              })}
+              disabled={saveConfigMutation.isPending}
+            >
+              {saveConfigMutation.isPending ? "Salvando..." : "Salvar Configurações"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Modal Exclusão */}
       <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
