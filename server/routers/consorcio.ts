@@ -488,10 +488,10 @@ export const consorcioRouter = router({
         // Comissão: zera se parcela acima do limite de Com.2
         const comissaoVal = parcNum <= limParc2 ? +(valorBem * pct2).toFixed(2) : 0;
 
+        // pctComissao1 e rbm são fixos do Excel - não alterar
+        // Apenas pctComissao2 e comissao são calculados pelo sistema
         await db.update(consorcios)
           .set({
-            pctComissao1: String(pct1),
-            rbm: String(rbmVal),
             pctComissao2: String(pct2),
             comissao: String(comissaoVal),
           })
