@@ -483,9 +483,9 @@ export const consorcioRouter = router({
           }
         }
 
-        // RBM: sempre calculado (valor que a empresa recebe), nunca zera
-        const rbmVal = +(valorBem * pct1).toFixed(2);
-        // Comissão: zera se parcela acima do limite
+        // RBM: zera se parcela acima do limite de Com.1
+        const rbmVal = parcNum <= limParc1 ? +(valorBem * pct1).toFixed(2) : 0;
+        // Comissão: zera se parcela acima do limite de Com.2
         const comissaoVal = parcNum <= limParc2 ? +(valorBem * pct2).toFixed(2) : 0;
 
         await db.update(consorcios)
