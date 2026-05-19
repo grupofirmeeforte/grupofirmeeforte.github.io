@@ -617,11 +617,11 @@ export const consorcioRouter = router({
         const rbmStr = entry.rbmTotal.toFixed(2);
 
         if (existente.length > 0) {
-          // Já existe: atualiza apenas comissaoConsorcio e rbmTotal
+          // Já existe: atualiza apenas comissaoConsorcio e rbmConsorcioC2
           await db.update(calculos)
             .set({
               comissaoConsorcio: comissaoStr,
-              rbmTotal: rbmStr,
+              rbmConsorcioC2: rbmStr,
             })
             .where(eq(calculos.id, existente[0].id));
           atualizados++;
@@ -634,7 +634,7 @@ export const consorcioRouter = router({
             chaveJ: entry.chaveJ,
             nomeAgente: entry.nomeAgente,
             comissaoConsorcio: comissaoStr,
-            rbmTotal: rbmStr,
+            rbmConsorcioC2: rbmStr,
           });
           inseridos++;
         }

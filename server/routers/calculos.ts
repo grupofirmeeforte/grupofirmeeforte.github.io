@@ -39,7 +39,7 @@ export const calculosRouter = router({
         .select()
         .from(calculos)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(calculos.mesRef), asc(calculos.empresa), asc(calculos.nomeAgente))
+        .orderBy(sql`CAST(${calculos.mesRef} AS UNSIGNED) DESC`, desc(calculos.createdAt), asc(calculos.empresa), asc(calculos.nomeAgente))
         .limit(input.limit)
         .offset(offset);
 

@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, Send } from "lucide-react";
+import { ArrowLeft, Download, Send, Trash2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -206,6 +206,12 @@ export default function Calculo() {
   const dtPagtoInputRef = useRef<HTMLInputElement>(null);
   const utils = trpc.useUtils();
   const editarMutation = trpc.calculosImportados.editar.useMutation();
+  const deletarMutation = trpc.calculosImportados.deletar.useMutation({
+    onSuccess: () => {
+      utils.calculosImportados.listar.invalidate();
+      utils.calculosImportados.contar.invalidate();
+    },
+  });
 
   const iniciarEdicaoDt = (r: any) => {
     setEditandoDtPagto(r.id);
@@ -337,6 +343,7 @@ export default function Calculo() {
                     {col.label}
                   </th>
                 ))}
+                <th className="px-1.5 py-1.5 text-center border-l border-white/20 w-8"></th>
               </tr>
             </thead>
             <tbody>
@@ -395,6 +402,20 @@ export default function Calculo() {
                       )}
                     </td>
                   ))}
+                  {/* Botão deletar */}
+                  <td className="px-1.5 py-1 text-center border-b border-slate-100 border-l border-l-slate-200">
+                    <button
+                      onClick={() => {
+                        if (confirm(`Excluir registro de ${r.nomeAgente ?? r.chaveJ}?`)) {
+                          deletarMutation.mutate({ id: r.id });
+                        }
+                      }}
+                      className="p-1 rounded hover:bg-red-100 text-red-400 hover:text-red-600 transition-colors"
+                      title="Excluir registro"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
