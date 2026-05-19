@@ -337,7 +337,7 @@ export const consorcioRouter = router({
       }
     }
 
-    // 4. Atualizar PARC2+ copiando da PARC1
+    // 4. Montar mapa de PARC1 com chaveJ
     const parc1Map = new Map<string, { chaveJ: string; nomeAgente: string }>();
     for (const p of parc1s) {
       if (p.proposta && p.chaveJ) {
@@ -346,14 +346,30 @@ export const consorcioRouter = router({
       }
     }
 
+    // 5. Para propostas sem PARC1, buscar qualquer parcela com chaveJ preenchido (a menor parcela)
+    const todasComChaveJ = await db.select({
+      proposta: consorcios.proposta,
+      chaveJ: consorcios.chaveJ,
+      nomeAgente: consorcios.nomeAgente,
+    }).from(consorcios).where(sql`chaveJ IS NOT NULL AND chaveJ != '' AND chaveJ != 'NULL'`)
+      .orderBy(asc(consorcios.parcLiberada));
+
+    for (const r of todasComChaveJ) {
+      if (r.proposta && r.chaveJ && !parc1Map.has(r.proposta)) {
+        const nome = nomesPorChaveJ.get(r.chaveJ.toUpperCase()) || r.nomeAgente || '';
+        parc1Map.set(r.proposta, { chaveJ: r.chaveJ.toUpperCase(), nomeAgente: nome });
+      }
+    }
+
     let atualizadosParcMais = 0;
     const propostas = Array.from(parc1Map.keys());
     for (const proposta of propostas) {
-      const parc1 = parc1Map.get(proposta)!;
+      const ref = parc1Map.get(proposta)!;
       try {
+        // Atualizar apenas registros sem chaveJ preenchido
         await db.update(consorcios)
-          .set({ chaveJ: parc1.chaveJ, nomeAgente: parc1.nomeAgente })
-          .where(sql`proposta = '${sql.raw(proposta.replace(/'/g, "''"))}' AND (parcLiberada != 'PARC1' OR parcLiberada IS NULL)`);
+          .set({ chaveJ: ref.chaveJ, nomeAgente: ref.nomeAgente })
+          .where(sql`proposta = '${sql.raw(proposta.replace(/'/g, "''"))}' AND (chaveJ IS NULL OR chaveJ = '' OR chaveJ = 'NULL')`);
         atualizadosParcMais++;
       } catch { /* ignora */ }
     }
