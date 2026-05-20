@@ -191,7 +191,44 @@ export const contaCorrenteRouter = router({
       return { inseridos, atualizados, erros };
     }),
 
-  // ── Calcular comissão: busca % na Tabela de Comissão pelo nível do agente ─
+  // ── Obter configurações de comissão ────────────────────────────────────────
+  getConfig: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return null;
+    const rows = await db.execute(
+      sql`SELECT chave, valor FROM cc_config`
+    ) as any;
+    const result: Record<string, string> = {};
+    const data = Array.isArray(rows) ? rows[0] : rows;
+    if (Array.isArray(data)) {
+      data.forEach((r: any) => { if (r.chave) result[r.chave] = r.valor ?? ''; });
+    }
+    return result;
+  }),
+
+  // ── Salvar configurações de comissão ─────────────────────────────────────
+  saveConfig: protectedProcedure
+    .input(z.object({
+      // Padrão
+      pctPadrao: z.string().optional(),           // % comissão padrão
+      // Especial
+      pctEspecial: z.string().optional(),         // % comissão especial
+      agentesEspeciais: z.string().optional(),    // ChaveJs especiais (um por linha)
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Banco não disponível');
+      const entries = Object.entries(input) as [string, string][];
+      for (const [chave, valor] of entries) {
+        await db.execute(
+          sql`INSERT INTO cc_config (chave, valor) VALUES (${chave}, ${valor ?? ''})
+              ON DUPLICATE KEY UPDATE valor = ${valor ?? ''}`
+        );
+      }
+      return { ok: true };
+    }),
+
+  // ── Calcular comissão: usa config cc_config (Padrão/Especial) ou Tabela de Comissão ─
   calcular: protectedProcedure
     .input(z.object({
       mesAno: z.string().optional(),

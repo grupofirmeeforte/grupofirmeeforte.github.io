@@ -422,7 +422,6 @@ export default function ContaCorrente() {
                 <th className="px-2 py-2 text-left">Conta</th>
                 <th className="px-2 py-2 text-left">Data</th>
                 <th className="px-2 py-2 text-right">RBM</th>
-                <th className="px-2 py-2 text-right">% Comissão</th>
                 <th className="px-2 py-2 text-right">Comissão</th>
                 <th className="px-2 py-2 text-left">Supervisor</th>
                 <th className="px-2 py-2 text-center">Ações</th>
@@ -465,13 +464,6 @@ export default function ContaCorrente() {
                         : "-"}
                     </td>
                     <td className="px-2 py-1.5 text-right font-mono">{fmtMoeda(r.rbm)}</td>
-                    <td className="px-2 py-1.5 text-right">
-                      {r.percComissao ? (
-                        <span className="bg-yellow-100 text-yellow-800 px-1 rounded text-xs font-medium">
-                          {fmtPct(r.percComissao)}
-                        </span>
-                      ) : "-"}
-                    </td>
                     <td className="px-2 py-1.5 text-right font-mono font-semibold text-green-700">
                       {r.comissao ? fmtMoeda(r.comissao) : "-"}
                     </td>
@@ -613,7 +605,6 @@ export default function ContaCorrente() {
               ))}
               {[
                 { label: "RBM", key: "rbm" },
-                { label: "% Comissão", key: "percComissao" },
                 { label: "Comissão", key: "comissao" },
               ].map(({ label, key }) => (
                 <div key={key}>
