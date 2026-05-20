@@ -355,38 +355,46 @@ export default function Calculo() {
 
       {/* Filtros */}
       <div className="bg-white border-b border-slate-200 px-3 py-2">
-        <div className="flex flex-wrap gap-2">
-          <div>
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex flex-col">
             <label className="block text-[10px] text-slate-500 mb-0.5">Mês/Ano</label>
-            <select
-              value={mesRef}
-              onChange={(e) => handleFiltroChange(setMesRef)(e.target.value)}
-              className="border border-slate-300 rounded px-1.5 py-1 text-xs bg-white"
-            >
-              <option value=""></option>
-              {meses.map((m) => (
-                <option key={m} value={m ?? ""}>{fmtMesRef(m)}</option>
-              ))}
-            </select>
-            <p className="text-[10px] text-slate-400 mt-0.5">Mês ant.: {getMesAnterior()}</p>
+            <div className="flex items-center gap-2">
+              <select
+                value={mesRef}
+                onChange={(e) => handleFiltroChange(setMesRef)(e.target.value)}
+                className="border border-slate-300 rounded px-1.5 py-1 text-xs bg-white h-7"
+              >
+                <option value="">-- Todos --</option>
+                {meses.map((m) => (
+                  <option key={m} value={m ?? ""}>{fmtMesRef(m)}</option>
+                ))}
+              </select>
+              <span className="text-[10px] text-slate-400 whitespace-nowrap">Mês ant.: <strong className="text-slate-600">{getMesAnterior()}</strong></span>
+            </div>
           </div>
-          <div>
+          <div className="flex flex-col">
             <label className="block text-[10px] text-slate-500 mb-0.5">Chave J</label>
             <Input
               value={chaveJ}
               onChange={(e) => handleFiltroChange(setChaveJ)(e.target.value)}
               placeholder="Ex: J9660864"
-              className="text-xs h-7 py-1"
+              className="text-xs h-7 py-1 w-32"
             />
           </div>
-          <div>
+          <div className="flex flex-col">
             <label className="block text-[10px] text-slate-500 mb-0.5">Nome Agente</label>
             <Input
               value={nomeAgente}
               onChange={(e) => handleFiltroChange(setNomeAgente)(e.target.value)}
               placeholder="Ex: João Silva"
-              className="text-xs h-7 py-1"
+              className="text-xs h-7 py-1 w-44"
             />
+          </div>
+          <div className="ml-auto flex items-end gap-3 pb-0.5">
+            <span className="text-[11px] text-slate-500">{total} registro(s)</span>
+            {selecionados.size > 0 && (
+              <span className="text-[11px] text-purple-600 font-medium">{selecionados.size} selecionado(s)</span>
+            )}
           </div>
         </div>
       </div>
