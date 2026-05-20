@@ -1,0 +1,80 @@
+{
+  "query": "\n-- Verificar se os agentes com supervisor LUANA têm registros em calculos\nSELECT c.chaveJ, c.mesRef, c.rbmCreditoC2, c.rbmConsorcioC2, c.nomeAgente\nFROM calculos c\nWHERE c.chaveJ IN (SELECT chaveJ FROM agentes WHERE UPPER(supervisor) = 'LUANA')\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \n-- Verificar se os agentes com supervisor LUANA têm registros em calculos\nSELECT c.chaveJ, c.mesRef, c.rbmCreditoC2, c.rbmConsorcioC2, c.nomeAgente\nFROM calculos c\nWHERE c.chaveJ IN (SELECT chaveJ FROM agentes WHERE UPPER(supervisor) = 'LUANA')\nLIMIT 10;\n",
+  "rows": [
+    {
+      "chaveJ": "J9663285",
+      "mesRef": "426",
+      "rbmCreditoC2": "4052.16",
+      "rbmConsorcioC2": "0.00",
+      "nomeAgente": "Carla Bonfim dos Santos"
+    },
+    {
+      "chaveJ": "J9660864",
+      "mesRef": "426",
+      "rbmCreditoC2": "2806.59",
+      "rbmConsorcioC2": "0.00",
+      "nomeAgente": "Edileia Alcantara de Oliviera Santos"
+    },
+    {
+      "chaveJ": "JJ628256",
+      "mesRef": "426",
+      "rbmCreditoC2": "846.23",
+      "rbmConsorcioC2": "0.00",
+      "nomeAgente": "Gleyce Ribeiro da Costa"
+    },
+    {
+      "chaveJ": "J9661460",
+      "mesRef": "426",
+      "rbmCreditoC2": "2689.29",
+      "rbmConsorcioC2": "1688.44",
+      "nomeAgente": "Gloria Barbosa dos Santos Silva"
+    },
+    {
+      "chaveJ": "JG497322",
+      "mesRef": "426",
+      "rbmCreditoC2": "186.34",
+      "rbmConsorcioC2": "0.00",
+      "nomeAgente": "Jordania Silva Caires"
+    },
+    {
+      "chaveJ": "JH016470",
+      "mesRef": "426",
+      "rbmCreditoC2": "6001.80",
+      "rbmConsorcioC2": "1692.02",
+      "nomeAgente": "Kailane Santos da Silva"
+    },
+    {
+      "chaveJ": "JH648134",
+      "mesRef": "426",
+      "rbmCreditoC2": "50.07",
+      "rbmConsorcioC2": "0.00",
+      "nomeAgente": "Mabel Maiana de Souza Barbosa"
+    },
+    {
+      "chaveJ": "J9663283",
+      "mesRef": "426",
+      "rbmCreditoC2": "1745.52",
+      "rbmConsorcioC2": "0.00",
+      "nomeAgente": "Maria Jociana Pereira da Silva"
+    },
+    {
+      "chaveJ": "JJ602263",
+      "mesRef": "426",
+      "rbmCreditoC2": "932.80",
+      "rbmConsorcioC2": "0.00",
+      "nomeAgente": "Marisa Laranjeira Mata"
+    },
+    {
+      "chaveJ": "J9670438",
+      "mesRef": "426",
+      "rbmCreditoC2": "2684.34",
+      "rbmConsorcioC2": "0.00",
+      "nomeAgente": "Patricia Alves de Souza"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\tmesRef\trbmCreditoC2\trbmConsorcioC2\tnomeAgente\nJ9663285\t426\t4052.16\t0.00\tCarla Bonfim dos Santos\nJ9660864\t426\t2806.59\t0.00\tEdileia Alcantara de Oliviera Santos\nJJ628256\t426\t846.23\t0.00\tGleyce Ribeiro da Costa\nJ9661460\t426\t2689.29\t1688.44\tGloria Barbosa dos Santos Silva\nJG497322\t426\t186.34\t0.00\tJordania Silva Caires\nJH016470\t426\t6001.80\t1692.02\tKailane Santos da Silva\nJH648134\t426\t50.07\t0.00\tMabel Maiana de Souza Barbosa\nJ9663283\t426\t1745.52\t0.00\tMaria Jociana Pereira da Silva\nJJ602263\t426\t932.80\t0.00\tMarisa Laranjeira Mata\nJ9670438\t426\t2684.34\t0.00\tPatricia Alves de Souza\n",
+  "stderr": "",
+  "execution_time_ms": 275
+}

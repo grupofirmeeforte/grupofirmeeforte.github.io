@@ -1,0 +1,35 @@
+{
+  "query": "\n-- Agentes com supervisor LUANA\nSELECT a.chaveJ, a.nomeAgente, a.supervisor FROM agentes a WHERE UPPER(a.supervisor) = 'LUANA' LIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \n-- Agentes com supervisor LUANA\nSELECT a.chaveJ, a.nomeAgente, a.supervisor FROM agentes a WHERE UPPER(a.supervisor) = 'LUANA' LIMIT 5;\n",
+  "rows": [
+    {
+      "chaveJ": "J9663285",
+      "nomeAgente": "CARLA BONFIM DOS SANTOS ",
+      "supervisor": "LUANA"
+    },
+    {
+      "chaveJ": "JJ596288",
+      "nomeAgente": "CARMITA RIBEIRO NUNES NETA",
+      "supervisor": "LUANA"
+    },
+    {
+      "chaveJ": "JJ596281",
+      "nomeAgente": "CLARICE FRANCISCA ITACARAMBY SANTOS ",
+      "supervisor": "LUANA"
+    },
+    {
+      "chaveJ": "JJ596294",
+      "nomeAgente": "AMAURICIO REAIS FERREIRAS DOS SANTOS ",
+      "supervisor": "LUANA"
+    },
+    {
+      "chaveJ": "J9663101",
+      "nomeAgente": "DOURILDA JUVENAL DE ARAUJO",
+      "supervisor": "LUANA"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\tnomeAgente\tsupervisor\nJ9663285\tCARLA BONFIM DOS SANTOS \tLUANA\nJJ596288\tCARMITA RIBEIRO NUNES NETA\tLUANA\nJJ596281\tCLARICE FRANCISCA ITACARAMBY SANTOS \tLUANA\nJJ596294\tAMAURICIO REAIS FERREIRAS DOS SANTOS \tLUANA\nJ9663101\tDOURILDA JUVENAL DE ARAUJO\tLUANA\n",
+  "stderr": "",
+  "execution_time_ms": 265
+}

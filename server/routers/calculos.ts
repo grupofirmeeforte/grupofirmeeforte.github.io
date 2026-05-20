@@ -39,7 +39,7 @@ export const calculosRouter = router({
         .select()
         .from(calculos)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(sql`CAST(${calculos.mesRef} AS UNSIGNED) DESC`, desc(calculos.createdAt), asc(calculos.empresa), asc(calculos.nomeAgente))
+        .orderBy(sql`STR_TO_DATE(CONCAT('01/', ${calculos.mesRef}), '%d/%m/%Y') DESC`, desc(calculos.createdAt), asc(calculos.empresa), asc(calculos.nomeAgente))
         .limit(input.limit)
         .offset(offset);
 
@@ -76,7 +76,7 @@ export const calculosRouter = router({
     const result = await db
       .selectDistinct({ mesRef: calculos.mesRef })
       .from(calculos)
-      .orderBy(desc(calculos.mesRef));
+      .orderBy(sql`STR_TO_DATE(CONCAT('01/', ${calculos.mesRef}), '%d/%m/%Y') DESC`);
     return result.map(r => r.mesRef).filter(Boolean);
   }),
 
@@ -199,10 +199,8 @@ export const calculosRouter = router({
       const resultados: { chaveJ: string; status: string; mensagem: string }[] = [];
 
       for (const reg of regs) {
-        // Converter mesRef (ex: "426" ou "0426") para MM/AAAA
-        let mesAno = reg.mesRef ?? "";
-        if (mesAno.length === 3) mesAno = mesAno.slice(0, 1).padStart(2, "0") + "/20" + mesAno.slice(1);
-        else if (mesAno.length === 4) mesAno = mesAno.slice(0, 2) + "/20" + mesAno.slice(2);
+        // mesRef já está no formato MM/AAAA (ex: "05/2026")
+        const mesAno = reg.mesRef ?? "";
 
         const tipoPagto = reg.tipoPagamento ?? "Comissão";
         const empresa = reg.empresa ?? "";

@@ -1,0 +1,40 @@
+{
+  "query": "\n-- O supervisor no banco é \"LUANA\" mas o nome cadastrado é \"Luana Andrade Farias\"\n-- O JOIN usa UPPER(a.supervisor) = UPPER(s.nome) — isso não bate!\n-- Verificar: agentes com supervisor LUANA têm calculos em 04/2026?\nSELECT c.chaveJ, c.mesRef, c.rbmCreditoC2, a.supervisor\nFROM calculos c\nJOIN agentes a ON c.chaveJ = a.chaveJ\nWHERE UPPER(a.supervisor) = 'LUANA' AND c.mesRef = '04/2026'\nLIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \n-- O supervisor no banco é \"LUANA\" mas o nome cadastrado é \"Luana Andrade Farias\"\n-- O JOIN usa UPPER(a.supervisor) = UPPER(s.nome) — isso não bate!\n-- Verificar: agentes com supervisor LUANA têm calculos em 04/2026?\nSELECT c.chaveJ, c.mesRef, c.rbmCreditoC2, a.supervisor\nFROM calculos c\nJOIN agentes a ON c.chaveJ = a.chaveJ\nWHERE UPPER(a.supervisor) = 'LUANA' AND c.mesRef = '04/2026'\nLIMIT 5;\n",
+  "rows": [
+    {
+      "chaveJ": "J9663285",
+      "mesRef": "04/2026",
+      "rbmCreditoC2": "4052.16",
+      "supervisor": "LUANA"
+    },
+    {
+      "chaveJ": "J9660864",
+      "mesRef": "04/2026",
+      "rbmCreditoC2": "2806.59",
+      "supervisor": "LUANA"
+    },
+    {
+      "chaveJ": "J9661460",
+      "mesRef": "04/2026",
+      "rbmCreditoC2": "2689.29",
+      "supervisor": "LUANA"
+    },
+    {
+      "chaveJ": "JJ628256",
+      "mesRef": "04/2026",
+      "rbmCreditoC2": "846.23",
+      "supervisor": "LUANA"
+    },
+    {
+      "chaveJ": "JG497322",
+      "mesRef": "04/2026",
+      "rbmCreditoC2": "186.34",
+      "supervisor": "LUANA"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\tmesRef\trbmCreditoC2\tsupervisor\nJ9663285\t04/2026\t4052.16\tLUANA\nJ9660864\t04/2026\t2806.59\tLUANA\nJ9661460\t04/2026\t2689.29\tLUANA\nJJ628256\t04/2026\t846.23\tLUANA\nJG497322\t04/2026\t186.34\tLUANA\n",
+  "stderr": "",
+  "execution_time_ms": 263
+}

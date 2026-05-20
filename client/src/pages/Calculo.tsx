@@ -29,10 +29,7 @@ const fmtTexto = (v: any) => {
 
 const fmtMesRef = (v: string | null | undefined) => {
   if (!v) return "-";
-  const s = String(v);
-  if (s.length === 3) return s.slice(0, 1).padStart(2, "0") + "/20" + s.slice(1);
-  if (s.length === 4) return s.slice(0, 2) + "/20" + s.slice(2);
-  return s;
+  return String(v); // já está no formato MM/AAAA
 };
 
 export default function Calculo() {
@@ -249,21 +246,11 @@ export default function Calculo() {
   }, [agenteSup, modalSup?.novo]);
 
   const { data: supervisores = [], refetch: refetchSup } = trpc.supervisores.listar.useQuery();
-  const [calcSup, setCalcSup] = useState<any[]>([]); // preenchido pelo botão Calcular
-  const [calculando, setCalculando] = useState(false);
-
-  const calcularSupMut = trpc.supervisores.calcular.useMutation({
-    onSuccess: (data) => {
-      setCalcSup(data);
-      setCalculando(false);
-    },
-    onError: () => setCalculando(false),
-  });
-
-  const handleCalcularSup = () => {
-    setCalculando(true);
-    calcularSupMut.mutate({ mesRef: mesRef || undefined });
-  };
+  // calcular é uma query automática — recalcula quando mesRef muda
+  const { data: calcSup = [], isFetching: calculando, refetch: refetchCalcSup } = trpc.supervisores.calcular.useQuery(
+    { mesRef: mesRef || undefined },
+    { enabled: true }
+  );
 
   const criarSupMut = trpc.supervisores.criar.useMutation({ onSuccess: () => { refetchSup(); setModalSup(null); } });
   const editarSupMut = trpc.supervisores.editar.useMutation({ onSuccess: () => { refetchSup(); setModalSup(null); } });
@@ -521,7 +508,7 @@ export default function Calculo() {
               <div className="flex gap-1.5">
                 <Button
                   size="sm"
-                  onClick={handleCalcularSup}
+                  onClick={() => refetchCalcSup()}
                   disabled={calculando}
                   className="h-6 px-2 text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1 disabled:opacity-60"
                 >

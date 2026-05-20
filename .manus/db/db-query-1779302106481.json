@@ -1,0 +1,25 @@
+{
+  "query": "SELECT DISTINCT mesRef FROM calculos ORDER BY mesRef DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT DISTINCT mesRef FROM calculos ORDER BY mesRef DESC;",
+  "rows": [
+    {
+      "mesRef": "05/2026"
+    },
+    {
+      "mesRef": "04/2026"
+    },
+    {
+      "mesRef": "03/2026"
+    },
+    {
+      "mesRef": "02/2026"
+    },
+    {
+      "mesRef": "01/2026"
+    }
+  ],
+  "messages": [],
+  "stdout": "mesRef\n05/2026\n04/2026\n03/2026\n02/2026\n01/2026\n",
+  "stderr": "",
+  "execution_time_ms": 273
+}
