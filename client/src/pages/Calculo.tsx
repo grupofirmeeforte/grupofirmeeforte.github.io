@@ -568,8 +568,20 @@ export default function Calculo() {
                         <td className="px-2 py-1 text-right">{s.pctDental > 0 ? s.pctDental.toFixed(2).replace(".",",") + "%" : "-"}</td>
                         <td className="px-2 py-1">
                           <div className="flex gap-1 justify-center">
-                            <button onClick={() => abrirEditarSup(s)} title="Editar percentuais" className="text-blue-600 hover:text-blue-800 p-0.5 rounded hover:bg-blue-100"><Pencil className="w-3 h-3" /></button>
-                            <button onClick={() => { if(confirm(`Excluir ${s.nome}?`)) excluirSupMut.mutate({ id: s.id }); }} title="Excluir supervisor" className="text-red-500 hover:text-red-700 p-0.5 rounded hover:bg-red-100"><X className="w-3 h-3" /></button>
+                            <button
+                              onClick={() => abrirEditarSup(s)}
+                              title="Editar percentuais"
+                              className="flex items-center gap-0.5 bg-blue-600 hover:bg-blue-700 text-white text-[9px] font-medium px-1.5 py-0.5 rounded"
+                            >
+                              <Pencil className="w-2.5 h-2.5" /> Editar
+                            </button>
+                            <button
+                              onClick={() => { if(confirm(`Excluir ${s.nome}?`)) excluirSupMut.mutate({ id: s.id }); }}
+                              title="Excluir supervisor"
+                              className="flex items-center gap-0.5 bg-red-500 hover:bg-red-600 text-white text-[9px] font-medium px-1.5 py-0.5 rounded"
+                            >
+                              <X className="w-2.5 h-2.5" /> Excluir
+                            </button>
                           </div>
                         </td>
                       </tr>
