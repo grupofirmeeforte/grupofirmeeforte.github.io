@@ -1,520 +1,659 @@
-import { useState, useRef, useMemo, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { trpc } from '@/lib/trpc';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { toast } from 'sonner';
-import { ArrowLeft, Plus, Pencil, Trash2, Upload, Search } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import { useState, useRef, useEffect } from "react";
+import { trpc } from "@/lib/trpc";
+import { useLocation } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Upload, Edit2, Trash2, Search, Calculator, Send } from "lucide-react";
+import * as XLSX from "xlsx";
+import { toast } from "sonner";
 
-type ContaCorrente = {
-  id: number;
-  empresa?: string | null;
-  mesAno?: string | null;
-  chaveJ?: string | null;
-  agente?: string | null;
-  agencia?: string | null;
-  contaCorrente?: string | null;
-  tipoServ?: string | null;
-  dataOperacao?: string | Date | null;
-  produto?: string | null;
-  modalidade?: string | null;
-  agRelacionamento?: string | null;
-  rbm?: string | number | null;
-  percComissao?: string | number | null;
-  comissao?: string | number | null;
-  supervisor?: string | null;
-};
-
-type FormData = {
-  empresa?: string;
-  mesAno?: string;
-  chaveJ?: string;
-  agente?: string;
-  agencia?: string;
-  contaCorrente?: string;
-  tipoServ?: string;
-  dataOperacao?: string;
-  produto?: string;
-  modalidade?: string;
-  agRelacionamento?: string;
-  rbm?: string;
-  percComissao?: string;
-  comissao?: string;
-  supervisor?: string;
-};
-
-const EMPTY_FORM: FormData = {};
-
-function moeda(val: string | number | null | undefined) {
-  if (val === null || val === undefined || val === '') return '-';
-  const n = typeof val === 'number' ? val : parseFloat(String(val));
-  if (isNaN(n)) return String(val);
-  return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+// ─── Formatadores ────────────────────────────────────────────────
+function fmtMoeda(v: string | number | null | undefined): string {
+  if (v == null || v === "") return "-";
+  const n = typeof v === "string" ? parseFloat(v) : v;
+  if (isNaN(n)) return "-";
+  return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-function pct(val: string | number | null | undefined) {
-  if (val === null || val === undefined || val === '') return '-';
-  const n = typeof val === 'number' ? val : parseFloat(String(val).replace(',', '.'));
-  if (isNaN(n)) return String(val);
-  // Se maior que 1, já é percentual direto (ex: 60 → 60,00%)
-  if (n > 1) return n.toFixed(2).replace('.', ',') + '%';
-  return (n * 100).toFixed(2).replace('.', ',') + '%';
+function fmtPct(v: string | number | null | undefined): string {
+  if (v == null || v === "") return "-";
+  const n = typeof v === "string" ? parseFloat(v) : v;
+  if (isNaN(n)) return "-";
+  // Se <= 1, é decimal (0.68 → 68,00%)
+  if (n <= 1) return (n * 100).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
+  return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
 }
 
-function strDate(val: string | Date | null | undefined) {
-  if (!val) return '-';
-  if (val instanceof Date) return val.toLocaleDateString('pt-BR');
-  return val;
+function norm(s: string) {
+  return s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim().replace(/\s+/g, "");
 }
 
+function toDate(v: any): string {
+  if (!v) return "";
+  if (v instanceof Date && !isNaN(v.getTime())) {
+    return `${String(v.getDate()).padStart(2, "0")}/${String(v.getMonth() + 1).padStart(2, "0")}/${v.getFullYear()}`;
+  }
+  if (typeof v === "number" && Number.isInteger(v) && v >= 40000 && v <= 60000) {
+    const d = new Date(new Date(1899, 11, 30).getTime() + v * 86400000);
+    return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+  }
+  const s = String(v).trim();
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
+  // Tenta converter "YYYY-MM-DD"
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, d] = s.split("-");
+    return `${d}/${m}/${y}`;
+  }
+  return s;
+}
+
+function toMesAno(v: any): string {
+  if (!v) return "";
+  if (v instanceof Date && !isNaN(v.getTime())) {
+    return `${String(v.getMonth() + 1).padStart(2, "0")}/${v.getFullYear()}`;
+  }
+  const s = String(v).trim();
+  if (/^\d{2}\/\d{4}$/.test(s)) return s;
+  const n = parseInt(s, 10);
+  if (!isNaN(n) && n > 0) {
+    const str = String(n);
+    return str.slice(0, str.length - 2).padStart(2, "0") + "/20" + str.slice(-2);
+  }
+  return s;
+}
+
+function toNum(v: any): number {
+  if (v == null || v === "") return 0;
+  const n = typeof v === "number" ? v : parseFloat(String(v).replace(",", "."));
+  return isNaN(n) ? 0 : n;
+}
+
+// ─── Componente principal ─────────────────────────────────────────
 export default function ContaCorrente() {
-  const [, setLocation] = useLocation();
-  const [filtroMes, setFiltroMes] = useState('');
-  const [filtroEmpresa, setFiltroEmpresa] = useState('');
-  const [filtroBusca, setFiltroBusca] = useState('');
-  const [modalAberto, setModalAberto] = useState(false);
-  const [editandoId, setEditandoId] = useState<number | null>(null);
-  const [form, setForm] = useState<FormData>(EMPTY_FORM);
-  const [confirmandoExclusao, setConfirmandoExclusao] = useState<number | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [calcInput, setCalcInput] = useState<{ chaveJ: string; rbm?: string } | null>(null);
+  const [, navigate] = useLocation();
 
-  const utils = trpc.useUtils();
+  // Filtros
+  const [search, setSearch] = useState("");
+  const [empresa, setEmpresa] = useState("__all__");
+  const [mesAno, setMesAno] = useState("__all__");
+  const [page, setPage] = useState(0);
+  const LIMIT = 100;
 
-  const { data: registros = [], isLoading } = trpc.contaCorrente.listar.useQuery({
-    mesAno: filtroMes || undefined,
-    empresa: filtroEmpresa || undefined,
-  }, { refetchInterval: 10000, refetchOnWindowFocus: true });
+  // Importação
+  const [importModal, setImportModal] = useState(false);
+  const [importRows, setImportRows] = useState<any[]>([]);
+  const [importFileName, setImportFileName] = useState("");
+  const [importModo, setImportModo] = useState<"inserir" | "subscrever">("inserir");
+  const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
 
-  const { data: meses = [] } = trpc.contaCorrente.listarMeses.useQuery(undefined, { refetchInterval: 10000, refetchOnWindowFocus: true });
-  const { data: empresas = [] } = trpc.contaCorrente.listarEmpresas.useQuery(undefined, { refetchInterval: 10000, refetchOnWindowFocus: true });
+  // Edição
+  const [editModal, setEditModal] = useState(false);
+  const [editRow, setEditRow] = useState<any>(null);
 
-  // Cálculo automático ao digitar ChaveJ
-  const { data: formulasData } = trpc.contaCorrente.calcularFormulas.useQuery(
-    calcInput || { chaveJ: '' },
-    { enabled: !!(calcInput && calcInput.chaveJ.length >= 5), refetchInterval: 10000, refetchOnWindowFocus: true }
-  );
+  // Exclusão
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (!formulasData || 'erro' in formulasData) return;
-    setForm(prev => ({
-      ...prev,
-      empresa: formulasData.empresa || prev.empresa,
-      agente: formulasData.agente || prev.agente,
-      supervisor: formulasData.supervisor || prev.supervisor,
-      percComissao: formulasData.percComissao || prev.percComissao,
-      comissao: formulasData.comissao || prev.comissao,
-    }));
-  }, [formulasData]);
-
-  const criar = trpc.contaCorrente.criar.useMutation({
-    onSuccess: () => {
-      utils.contaCorrente.listar.invalidate();
-      utils.contaCorrente.listarMeses.invalidate();
-      utils.contaCorrente.listarEmpresas.invalidate();
-      toast.success('Registro criado!');
-      setModalAberto(false);
-    },
-    onError: (e) => toast.error('Erro: ' + e.message),
+  // Seleção de linhas para envio
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const toggleSelect = (id: number) => setSelectedIds(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
   });
-
-  const atualizar = trpc.contaCorrente.atualizar.useMutation({
-    onSuccess: () => {
-      utils.contaCorrente.listar.invalidate();
-      toast.success('Registro atualizado!');
-      setModalAberto(false);
-    },
-    onError: (e) => toast.error('Erro: ' + e.message),
-  });
-
-  const excluir = trpc.contaCorrente.excluir.useMutation({
-    onSuccess: () => {
-      utils.contaCorrente.listar.invalidate();
-      toast.success('Registro excluído!');
-      setConfirmandoExclusao(null);
-    },
-    onError: (e) => toast.error('Erro: ' + e.message),
-  });
-
-  const importar = trpc.contaCorrente.importar.useMutation({
-    onSuccess: (r) => {
-      utils.contaCorrente.listar.invalidate();
-      utils.contaCorrente.listarMeses.invalidate();
-      utils.contaCorrente.listarEmpresas.invalidate();
-      toast.success(`${r.count} registros importados!`);
-    },
-    onError: (e) => toast.error('Erro na importação: ' + e.message),
-  });
-
-  function setField(field: keyof FormData, value: string) {
-    setForm(prev => {
-      const updated = { ...prev, [field]: value };
-      if (['chaveJ', 'rbm'].includes(field)) {
-        const chaveJ = field === 'chaveJ' ? value : (prev.chaveJ || '');
-        if (chaveJ.length >= 5) {
-          setCalcInput({
-            chaveJ,
-            rbm: field === 'rbm' ? value : prev.rbm,
-          });
-        }
-      }
-      return updated;
-    });
-  }
-
-  function openNovo() {
-    setForm(EMPTY_FORM);
-    setCalcInput(null);
-    setEditandoId(null);
-    setModalAberto(true);
-  }
-
-  function openEditar(r: ContaCorrente) {
-    setForm({
-      empresa: r.empresa || undefined,
-      mesAno: r.mesAno || undefined,
-      chaveJ: r.chaveJ || undefined,
-      agente: r.agente || undefined,
-      agencia: r.agencia || undefined,
-      contaCorrente: r.contaCorrente || undefined,
-      tipoServ: r.tipoServ || undefined,
-      dataOperacao: r.dataOperacao instanceof Date
-        ? r.dataOperacao.toISOString().split('T')[0]
-        : (r.dataOperacao || undefined),
-      produto: r.produto || undefined,
-      modalidade: r.modalidade || undefined,
-      agRelacionamento: r.agRelacionamento || undefined,
-      rbm: r.rbm !== null && r.rbm !== undefined ? String(r.rbm) : undefined,
-      percComissao: r.percComissao !== null && r.percComissao !== undefined ? String(r.percComissao) : undefined,
-      comissao: r.comissao !== null && r.comissao !== undefined ? String(r.comissao) : undefined,
-      supervisor: r.supervisor || undefined,
-    });
-    setEditandoId(r.id);
-    setModalAberto(true);
-  }
-
-  function handleSalvar() {
-    const cleanForm = Object.fromEntries(
-      Object.entries(form).map(([k, v]) => [k, v === null ? undefined : v])
-    );
-    if (editandoId !== null) {
-      atualizar.mutate({ id: editandoId, ...cleanForm } as any);
-    } else {
-      criar.mutate(cleanForm as any);
-    }
-  }
-
-  // Mapeamento de colunas do Excel
-  const COL_MAP: Record<string, keyof FormData> = {
-    'empresa': 'empresa', 'mês ano': 'mesAno', 'mes ano': 'mesAno', 'mês_ano': 'mesAno',
-    'chave j': 'chaveJ', 'chavej': 'chaveJ', 'chave_j': 'chaveJ',
-    'agente': 'agente', 'agencia': 'agencia', 'agência': 'agencia',
-    'conta_corrente': 'contaCorrente', 'conta corrente': 'contaCorrente',
-    'tipo_serv': 'tipoServ', 'tipo serv': 'tipoServ', 'tiposerv': 'tipoServ',
-    'data': 'dataOperacao', 'dataoperacao': 'dataOperacao', 'data operacao': 'dataOperacao',
-    'produto': 'produto', 'modalidade': 'modalidade',
-    'ag_relacionamento': 'agRelacionamento', 'ag relacionamento': 'agRelacionamento',
-    'rbm': 'rbm', 'perc._comissão': 'percComissao', 'perc. comissão': 'percComissao',
-    'perc_comissao': 'percComissao', 'comissão': 'comissao', 'comissao': 'comissao',
-    'supervisor': 'supervisor',
+  const toggleSelectAll = () => {
+    if (selectedIds.size === rows.length && rows.length > 0) setSelectedIds(new Set());
+    else setSelectedIds(new Set(rows.map((r: any) => r.id)));
   };
 
-  function handleImportar(e: React.ChangeEvent<HTMLInputElement>) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const utils = trpc.useUtils();
+
+  const { data: filtros } = trpc.contaCorrenteProd.filtros.useQuery();
+  const { data, isLoading } = trpc.contaCorrenteProd.list.useQuery({
+    page,
+    limit: LIMIT,
+    search: search || undefined,
+    empresa: empresa !== "__all__" ? empresa : undefined,
+    mesAno: mesAno !== "__all__" ? mesAno : undefined,
+  });
+
+  const importarMutation = trpc.contaCorrenteProd.importar.useMutation({
+    onSuccess: () => {
+      utils.contaCorrenteProd.list.invalidate();
+      utils.contaCorrenteProd.filtros.invalidate();
+    },
+  });
+
+  const calcularMutation = trpc.contaCorrenteProd.calcular.useMutation({
+    onSuccess: (res) => {
+      utils.contaCorrenteProd.list.invalidate();
+      toast.success(`Cálculo concluído! ${res.calculados} com comissão, ${res.zerados} zerados.`);
+    },
+    onError: () => toast.error("Erro ao calcular comissões"),
+  });
+
+  const atualizarMutation = trpc.contaCorrenteProd.atualizar.useMutation({
+    onSuccess: () => {
+      utils.contaCorrenteProd.list.invalidate();
+      setEditModal(false);
+      toast.success("Registro atualizado!");
+    },
+    onError: (e) => toast.error("Erro: " + e.message),
+  });
+
+  const excluirMutation = trpc.contaCorrenteProd.excluir.useMutation({
+    onSuccess: () => {
+      utils.contaCorrenteProd.list.invalidate();
+      setDeleteId(null);
+      toast.success("Registro excluído!");
+    },
+    onError: (e) => toast.error("Erro: " + e.message),
+  });
+
+  const enviarCalculoMutation = trpc.contaCorrenteProd.enviarParaCalculo.useMutation({
+    onSuccess: (res) => {
+      setSelectedIds(new Set());
+      toast.success(`Enviado para Cálculo! ${res.inseridos} novo(s) inserido(s), ${res.atualizados} atualizado(s).`);
+    },
+    onError: (err) => toast.error(`Erro ao enviar: ${err.message}`),
+  });
+
+  // ── Parser Excel ──────────────────────────────────────────────
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setImportFileName(file.name);
     const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const wb = XLSX.read(evt.target?.result, { type: 'binary' });
-        const sheetName = wb.SheetNames.find(n =>
-          n.toLowerCase().includes('conta') && n.toLowerCase().includes('corrente')
-        ) || wb.SheetNames[0];
-        const ws = wb.Sheets[sheetName];
-        const data: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    reader.onload = (ev) => {
+      const wb = XLSX.read(ev.target?.result, { type: "array", cellDates: false });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const raw: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
 
-        // Encontrar linha de cabeçalho
-        let headerRow = -1;
-        for (let i = 0; i < Math.min(data.length, 10); i++) {
-          const row = data[i].map((c: any) => String(c).toLowerCase());
-          if (row.some(c => c.includes('empresa') || c.includes('chave') || c.includes('agente'))) {
-            headerRow = i;
-            break;
-          }
+      // Encontrar linha de cabeçalho (contém "Empresa" ou "Chave J" ou "ChaveJ")
+      let headerIdx = -1;
+      for (let i = 0; i < Math.min(raw.length, 15); i++) {
+        const rowStr = raw[i]?.map((c: any) => norm(String(c ?? ""))).join(" ") ?? "";
+        if (rowStr.includes("EMPRESA") || rowStr.includes("CHAVEJ") || rowStr.includes("CHAVE")) {
+          headerIdx = i;
+          break;
         }
-        if (headerRow === -1) { toast.error('Cabeçalho não encontrado'); return; }
-
-        const headers = data[headerRow].map((c: any) => String(c).toLowerCase().trim());
-        const rows: FormData[] = [];
-
-        for (let i = headerRow + 1; i < data.length; i++) {
-          const row = data[i];
-          if (!row.some((v: any) => v !== '')) continue;
-          const obj: FormData = {};
-          headers.forEach((h: string, idx: number) => {
-            const key = COL_MAP[h];
-            if (key && row[idx] !== '' && row[idx] !== null && row[idx] !== undefined) {
-              obj[key] = String(row[idx]);
-            }
-          });
-          if (obj.chaveJ || obj.agente || obj.mesAno) rows.push(obj);
-        }
-
-        if (rows.length === 0) { toast.error('Nenhum dado encontrado'); return; }
-        importar.mutate(rows as any);
-      } catch (err) {
-        toast.error('Erro ao ler arquivo: ' + String(err));
       }
+      if (headerIdx === -1) { toast.error("Cabeçalho não encontrado. Verifique se a planilha tem as colunas: Empresa, Mês Ano, Chave J, Agente, RBM, Comissão"); return; }
+
+      const headers = raw[headerIdx].map((h: any) => norm(String(h ?? "")));
+      const colIdx = (name: string) => headers.indexOf(norm(name));
+      const colFind = (terms: string[]) => {
+        for (const t of terms) {
+          const idx = headers.findIndex((h: string) => h.includes(norm(t)));
+          if (idx !== -1) return idx;
+        }
+        return -1;
+      };
+
+      // Mapeamento de colunas da planilha COntaCORRENTE.xlsx
+      // Linha 5: Empresa | Mês Ano | Agencia | Conta Corrente | Chave J | Agente | Tipo Serv | Data | Produto | Modalidade | Age Relaciomam | Rbm | Comissão | Supervisor
+      const iEmpresa        = colFind(["EMPRESA"]);
+      const iMesAno         = colFind(["MESANO", "MES ANO", "MESANO"]);
+      const iAgencia        = colFind(["AGENCIA"]);
+      const iContaCorrente  = colFind(["CONTACORRENTE", "CONTA CORRENTE", "CONTA"]);
+      const iChaveJ         = colFind(["CHAVEJ", "CHAVE J", "CHAVE"]);
+      const iAgente         = colFind(["AGENTE"]);
+      const iTipoServ       = colFind(["TIPOSERV", "TIPO SERV", "TIPO"]);
+      const iData           = colFind(["DATA"]);
+      const iProduto        = colFind(["PRODUTO"]);
+      const iModalidade     = colFind(["MODALIDADE"]);
+      const iAgRel          = colFind(["AGERELACIOMAM", "AGERELACIONAM", "RELACIONAM"]);
+      const iRbm            = colFind(["RBM"]);
+      const iComissao       = colFind(["COMISSAO", "COMISSÃO"]);
+      const iSupervisor     = colFind(["SUPERVISOR"]);
+
+      const rows: any[] = [];
+      for (let r = headerIdx + 1; r < raw.length; r++) {
+        const row = raw[r];
+        if (!row || !row.some((c: any) => c != null && c !== "")) continue;
+
+        // Precisa ter pelo menos ChaveJ ou Conta Corrente
+        const chaveJVal = iChaveJ !== -1 ? String(row[iChaveJ] ?? "").trim().toUpperCase() : "";
+        const contaVal = iContaCorrente !== -1 ? String(row[iContaCorrente] ?? "").trim() : "";
+        if (!chaveJVal && !contaVal) continue;
+
+        // Empresa: se 0 ou vazio, usar "Não informado"
+        let empresaVal = iEmpresa !== -1 ? String(row[iEmpresa] ?? "").trim().toUpperCase() : "";
+        if (!empresaVal || empresaVal === "0") empresaVal = "NÃO INFORMADO";
+
+        const mesAnoVal = toMesAno(iMesAno !== -1 ? row[iMesAno] : null);
+        const dataVal = toDate(iData !== -1 ? row[iData] : null);
+
+        rows.push({
+          empresa: empresaVal,
+          mesAno: mesAnoVal || undefined,
+          chaveJ: chaveJVal || undefined,
+          agente: iAgente !== -1 ? String(row[iAgente] ?? "").trim() || undefined : undefined,
+          agencia: iAgencia !== -1 ? String(row[iAgencia] ?? "").trim() || undefined : undefined,
+          contaCorrente: contaVal || undefined,
+          tipoServ: iTipoServ !== -1 ? String(row[iTipoServ] ?? "").trim() || undefined : undefined,
+          dataOperacao: dataVal || undefined,
+          produto: iProduto !== -1 ? String(row[iProduto] ?? "").trim() || undefined : undefined,
+          modalidade: iModalidade !== -1 ? String(row[iModalidade] ?? "").trim() || undefined : undefined,
+          agRelacionamento: iAgRel !== -1 ? String(row[iAgRel] ?? "").trim() || undefined : undefined,
+          rbm: iRbm !== -1 ? toNum(row[iRbm]) || undefined : undefined,
+          percComissao: undefined, // calculado pelo sistema
+          comissao: iComissao !== -1 ? toNum(row[iComissao]) || undefined : undefined,
+          supervisor: iSupervisor !== -1 ? String(row[iSupervisor] ?? "").trim() || undefined : undefined,
+        });
+      }
+      setImportRows(rows);
+      toast.success(`${rows.length} registros lidos do arquivo`);
     };
-    reader.readAsBinaryString(file);
-    e.target.value = '';
+    reader.readAsArrayBuffer(file);
+    e.target.value = "";
   }
 
-  // Filtro local por busca
-  const registrosFiltrados = useMemo(() => {
-    if (!filtroBusca) return registros;
-    const q = filtroBusca.toLowerCase();
-    return registros.filter(r =>
-      (r.agente || '').toLowerCase().includes(q) ||
-      (r.chaveJ || '').toLowerCase().includes(q) ||
-      (r.empresa || '').toLowerCase().includes(q) ||
-      (r.contaCorrente || '').toLowerCase().includes(q) ||
-      (r.produto || '').toLowerCase().includes(q)
-    );
-  }, [registros, filtroBusca]);
+  async function handleImport() {
+    if (importRows.length === 0) return;
+    setImporting(true);
+    setImportProgress(0);
+    const BATCH = 200;
+    let totalInseridos = 0;
+    let totalErros = 0;
 
-  // Totalizadores
-  const totalRbm = useMemo(() =>
-    registrosFiltrados.reduce((acc, r) => acc + (parseFloat(String(r.rbm || 0)) || 0), 0),
-    [registrosFiltrados]
-  );
-  const totalComissao = useMemo(() =>
-    registrosFiltrados.reduce((acc, r) => acc + (parseFloat(String(r.comissao || 0)) || 0), 0),
-    [registrosFiltrados]
-  );
+    for (let i = 0; i < importRows.length; i += BATCH) {
+      const chunk = importRows.slice(i, i + BATCH);
+      try {
+        const res = await importarMutation.mutateAsync({ rows: chunk, modo: importModo });
+        totalInseridos += res.inseridos;
+        totalErros += res.erros;
+      } catch {
+        totalErros += chunk.length;
+      }
+      setImportProgress(Math.round(((i + BATCH) / importRows.length) * 100));
+    }
+
+    setImporting(false);
+    setImportModal(false);
+    setImportRows([]);
+    setImportFileName("");
+    toast.success(`Importação concluída: ${totalInseridos} inseridos, ${totalErros} erros`);
+  }
+
+  const rows = data?.rows ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = Math.ceil(total / LIMIT);
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f0f4ff 0%, #e8eeff 50%, #f5f0ff 100%)' }}>
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b px-6 py-3 flex items-center gap-3">
+      <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
         <div>
-          <h1 className="text-lg font-bold text-gray-800">Conta Corrente</h1>
-          <p className="text-xs text-gray-500">Operações de conta corrente</p>
+          <h1 className="text-lg font-bold text-gray-800">Produção — Conta Corrente</h1>
+          <p className="text-xs text-gray-500">{total.toLocaleString("pt-BR")} registros</p>
         </div>
-        <div className="ml-auto flex gap-2">
-          <Button variant="outline" className="border-green-500 text-green-700 hover:bg-green-50 flex items-center gap-2" onClick={() => fileInputRef.current?.click()}>
-            <Upload className="w-4 h-4" /> Importar
+        <div className="ml-auto flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => calcularMutation.mutate({
+              mesAno: mesAno !== "__all__" ? mesAno : undefined,
+              empresa: empresa !== "__all__" ? empresa : undefined,
+            })}
+            disabled={calcularMutation.isPending}
+            className="gap-1 border-green-500 text-green-700 hover:bg-green-50"
+            title="Calcular comissão com base na Tabela de Comissão (convênio Conta Corrente)"
+          >
+            <Calculator className={`w-4 h-4 ${calcularMutation.isPending ? "animate-pulse" : ""}`} />
+            {calcularMutation.isPending ? "Calculando..." : "Calcular"}
           </Button>
-          <Button className="bg-blue-700 hover:bg-blue-800 flex items-center gap-2" onClick={openNovo}>
-            <Plus className="w-4 h-4" /> Novo
+          <Button size="sm" onClick={() => setImportModal(true)} className="gap-1">
+            <Upload className="w-4 h-4" /> Importar Excel
           </Button>
-          <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportar} />
-          <Button size="sm" onClick={() => setLocation('/')} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+          <Button
+            size="sm"
+            onClick={() => {
+              if (selectedIds.size === 0) {
+                toast.error("Selecione ao menos um registro antes de enviar para Cálculo");
+                return;
+              }
+              enviarCalculoMutation.mutate({ ids: Array.from(selectedIds) });
+            }}
+            disabled={enviarCalculoMutation.isPending}
+            className={`gap-1 text-white ${selectedIds.size > 0 ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-300 cursor-not-allowed"}`}
+            title={selectedIds.size > 0 ? `Enviar ${selectedIds.size} registro(s) para Cálculo` : "Selecione registros para enviar"}
+          >
+            <Send className={`w-4 h-4 ${enviarCalculoMutation.isPending ? "animate-pulse" : ""}`} />
+            {enviarCalculoMutation.isPending ? "Enviando..." : `Enviar para Cálculo${selectedIds.size > 0 ? ` (${selectedIds.size})` : ""}`}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => navigate("/")}
+            className="gap-1 bg-orange-500 text-white hover:bg-orange-600 border-orange-500"
+          >
             <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="px-6 py-3 flex gap-3 items-center bg-white/60 border-b flex-wrap">
-        <Select value={filtroMes} onValueChange={setFiltroMes}>
-          <SelectTrigger className="w-40 bg-white">
-            <SelectValue placeholder="Todos os meses" />
+      <div className="bg-white border-b px-4 py-2 flex items-center gap-3 flex-wrap">
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            className="pl-8 h-8 w-48 text-sm"
+            placeholder="Buscar ChaveJ, Agente..."
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(0); }}
+          />
+        </div>
+        <Select value={empresa} onValueChange={v => { setEmpresa(v); setPage(0); }}>
+          <SelectTrigger className="h-8 w-36 text-sm">
+            <SelectValue placeholder="Empresa" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos os meses</SelectItem>
-            {meses.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            <SelectItem value="__all__">Todas Empresas</SelectItem>
+            {filtros?.empresas.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={filtroEmpresa} onValueChange={setFiltroEmpresa}>
-          <SelectTrigger className="w-36 bg-white">
-            <SelectValue placeholder="Todas" />
+        <Select value={mesAno} onValueChange={v => { setMesAno(v); setPage(0); }}>
+          <SelectTrigger className="h-8 w-36 text-sm">
+            <SelectValue placeholder="Mês/Ano" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todas</SelectItem>
-            {empresas.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+            <SelectItem value="__all__">Todos os Meses</SelectItem>
+            {filtros?.mesanos.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
           </SelectContent>
         </Select>
-        <div className="flex-1 relative min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <Input className="pl-9 bg-white" placeholder="Buscar por agente, ChaveJ, conta..." value={filtroBusca} onChange={e => setFiltroBusca(e.target.value)} />
-        </div>
-        <span className="text-sm text-gray-500 whitespace-nowrap">{registrosFiltrados.length} registro(s)</span>
-        {/* Totalizadores */}
-        <div className="flex gap-4 ml-auto">
-          <div className="text-right">
-            <div className="text-xs text-gray-500">Total RBM</div>
-            <div className="font-bold text-blue-700">{moeda(totalRbm)}</div>
-          </div>
-          <div className="text-right">
-            <div className="text-xs text-gray-500">Total Comissão</div>
-            <div className="font-bold text-green-700">{moeda(totalComissao)}</div>
-          </div>
-        </div>
+        {selectedIds.size > 0 && (
+          <span className="text-xs text-blue-600 font-medium">
+            {selectedIds.size} selecionado(s)
+          </span>
+        )}
       </div>
 
       {/* Tabela */}
-      <div className="px-6 py-4 overflow-x-auto">
-        <table className="w-full text-sm border-collapse rounded-xl overflow-hidden shadow-lg min-w-[1200px]">
-          <thead>
-            <tr style={{ background: 'linear-gradient(90deg, #002776 0%, #1a6ed8 60%, #003399 100%)' }}>
-              {['Empresa','Mês/Ano','ChaveJ','Agente','Agência','Conta','Tipo Serv.','Data','Produto','Modalidade','Ag. Relacionamento','RBM','Perc. Comissão','Comissão','Supervisor','Ações'].map(h => (
-                <th key={h} className="px-3 py-3 text-left text-white font-semibold text-xs whitespace-nowrap">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading ? (
-              <tr><td colSpan={16} className="text-center py-8 text-gray-400">Carregando...</td></tr>
-            ) : registrosFiltrados.length === 0 ? (
-              <tr>
-                <td colSpan={16} className="text-center py-12 text-gray-400">
-                  <div className="text-4xl mb-2">📋</div>
-                  <div className="font-medium">Nenhum registro encontrado</div>
-                  <div className="text-sm">Importe uma planilha ou cadastre manualmente</div>
-                </td>
+      <div className="p-4 overflow-x-auto">
+        {isLoading ? (
+          <div className="text-center py-12 text-gray-500">Carregando...</div>
+        ) : rows.length === 0 ? (
+          <div className="text-center py-12 text-gray-400">
+            <p className="text-lg font-medium">Nenhum registro encontrado</p>
+            <p className="text-sm mt-1">Importe uma planilha Excel para começar</p>
+          </div>
+        ) : (
+          <table className="w-full text-xs border-collapse bg-white rounded-lg shadow-sm overflow-hidden">
+            <thead>
+              <tr className="bg-gradient-to-r from-blue-800 to-blue-900 text-white">
+                <th className="px-2 py-2 text-center w-8">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.size === rows.length && rows.length > 0}
+                    onChange={toggleSelectAll}
+                    className="cursor-pointer"
+                  />
+                </th>
+                <th className="px-2 py-2 text-left">Empresa</th>
+                <th className="px-2 py-2 text-left">Mês/Ano</th>
+                <th className="px-2 py-2 text-left">ChaveJ</th>
+                <th className="px-2 py-2 text-left">Agente</th>
+                <th className="px-2 py-2 text-left">Agência</th>
+                <th className="px-2 py-2 text-left">Conta</th>
+                <th className="px-2 py-2 text-left">Data</th>
+                <th className="px-2 py-2 text-right">RBM</th>
+                <th className="px-2 py-2 text-right">% Comissão</th>
+                <th className="px-2 py-2 text-right">Comissão</th>
+                <th className="px-2 py-2 text-left">Supervisor</th>
+                <th className="px-2 py-2 text-center">Ações</th>
               </tr>
-            ) : registrosFiltrados.map((r, idx) => (
-              <tr key={r.id}
-                className="border-b border-blue-100/50 hover:brightness-95 transition-all"
-                style={{
-                  background: idx % 2 === 0
-                    ? 'linear-gradient(90deg, #f0f4ff 0%, #f5f8ff 100%)'
-                    : 'linear-gradient(90deg, #e8eeff 0%, #eef0ff 100%)'
-                }}
-              >
-                <td className="px-3 py-2 font-medium text-blue-900 whitespace-nowrap">{r.empresa || '-'}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{r.mesAno || '-'}</td>
-                <td className="px-3 py-2 font-mono text-xs">{r.chaveJ || '-'}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{r.agente || '-'}</td>
-                <td className="px-3 py-2">{r.agencia || '-'}</td>
-                <td className="px-3 py-2 font-mono text-xs">{r.contaCorrente || '-'}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{r.tipoServ || '-'}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{strDate(r.dataOperacao)}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{r.produto || '-'}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{r.modalidade || '-'}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{r.agRelacionamento || '-'}</td>
-                <td className="px-3 py-2 text-right font-medium text-blue-700 whitespace-nowrap">{moeda(r.rbm)}</td>
-                <td className="px-3 py-2 text-right text-indigo-700 whitespace-nowrap">{pct(r.percComissao)}</td>
-                <td className="px-3 py-2 text-right font-bold text-green-700 whitespace-nowrap">{moeda(r.comissao)}</td>
-                <td className="px-3 py-2 whitespace-nowrap">{r.supervisor || '-'}</td>
-                <td className="px-3 py-2 whitespace-nowrap">
-                  <div className="flex gap-1">
-                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-100" onClick={() => openEditar(r)}>
-                      <Pencil className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:bg-red-100" onClick={() => setConfirmandoExclusao(r.id)}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((r: any, idx: number) => {
+                const isSelected = selectedIds.has(r.id);
+                return (
+                  <tr
+                    key={r.id}
+                    className={`border-b cursor-pointer transition-colors ${
+                      isSelected
+                        ? "bg-blue-50 border-blue-200"
+                        : idx % 2 === 0
+                        ? "bg-white hover:bg-gray-50"
+                        : "bg-gray-50 hover:bg-gray-100"
+                    }`}
+                    onClick={() => toggleSelect(r.id)}
+                  >
+                    <td className="px-2 py-1.5 text-center" onClick={e => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(r.id)}
+                        className="cursor-pointer"
+                      />
+                    </td>
+                    <td className="px-2 py-1.5 font-medium">{r.empresa || "-"}</td>
+                    <td className="px-2 py-1.5">{r.mesAno || "-"}</td>
+                    <td className="px-2 py-1.5 font-mono text-blue-700">{r.chaveJ || "-"}</td>
+                    <td className="px-2 py-1.5">{r.agente || "-"}</td>
+                    <td className="px-2 py-1.5">{r.agencia || "-"}</td>
+                    <td className="px-2 py-1.5">{r.contaCorrente || "-"}</td>
+                    <td className="px-2 py-1.5">
+                      {r.dataOperacao
+                        ? (r.dataOperacao instanceof Date
+                          ? r.dataOperacao.toLocaleDateString("pt-BR")
+                          : String(r.dataOperacao).split("T")[0])
+                        : "-"}
+                    </td>
+                    <td className="px-2 py-1.5 text-right font-mono">{fmtMoeda(r.rbm)}</td>
+                    <td className="px-2 py-1.5 text-right">
+                      {r.percComissao ? (
+                        <span className="bg-yellow-100 text-yellow-800 px-1 rounded text-xs font-medium">
+                          {fmtPct(r.percComissao)}
+                        </span>
+                      ) : "-"}
+                    </td>
+                    <td className="px-2 py-1.5 text-right font-mono font-semibold text-green-700">
+                      {r.comissao ? fmtMoeda(r.comissao) : "-"}
+                    </td>
+                    <td className="px-2 py-1.5">{r.supervisor || "-"}</td>
+                    <td className="px-2 py-1.5 text-center" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          onClick={() => { setEditRow({ ...r }); setEditModal(true); }}
+                          className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                          title="Editar"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => setDeleteId(r.id)}
+                          className="p-1 text-red-500 hover:bg-red-50 rounded"
+                          title="Excluir"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+
+        {/* Paginação */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-xs text-gray-500">
+              Página {page + 1} de {totalPages} — {total.toLocaleString("pt-BR")} registros
+            </span>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}>
+                Anterior
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}>
+                Próximo
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Modal de Edição/Criação */}
-      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      {/* Modal Importação */}
+      <Dialog open={importModal} onOpenChange={setImportModal}>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editandoId ? 'Editar Registro' : 'Novo Registro'} — Conta Corrente</DialogTitle>
+            <DialogTitle>Importar Planilha — Conta Corrente</DialogTitle>
           </DialogHeader>
-          <div className="text-xs text-blue-600 bg-blue-50 rounded p-2 mb-2">
-            💡 Campos em <span className="font-bold text-blue-700">azul</span> e <span className="font-bold text-green-700">verde</span> são preenchidos automaticamente ao informar o ChaveJ.
-          </div>
-          <div className="grid grid-cols-3 gap-3 py-2">
-            {/* Linha 1 */}
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Empresa (auto)</label>
-              <Input value={form.empresa || ''} readOnly className="bg-blue-50 text-blue-800 font-medium cursor-default" placeholder="auto: busca pelo ChaveJ" />
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setImportModo("inserir")}
+                className={`p-3 rounded border-2 text-left transition ${importModo === "inserir" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+              >
+                <div className="font-semibold text-sm">Apenas Inserir</div>
+                <div className="text-xs text-gray-500 mt-1">Adiciona somente registros novos.</div>
+              </button>
+              <button
+                onClick={() => setImportModo("subscrever")}
+                className={`p-3 rounded border-2 text-left transition ${importModo === "subscrever" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+              >
+                <div className="font-semibold text-sm">Subscrever</div>
+                <div className="text-xs text-gray-500 mt-1">Adiciona todos os registros (pode duplicar).</div>
+              </button>
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Mês/Ano (MM/AAAA)</label>
-              <Input value={form.mesAno || ''} onChange={e => setField('mesAno', e.target.value)} placeholder="05/2026" />
+              <p className="text-sm font-medium mb-2">Arquivo Excel (.xlsx)</p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleFileChange}
+                style={{ display: "block", width: "100%", padding: "10px", border: "2px dashed #d1d5db", borderRadius: 8, cursor: "pointer", fontSize: 13, background: "#f9fafb" }}
+              />
+              {importFileName && (
+                <p className="text-xs text-gray-500 mt-1">📄 {importFileName} — {importRows.length} registros lidos</p>
+              )}
             </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">ChaveJ *</label>
-              <Input value={form.chaveJ || ''} onChange={e => setField('chaveJ', e.target.value.toUpperCase())} placeholder="J1234567" className="font-mono" />
+            <div className="bg-blue-50 rounded-lg p-3 text-xs text-blue-700">
+              <p className="font-semibold mb-1">Colunas esperadas na planilha:</p>
+              <p>Empresa | Mês Ano | Agência | Conta Corrente | Chave J | Agente | Tipo Serv | Data | Produto | Modalidade | RBM | Comissão | Supervisor</p>
             </div>
-            {/* Linha 2 */}
-            <div className="col-span-2">
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Agente (auto)</label>
-              <Input value={form.agente || ''} readOnly className="bg-blue-50 text-blue-800 font-medium cursor-default" placeholder="auto: busca pelo ChaveJ" />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Agência</label>
-              <Input value={form.agencia || ''} onChange={e => setField('agencia', e.target.value)} placeholder="0001" />
-            </div>
-            {/* Linha 3 */}
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Conta Corrente</label>
-              <Input value={form.contaCorrente || ''} onChange={e => setField('contaCorrente', e.target.value)} placeholder="00000-0" className="font-mono" />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Tipo Serviço</label>
-              <Input value={form.tipoServ || ''} onChange={e => setField('tipoServ', e.target.value)} placeholder="CC / Poupança..." />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Data Operação</label>
-              <Input type="date" value={form.dataOperacao || ''} onChange={e => setField('dataOperacao', e.target.value)} />
-            </div>
-            {/* Linha 4 */}
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Produto</label>
-              <Input value={form.produto || ''} onChange={e => setField('produto', e.target.value)} placeholder="Conta Corrente..." />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Modalidade</label>
-              <Input value={form.modalidade || ''} onChange={e => setField('modalidade', e.target.value)} placeholder="PF / PJ..." />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Ag. Relacionamento</label>
-              <Input value={form.agRelacionamento || ''} onChange={e => setField('agRelacionamento', e.target.value)} placeholder="Nome do agente" />
-            </div>
-            {/* Linha 5 - Fórmulas */}
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">RBM</label>
-              <Input value={form.rbm || ''} onChange={e => setField('rbm', e.target.value)} placeholder="0,00" />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Perc. Comissão (auto)</label>
-              <Input value={form.percComissao || ''} readOnly className="bg-green-50 text-green-800 font-medium cursor-default" placeholder="auto: Tabela Comissão" />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Comissão (auto)</label>
-              <Input value={form.comissao || ''} readOnly className="bg-green-50 text-green-800 font-medium cursor-default" placeholder="auto: RBM × Perc.Comissão" />
-            </div>
-            {/* Linha 6 */}
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Supervisor (auto)</label>
-              <Input value={form.supervisor || ''} readOnly className="bg-blue-50 text-blue-800 font-medium cursor-default" placeholder="auto: busca pelo ChaveJ" />
-            </div>
+            {importing && (
+              <div>
+                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <span>Importando...</span><span>{importProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${importProgress}%` }} />
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
-            <Button onClick={handleSalvar} disabled={criar.isPending || atualizar.isPending}
-              style={{ background: 'linear-gradient(90deg, #002776, #1a6ed8)' }} className="text-white">
-              {criar.isPending || atualizar.isPending ? 'Salvando...' : 'Salvar'}
+            <Button variant="outline" onClick={() => setImportModal(false)} disabled={importing}>Cancelar</Button>
+            <Button onClick={handleImport} disabled={importRows.length === 0 || importing}>
+              {importing ? "Importando..." : `Importar ${importRows.length} registros`}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Modal de confirmação de exclusão */}
-      <Dialog open={confirmandoExclusao !== null} onOpenChange={() => setConfirmandoExclusao(null)}>
+      {/* Modal Edição */}
+      {editRow && (
+        <Dialog open={editModal} onOpenChange={setEditModal}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Editar Registro — {editRow.chaveJ || editRow.agente}</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              {[
+                { label: "Empresa", key: "empresa" },
+                { label: "Mês/Ano", key: "mesAno" },
+                { label: "ChaveJ", key: "chaveJ" },
+                { label: "Agente", key: "agente" },
+                { label: "Agência", key: "agencia" },
+                { label: "Conta Corrente", key: "contaCorrente" },
+                { label: "Tipo Serv", key: "tipoServ" },
+                { label: "Data (AAAA-MM-DD)", key: "dataOperacao" },
+                { label: "Produto", key: "produto" },
+                { label: "Modalidade", key: "modalidade" },
+                { label: "Ag. Relacionamento", key: "agRelacionamento" },
+                { label: "Supervisor", key: "supervisor" },
+              ].map(({ label, key }) => (
+                <div key={key}>
+                  <Label className="text-xs">{label}</Label>
+                  <Input
+                    value={key === "dataOperacao" && editRow[key] instanceof Date
+                      ? editRow[key].toISOString().split("T")[0]
+                      : (editRow[key] ?? "")}
+                    onChange={e => setEditRow((r: any) => ({ ...r, [key]: e.target.value }))}
+                  />
+                </div>
+              ))}
+              {[
+                { label: "RBM", key: "rbm" },
+                { label: "% Comissão", key: "percComissao" },
+                { label: "Comissão", key: "comissao" },
+              ].map(({ label, key }) => (
+                <div key={key}>
+                  <Label className="text-xs">{label}</Label>
+                  <Input
+                    type="number"
+                    step="0.000001"
+                    value={editRow[key] ?? ""}
+                    onChange={e => setEditRow((r: any) => ({ ...r, [key]: parseFloat(e.target.value) || null }))}
+                  />
+                </div>
+              ))}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditModal(false)}>Cancelar</Button>
+              <Button
+                onClick={() => atualizarMutation.mutate({
+                  id: editRow.id,
+                  empresa: editRow.empresa,
+                  mesAno: editRow.mesAno,
+                  chaveJ: editRow.chaveJ,
+                  agente: editRow.agente,
+                  agencia: editRow.agencia,
+                  contaCorrente: editRow.contaCorrente,
+                  tipoServ: editRow.tipoServ,
+                  dataOperacao: editRow.dataOperacao instanceof Date
+                    ? editRow.dataOperacao.toISOString().split("T")[0]
+                    : editRow.dataOperacao,
+                  produto: editRow.produto,
+                  modalidade: editRow.modalidade,
+                  agRelacionamento: editRow.agRelacionamento,
+                  rbm: editRow.rbm ? parseFloat(editRow.rbm) : null,
+                  percComissao: editRow.percComissao ? parseFloat(editRow.percComissao) : null,
+                  comissao: editRow.comissao ? parseFloat(editRow.comissao) : null,
+                  supervisor: editRow.supervisor,
+                })}
+                disabled={atualizarMutation.isPending}
+              >
+                Salvar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Modal Confirmação Exclusão */}
+      <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>Confirmar Exclusão</DialogTitle>
           </DialogHeader>
-          <p className="text-gray-600">Tem certeza que deseja excluir este registro?</p>
+          <p className="text-sm text-gray-600">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmandoExclusao(null)}>Cancelar</Button>
-            <Button variant="destructive" onClick={() => confirmandoExclusao && excluir.mutate({ id: confirmandoExclusao })}
-              disabled={excluir.isPending}>
-              {excluir.isPending ? 'Excluindo...' : 'Excluir'}
+            <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteId !== null && excluirMutation.mutate({ id: deleteId })}
+              disabled={excluirMutation.isPending}
+            >
+              Excluir
             </Button>
           </DialogFooter>
         </DialogContent>

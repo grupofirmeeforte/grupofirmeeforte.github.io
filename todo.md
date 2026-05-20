@@ -549,3 +549,10 @@
 - [x] Exibir tela de bloqueio com mensagem explicativa e botão "Tentar Novamente"
 - [x] Exibir instruções de como autorizar localização no Chrome, Edge e Firefox
 - [x] Testes unitários para lógica de verificação de coordenadas (12 casos)
+
+## CONTA CORRENTE (PRODUÇÃO) - NOVO MÓDULO
+- [x] Router dedicado contaCorrenteRouter com list, filtros, importar (batch 200), calcular, atualizar, excluir, enviarParaCalculo
+- [x] Página ContaCorrente.tsx reescrita com padrão idêntico ao Consórcio: importação Excel, checkboxes de seleção, calcular comissão, enviar para Cálculo
+- [x] Parser Excel detecta cabeçalho automaticamente (Empresa, Mês Ano, ChaveJ, Agente, RBM, Comissão etc.)
+- [x] Envio para Cálculo agrupa por ChaveJ+MesAno, faz upsert em calculos.comissaoCc e rbmContaCorrente
+- [x] Testes unitários (11 testes passando)

@@ -13,6 +13,7 @@ import { calculosRouter } from "./routers/calculos";
 import { despesasFixasRouter } from "./routers/despesasFixas";
 import { feriadosRouter } from "./routers/feriados";
 import { consorcioRouter } from "./routers/consorcio";
+import { contaCorrenteRouter } from "./routers/contaCorrente";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
 import { users, agentes, despesasFixas, pagamentos } from "../drizzle/schema";
@@ -343,6 +344,7 @@ export const appRouter = router({
   febraban: febrabanRouter,
   feriados: feriadosRouter,
   consorcio: consorcioRouter,
+  contaCorrenteProd: contaCorrenteRouter,
   pagamentos: pagamentosRouter,
   proRata: proRataRouter,
   calculosImportados: calculosRouter,
