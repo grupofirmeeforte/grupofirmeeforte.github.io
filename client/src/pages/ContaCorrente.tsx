@@ -50,17 +50,37 @@ function toDate(v: any): string {
   return s;
 }
 
+function excelSerialToDate(serial: number): Date {
+  // Base do Excel: 1899-12-30
+  return new Date(new Date(1899, 11, 30).getTime() + serial * 86400000);
+}
+
 function toMesAno(v: any): string {
   if (!v) return "";
   if (v instanceof Date && !isNaN(v.getTime())) {
     return `${String(v.getMonth() + 1).padStart(2, "0")}/${v.getFullYear()}`;
   }
   const s = String(v).trim();
-  if (/^\d{2}\/\d{4}$/.test(s)) return s;
+  // Já está no formato MM/AAAA
+  if (/^\d{1,2}\/\d{4}$/.test(s)) return s.replace(/^(\d)\//, "0$1/");
+  // Já está no formato MM/AA
+  if (/^\d{1,2}\/\d{2}$/.test(s)) {
+    const [mm, aa] = s.split("/");
+    return mm.padStart(2, "0") + "/20" + aa;
+  }
   const n = parseInt(s, 10);
   if (!isNaN(n) && n > 0) {
+    // Serial do Excel (tipicamente entre 40000 e 60000 para datas 2009-2064)
+    if (n >= 40000 && n <= 60000) {
+      const d = excelSerialToDate(n);
+      return `${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+    }
+    // Formato legado MMAA (ex: 526 = maio/2026)
     const str = String(n);
-    return str.slice(0, str.length - 2).padStart(2, "0") + "/20" + str.slice(-2);
+    if (str.length <= 4) {
+      const mm = str.slice(0, str.length - 2).padStart(2, "0");
+      return mm + "/20" + str.slice(-2);
+    }
   }
   return s;
 }
