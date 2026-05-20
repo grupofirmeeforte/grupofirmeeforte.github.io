@@ -564,3 +564,8 @@
 - [x] Cálculo automático por supervisor baseado no RBM dos agentes vinculados pelo campo Supervisor
 - [x] Modal de cadastro/edição de supervisor com % por produto
 - [x] Totalizador de comissão por produto e total geral
+## MELHORIAS MÓDULO CÁLCULO (SESSÃO ATUAL)
+- [x] Corrigir bug JSX "Unterminated JSX contents" no Calculo.tsx (supervisores.length em vez de calcSup.length)
+- [x] Auto-preenchimento do Nome ao digitar ChaveJ no modal de supervisor (usa trpc.agentes.getByChaveJ)
+- [x] Enviar para Pagto: filtro por mês antes de enviar (modal de confirmação com seletor de mês)
+- [x] Verificar e testar painel de Comissão Supervisor com dados reais

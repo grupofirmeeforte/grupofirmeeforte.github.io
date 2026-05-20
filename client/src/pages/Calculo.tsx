@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -178,6 +178,11 @@ export default function Calculo() {
   const soma = (key: string) =>
     (registros as any[]).reduce((acc, r) => acc + (parseFloat(String(r[key])) || 0), 0);
 
+  // Modal de confirmação de envio para Pagto
+  const [modalEnviarPagto, setModalEnviarPagto] = useState(false);
+  const [mesFiltroEnvio, setMesFiltroEnvio] = useState("");
+  const [selecionadosEnvio, setSelecionadosEnvio] = useState<Set<number>>(new Set());
+
   const enviarMutation = trpc.calculosImportados.enviarParaPagto.useMutation({
     onSuccess: (data) => {
       const msg = `✅ ${data.enviados} registro(s) enviado(s) para Pagamentos com sucesso!${
@@ -185,6 +190,8 @@ export default function Calculo() {
       }`;
       alert(msg);
       setSelecionados(new Set());
+      setSelecionadosEnvio(new Set());
+      setModalEnviarPagto(false);
     },
     onError: (err) => {
       alert(`Erro ao enviar: ${err.message}`);
@@ -196,8 +203,29 @@ export default function Calculo() {
       alert("Selecione ao menos uma linha para enviar para pagamento.");
       return;
     }
-    if (!confirm(`Deseja enviar ${selecionados.size} registro(s) para Financeiro → Pagamentos?`)) return;
-    enviarMutation.mutate({ ids: Array.from(selecionados) });
+    // Abre o modal de confirmação com os registros selecionados
+    setSelecionadosEnvio(new Set(selecionados));
+    setMesFiltroEnvio("");
+    setModalEnviarPagto(true);
+  };
+
+  // Registros filtrados no modal de envio
+  const registrosParaEnvio = (registros as any[]).filter(r => selecionadosEnvio.has(r.id));
+  const registrosFiltradosEnvio = mesFiltroEnvio
+    ? registrosParaEnvio.filter(r => String(r.mesRef) === mesFiltroEnvio)
+    : registrosParaEnvio;
+  const mesesEnvio = Array.from(new Set(registrosParaEnvio.map((r: any) => String(r.mesRef)).filter(Boolean))).sort((a, b) => b.localeCompare(a));
+
+  const confirmarEnvio = () => {
+    // Enviar apenas os que estão marcados E visíveis (filtro por mês aplicado)
+    const ids = registrosFiltradosEnvio
+      .filter((r: any) => selecionadosEnvio.has(r.id))
+      .map((r: any) => r.id);
+    if (ids.length === 0) {
+      alert("Nenhum registro selecionado para enviar.");
+      return;
+    }
+    enviarMutation.mutate({ ids });
   };
 
   const todosSelecionados = registros.length > 0 && selecionados.size === registros.length;
@@ -208,6 +236,17 @@ export default function Calculo() {
   const [showSupervisores, setShowSupervisores] = useState(false);
   const [modalSup, setModalSup] = useState<any | null>(null);
   const [formSup, setFormSup] = useState({ chaveJ: "", nome: "", pctConsig: "", pctConsorcio: "", pctCc: "", pctOurocap: "", pctSeguro: "", pctDental: "" });
+  // Auto-preenchimento do nome ao digitar ChaveJ no modal de supervisor
+  const [chaveJBuscaSup, setChaveJBuscaSup] = useState("");
+  const { data: agenteSup } = trpc.agentes.getByChaveJ.useQuery(
+    { chaveJ: chaveJBuscaSup },
+    { enabled: chaveJBuscaSup.length >= 3 }
+  );
+  useEffect(() => {
+    if (agenteSup && agenteSup.nomeAgente && modalSup?.novo) {
+      setFormSup(p => ({ ...p, nome: agenteSup.nomeAgente ?? p.nome }));
+    }
+  }, [agenteSup, modalSup?.novo]);
 
   const { data: supervisores = [], refetch: refetchSup } = trpc.supervisores.listar.useQuery();
   const { data: calcSup = [] } = trpc.supervisores.calcular.useQuery({ mesRef: mesRef || undefined });
@@ -219,6 +258,7 @@ export default function Calculo() {
   const abrirNovoSup = () => {
     setModalSup({ novo: true });
     setFormSup({ chaveJ: "", nome: "", pctConsig: "", pctConsorcio: "", pctCc: "", pctOurocap: "", pctSeguro: "", pctDental: "" });
+    setChaveJBuscaSup("");
   };
 
   const abrirEditarSup = (s: any) => {
@@ -468,7 +508,7 @@ export default function Calculo() {
                 <Plus className="w-3 h-3" /> Novo Supervisor
               </Button>
             </div>
-            {calcSup.length === 0 ? (
+            {supervisores.length === 0 ? (
               <p className="text-[11px] text-slate-500">Nenhum supervisor cadastrado. Clique em "Novo Supervisor" para adicionar.</p>
             ) : (
               <div className="overflow-x-auto">
@@ -747,6 +787,115 @@ export default function Calculo() {
     </Dialog>
     </div>
 
+    {/* Modal Confirmar Envio para Pagto */}
+    <Dialog open={modalEnviarPagto} onOpenChange={(open) => !open && setModalEnviarPagto(false)}>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Enviar para Pagamentos</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          {/* Filtro por mês */}
+          <div className="flex items-center gap-3">
+            <label className="text-xs font-medium text-slate-600 whitespace-nowrap">Filtrar por Mês:</label>
+            <select
+              value={mesFiltroEnvio}
+              onChange={e => setMesFiltroEnvio(e.target.value)}
+              className="border border-slate-300 rounded px-2 py-1 text-xs bg-white h-7"
+            >
+              <option value="">-- Todos os meses selecionados --</option>
+              {mesesEnvio.map(m => (
+                <option key={m} value={m}>{fmtMesRef(m)}</option>
+              ))}
+            </select>
+            <span className="text-xs text-slate-500">
+              {registrosFiltradosEnvio.length} registro(s) a enviar
+            </span>
+          </div>
+
+          {/* Tabela de registros a enviar */}
+          <div className="border border-slate-200 rounded overflow-hidden">
+            <table className="w-full text-[10px] border-collapse">
+              <thead>
+                <tr className="bg-blue-600 text-white">
+                  <th className="px-2 py-1 text-left">
+                    <input
+                      type="checkbox"
+                      checked={selecionadosEnvio.size > 0 && registrosFiltradosEnvio.every((r: any) => selecionadosEnvio.has(r.id))}
+                      onChange={e => {
+                        const novo = new Set(selecionadosEnvio);
+                        registrosFiltradosEnvio.forEach((r: any) => {
+                          if (e.target.checked) novo.add(r.id);
+                          else novo.delete(r.id);
+                        });
+                        setSelecionadosEnvio(novo);
+                      }}
+                      className="w-3 h-3 cursor-pointer accent-white"
+                    />
+                  </th>
+                  <th className="px-2 py-1 text-left">Mês Ref</th>
+                  <th className="px-2 py-1 text-left">Chave J</th>
+                  <th className="px-2 py-1 text-left">Nome Agente</th>
+                  <th className="px-2 py-1 text-left">Empresa</th>
+                  <th className="px-2 py-1 text-right">Comissão Total</th>
+                  <th className="px-2 py-1 text-left">Tipo Pagto</th>
+                </tr>
+              </thead>
+              <tbody>
+                {registrosFiltradosEnvio.length === 0 ? (
+                  <tr><td colSpan={7} className="px-2 py-4 text-center text-slate-400">Nenhum registro com os filtros atuais</td></tr>
+                ) : (
+                  registrosFiltradosEnvio.map((r: any, idx: number) => (
+                    <tr key={r.id} className={idx % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+                      <td className="px-2 py-1">
+                        <input
+                          type="checkbox"
+                          checked={selecionadosEnvio.has(r.id)}
+                          onChange={() => {
+                            const novo = new Set(selecionadosEnvio);
+                            if (novo.has(r.id)) novo.delete(r.id);
+                            else novo.add(r.id);
+                            setSelecionadosEnvio(novo);
+                          }}
+                          className="w-3 h-3 cursor-pointer accent-blue-600"
+                        />
+                      </td>
+                      <td className="px-2 py-1 font-mono">{fmtMesRef(r.mesRef)}</td>
+                      <td className="px-2 py-1 font-mono">{r.chaveJ ?? "-"}</td>
+                      <td className="px-2 py-1">{r.nomeAgente ?? "-"}</td>
+                      <td className="px-2 py-1">{r.empresa ?? "-"}</td>
+                      <td className="px-2 py-1 text-right">{fmtMoeda(r.comissaoTotal)}</td>
+                      <td className="px-2 py-1">{r.tipoPagamento ?? "Comissão"}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Resumo */}
+          <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded px-3 py-2">
+            <span className="text-xs text-blue-700">
+              <strong>{selecionadosEnvio.size > 0 ? registrosFiltradosEnvio.filter((r: any) => selecionadosEnvio.has(r.id)).length : 0}</strong> registro(s) serão enviados para Financeiro → Pagamentos
+            </span>
+            <span className="text-xs font-bold text-blue-800">
+              Total: {fmtMoeda(registrosFiltradosEnvio.filter((r: any) => selecionadosEnvio.has(r.id)).reduce((a: number, r: any) => a + (parseFloat(String(r.comissaoTotal)) || 0), 0))}
+            </span>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => setModalEnviarPagto(false)}>Cancelar</Button>
+          <Button
+            size="sm"
+            onClick={confirmarEnvio}
+            disabled={enviarMutation.isPending || selecionadosEnvio.size === 0}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            {enviarMutation.isPending ? "Enviando..." : `Enviar ${registrosFiltradosEnvio.filter((r: any) => selecionadosEnvio.has(r.id)).length} registro(s)`}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
     {/* Modal Novo/Editar Supervisor */}
     <Dialog open={!!modalSup} onOpenChange={(open) => !open && setModalSup(null)}>
       <DialogContent className="max-w-lg">
@@ -756,7 +905,16 @@ export default function Calculo() {
         <div className="grid grid-cols-2 gap-3 py-2">
           <div className="flex flex-col gap-1 col-span-2">
             <Label className="text-xs font-medium text-slate-600">Chave J</Label>
-            <Input value={formSup.chaveJ} onChange={e => setFormSup(p => ({...p, chaveJ: e.target.value}))} placeholder="Ex: J9660864" className="h-7 text-xs" />
+            <Input
+              value={formSup.chaveJ}
+              onChange={e => {
+                const v = e.target.value;
+                setFormSup(p => ({...p, chaveJ: v}));
+                if (modalSup?.novo) setChaveJBuscaSup(v.trim());
+              }}
+              placeholder="Ex: J9660864"
+              className="h-7 text-xs"
+            />
           </div>
           <div className="flex flex-col gap-1 col-span-2">
             <Label className="text-xs font-medium text-slate-600">Nome</Label>
