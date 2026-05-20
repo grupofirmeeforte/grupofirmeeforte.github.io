@@ -536,26 +536,62 @@ export default function Calculo() {
                 </Button>
               </div>
             </div>
+            {/* Lista de supervisores cadastrados — sempre visível com botões editar/excluir */}
             {supervisores.length === 0 ? (
               <p className="text-[11px] text-slate-500">Nenhum supervisor cadastrado. Clique em "Novo Supervisor" para adicionar.</p>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto mb-3">
+                <table className="w-full text-[10px] border-collapse">
+                  <thead>
+                    <tr className="bg-violet-500 text-white">
+                      <th className="px-2 py-1 text-left">Chave J</th>
+                      <th className="px-2 py-1 text-left">Nome</th>
+                      <th className="px-2 py-1 text-right">% Consig</th>
+                      <th className="px-2 py-1 text-right">% Consórcio</th>
+                      <th className="px-2 py-1 text-right">% C/C</th>
+                      <th className="px-2 py-1 text-right">% Ourocap</th>
+                      <th className="px-2 py-1 text-right">% Seguro</th>
+                      <th className="px-2 py-1 text-right">% Dental</th>
+                      <th className="px-2 py-1 text-center">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {supervisores.map((s: any) => (
+                      <tr key={s.id} className="border-b border-violet-100 hover:bg-violet-100">
+                        <td className="px-2 py-1 font-mono">{s.chaveJ}</td>
+                        <td className="px-2 py-1 font-medium">{s.nome}</td>
+                        <td className="px-2 py-1 text-right">{s.pctConsig > 0 ? s.pctConsig.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.pctConsorcio > 0 ? s.pctConsorcio.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.pctCc > 0 ? s.pctCc.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.pctOurocap > 0 ? s.pctOurocap.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.pctSeguro > 0 ? s.pctSeguro.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.pctDental > 0 ? s.pctDental.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1">
+                          <div className="flex gap-1 justify-center">
+                            <button onClick={() => abrirEditarSup(s)} title="Editar percentuais" className="text-blue-600 hover:text-blue-800 p-0.5 rounded hover:bg-blue-100"><Pencil className="w-3 h-3" /></button>
+                            <button onClick={() => { if(confirm(`Excluir ${s.nome}?`)) excluirSupMut.mutate({ id: s.id }); }} title="Excluir supervisor" className="text-red-500 hover:text-red-700 p-0.5 rounded hover:bg-red-100"><X className="w-3 h-3" /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Tabela de resultados do cálculo — aparece após clicar em Calcular */}
+            {calcSup.length > 0 && (
+              <div className="overflow-x-auto border-t border-violet-200 pt-2">
+                <p className="text-[10px] font-semibold text-violet-700 mb-1">Resultado do Cálculo:</p>
                 <table className="w-full text-[10px] border-collapse">
                   <thead>
                     <tr className="bg-violet-700 text-white">
                       <th className="px-2 py-1 text-left">Chave J</th>
                       <th className="px-2 py-1 text-left">Nome</th>
-                      <th className="px-2 py-1 text-right">% Consig</th>
                       <th className="px-2 py-1 text-right">Comis. Consig</th>
-                      <th className="px-2 py-1 text-right">% Consórcio</th>
                       <th className="px-2 py-1 text-right">Comis. Consórcio</th>
-                      <th className="px-2 py-1 text-right">% C/C</th>
                       <th className="px-2 py-1 text-right">Comis. C/C</th>
-                      <th className="px-2 py-1 text-right">% Ourocap</th>
-                      <th className="px-2 py-1 text-right">% Seguro</th>
-                      <th className="px-2 py-1 text-right">% Dental</th>
                       <th className="px-2 py-1 text-right font-bold">Total</th>
-                      <th className="px-2 py-1"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -563,36 +599,20 @@ export default function Calculo() {
                       <tr key={s.id} className="border-b border-violet-100 hover:bg-violet-100">
                         <td className="px-2 py-1 font-mono">{s.chaveJ}</td>
                         <td className="px-2 py-1">{s.nome}</td>
-                        <td className="px-2 py-1 text-right">{s.pctConsig > 0 ? s.pctConsig.toFixed(2).replace(".",",") + "%" : "-"}</td>
                         <td className="px-2 py-1 text-right">{s.comissaoConsig > 0 ? fmtMoeda(s.comissaoConsig) : "-"}</td>
-                        <td className="px-2 py-1 text-right">{s.pctConsorcio > 0 ? s.pctConsorcio.toFixed(2).replace(".",",") + "%" : "-"}</td>
                         <td className="px-2 py-1 text-right">{s.comissaoConsorcio > 0 ? fmtMoeda(s.comissaoConsorcio) : "-"}</td>
-                        <td className="px-2 py-1 text-right">{s.pctCc > 0 ? s.pctCc.toFixed(2).replace(".",",") + "%" : "-"}</td>
                         <td className="px-2 py-1 text-right">{s.comissaoCc > 0 ? fmtMoeda(s.comissaoCc) : "-"}</td>
-                        <td className="px-2 py-1 text-right">{s.pctOurocap > 0 ? s.pctOurocap.toFixed(2).replace(".",",") + "%" : "-"}</td>
-                        <td className="px-2 py-1 text-right">{s.pctSeguro > 0 ? s.pctSeguro.toFixed(2).replace(".",",") + "%" : "-"}</td>
-                        <td className="px-2 py-1 text-right">{s.pctDental > 0 ? s.pctDental.toFixed(2).replace(".",",") + "%" : "-"}</td>
                         <td className="px-2 py-1 text-right font-bold text-violet-800">{fmtMoeda(s.total)}</td>
-                        <td className="px-2 py-1">
-                          <div className="flex gap-1">
-                            <button onClick={() => abrirEditarSup(s)} className="text-blue-600 hover:text-blue-800"><Pencil className="w-3 h-3" /></button>
-                            <button onClick={() => { if(confirm(`Excluir ${s.nome}?`)) excluirSupMut.mutate({ id: s.id }); }} className="text-red-500 hover:text-red-700"><X className="w-3 h-3" /></button>
-                          </div>
-                        </td>
                       </tr>
                     ))}
                   </tbody>
                   <tfoot>
                     <tr className="bg-violet-200 font-bold">
-                      <td colSpan={3} className="px-2 py-1 text-violet-800">TOTAL GERAL</td>
+                      <td colSpan={2} className="px-2 py-1 text-violet-800">TOTAL GERAL</td>
                       <td className="px-2 py-1 text-right">{fmtMoeda(calcSup.reduce((a:number,s:any)=>a+s.comissaoConsig,0))}</td>
-                      <td></td>
                       <td className="px-2 py-1 text-right">{fmtMoeda(calcSup.reduce((a:number,s:any)=>a+s.comissaoConsorcio,0))}</td>
-                      <td></td>
                       <td className="px-2 py-1 text-right">{fmtMoeda(calcSup.reduce((a:number,s:any)=>a+s.comissaoCc,0))}</td>
-                      <td colSpan={3}></td>
                       <td className="px-2 py-1 text-right text-violet-900">{fmtMoeda(calcSup.reduce((a:number,s:any)=>a+s.total,0))}</td>
-                      <td></td>
                     </tr>
                   </tfoot>
                 </table>
