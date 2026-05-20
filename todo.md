@@ -569,3 +569,10 @@
 - [x] Auto-preenchimento do Nome ao digitar ChaveJ no modal de supervisor (usa trpc.agentes.getByChaveJ)
 - [x] Enviar para Pagto: filtro por mês antes de enviar (modal de confirmação com seletor de mês)
 - [x] Verificar e testar painel de Comissão Supervisor com dados reais
+
+## RECALCULAR COMISSÃO TOTAL E EDIÇÃO INLINE CRÉD/DÉB
+- [x] Edição inline de Créditos/Débitos na tabela do Cálculo (clique na célula para editar, Enter/blur para salvar)
+- [x] Procedure recalcularComissaoTotal no router de calculos (fórmula: consig + consorcio + ourocap + cc + seguros + ajudaCusto + créd/déb - adiantamento; reajuste NÃO entra)
+- [x] Adiantamento buscado automaticamente na tabela pagamentos (tipoPagto = 'Adto') ao recalcular
+- [x] Botão 'Recalcular Totais' (âmbar) na barra de ações do Cálculo, ao lado de 'Enviar Para Pagto'
+- [x] Confirmação antes de recalcular exibe a fórmula utilizada

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Download, Send, Trash2, Pencil, Settings, Plus, X } from "lucide-react";
+import { ArrowLeft, Download, Send, Trash2, Pencil, Settings, Plus, X, RefreshCw } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -194,6 +194,23 @@ export default function Calculo() {
       alert(`Erro ao enviar: ${err.message}`);
     },
   });
+  const recalcularMutation = trpc.calculosImportados.recalcularComissaoTotal.useMutation({
+    onSuccess: (data) => {
+      alert(`✅ ${data.atualizados} registro(s) recalculado(s) com sucesso!`);
+      utils.calculosImportados.listar.invalidate();
+    },
+    onError: (err) => {
+      alert(`Erro ao recalcular: ${err.message}`);
+    },
+  });
+  const handleRecalcularTotais = () => {
+    if (!mesRef) {
+      alert("Selecione um mês para recalcular.");
+      return;
+    }
+    if (!confirm(`Recalcular Comissão Total de todos os registros de ${mesRef}?\n\nFórmula: Consig + Consórcio + Ourocap + C/C + Seguros + Ajuda de Custo + Créd/Déb - Adiantamento`)) return;
+    recalcularMutation.mutate({ mesRef });
+  };
 
   const handleEnviarParaPagto = () => {
     if (selecionados.size === 0) {
@@ -377,6 +394,10 @@ export default function Calculo() {
   const [editandoDtPagto, setEditandoDtPagto] = useState<number | null>(null);
   const [valorDtPagto, setValorDtPagto] = useState("");
   const dtPagtoInputRef = useRef<HTMLInputElement>(null);
+  // Edição inline de Créditos/Débitos
+  const [editandoCreditoDebito, setEditandoCreditoDebito] = useState<number | null>(null);
+  const [valorCreditoDebito, setValorCreditoDebito] = useState("");
+  const creditoDebitoInputRef = useRef<HTMLInputElement>(null);
   const utils = trpc.useUtils();
   const editarMutation = trpc.calculosImportados.editar.useMutation();
   const deletarMutation = trpc.calculosImportados.deletar.useMutation({
@@ -390,6 +411,20 @@ export default function Calculo() {
     setEditandoDtPagto(r.id);
     setValorDtPagto(r.dtPagto ?? "");
     setTimeout(() => dtPagtoInputRef.current?.focus(), 50);
+  };
+  const iniciarEdicaoCreditoDebito = (r: any) => {
+    setEditandoCreditoDebito(r.id);
+    const val = r.creditosDebitos ? parseFloat(String(r.creditosDebitos)) : 0;
+    setValorCreditoDebito(val !== 0 ? String(val) : "");
+    setTimeout(() => creditoDebitoInputRef.current?.focus(), 50);
+  };
+  const salvarCreditoDebito = (id: number) => {
+    const num = parseFloat(valorCreditoDebito.replace(",", ".")) || 0;
+    editarMutation.mutate(
+      { id, creditosDebitos: num },
+      { onSuccess: () => { utils.calculosImportados.listar.invalidate(); } }
+    );
+    setEditandoCreditoDebito(null);
   };
 
   const salvarDtPagto = (id: number) => {
@@ -427,6 +462,14 @@ export default function Calculo() {
         <div className="ml-auto flex gap-1.5">
           <Button onClick={handleExportar} size="sm" className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1 h-7 px-2 text-xs">
             <Download className="w-3 h-3" /> Excel
+          </Button>
+          <Button
+            onClick={handleRecalcularTotais}
+            disabled={recalcularMutation.isPending}
+            size="sm"
+            className="bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-1 h-7 px-2 text-xs disabled:opacity-60"
+          >
+            <RefreshCw className="w-3 h-3" /> Recalcular Totais
           </Button>
           <Button
             onClick={handleEnviarParaPagto}
@@ -710,6 +753,33 @@ export default function Calculo() {
                             title={selecionados.size > 1 && selecionados.has(r.id) ? `Clique para editar e aplicar em ${selecionados.size} linhas selecionadas` : "Clique para editar"}
                           >
                             {r.dtPagto || <span className="text-slate-300 italic">DD/MM/AAAA</span>}
+                          </span>
+                        )
+                      ) : col.key === "creditosDebitos" ? (
+                        editandoCreditoDebito === r.id ? (
+                          <input
+                            ref={creditoDebitoInputRef}
+                            type="number"
+                            step="0.01"
+                            value={valorCreditoDebito}
+                            onChange={(e) => setValorCreditoDebito(e.target.value)}
+                            onBlur={() => salvarCreditoDebito(r.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") salvarCreditoDebito(r.id);
+                              if (e.key === "Escape") setEditandoCreditoDebito(null);
+                            }}
+                            placeholder="0.00"
+                            className="w-24 border border-pink-400 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-pink-500 bg-white text-right"
+                          />
+                        ) : (
+                          <span
+                            onClick={() => iniciarEdicaoCreditoDebito(r)}
+                            className="cursor-pointer hover:bg-pink-100 rounded px-1 py-0.5 min-w-[5rem] inline-block text-right border border-transparent hover:border-pink-300"
+                            title="Clique para editar Créditos/Débitos"
+                          >
+                            {r.creditosDebitos && parseFloat(String(r.creditosDebitos)) !== 0
+                              ? fmtMoeda(r.creditosDebitos)
+                              : <span className="text-slate-300 italic">0,00</span>}
                           </span>
                         )
                       ) : (

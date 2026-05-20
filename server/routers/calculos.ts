@@ -282,4 +282,50 @@ export const calculosRouter = router({
       const duplicados = resultados.filter((r) => r.status === "duplicado").length;
       return { enviados, duplicados, resultados };
     }),
+  // Recalcular comissaoTotal pela nova formula (a partir de 05/2026)
+  // Formula: consig + consorcio + ourocap + cc + seguros + ajudaCusto + creditosDebitos - adiantamento
+  // Adiantamento e buscado na tabela pagamentos (tipoPagto = 'Adto')
+  // Campo reajuste NAO entra no calculo
+  recalcularComissaoTotal: publicProcedure
+    .input(z.object({
+      mesRef: z.string(), // formato MM/AAAA
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponivel' });
+
+      // Buscar todos os registros do mes
+      const regs = await db.select().from(calculos).where(eq(calculos.mesRef, input.mesRef));
+
+      let atualizados = 0;
+      for (const reg of regs) {
+        const chaveJ = reg.chaveJ;
+        if (!chaveJ) continue;
+
+        // Buscar adiantamento na tabela pagamentos
+        const adtoRows = await db.execute(
+          sql`SELECT COALESCE(SUM(valor), 0) as total FROM pagamentos WHERE tipoPagto = 'Adto' AND chaveJ = ${chaveJ} AND mesAno = ${input.mesRef}`
+        ) as any;
+        const adtoArr = Array.isArray(adtoRows) ? adtoRows[0] : adtoRows;
+        const adtoList = Array.isArray(adtoArr) ? adtoArr : [adtoArr];
+        const adiantamento = parseFloat(String(adtoList[0]?.total ?? 0)) || 0;
+
+        const toN = (v: any) => parseFloat(String(v ?? 0)) || 0;
+        const novaComissaoTotal =
+          toN(reg.comissaoConsig) +
+          toN(reg.comissaoConsorcio) +
+          toN(reg.comissaoOurocap) +
+          toN(reg.comissaoCc) +
+          toN(reg.comissaoSeguros) +
+          toN(reg.ajudaCusto) +
+          toN(reg.creditosDebitos) -
+          adiantamento;
+
+        await db.update(calculos)
+          .set({ comissaoTotal: String(novaComissaoTotal), adiantamento: String(adiantamento) })
+          .where(eq(calculos.id, reg.id));
+        atualizados++;
+      }
+      return { atualizados };
+    }),
 });
