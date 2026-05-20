@@ -249,11 +249,28 @@ export const contaCorrenteRouter = router({
 
       const registros = await db.select().from(contasCorrentes).where(where);
 
-      // Buscar tabela de comissão (convênio Conta Corrente)
-      const tabelas = await db.select().from(tabelasComissao)
-        .where(like(tabelasComissao.convenio, '%Conta%'));
+      // Buscar configuração de comissão (Padrão/Especial)
+      const cfgRows = await db.execute(sql`SELECT chave, valor FROM cc_config`) as any;
+      const cfgData = Array.isArray(cfgRows) ? cfgRows[0] : cfgRows;
+      const cfg: Record<string, string> = {};
+      if (Array.isArray(cfgData)) {
+        cfgData.forEach((row: any) => { if (row.chave) cfg[row.chave] = row.valor ?? ''; });
+      }
 
-      // Buscar todos os agentes para mapear nível
+      // Valor fixo em R$ para Padrão e Especial
+      const valPadrao = cfg.pctPadrao ? parseFloat(cfg.pctPadrao.replace(',', '.')) : 0;
+      const valEspecial = cfg.pctEspecial ? parseFloat(cfg.pctEspecial.replace(',', '.')) : 0;
+      // Lista de ChaveJs especiais (normalizada para uppercase)
+      const agentesEspeciais = new Set(
+        (cfg.agentesEspeciais ?? '')
+          .split('\n')
+          .map((s: string) => s.trim().toUpperCase())
+          .filter(Boolean)
+      );
+
+      const usarConfig = valPadrao > 0 || valEspecial > 0;
+
+      // Buscar todos os agentes para mapear nome e supervisor
       const todosAgentes = await db.select({
         chaveJ: agentes.chaveJ,
         situacao: agentes.situacao,
@@ -265,37 +282,42 @@ export const contaCorrenteRouter = router({
       const agentesMap = new Map<string, typeof todosAgentes[0]>();
       todosAgentes.forEach(a => { if (a.chaveJ) agentesMap.set(a.chaveJ.toUpperCase(), a); });
 
+      // Buscar tabela de comissão (convênio Conta Corrente) — usado apenas se config não definida
+      const tabelas = usarConfig ? [] : await db.select().from(tabelasComissao)
+        .where(like(tabelasComissao.convenio, '%Conta%'));
+
       let calculados = 0;
       let zerados = 0;
 
       for (const r of registros) {
         const chaveJUp = (r.chaveJ ?? '').toUpperCase();
         const agente = agentesMap.get(chaveJUp);
-        const rbmVal = r.rbm != null ? parseFloat(String(r.rbm)) : 0;
 
-        // Determinar nível do agente (Ativo01..Ativo10)
-        const situacao = agente?.situacao || '';
-        const nivelMatch = situacao.match(/Ativo(\d{2})/i);
-        const nivelNum = nivelMatch ? parseInt(nivelMatch[1]) : null;
-        const ativoCol = nivelNum ? `ativo${String(nivelNum).padStart(2, '0')}` : null;
+        let comissaoVal = 0;
 
-        let percComissao = 0;
-        if (ativoCol && tabelas.length > 0) {
-          const pctStr = (tabelas[0] as any)[ativoCol];
-          percComissao = parsePct(pctStr);
-          // Se > 1, é percentual direto (ex: 68 = 68%), converter para decimal
-          if (percComissao > 1) percComissao = percComissao / 100;
+        if (usarConfig) {
+          // Usar valor fixo em R$: especial se ChaveJ está na lista, senão padrão
+          const isEspecial = agentesEspeciais.has(chaveJUp);
+          comissaoVal = isEspecial && valEspecial > 0 ? valEspecial : valPadrao;
+        } else {
+          // Fallback: usar tabela de comissão por nível do agente
+          const rbmVal = r.rbm != null ? parseFloat(String(r.rbm)) : 0;
+          const situacao = agente?.situacao || '';
+          const nivelMatch = situacao.match(/Ativo(\d{2})/i);
+          const nivelNum = nivelMatch ? parseInt(nivelMatch[1]) : null;
+          const ativoCol = nivelNum ? `ativo${String(nivelNum).padStart(2, '0')}` : null;
+          let percComissao = 0;
+          if (ativoCol && tabelas.length > 0) {
+            const pctStr = (tabelas[0] as any)[ativoCol];
+            percComissao = parsePct(pctStr);
+            if (percComissao > 1) percComissao = percComissao / 100;
+          }
+          comissaoVal = rbmVal > 0 && percComissao > 0 ? +(rbmVal * percComissao).toFixed(2) : 0;
         }
-
-        const comissaoVal = rbmVal > 0 && percComissao > 0
-          ? +(rbmVal * percComissao).toFixed(2)
-          : 0;
 
         await db.update(contasCorrentes)
           .set({
-            percComissao: percComissao > 0 ? String(percComissao) : null,
             comissao: comissaoVal > 0 ? String(comissaoVal) : null,
-            // Atualizar nome do agente e supervisor do cadastro
             agente: agente?.nomeAgente || r.agente || null,
             supervisor: agente?.supervisor || r.supervisor || null,
           })
