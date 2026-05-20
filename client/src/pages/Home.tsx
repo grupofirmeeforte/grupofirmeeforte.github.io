@@ -85,24 +85,8 @@ export default function Home() {
     );
   }
 
-  // Grupos em ordem alfabética
+  // Grupos na ordem definida pelo usuário
   const grupos: GroupModule[] = [
-    {
-      type: 'group',
-      key: 'auditoria',
-      title: 'Auditoria',
-      description: 'Logs de acesso e feriados nacionais e estaduais',
-      icon: ClipboardList,
-      color: 'bg-slate-700',
-      borderColor: 'border-slate-200',
-      bgColor: 'from-slate-50 to-gray-50',
-      subModules: [
-        { title: 'Crédito x Despesas', description: 'Comparação entre créditos e despesas', icon: BarChart2, color: 'bg-slate-700', path: '/auditoria?aba=credito-despesas', subKey: 'credito-despesas' },
-        { title: 'Feriados', description: 'Feriados nacionais e estaduais BA', icon: ClipboardList, color: 'bg-slate-500', path: '/auditoria?aba=feriados', subKey: 'feriados' },
-        { title: 'Logs de Acesso', description: 'Histórico de acessos ao sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria?aba=logs', subKey: 'logs' },
-      ],
-    },
-
     {
       type: 'group',
       key: 'cadastros',
@@ -121,57 +105,6 @@ export default function Home() {
 
     {
       type: 'group',
-      key: 'crm',
-      title: 'CRM',
-      description: 'Gestão de relacionamento com clientes',
-      icon: UserRound,
-      color: 'bg-sky-600',
-      borderColor: 'border-sky-200',
-      bgColor: 'from-sky-50 to-cyan-50',
-      subModules: [
-        { title: 'Clientes', description: 'Cadastro e gestão de clientes', icon: Users, color: 'bg-sky-600', path: '/crm?aba=clientes', subKey: 'clientes' },
-        { title: 'Oportunidades', description: 'Pipeline de negócios', icon: TrendingUp, color: 'bg-blue-600', path: '/crm?aba=oportunidades', subKey: 'oportunidades' },
-        { title: 'Atendimentos', description: 'Histórico de contatos', icon: Phone, color: 'bg-indigo-600', path: '/crm?aba=atendimentos', subKey: 'atendimentos' },
-        { title: 'Tarefas / Follow-up', description: 'Lembretes e tarefas', icon: CheckSquare, color: 'bg-violet-600', path: '/crm?aba=tarefas', subKey: 'tarefas' },
-        { title: 'Relatórios CRM', description: 'Funil e produtividade', icon: BarChart2, color: 'bg-teal-600', path: '/crm?aba=relatorios', subKey: 'relatorios' },
-      ],
-    },
-    {
-      type: 'group',
-      key: 'extratos',
-      title: 'Extratos',
-      description: 'Extratos bancários e financeiros',
-      icon: FileText,
-      color: 'bg-emerald-600',
-      borderColor: 'border-emerald-200',
-      bgColor: 'from-emerald-50 to-green-50',
-      subModules: [
-        { title: 'Extrato Consignado', description: 'Extrato de operações consignadas', icon: FileText, color: 'bg-blue-600', path: '/extratos?aba=consignado', subKey: 'consignado' },
-        { title: 'Extrato C/C', description: 'Extrato de conta corrente', icon: FileText, color: 'bg-green-600', path: '/extratos?aba=cc', subKey: 'cc' },
-        { title: 'Extrato Consórcio', description: 'Extrato de consórcio', icon: FileText, color: 'bg-purple-600', path: '/extratos?aba=consorcio', subKey: 'consorcio' },
-        { title: 'Extrato Ourocap', description: 'Extrato de Ourocap', icon: FileText, color: 'bg-yellow-600', path: '/extratos?aba=ourocap', subKey: 'ourocap' },
-        { title: 'Extrato Seguros', description: 'Extrato de seguros', icon: FileText, color: 'bg-red-600', path: '/extratos?aba=seguros', subKey: 'seguros' },
-        { title: 'Extrato BB Dental', description: 'Extrato BB Dental', icon: FileText, color: 'bg-teal-600', path: '/extratos?aba=bbdental', subKey: 'bbdental' },
-        { title: 'Perspectiva de Ganho', description: 'Perspectiva de comissão do mês atual', icon: TrendingUp, color: 'bg-indigo-600', path: '/extratos?aba=perspectiva', subKey: 'perspectiva' },
-        { title: 'Minha Tabela', description: 'Tabela personalizada de comissões', icon: TableProperties, color: 'bg-orange-500', path: '/extratos?aba=minha-tabela', subKey: 'minha-tabela' },
-      ],
-    },
-    {
-      type: 'group',
-      key: 'febraban',
-      title: 'Febraban',
-      description: 'Relatório de Produção BB — importação e gestão de propostas',
-      icon: ShieldCheck,
-      color: 'bg-violet-600',
-      borderColor: 'border-violet-200',
-      bgColor: 'from-violet-50 to-purple-50',
-      subModules: [
-        { title: 'Produção BB', description: 'Relatório de produção Febraban', icon: ShieldCheck, color: 'bg-violet-500', path: '/febraban', subKey: 'producao-bb' },
-        { title: 'Acompanhamento Diário', description: 'Produção diária por agente (BMF e FLEX)', icon: ShieldCheck, color: 'bg-violet-700', path: '/febraban/acompanhamento-diario', subKey: 'acompanhamento-diario' },
-      ],
-    },
-    {
-      type: 'group',
       key: 'financeiro',
       title: 'Financeiro',
       description: 'Comissões, Pagamentos e Relatórios',
@@ -181,24 +114,9 @@ export default function Home() {
       bgColor: 'from-red-50 to-orange-50',
       subModules: [
         { title: 'Cálculo', description: 'Cálculo de comissões e RBM em moeda', icon: DollarSign, color: 'bg-amber-500', path: '/calculo', subKey: 'calculo' },
-        { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos', subKey: 'pagamentos' },
         { title: 'Despesas Fixas', description: 'Controle de despesas fixas', icon: Building2, color: 'bg-purple-500', path: '/fornecedores', subKey: 'despesas' },
+        { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos', subKey: 'pagamentos' },
         { title: 'Pró Rata', description: 'Operações com controle de parcelas pagas e a receber', icon: DollarSign, color: 'bg-indigo-600', path: '/pro-rata', subKey: 'pro-rata', ceoOnly: true },
-      ],
-    },
-    {
-      type: 'group',
-      key: 'mailing',
-      title: 'Mensagem do Dia',
-      description: 'Versículos e Salmos do dia',
-      icon: Mail,
-      color: 'bg-rose-600',
-      borderColor: 'border-rose-200',
-      bgColor: 'from-rose-50 to-pink-50',
-      subModules: [
-        { title: 'Minutos de Sabedoria', description: 'Reflexões diárias de sabedoria', icon: Sparkles, color: 'bg-purple-600', path: '/mensagem-do-dia/minutos-sabedoria', subKey: 'minutos-sabedoria' },
-        { title: 'Salmos', description: 'Salmos do dia', icon: BookOpen, color: 'bg-amber-600', path: '/mensagem-do-dia/salmos', subKey: 'salmos' },
-        { title: 'Versículos', description: 'Versículos motivacionais do dia', icon: BookMarked, color: 'bg-rose-600', path: '/mensagem-do-dia/versiculos', subKey: 'versiculos' },
       ],
     },
 
@@ -220,6 +138,77 @@ export default function Home() {
         { title: 'Seguros', description: 'Seguros e apólices', icon: ShieldPlus, color: 'bg-indigo-600', path: '/producao/seguros', subKey: 'seguros-prod' },
       ],
     },
+
+    {
+      type: 'group',
+      key: 'febraban',
+      title: 'Febraban',
+      description: 'Relatório de Produção BB — importação e gestão de propostas',
+      icon: ShieldCheck,
+      color: 'bg-violet-600',
+      borderColor: 'border-violet-200',
+      bgColor: 'from-violet-50 to-purple-50',
+      subModules: [
+        { title: 'Produção BB', description: 'Relatório de produção Febraban', icon: ShieldCheck, color: 'bg-violet-500', path: '/febraban', subKey: 'producao-bb' },
+        { title: 'Acompanhamento Diário', description: 'Produção diária por agente (BMF e FLEX)', icon: ShieldCheck, color: 'bg-violet-700', path: '/febraban/acompanhamento-diario', subKey: 'acompanhamento-diario' },
+      ],
+    },
+
+    {
+      type: 'group',
+      key: 'extratos',
+      title: 'Extratos',
+      description: 'Extratos bancários e financeiros',
+      icon: FileText,
+      color: 'bg-emerald-600',
+      borderColor: 'border-emerald-200',
+      bgColor: 'from-emerald-50 to-green-50',
+      subModules: [
+        { title: 'Extrato Consignado', description: 'Extrato de operações consignadas', icon: FileText, color: 'bg-blue-600', path: '/extratos?aba=consignado', subKey: 'consignado' },
+        { title: 'Extrato C/C', description: 'Extrato de conta corrente', icon: FileText, color: 'bg-green-600', path: '/extratos?aba=cc', subKey: 'cc' },
+        { title: 'Extrato Consórcio', description: 'Extrato de consórcio', icon: FileText, color: 'bg-purple-600', path: '/extratos?aba=consorcio', subKey: 'consorcio' },
+        { title: 'Extrato Ourocap', description: 'Extrato de Ourocap', icon: FileText, color: 'bg-yellow-600', path: '/extratos?aba=ourocap', subKey: 'ourocap' },
+        { title: 'Extrato Seguros', description: 'Extrato de seguros', icon: FileText, color: 'bg-red-600', path: '/extratos?aba=seguros', subKey: 'seguros' },
+        { title: 'Extrato BB Dental', description: 'Extrato BB Dental', icon: FileText, color: 'bg-teal-600', path: '/extratos?aba=bbdental', subKey: 'bbdental' },
+        { title: 'Perspectiva de Ganho', description: 'Perspectiva de comissão do mês atual', icon: TrendingUp, color: 'bg-indigo-600', path: '/extratos?aba=perspectiva', subKey: 'perspectiva' },
+        { title: 'Minha Tabela', description: 'Tabela personalizada de comissões', icon: TableProperties, color: 'bg-orange-500', path: '/extratos?aba=minha-tabela', subKey: 'minha-tabela' },
+      ],
+    },
+
+    {
+      type: 'group',
+      key: 'mailing',
+      title: 'Mensagem do Dia',
+      description: 'Versículos e Salmos do dia',
+      icon: Mail,
+      color: 'bg-rose-600',
+      borderColor: 'border-rose-200',
+      bgColor: 'from-rose-50 to-pink-50',
+      subModules: [
+        { title: 'Minutos de Sabedoria', description: 'Reflexões diárias de sabedoria', icon: Sparkles, color: 'bg-purple-600', path: '/mensagem-do-dia/minutos-sabedoria', subKey: 'minutos-sabedoria' },
+        { title: 'Salmos', description: 'Salmos do dia', icon: BookOpen, color: 'bg-amber-600', path: '/mensagem-do-dia/salmos', subKey: 'salmos' },
+        { title: 'Versículos', description: 'Versículos motivacionais do dia', icon: BookMarked, color: 'bg-rose-600', path: '/mensagem-do-dia/versiculos', subKey: 'versiculos' },
+      ],
+    },
+
+    {
+      type: 'group',
+      key: 'crm',
+      title: 'CRM',
+      description: 'Gestão de relacionamento com clientes',
+      icon: UserRound,
+      color: 'bg-sky-600',
+      borderColor: 'border-sky-200',
+      bgColor: 'from-sky-50 to-cyan-50',
+      subModules: [
+        { title: 'Clientes', description: 'Cadastro e gestão de clientes', icon: Users, color: 'bg-sky-600', path: '/crm?aba=clientes', subKey: 'clientes' },
+        { title: 'Oportunidades', description: 'Pipeline de negócios', icon: TrendingUp, color: 'bg-blue-600', path: '/crm?aba=oportunidades', subKey: 'oportunidades' },
+        { title: 'Atendimentos', description: 'Histórico de contatos', icon: Phone, color: 'bg-indigo-600', path: '/crm?aba=atendimentos', subKey: 'atendimentos' },
+        { title: 'Tarefas / Follow-up', description: 'Lembretes e tarefas', icon: CheckSquare, color: 'bg-violet-600', path: '/crm?aba=tarefas', subKey: 'tarefas' },
+        { title: 'Relatórios CRM', description: 'Funil e produtividade', icon: BarChart2, color: 'bg-teal-600', path: '/crm?aba=relatorios', subKey: 'relatorios' },
+      ],
+    },
+
     {
       type: 'group',
       key: 'relatorios',
