@@ -541,3 +541,11 @@
 - [x] Admin sempre tem acesso total ao Acompanhamento Diário
 - [x] Demais usuários bloqueados por padrão (acesso liberado individualmente depois)
 - [x] Usar campo permissoesModulos.febraban.acompanhamento-diario para controle granular (já disponível no cadastro de agentes)
+
+## GEOLOCALIZAÇÃO
+- [x] Implementar verificação de geolocalização obrigatória antes de qualquer acesso ao sistema
+- [x] Bloquear acesso se usuário estiver fora do Brasil (bounding box geográfico)
+- [x] Bloquear acesso se usuário negar permissão de GPS no navegador
+- [x] Exibir tela de bloqueio com mensagem explicativa e botão "Tentar Novamente"
+- [x] Exibir instruções de como autorizar localização no Chrome, Edge e Firefox
+- [x] Testes unitários para lógica de verificação de coordenadas (12 casos)

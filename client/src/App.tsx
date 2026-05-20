@@ -34,6 +34,8 @@ import { LGPDModal } from "./components/LGPDModal";
 import { useState, useEffect } from "react";
 import { useAuth } from "./hooks/useAuth";
 import { trpc } from "./lib/trpc";
+import { useGeolocalizacao } from "./hooks/useGeolocalizacao";
+import BloqueioGeolocalizacao from "./components/BloqueioGeolocalizacao";
 // import { useCheckPasswordChange } from "./hooks/useCheckPasswordChange";
 
 function RouterWithInactivity() {
@@ -118,6 +120,22 @@ function LGPDGate() {
 //   to keep consistent foreground/background color across components
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
+function GeoGate() {
+  const geo = useGeolocalizacao();
+
+  if (geo.status !== 'autorizado') {
+    return (
+      <BloqueioGeolocalizacao
+        status={geo.status}
+        mensagem={geo.mensagem}
+        tentarNovamente={geo.tentarNovamente}
+      />
+    );
+  }
+
+  return <LGPDGate />;
+}
+
 function App() {
   return (
     <ErrorBoundary>
@@ -127,7 +145,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
-          <LGPDGate />
+          <GeoGate />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
