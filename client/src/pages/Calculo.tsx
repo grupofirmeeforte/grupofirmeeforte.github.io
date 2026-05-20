@@ -96,7 +96,7 @@ export default function Calculo() {
       const cab = [
         "TipoPagamento", "Empresa", "Situação", "Mês Ref", "Chave J", "Nome Agente", "Cidade",
         "Percentual", "Comissão Total", "RBM Total", "Comissão Consig", "Comissão Consórcio",
-        "ComissãoOurocap", "Comissão C/C", "Seguros", "Ajuda de Custo", "Créditos/Débitos",
+        "ComissãoOurocap", "Comissão C/C", "Comissão Seguro", "Ajuda de Custo", "Créditos/Débitos",
         "Adiantamento", "Reajuste", "RbmcreditoC2", "RBMContaCorrente", "RbmConsorcioC2",
         "RBMOurocap", "RBM Seguros", "Qtde Contas", "Vr. Liquido", "SRCC", "VrLiquido-Srcc", "Dt Pagto",
       ];
@@ -149,7 +149,7 @@ export default function Calculo() {
     { label: "Comissão Consórcio", key: "comissaoConsorcio",tipo: "moeda" },
     { label: "ComissãoOurocap",    key: "comissaoOurocap",  tipo: "moeda" },
     { label: "Comissão C/C",       key: "comissaoCc",       tipo: "moeda" },
-    { label: "Seguros",            key: "comissaoSeguros",  tipo: "moeda" },
+    { label: "Comissão Seguro",    key: "comissaoSeguros",  tipo: "moeda" },
     { label: "Ajuda de Custo",     key: "ajudaCusto",       tipo: "moeda" },
     { label: "Créditos/Débitos",   key: "creditosDebitos",  tipo: "moeda" },
     { label: "Adiantamento",       key: "adiantamento",     tipo: "moeda" },
@@ -566,7 +566,7 @@ export default function Calculo() {
             { label: "Comissão Consórcio", key: "comissaoConsorcio" },
             { label: "Comissão Ourocap", key: "comissaoOurocap" },
             { label: "Comissão C/C", key: "comissaoCc" },
-            { label: "Seguros", key: "comissaoSeguros" },
+            { label: "Comissão Seguro", key: "comissaoSeguros" },
             { label: "Ajuda de Custo", key: "ajudaCusto" },
             { label: "Créditos/Débitos", key: "creditosDebitos" },
             { label: "Adiantamento", key: "adiantamento" },
