@@ -72,7 +72,7 @@ export const supervisoresRouter = router({
   // Calcula comissão do supervisor por mês baseado no RBM dos agentes vinculados pelo campo supervisor
   calcular: protectedProcedure
     .input(z.object({ mesRef: z.string().optional() }))
-    .query(async ({ input }) => {
+    .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) return [];
       const mesRef = input.mesRef ?? "";

@@ -249,7 +249,21 @@ export default function Calculo() {
   }, [agenteSup, modalSup?.novo]);
 
   const { data: supervisores = [], refetch: refetchSup } = trpc.supervisores.listar.useQuery();
-  const { data: calcSup = [] } = trpc.supervisores.calcular.useQuery({ mesRef: mesRef || undefined });
+  const [calcSup, setCalcSup] = useState<any[]>([]); // preenchido pelo botão Calcular
+  const [calculando, setCalculando] = useState(false);
+
+  const calcularSupMut = trpc.supervisores.calcular.useMutation({
+    onSuccess: (data) => {
+      setCalcSup(data);
+      setCalculando(false);
+    },
+    onError: () => setCalculando(false),
+  });
+
+  const handleCalcularSup = () => {
+    setCalculando(true);
+    calcularSupMut.mutate({ mesRef: mesRef || undefined });
+  };
 
   const criarSupMut = trpc.supervisores.criar.useMutation({ onSuccess: () => { refetchSup(); setModalSup(null); } });
   const editarSupMut = trpc.supervisores.editar.useMutation({ onSuccess: () => { refetchSup(); setModalSup(null); } });
@@ -504,9 +518,23 @@ export default function Calculo() {
           <div className="mt-3 border border-violet-200 rounded-lg bg-violet-50 p-3">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-violet-800">Comissão Supervisor {mesRef ? `— ${fmtMesRef(mesRef)}` : "— Todos os meses"}</span>
-              <Button size="sm" onClick={abrirNovoSup} className="h-6 px-2 text-[10px] bg-violet-600 hover:bg-violet-700 text-white flex items-center gap-1">
-                <Plus className="w-3 h-3" /> Novo Supervisor
-              </Button>
+              <div className="flex gap-1.5">
+                <Button
+                  size="sm"
+                  onClick={handleCalcularSup}
+                  disabled={calculando}
+                  className="h-6 px-2 text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1 disabled:opacity-60"
+                >
+                  {calculando ? (
+                    <>⏳ Calculando...</>
+                  ) : (
+                    <>📊 Calcular</>
+                  )}
+                </Button>
+                <Button size="sm" onClick={abrirNovoSup} className="h-6 px-2 text-[10px] bg-violet-600 hover:bg-violet-700 text-white flex items-center gap-1">
+                  <Plus className="w-3 h-3" /> Novo Supervisor
+                </Button>
+              </div>
             </div>
             {supervisores.length === 0 ? (
               <p className="text-[11px] text-slate-500">Nenhum supervisor cadastrado. Clique em "Novo Supervisor" para adicionar.</p>
