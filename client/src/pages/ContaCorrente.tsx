@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Upload, Edit2, Trash2, Search, Calculator, Send } from "lucide-react";
+import { ArrowLeft, Upload, Edit2, Trash2, Search, Calculator, Send, Settings } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
@@ -129,6 +129,12 @@ export default function ContaCorrente() {
     else setSelectedIds(new Set(rows.map((r: any) => r.id)));
   };
 
+  // Configuração de Comissão
+  const [showConfig, setShowConfig] = useState(false);
+  const [cfgPadrao, setCfgPadrao] = useState("");
+  const [cfgEspecial, setCfgEspecial] = useState("");
+  const [cfgAgentesEspeciais, setCfgAgentesEspeciais] = useState("");
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const utils = trpc.useUtils();
 
@@ -139,6 +145,24 @@ export default function ContaCorrente() {
     search: search || undefined,
     empresa: empresa !== "__all__" ? empresa : undefined,
     mesAno: mesAno !== "__all__" ? mesAno : undefined,
+  });
+
+  const { data: configData } = trpc.contaCorrenteProd.getConfig.useQuery();
+  useEffect(() => {
+    if (configData) {
+      setCfgPadrao((configData as any).pctPadrao ?? "");
+      setCfgEspecial((configData as any).pctEspecial ?? "");
+      setCfgAgentesEspeciais((configData as any).agentesEspeciais ?? "");
+    }
+  }, [configData]);
+
+  const saveConfigMutation = trpc.contaCorrenteProd.saveConfig.useMutation({
+    onSuccess: () => {
+      utils.contaCorrenteProd.getConfig.invalidate();
+      toast.success("Configuração salva!");
+      setShowConfig(false);
+    },
+    onError: (e: any) => toast.error("Erro ao salvar: " + e.message),
   });
 
   const importarMutation = trpc.contaCorrenteProd.importar.useMutation({
@@ -349,6 +373,15 @@ export default function ContaCorrente() {
           <Button
             size="sm"
             variant="outline"
+            onClick={() => setShowConfig(v => !v)}
+            className={`gap-1 border-gray-400 ${showConfig ? "bg-gray-100" : ""}`}
+            title="Configuração de Comissão"
+          >
+            <Settings className="w-4 h-4" /> Configuração
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
             onClick={() => navigate("/")}
             className="gap-1 bg-orange-500 text-white hover:bg-orange-600 border-orange-500"
           >
@@ -393,8 +426,79 @@ export default function ContaCorrente() {
         )}
       </div>
 
+      {/* Layout com painel lateral de configuração */}
+      <div className="flex gap-0">
+
+      {/* Painel de Configuração de Comissão */}
+      {showConfig && (
+        <div className="w-72 min-w-[18rem] bg-white border-r shadow-sm flex-shrink-0 p-4 space-y-4">
+          <h3 className="text-sm font-bold text-gray-700">Configuração de Comissão</h3>
+
+          {/* Comissão Padrão */}
+          <div className="border border-green-200 rounded-lg p-3 bg-green-50">
+            <h4 className="text-xs font-semibold text-green-800 mb-2">Comissão Padrão</h4>
+            <div className="space-y-2">
+              <div>
+                <label className="text-xs text-gray-600">Padrão (R$)</label>
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="text-xs text-gray-500 font-medium">R$</span>
+                  <Input
+                    className="h-7 text-sm w-full"
+                    placeholder="0,00"
+                    value={cfgPadrao}
+                    onChange={e => setCfgPadrao(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Comissão Especial */}
+          <div className="border border-blue-200 rounded-lg p-3 bg-blue-50">
+            <h4 className="text-xs font-semibold text-blue-800 mb-2">Comissão Especial</h4>
+            <div className="space-y-2">
+              <div>
+                <label className="text-xs text-gray-600">Especial (R$)</label>
+                <div className="flex items-center gap-1 mt-1">
+                  <span className="text-xs text-gray-500 font-medium">R$</span>
+                  <Input
+                    className="h-7 text-sm w-full"
+                    placeholder="0,00"
+                    value={cfgEspecial}
+                    onChange={e => setCfgEspecial(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-gray-600">Agentes com comissão especial</label>
+                <textarea
+                  className="mt-1 w-full border rounded p-1.5 text-xs font-mono resize-none h-24 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  placeholder="Um ChaveJ por linha\nEx: J12345\nJ67890"
+                  value={cfgAgentesEspeciais}
+                  onChange={e => setCfgAgentesEspeciais(e.target.value)}
+                />
+                <p className="text-xs text-gray-400 mt-1">Digite um ChaveJ por linha para cálculo.</p>
+              </div>
+            </div>
+          </div>
+
+          <Button
+            size="sm"
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            onClick={() => saveConfigMutation.mutate({
+              pctPadrao: cfgPadrao,
+              pctEspecial: cfgEspecial,
+              agentesEspeciais: cfgAgentesEspeciais,
+            })}
+            disabled={saveConfigMutation.isPending}
+          >
+            {saveConfigMutation.isPending ? "Salvando..." : "Salvar Configuração"}
+          </Button>
+        </div>
+      )}
+
       {/* Tabela */}
-      <div className="p-4 overflow-x-auto">
+      <div className="p-4 overflow-x-auto flex-1">
         {isLoading ? (
           <div className="text-center py-12 text-gray-500">Carregando...</div>
         ) : rows.length === 0 ? (
@@ -510,6 +614,7 @@ export default function ContaCorrente() {
           </div>
         )}
       </div>
+      </div>{/* fim flex layout */}
 
       {/* Modal Importação */}
       <Dialog open={importModal} onOpenChange={setImportModal}>
