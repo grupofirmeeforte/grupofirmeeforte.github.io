@@ -448,7 +448,12 @@ export const contaCorrenteRouter = router({
 
       // 3. Upsert na tabela calculos por ChaveJ + mesRef
       for (const entry of Array.from(agrupado.values())) {
-        const existente = await db.select({ id: calculos.id })
+        const existente = await db.select({
+          id: calculos.id,
+          comissaoCc: calculos.comissaoCc,
+          rbmContaCorrente: calculos.rbmContaCorrente,
+          qtdeContas: calculos.qtdeContas,
+        })
           .from(calculos)
           .where(and(
             eq(calculos.chaveJ, entry.chaveJ),
@@ -456,15 +461,17 @@ export const contaCorrenteRouter = router({
           ))
           .limit(1);
 
-        const comissaoStr = entry.comissaoCc.toFixed(2);
-        const rbmStr = entry.rbmContaCorrente.toFixed(2);
-
         if (existente.length > 0) {
-          // Atualiza apenas as colunas de Conta Corrente
+          // Soma ao valor já existente (não sobrescreve)
+          const ccAtual = parseFloat(String(existente[0].comissaoCc ?? '0')) || 0;
+          const rbmAtual = parseFloat(String(existente[0].rbmContaCorrente ?? '0')) || 0;
+          const qtdAtual = existente[0].qtdeContas ?? 0;
+
           await db.update(calculos)
             .set({
-              comissaoCc: comissaoStr,
-              rbmContaCorrente: rbmStr,
+              comissaoCc: (ccAtual + entry.comissaoCc).toFixed(2),
+              rbmContaCorrente: (rbmAtual + entry.rbmContaCorrente).toFixed(2),
+              qtdeContas: qtdAtual + entry.qtd,
             })
             .where(eq(calculos.id, existente[0].id));
           atualizados++;
@@ -476,8 +483,9 @@ export const contaCorrenteRouter = router({
             empresa: entry.empresa,
             chaveJ: entry.chaveJ,
             nomeAgente: entry.nomeAgente,
-            comissaoCc: comissaoStr,
-            rbmContaCorrente: rbmStr,
+            comissaoCc: entry.comissaoCc.toFixed(2),
+            rbmContaCorrente: entry.rbmContaCorrente.toFixed(2),
+            qtdeContas: entry.qtd,
           });
           inseridos++;
         }
