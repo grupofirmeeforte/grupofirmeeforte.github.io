@@ -606,8 +606,11 @@ export const appRouter = router({
         if (input?.empresa) conditions.push(eq(consignados.empresa, input.empresa));
         if (input?.chaveJ) conditions.push(like(consignados.chaveJ, `%${input.chaveJ}%`));
         if (input?.convenio) conditions.push(eq(consignados.convenio, input.convenio));
-        const { desc } = await import('drizzle-orm');
-        return await db.select().from(consignados).where(and(...conditions)).orderBy(consignados.mes, consignados.empresa, consignados.chaveJ);
+        const { desc, asc, sql: sqlOrd } = await import('drizzle-orm');
+        // Ordenar por mês DESC (maior = mais recente) convertendo MMAA para AAAAMM
+        // ex: "126" (jan/2026) → LPAD(SUBSTRING(mes,1,LENGTH(mes)-2),2,'0') + '20' + RIGHT(mes,2)
+        const mesOrdem = sqlOrd`CAST(CONCAT('20', RIGHT(mes, 2), LPAD(FLOOR(CAST(mes AS UNSIGNED) / 100), 2, '0')) AS UNSIGNED)`;
+        return await db.select().from(consignados).where(and(...conditions)).orderBy(desc(mesOrdem), asc(consignados.empresa), asc(consignados.chaveJ));
       }),
 
     criar: publicProcedure
@@ -683,9 +686,11 @@ export const appRouter = router({
         if (input?.mes) conditions.push(eq(consignados.mes, input.mes));
         if (input?.chaveJ) conditions.push(like(consignados.chaveJ, `%${input.chaveJ}%`));
         if (input?.nomeAgente) conditions.push(like(consignados.nomeAgente, `%${input.nomeAgente}%`));
+        const { desc: descOrd2, asc: ascOrd2, sql: sqlOrd2 } = await import('drizzle-orm');
+        const mesOrdem2 = sqlOrd2`CAST(CONCAT('20', RIGHT(mes, 2), LPAD(FLOOR(CAST(mes AS UNSIGNED) / 100), 2, '0')) AS UNSIGNED)`;
         return conditions.length > 0
-          ? await db.select().from(consignados).where(and(...conditions)).orderBy(consignados.mes, consignados.empresa, consignados.chaveJ)
-          : await db.select().from(consignados).orderBy(consignados.mes, consignados.empresa, consignados.chaveJ);
+          ? await db.select().from(consignados).where(and(...conditions)).orderBy(descOrd2(mesOrdem2), ascOrd2(consignados.empresa), ascOrd2(consignados.chaveJ))
+          : await db.select().from(consignados).orderBy(descOrd2(mesOrdem2), ascOrd2(consignados.empresa), ascOrd2(consignados.chaveJ));
       }),
 
     // Procedure para calcular fórmulas automáticas dado chaveJ e convenio
@@ -782,7 +787,9 @@ export const appRouter = router({
       const db = await getDb();
       if (!db) return [];
       const { consignados } = await import('../drizzle/schema');
-      const rows = await db.selectDistinct({ mes: consignados.mes }).from(consignados).orderBy(consignados.mes);
+      const { desc: dMes, sql: sqlMes } = await import('drizzle-orm');
+      const mesOrd = sqlMes`CAST(CONCAT('20', RIGHT(mes, 2), LPAD(FLOOR(CAST(mes AS UNSIGNED) / 100), 2, '0')) AS UNSIGNED)`;
+      const rows = await db.selectDistinct({ mes: consignados.mes }).from(consignados).orderBy(dMes(mesOrd));
       return rows.map(r => r.mes).filter(Boolean) as string[];
     }),
 

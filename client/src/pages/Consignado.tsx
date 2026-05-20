@@ -98,6 +98,18 @@ function strVal(val: string | Date | null | undefined) {
   return val;
 }
 
+function mesNumParaStr(mes: string | null | undefined): string {
+  if (!mes) return '-';
+  const s = String(mes).trim();
+  if (/^\d{1,2}\/\d{4}$/.test(s)) return s;
+  const n = parseInt(s, 10);
+  if (isNaN(n) || n <= 0) return s;
+  const aa = n % 100;
+  const mm = Math.floor(n / 100);
+  if (mm < 1 || mm > 12) return s;
+  return `${String(mm).padStart(2, '0')}/20${String(aa).padStart(2, '0')}`;
+}
+
 export default function Consignado() {
   const [, setLocation] = useLocation();
   const [filtroMes, setFiltroMes] = useState('');
@@ -535,7 +547,7 @@ export default function Consignado() {
                   <option value="">-- Selecione --</option>
                   {meses.map((m) => (
                     <option key={m} value={m}>
-                      {m}
+                      {mesNumParaStr(m)}
                     </option>
                   ))}
                 </select>
@@ -580,7 +592,7 @@ export default function Consignado() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="__all__">Todos os meses</SelectItem>
-              {meses.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+              {meses.map(m => <SelectItem key={m} value={m}>{mesNumParaStr(m)}</SelectItem>)}
             </SelectContent>
           </Select>
 
@@ -697,7 +709,7 @@ export default function Consignado() {
                     </td>
                   )}
                   <td className="px-2 py-1.5 border-b border-gray-100 font-medium text-blue-900">{strVal(r.empresa)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.mes)}</td>
+                  <td className="px-2 py-1.5 border-b border-gray-100">{mesNumParaStr(r.mes)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 font-mono">{strVal(r.chaveJ)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 whitespace-nowrap">{strVal(r.nomeAgente)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.convenio)}</td>
