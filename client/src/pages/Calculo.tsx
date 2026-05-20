@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Download, Send, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Download, Send, Trash2, Pencil } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -16,7 +18,8 @@ const fmtPerc = (v: any) => {
   if (v === null || v === undefined || v === "" || v === "NULL") return "-";
   const n = parseFloat(String(v));
   if (isNaN(n)) return "-";
-  return (n * 100).toFixed(3).replace(".", ",") + "%";
+  // Formato 00,00% (2 casas decimais)
+  return (n * 100).toFixed(2).replace(".", ",") + "%";
 };
 
 const fmtTexto = (v: any) => {
@@ -199,6 +202,88 @@ export default function Calculo() {
 
   const todosSelecionados = registros.length > 0 && selecionados.size === registros.length;
   const algunsSelecionados = selecionados.size > 0 && selecionados.size < registros.length;
+
+  // Modal de edição completa
+  const [modalEditar, setModalEditar] = useState<any | null>(null);
+  const [formEditar, setFormEditar] = useState<Record<string, string>>({});
+
+  const abrirEditar = (r: any) => {
+    setModalEditar(r);
+    setFormEditar({
+      tipoPagamento: r.tipoPagamento ?? "",
+      empresa: r.empresa ?? "",
+      situacao: r.situacao ?? "",
+      mesRef: r.mesRef ?? "",
+      chaveJ: r.chaveJ ?? "",
+      nomeAgente: r.nomeAgente ?? "",
+      cidade: r.cidade ?? "",
+      percentual: r.percentual != null ? (parseFloat(String(r.percentual)) * 100).toFixed(2) : "",
+      comissaoTotal: r.comissaoTotal ?? "",
+      rbmTotal: r.rbmTotal ?? "",
+      comissaoConsig: r.comissaoConsig ?? "",
+      comissaoConsorcio: r.comissaoConsorcio ?? "",
+      comissaoOurocap: r.comissaoOurocap ?? "",
+      comissaoCc: r.comissaoCc ?? "",
+      comissaoSeguros: r.comissaoSeguros ?? "",
+      ajudaCusto: r.ajudaCusto ?? "",
+      creditosDebitos: r.creditosDebitos ?? "",
+      adiantamento: r.adiantamento ?? "",
+      reajuste: r.reajuste ?? "",
+      rbmCreditoC2: r.rbmCreditoC2 ?? "",
+      rbmContaCorrente: r.rbmContaCorrente ?? "",
+      rbmConsorcioC2: r.rbmConsorcioC2 ?? "",
+      rbmOurocap: r.rbmOurocap ?? "",
+      rbmSeguros: r.rbmSeguros ?? "",
+      qtdeContas: r.qtdeContas != null ? String(r.qtdeContas) : "",
+      vrLiquidoC2: r.vrLiquidoC2 ?? "",
+      srccC2: r.srccC2 ?? "",
+      vrLiquidoSrcc: r.vrLiquidoSrcc ?? "",
+      dtPagto: r.dtPagto ?? "",
+    });
+  };
+
+  const salvarEdicao = () => {
+    if (!modalEditar) return;
+    const toNum = (v: string) => v === "" ? undefined : parseFloat(v.replace(",", "."));
+    editarMutation.mutate({
+      id: modalEditar.id,
+      tipoPagamento: formEditar.tipoPagamento || undefined,
+      empresa: formEditar.empresa || undefined,
+      situacao: formEditar.situacao || undefined,
+      mesRef: formEditar.mesRef || undefined,
+      chaveJ: formEditar.chaveJ || undefined,
+      nomeAgente: formEditar.nomeAgente || undefined,
+      cidade: formEditar.cidade || undefined,
+      percentual: formEditar.percentual !== "" ? (parseFloat(formEditar.percentual.replace(",", ".")) / 100) : undefined,
+      comissaoTotal: toNum(formEditar.comissaoTotal),
+      rbmTotal: toNum(formEditar.rbmTotal),
+      comissaoConsig: toNum(formEditar.comissaoConsig),
+      comissaoConsorcio: toNum(formEditar.comissaoConsorcio),
+      comissaoOurocap: toNum(formEditar.comissaoOurocap),
+      comissaoCc: toNum(formEditar.comissaoCc),
+      comissaoSeguros: toNum(formEditar.comissaoSeguros),
+      ajudaCusto: toNum(formEditar.ajudaCusto),
+      creditosDebitos: toNum(formEditar.creditosDebitos),
+      adiantamento: toNum(formEditar.adiantamento),
+      reajuste: toNum(formEditar.reajuste),
+      rbmCreditoC2: toNum(formEditar.rbmCreditoC2),
+      rbmContaCorrente: toNum(formEditar.rbmContaCorrente),
+      rbmConsorcioC2: toNum(formEditar.rbmConsorcioC2),
+      rbmOurocap: toNum(formEditar.rbmOurocap),
+      rbmSeguros: toNum(formEditar.rbmSeguros),
+      qtdeContas: formEditar.qtdeContas !== "" ? parseInt(formEditar.qtdeContas) : undefined,
+      vrLiquidoC2: toNum(formEditar.vrLiquidoC2),
+      srccC2: toNum(formEditar.srccC2),
+      vrLiquidoSrcc: toNum(formEditar.vrLiquidoSrcc),
+      dtPagto: formEditar.dtPagto || undefined,
+    }, {
+      onSuccess: () => {
+        utils.calculosImportados.listar.invalidate();
+        setModalEditar(null);
+      },
+      onError: (err) => alert("Erro ao salvar: " + err.message),
+    });
+  };
 
   // Edição inline de Dt Pagto
   const [editandoDtPagto, setEditandoDtPagto] = useState<number | null>(null);
@@ -402,19 +487,28 @@ export default function Calculo() {
                       )}
                     </td>
                   ))}
-                  {/* Botão deletar */}
+                  {/* Botões de ação: editar + deletar */}
                   <td className="px-1.5 py-1 text-center border-b border-slate-100 border-l border-l-slate-200">
-                    <button
-                      onClick={() => {
-                        if (confirm(`Excluir registro de ${r.nomeAgente ?? r.chaveJ}?`)) {
-                          deletarMutation.mutate({ id: r.id });
-                        }
-                      }}
-                      className="p-1 rounded hover:bg-red-100 text-red-400 hover:text-red-600 transition-colors"
-                      title="Excluir registro"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
+                    <div className="flex items-center gap-1 justify-center">
+                      <button
+                        onClick={() => abrirEditar(r)}
+                        className="p-1 rounded hover:bg-blue-100 text-blue-400 hover:text-blue-600 transition-colors"
+                        title="Editar registro"
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm(`Excluir registro de ${r.nomeAgente ?? r.chaveJ}?`)) {
+                            deletarMutation.mutate({ id: r.id });
+                          }
+                        }}
+                        className="p-1 rounded hover:bg-red-100 text-red-400 hover:text-red-600 transition-colors"
+                        title="Excluir registro"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -450,6 +544,64 @@ export default function Calculo() {
           </div>
         </div>
       )}
+    {/* Modal de edição completa */}
+    <Dialog open={!!modalEditar} onOpenChange={(open) => !open && setModalEditar(null)}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Editar Registro — {modalEditar?.nomeAgente ?? modalEditar?.chaveJ}</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-3 py-2">
+          {([
+            { label: "Tipo Pagamento", key: "tipoPagamento" },
+            { label: "Empresa", key: "empresa" },
+            { label: "Situação", key: "situacao" },
+            { label: "Mês Ref (MMAA)", key: "mesRef" },
+            { label: "Chave J", key: "chaveJ" },
+            { label: "Nome Agente", key: "nomeAgente" },
+            { label: "Cidade", key: "cidade" },
+            { label: "Percentual (%)", key: "percentual" },
+            { label: "Comissão Total", key: "comissaoTotal" },
+            { label: "RBM Total", key: "rbmTotal" },
+            { label: "Comissão Consig", key: "comissaoConsig" },
+            { label: "Comissão Consórcio", key: "comissaoConsorcio" },
+            { label: "Comissão Ourocap", key: "comissaoOurocap" },
+            { label: "Comissão C/C", key: "comissaoCc" },
+            { label: "Seguros", key: "comissaoSeguros" },
+            { label: "Ajuda de Custo", key: "ajudaCusto" },
+            { label: "Créditos/Débitos", key: "creditosDebitos" },
+            { label: "Adiantamento", key: "adiantamento" },
+            { label: "Reajuste", key: "reajuste" },
+            { label: "RBM Crédito C2", key: "rbmCreditoC2" },
+            { label: "RBM Conta Corrente", key: "rbmContaCorrente" },
+            { label: "RBM Consórcio C2", key: "rbmConsorcioC2" },
+            { label: "RBM Ourocap", key: "rbmOurocap" },
+            { label: "RBM Seguros", key: "rbmSeguros" },
+            { label: "Qtde Contas", key: "qtdeContas" },
+            { label: "Vr. Líquido C2", key: "vrLiquidoC2" },
+            { label: "SRCC", key: "srccC2" },
+            { label: "VrLiquido-Srcc", key: "vrLiquidoSrcc" },
+            { label: "Dt Pagto (DD/MM/AAAA)", key: "dtPagto" },
+          ] as { label: string; key: string }[]).map(({ label, key }) => (
+            <div key={key} className="flex flex-col gap-1">
+              <Label className="text-xs font-medium text-slate-600">{label}</Label>
+              <Input
+                value={formEditar[key] ?? ""}
+                onChange={(e) => setFormEditar(prev => ({ ...prev, [key]: e.target.value }))}
+                className="h-7 text-xs"
+                placeholder={label}
+              />
+            </div>
+          ))}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => setModalEditar(null)}>Cancelar</Button>
+          <Button size="sm" onClick={salvarEdicao} disabled={editarMutation.isPending}
+            className="bg-purple-600 hover:bg-purple-700 text-white">
+            {editarMutation.isPending ? "Salvando..." : "Salvar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
     </div>
   );
 }
