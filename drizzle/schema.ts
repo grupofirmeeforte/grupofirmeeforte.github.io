@@ -968,3 +968,19 @@ export const crmMailing = mysqlTable("crm_mailing", {
 }));
 export type CrmMailingItem = typeof crmMailing.$inferSelect;
 export type InsertCrmMailingItem = typeof crmMailing.$inferInsert;
+
+/**
+ * Minutos de Sabedoria — pensamentos do livro de C. Torres Pastorino
+ */
+export const minutosSabedoria = mysqlTable("minutos_sabedoria", {
+  id: int("id").autoincrement().primaryKey(),
+  numero: int("numero").notNull(),
+  titulo: varchar("titulo", { length: 255 }),
+  conteudo: text("conteudo").notNull(),
+  ativo: boolean("ativo").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  numeroIdx: index("idx_ms_numero").on(table.numero),
+}));
+export type MinutoSabedoria = typeof minutosSabedoria.$inferSelect;
+export type InsertMinutoSabedoria = typeof minutosSabedoria.$inferInsert;
