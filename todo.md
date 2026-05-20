@@ -556,3 +556,11 @@
 - [x] Parser Excel detecta cabeçalho automaticamente (Empresa, Mês Ano, ChaveJ, Agente, RBM, Comissão etc.)
 - [x] Envio para Cálculo agrupa por ChaveJ+MesAno, faz upsert em calculos.comissaoCc e rbmContaCorrente
 - [x] Testes unitários (11 testes passando)
+
+## COMISSÃO SUPERVISOR
+- [x] Tabela `supervisores` criada no banco (chaveJ, nome, pctConsig, pctConsorcio, pctCc, pctOurocap, pctSeguro, pctDental)
+- [x] Router `supervisores` com listar, criar, editar, excluir e calcular
+- [x] Painel expandível "Comissão Supervisor" na faixa de filtros do Cálculo
+- [x] Cálculo automático por supervisor baseado no RBM dos agentes vinculados pelo campo Supervisor
+- [x] Modal de cadastro/edição de supervisor com % por produto
+- [x] Totalizador de comissão por produto e total geral

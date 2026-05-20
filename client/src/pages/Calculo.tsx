@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Download, Send, Trash2, Pencil } from "lucide-react";
+import { ArrowLeft, Download, Send, Trash2, Pencil, Settings, Plus, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 
@@ -204,6 +204,53 @@ export default function Calculo() {
   const algunsSelecionados = selecionados.size > 0 && selecionados.size < registros.length;
 
   // Modal de edição completa
+  // Painel Supervisores
+  const [showSupervisores, setShowSupervisores] = useState(false);
+  const [modalSup, setModalSup] = useState<any | null>(null);
+  const [formSup, setFormSup] = useState({ chaveJ: "", nome: "", pctConsig: "", pctConsorcio: "", pctCc: "", pctOurocap: "", pctSeguro: "", pctDental: "" });
+
+  const { data: supervisores = [], refetch: refetchSup } = trpc.supervisores.listar.useQuery();
+  const { data: calcSup = [] } = trpc.supervisores.calcular.useQuery({ mesRef: mesRef || undefined });
+
+  const criarSupMut = trpc.supervisores.criar.useMutation({ onSuccess: () => { refetchSup(); setModalSup(null); } });
+  const editarSupMut = trpc.supervisores.editar.useMutation({ onSuccess: () => { refetchSup(); setModalSup(null); } });
+  const excluirSupMut = trpc.supervisores.excluir.useMutation({ onSuccess: () => refetchSup() });
+
+  const abrirNovoSup = () => {
+    setModalSup({ novo: true });
+    setFormSup({ chaveJ: "", nome: "", pctConsig: "", pctConsorcio: "", pctCc: "", pctOurocap: "", pctSeguro: "", pctDental: "" });
+  };
+
+  const abrirEditarSup = (s: any) => {
+    setModalSup(s);
+    setFormSup({
+      chaveJ: s.chaveJ ?? "",
+      nome: s.nome ?? "",
+      pctConsig: s.pctConsig != null ? String(s.pctConsig) : "",
+      pctConsorcio: s.pctConsorcio != null ? String(s.pctConsorcio) : "",
+      pctCc: s.pctCc != null ? String(s.pctCc) : "",
+      pctOurocap: s.pctOurocap != null ? String(s.pctOurocap) : "",
+      pctSeguro: s.pctSeguro != null ? String(s.pctSeguro) : "",
+      pctDental: s.pctDental != null ? String(s.pctDental) : "",
+    });
+  };
+
+  const salvarSup = () => {
+    const toNum = (v: string) => parseFloat(v.replace(",", ".")) || 0;
+    const payload = {
+      chaveJ: formSup.chaveJ,
+      nome: formSup.nome,
+      pctConsig: toNum(formSup.pctConsig),
+      pctConsorcio: toNum(formSup.pctConsorcio),
+      pctCc: toNum(formSup.pctCc),
+      pctOurocap: toNum(formSup.pctOurocap),
+      pctSeguro: toNum(formSup.pctSeguro),
+      pctDental: toNum(formSup.pctDental),
+    };
+    if (modalSup?.novo) criarSupMut.mutate(payload);
+    else editarSupMut.mutate({ id: modalSup.id, ...payload });
+  };
+
   const [modalEditar, setModalEditar] = useState<any | null>(null);
   const [formEditar, setFormEditar] = useState<Record<string, string>>({});
 
@@ -323,6 +370,7 @@ export default function Calculo() {
   };
 
   return (
+    <>
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
       <div className="flex items-center gap-3 px-3 py-2 bg-white border-b border-slate-200">
@@ -353,7 +401,7 @@ export default function Calculo() {
         </div>
       </div>
 
-      {/* Filtros */}
+      {/* Filtros + Painel Supervisores */}
       <div className="bg-white border-b border-slate-200 px-3 py-2">
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex flex-col">
@@ -390,6 +438,19 @@ export default function Calculo() {
               className="text-xs h-7 py-1 w-44"
             />
           </div>
+
+          {/* Botão Comissão Supervisor */}
+          <div className="flex flex-col">
+            <label className="block text-[10px] text-slate-500 mb-0.5">&nbsp;</label>
+            <Button
+              size="sm"
+              onClick={() => setShowSupervisores(v => !v)}
+              className="h-7 px-2 text-xs bg-violet-600 hover:bg-violet-700 text-white flex items-center gap-1"
+            >
+              <Settings className="w-3 h-3" /> Comissão Supervisor
+            </Button>
+          </div>
+
           <div className="ml-auto flex items-end gap-3 pb-0.5">
             <span className="text-[11px] text-slate-500">{total} registro(s)</span>
             {selecionados.size > 0 && (
@@ -397,6 +458,80 @@ export default function Calculo() {
             )}
           </div>
         </div>
+
+        {/* Painel expandível de Comissão Supervisor */}
+        {showSupervisores && (
+          <div className="mt-3 border border-violet-200 rounded-lg bg-violet-50 p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-violet-800">Comissão Supervisor {mesRef ? `— ${fmtMesRef(mesRef)}` : "— Todos os meses"}</span>
+              <Button size="sm" onClick={abrirNovoSup} className="h-6 px-2 text-[10px] bg-violet-600 hover:bg-violet-700 text-white flex items-center gap-1">
+                <Plus className="w-3 h-3" /> Novo Supervisor
+              </Button>
+            </div>
+            {calcSup.length === 0 ? (
+              <p className="text-[11px] text-slate-500">Nenhum supervisor cadastrado. Clique em "Novo Supervisor" para adicionar.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-[10px] border-collapse">
+                  <thead>
+                    <tr className="bg-violet-700 text-white">
+                      <th className="px-2 py-1 text-left">Chave J</th>
+                      <th className="px-2 py-1 text-left">Nome</th>
+                      <th className="px-2 py-1 text-right">% Consig</th>
+                      <th className="px-2 py-1 text-right">Comis. Consig</th>
+                      <th className="px-2 py-1 text-right">% Consórcio</th>
+                      <th className="px-2 py-1 text-right">Comis. Consórcio</th>
+                      <th className="px-2 py-1 text-right">% C/C</th>
+                      <th className="px-2 py-1 text-right">Comis. C/C</th>
+                      <th className="px-2 py-1 text-right">% Ourocap</th>
+                      <th className="px-2 py-1 text-right">% Seguro</th>
+                      <th className="px-2 py-1 text-right">% Dental</th>
+                      <th className="px-2 py-1 text-right font-bold">Total</th>
+                      <th className="px-2 py-1"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {calcSup.map((s: any) => (
+                      <tr key={s.id} className="border-b border-violet-100 hover:bg-violet-100">
+                        <td className="px-2 py-1 font-mono">{s.chaveJ}</td>
+                        <td className="px-2 py-1">{s.nome}</td>
+                        <td className="px-2 py-1 text-right">{s.pctConsig > 0 ? s.pctConsig.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.comissaoConsig > 0 ? fmtMoeda(s.comissaoConsig) : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.pctConsorcio > 0 ? s.pctConsorcio.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.comissaoConsorcio > 0 ? fmtMoeda(s.comissaoConsorcio) : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.pctCc > 0 ? s.pctCc.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.comissaoCc > 0 ? fmtMoeda(s.comissaoCc) : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.pctOurocap > 0 ? s.pctOurocap.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.pctSeguro > 0 ? s.pctSeguro.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right">{s.pctDental > 0 ? s.pctDental.toFixed(2).replace(".",",") + "%" : "-"}</td>
+                        <td className="px-2 py-1 text-right font-bold text-violet-800">{fmtMoeda(s.total)}</td>
+                        <td className="px-2 py-1">
+                          <div className="flex gap-1">
+                            <button onClick={() => abrirEditarSup(s)} className="text-blue-600 hover:text-blue-800"><Pencil className="w-3 h-3" /></button>
+                            <button onClick={() => { if(confirm(`Excluir ${s.nome}?`)) excluirSupMut.mutate({ id: s.id }); }} className="text-red-500 hover:text-red-700"><X className="w-3 h-3" /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="bg-violet-200 font-bold">
+                      <td colSpan={3} className="px-2 py-1 text-violet-800">TOTAL GERAL</td>
+                      <td className="px-2 py-1 text-right">{fmtMoeda(calcSup.reduce((a:number,s:any)=>a+s.comissaoConsig,0))}</td>
+                      <td></td>
+                      <td className="px-2 py-1 text-right">{fmtMoeda(calcSup.reduce((a:number,s:any)=>a+s.comissaoConsorcio,0))}</td>
+                      <td></td>
+                      <td className="px-2 py-1 text-right">{fmtMoeda(calcSup.reduce((a:number,s:any)=>a+s.comissaoCc,0))}</td>
+                      <td colSpan={3}></td>
+                      <td className="px-2 py-1 text-right text-violet-900">{fmtMoeda(calcSup.reduce((a:number,s:any)=>a+s.total,0))}</td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Paginador TOPO */}
@@ -611,5 +746,54 @@ export default function Calculo() {
       </DialogContent>
     </Dialog>
     </div>
+
+    {/* Modal Novo/Editar Supervisor */}
+    <Dialog open={!!modalSup} onOpenChange={(open) => !open && setModalSup(null)}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{modalSup?.novo ? "Novo Supervisor" : `Editar — ${modalSup?.nome}`}</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-3 py-2">
+          <div className="flex flex-col gap-1 col-span-2">
+            <Label className="text-xs font-medium text-slate-600">Chave J</Label>
+            <Input value={formSup.chaveJ} onChange={e => setFormSup(p => ({...p, chaveJ: e.target.value}))} placeholder="Ex: J9660864" className="h-7 text-xs" />
+          </div>
+          <div className="flex flex-col gap-1 col-span-2">
+            <Label className="text-xs font-medium text-slate-600">Nome</Label>
+            <Input value={formSup.nome} onChange={e => setFormSup(p => ({...p, nome: e.target.value}))} placeholder="Nome completo" className="h-7 text-xs" />
+          </div>
+          {([
+            { label: "% Consignado", key: "pctConsig" },
+            { label: "% Consórcio", key: "pctConsorcio" },
+            { label: "% Conta Corrente", key: "pctCc" },
+            { label: "% Ourocap", key: "pctOurocap" },
+            { label: "% Seguro", key: "pctSeguro" },
+            { label: "% Dental", key: "pctDental" },
+          ] as { label: string; key: keyof typeof formSup }[]).map(({ label, key }) => (
+            <div key={key} className="flex flex-col gap-1">
+              <Label className="text-xs font-medium text-slate-600">{label}</Label>
+              <Input
+                value={formSup[key]}
+                onChange={e => setFormSup(p => ({...p, [key]: e.target.value}))}
+                placeholder="0,00"
+                className="h-7 text-xs"
+              />
+            </div>
+          ))}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => setModalSup(null)}>Cancelar</Button>
+          <Button
+            size="sm"
+            onClick={salvarSup}
+            disabled={criarSupMut.isPending || editarSupMut.isPending}
+            className="bg-violet-600 hover:bg-violet-700 text-white"
+          >
+            {criarSupMut.isPending || editarSupMut.isPending ? "Salvando..." : "Salvar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
