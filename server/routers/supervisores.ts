@@ -3,10 +3,23 @@ import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { sql } from "drizzle-orm";
 
-// Helper: normaliza retorno de db.execute (Drizzle retorna [rows, fields] ou rows direto)
+// Helper: normaliza retorno de db.execute — mesmo padrão usado em consorcio.ts
+// db.execute retorna [rows, fields] no mysql2, então rows[0] é o array de linhas
 function getRows(res: any): any[] {
   const data = Array.isArray(res) ? res[0] : res;
-  return Array.isArray(data) ? data : [];
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  // Se for um único objeto (não array), envolve em array
+  if (typeof data === "object") return [data];
+  return [];
+}
+
+// Helper: extrai valor numérico de uma query SUM — retorna 0 se nulo
+function extractSum(res: any): number {
+  const rows = getRows(res);
+  if (!rows.length) return 0;
+  const val = rows[0]?.total ?? rows[0]?.TOTAL ?? 0;
+  return parseFloat(String(val)) || 0;
 }
 
 export const supervisoresRouter = router({
@@ -18,7 +31,7 @@ export const supervisoresRouter = router({
       FROM supervisores
       WHERE ativo = 1
       ORDER BY nome ASC
-    `);
+    `) as any;
     const rows = getRows(res);
     return rows.map((r: any) => ({
       id: Number(r.id),
@@ -81,58 +94,66 @@ export const supervisoresRouter = router({
       return { ok: true };
     }),
 
-  // Calcula comissão do supervisor por mês baseado no RBM dos agentes vinculados pelo campo supervisor
+  // Calcula comissão do supervisor por mês baseado no RBM dos agentes vinculados
+  // Regra: se não tem RBM para um produto, comissão = R$ 0,00 (não bloqueia o cálculo)
   calcular: protectedProcedure
     .input(z.object({ mesRef: z.string().optional() }))
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) return [];
-      const mesRef = input.mesRef ?? "";
+      const mesRef = (input.mesRef ?? "").trim();
 
       const supRes = await db.execute(sql`
         SELECT id, chaveJ, nome, pctConsig, pctConsorcio, pctCc, pctOurocap, pctSeguro, pctDental
         FROM supervisores WHERE ativo = 1 ORDER BY nome ASC
-      `);
+      `) as any;
       const supRows = getRows(supRes);
       if (!supRows.length) return [];
 
       const resultado = await Promise.all(supRows.map(async (sup: any) => {
         const nomeSup = (sup.nome ?? "").trim();
+        const pctConsig    = parseFloat(sup.pctConsig    ?? sup.pctconsig    ?? 0);
+        const pctConsorcio = parseFloat(sup.pctConsorcio ?? sup.pctconsorcio ?? 0);
+        const pctCc        = parseFloat(sup.pctCc        ?? sup.pctcc        ?? 0);
+        const pctOurocap   = parseFloat(sup.pctOurocap   ?? sup.pctourocap   ?? 0);
+        const pctSeguro    = parseFloat(sup.pctSeguro    ?? sup.pctseguro    ?? 0);
+        const pctDental    = parseFloat(sup.pctDental    ?? sup.pctdental    ?? 0);
 
-        // RBM Consignado — campo mes no consignado é no formato MMAA (ex: 426 = abr/2026)
-        const consigRes = mesRef
-          ? await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM consignados WHERE TRIM(supervisor) = ${nomeSup} AND mes = ${mesRef}`)
-          : await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM consignados WHERE TRIM(supervisor) = ${nomeSup}`);
-        const consigData = getRows(consigRes);
-        const rbmConsig = parseFloat(consigData[0]?.total ?? 0);
+        // RBM Consignado — campo mes no formato MMAA (ex: "526" = mai/2026)
+        // Se percentual = 0, não busca (RBM = 0)
+        let rbmConsig = 0;
+        if (pctConsig > 0) {
+          const r = mesRef
+            ? await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM consignados WHERE TRIM(supervisor) = ${nomeSup} AND mes = ${mesRef}`) as any
+            : await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM consignados WHERE TRIM(supervisor) = ${nomeSup}`) as any;
+          rbmConsig = extractSum(r);
+        }
 
         // RBM Consórcio — campo mesAno no formato MM/AAAA
-        const consorcioRes = mesRef
-          ? await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM consorcios WHERE TRIM(supervisor) = ${nomeSup} AND mesAno = ${mesRef}`)
-          : await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM consorcios WHERE TRIM(supervisor) = ${nomeSup}`);
-        const consorcioData = getRows(consorcioRes);
-        const rbmConsorcio = parseFloat(consorcioData[0]?.total ?? 0);
+        let rbmConsorcio = 0;
+        if (pctConsorcio > 0) {
+          const r = mesRef
+            ? await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM consorcios WHERE TRIM(supervisor) = ${nomeSup} AND mesAno = ${mesRef}`) as any
+            : await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM consorcios WHERE TRIM(supervisor) = ${nomeSup}`) as any;
+          rbmConsorcio = extractSum(r);
+        }
 
         // RBM Conta Corrente — campo mesAno no formato MM/AAAA
-        const ccRes = mesRef
-          ? await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM contasCorrentes WHERE TRIM(supervisor) = ${nomeSup} AND mesAno = ${mesRef}`)
-          : await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM contasCorrentes WHERE TRIM(supervisor) = ${nomeSup}`);
-        const ccData = getRows(ccRes);
-        const rbmCc = parseFloat(ccData[0]?.total ?? 0);
+        let rbmCc = 0;
+        if (pctCc > 0) {
+          const r = mesRef
+            ? await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM contasCorrentes WHERE TRIM(supervisor) = ${nomeSup} AND mesAno = ${mesRef}`) as any
+            : await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM contasCorrentes WHERE TRIM(supervisor) = ${nomeSup}`) as any;
+          rbmCc = extractSum(r);
+        }
 
-        const pctConsig = parseFloat(sup.pctConsig ?? sup.pctconsig ?? 0);
-        const pctConsorcio = parseFloat(sup.pctConsorcio ?? sup.pctconsorcio ?? 0);
-        const pctCc = parseFloat(sup.pctCc ?? sup.pctcc ?? 0);
-        const pctOurocap = parseFloat(sup.pctOurocap ?? sup.pctourocap ?? 0);
-        const pctSeguro = parseFloat(sup.pctSeguro ?? sup.pctseguro ?? 0);
-        const pctDental = parseFloat(sup.pctDental ?? sup.pctdental ?? 0);
-
-        const comissaoConsig = rbmConsig * (pctConsig / 100);
+        // Comissões calculadas — se RBM = 0, comissão = 0
+        const comissaoConsig    = rbmConsig    * (pctConsig    / 100);
         const comissaoConsorcio = rbmConsorcio * (pctConsorcio / 100);
-        const comissaoCc = rbmCc * (pctCc / 100);
-        const comissaoOurocap = 0;
-        const comissaoSeguro = 0;
-        const comissaoDental = 0;
+        const comissaoCc        = rbmCc        * (pctCc        / 100);
+        const comissaoOurocap   = 0; // sem RBM disponível
+        const comissaoSeguro    = 0; // sem RBM disponível
+        const comissaoDental    = 0; // sem RBM disponível
 
         const total = comissaoConsig + comissaoConsorcio + comissaoCc + comissaoOurocap + comissaoSeguro + comissaoDental;
 
