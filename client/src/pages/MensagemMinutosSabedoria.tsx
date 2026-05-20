@@ -1,14 +1,14 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Sparkles, BookOpen, RefreshCw } from "lucide-react";
+import { ArrowLeft, Sparkles, BookOpen } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 export default function MensagemMinutosSabedoria() {
   const [, navigate] = useLocation();
   const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-  const { data: pensamento, isLoading, refetch, isFetching } = trpc.minutosSabedoria.getRandom.useQuery(undefined, {
+  const { data: pensamento, isLoading } = trpc.minutosSabedoria.getDoDia.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
 
@@ -74,22 +74,12 @@ export default function MensagemMinutosSabedoria() {
                   <div className="w-16 h-1 rounded-full" style={{ background: 'linear-gradient(90deg, #c8960c, #6d28d9)' }} />
                 </div>
 
-                <p className="text-xs text-slate-400 italic mb-6">
+                <p className="text-xs text-slate-400 italic mb-2">
                   C. Torres Pastorino — <em>Minutos de Sabedoria</em>
                 </p>
 
-                <Button
-                  onClick={() => refetch()}
-                  disabled={isFetching}
-                  variant="outline"
-                  className="flex items-center gap-2 mx-auto border-purple-300 text-purple-700 hover:bg-purple-50"
-                >
-                  <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
-                  Novo pensamento
-                </Button>
-
                 {total != null && total > 0 && (
-                  <p className="text-xs text-slate-400 mt-4">
+                  <p className="text-xs text-slate-300 mt-1">
                     {total} pensamento{total !== 1 ? 's' : ''} disponíve{total !== 1 ? 'is' : 'l'}
                   </p>
                 )}

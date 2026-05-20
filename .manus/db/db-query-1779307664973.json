@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE minutos_sabedoria ADD COLUMN fonte VARCHAR(255) DEFAULT 'Minutos de Sabedoria — C. Torres Pastorino';\nUPDATE minutos_sabedoria SET fonte = 'Minutos de Sabedoria — C. Torres Pastorino' WHERE fonte IS NULL OR fonte = '';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute ALTER TABLE minutos_sabedoria ADD COLUMN fonte VARCHAR(255) DEFAULT 'Minutos de Sabedoria — C. Torres Pastorino';\nUPDATE minutos_sabedoria SET fonte = 'Minutos de Sabedoria — C. Torres Pastorino' WHERE fonte IS NULL OR fonte = '';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 419
+}

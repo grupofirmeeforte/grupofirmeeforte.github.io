@@ -984,3 +984,16 @@ export const minutosSabedoria = mysqlTable("minutos_sabedoria", {
 }));
 export type MinutoSabedoria = typeof minutosSabedoria.$inferSelect;
 export type InsertMinutoSabedoria = typeof minutosSabedoria.$inferInsert;
+
+/**
+ * Controle do pensamento do dia por usuário
+ * Garante que cada usuário recebe um pensamento fixo por dia, sem repetir
+ */
+export const pensamentoDoDiaUsuario = mysqlTable("pensamento_do_dia_usuario", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: varchar("user_id", { length: 255 }).notNull(),
+  dataDia: date("data_dia").notNull(),
+  pensamentoId: int("pensamento_id").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type PensamentoDoDiaUsuario = typeof pensamentoDoDiaUsuario.$inferSelect;
