@@ -7,17 +7,31 @@ export const supervisoresRouter = router({
   listar: protectedProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
-    const rows = await db.execute(sql`SELECT * FROM supervisores WHERE ativo = 1 ORDER BY nome ASC`);
+    const rows = await db.execute(sql`
+      SELECT
+        id,
+        chaveJ AS chavej,
+        nome,
+        pctConsig AS pctconsig,
+        pctConsorcio AS pctconsorcio,
+        pctCc AS pctcc,
+        pctOurocap AS pctourocap,
+        pctSeguro AS pctseguro,
+        pctDental AS pctdental
+      FROM supervisores
+      WHERE ativo = 1
+      ORDER BY nome ASC
+    `);
     return (rows as any[]).map((r: any) => ({
       id: Number(r.id),
-      chaveJ: r.chaveJ ?? "",
+      chaveJ: r.chavej ?? "",
       nome: r.nome ?? "",
-      pctConsig: parseFloat(r.pctConsig ?? 0),
-      pctConsorcio: parseFloat(r.pctConsorcio ?? 0),
-      pctCc: parseFloat(r.pctCc ?? 0),
-      pctOurocap: parseFloat(r.pctOurocap ?? 0),
-      pctSeguro: parseFloat(r.pctSeguro ?? 0),
-      pctDental: parseFloat(r.pctDental ?? 0),
+      pctConsig: parseFloat(r.pctconsig ?? 0),
+      pctConsorcio: parseFloat(r.pctconsorcio ?? 0),
+      pctCc: parseFloat(r.pctcc ?? 0),
+      pctOurocap: parseFloat(r.pctourocap ?? 0),
+      pctSeguro: parseFloat(r.pctseguro ?? 0),
+      pctDental: parseFloat(r.pctdental ?? 0),
     }));
   }),
 
@@ -77,10 +91,15 @@ export const supervisoresRouter = router({
       if (!db) return [];
       const mesRef = input.mesRef ?? "";
 
-      const supervisores = await db.execute(sql`SELECT * FROM supervisores WHERE ativo = 1 ORDER BY nome ASC`) as any[];
-      if (!supervisores.length) return [];
+      // MySQL/TiDB retorna nomes de colunas em lowercase
+      const supRows = await db.execute(sql`
+        SELECT id, chaveJ AS chavej, nome, pctConsig AS pctconsig, pctConsorcio AS pctconsorcio,
+               pctCc AS pctcc, pctOurocap AS pctourocap, pctSeguro AS pctseguro, pctDental AS pctdental
+        FROM supervisores WHERE ativo = 1 ORDER BY nome ASC
+      `) as any[];
+      if (!supRows.length) return [];
 
-      const resultado = await Promise.all(supervisores.map(async (sup: any) => {
+      const resultado = await Promise.all(supRows.map(async (sup: any) => {
         const nomeSup = (sup.nome ?? "").trim();
 
         // RBM Consignado — campo mes no consignado é no formato MMAA (ex: 426 = abr/2026)
@@ -101,12 +120,12 @@ export const supervisoresRouter = router({
           : await db!.execute(sql`SELECT COALESCE(SUM(CAST(rbm AS DECIMAL(15,2))), 0) as total FROM contasCorrentes WHERE TRIM(supervisor) = ${nomeSup}`);
         const rbmCc = parseFloat((ccRows as any[])[0]?.total ?? 0);
 
-        const pctConsig = parseFloat(sup.pctConsig ?? 0);
-        const pctConsorcio = parseFloat(sup.pctConsorcio ?? 0);
-        const pctCc = parseFloat(sup.pctCc ?? 0);
-        const pctOurocap = parseFloat(sup.pctOurocap ?? 0);
-        const pctSeguro = parseFloat(sup.pctSeguro ?? 0);
-        const pctDental = parseFloat(sup.pctDental ?? 0);
+        const pctConsig = parseFloat(sup.pctconsig ?? 0);
+        const pctConsorcio = parseFloat(sup.pctconsorcio ?? 0);
+        const pctCc = parseFloat(sup.pctcc ?? 0);
+        const pctOurocap = parseFloat(sup.pctourocap ?? 0);
+        const pctSeguro = parseFloat(sup.pctseguro ?? 0);
+        const pctDental = parseFloat(sup.pctdental ?? 0);
 
         const comissaoConsig = rbmConsig * (pctConsig / 100);
         const comissaoConsorcio = rbmConsorcio * (pctConsorcio / 100);
@@ -119,7 +138,7 @@ export const supervisoresRouter = router({
 
         return {
           id: Number(sup.id),
-          chaveJ: sup.chaveJ ?? "",
+          chaveJ: sup.chavej ?? "",
           nome: nomeSup,
           pctConsig, pctConsorcio, pctCc, pctOurocap, pctSeguro, pctDental,
           rbmConsig, rbmConsorcio, rbmCc,
