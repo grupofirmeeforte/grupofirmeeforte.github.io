@@ -189,7 +189,7 @@ export default function ContaCorrente() {
     setImportFileName(file.name);
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const wb = XLSX.read(ev.target?.result, { type: "array", cellDates: false });
+      const wb = XLSX.read(ev.target?.result, { type: "array", cellDates: true });
       const ws = wb.Sheets[wb.SheetNames[0]];
       const raw: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
 
