@@ -41,7 +41,21 @@ const MODULOS_PERMISSOES = [
   ]},
   { modulo: 'producao', label: 'Produção', subabas: [
     { key: 'consignado-prod', label: 'Consignado' },
+    { key: 'consorcio-prod', label: 'Consórcio' },
     { key: 'conta-corrente', label: 'Conta Corrente' },
+  ]},
+  { modulo: 'crm', label: 'CRM', subabas: [
+    { key: 'atendimentos', label: 'Atendimentos' },
+    { key: 'clientes', label: 'Clientes' },
+    { key: 'mailing', label: 'Mailing' },
+    { key: 'oportunidades', label: 'Oportunidades' },
+    { key: 'relatorios-crm', label: 'Relatórios CRM' },
+    { key: 'tarefas', label: 'Tarefas / Follow-up' },
+  ]},
+  { modulo: 'mensagem-dia', label: 'Mensagem do Dia', subabas: [
+    { key: 'minutos-sabedoria', label: 'Minutos de Sabedoria' },
+    { key: 'salmos', label: 'Salmos' },
+    { key: 'versiculos', label: 'Versículos' },
   ]},
   { modulo: 'febraban', label: 'Febraban', subabas: [
     { key: 'producao-bb', label: 'Produção BB' },
