@@ -69,7 +69,8 @@ export const contaCorrenteRouter = router({
         db.select().from(contasCorrentes)
           .where(where)
           .orderBy(
-            desc(sql`CONCAT(SUBSTRING(mesAno, 4, 4), SUBSTRING(mesAno, 1, 2))`),
+            // Converte MM/AAAA → AAAAMM para ordenar DESC (mais recente no topo)
+            desc(sql`CONCAT(SUBSTRING_INDEX(mesAno, '/', -1), LPAD(SUBSTRING_INDEX(mesAno, '/', 1), 2, '0'))`),
             asc(contasCorrentes.empresa),
             asc(contasCorrentes.agente)
           )
@@ -92,7 +93,7 @@ export const contaCorrenteRouter = router({
         .orderBy(asc(contasCorrentes.empresa)),
       db.selectDistinct({ v: contasCorrentes.mesAno }).from(contasCorrentes)
         .where(sql`mesAno IS NOT NULL AND mesAno != ''`)
-        .orderBy(desc(sql`CONCAT(SUBSTRING(mesAno, 4, 4), SUBSTRING(mesAno, 1, 2))`)),
+        .orderBy(desc(sql`CONCAT(SUBSTRING_INDEX(mesAno, '/', -1), LPAD(SUBSTRING_INDEX(mesAno, '/', 1), 2, '0'))`)),
     ]);
 
     return {
