@@ -288,7 +288,7 @@ export default function AgentesPage() {
                   <TableHead>Área</TableHead>
                   <TableHead>Vínculo</TableHead>
                   <TableHead>Certif. CONSIG</TableHead>
-                  <TableHead>Certif. LGPD</TableHead>
+                  <TableHead>Certif. PLDFT</TableHead>
                   <TableHead>Situação</TableHead>
                   <TableHead>Supervisor</TableHead>
                   <TableHead>Cidade</TableHead>
@@ -342,7 +342,7 @@ export default function AgentesPage() {
                            return <Badge className="bg-green-100 text-green-800 border-0 text-xs">A vencer {c.dias}d</Badge>;
                          })()}
                       </TableCell>
-                      {/* Certif. LGPD */}
+                      {/* Certif. PLDFT */}
                       <TableCell>
 
                         {(() => {
