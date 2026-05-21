@@ -288,7 +288,7 @@ export default function AgentesPage() {
                   <TableHead>Área</TableHead>
                   <TableHead>Vínculo</TableHead>
                   <TableHead>Certif. CONSIG</TableHead>
-                  <TableHead>Certif. PLDFT</TableHead>
+                  <TableHead>Certif. CONSIG / LGPD</TableHead>
                   <TableHead>Situação</TableHead>
                   <TableHead>Supervisor</TableHead>
                   <TableHead>Cidade</TableHead>
