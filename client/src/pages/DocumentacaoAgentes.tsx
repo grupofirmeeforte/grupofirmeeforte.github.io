@@ -67,6 +67,8 @@ export default function DocumentacaoAgentes() {
 
   // Modal visualização
   const [docVisualizar, setDocVisualizar] = useState<any>(null);
+  const [urlAssinada, setUrlAssinada] = useState<string | null>(null);
+  const [loadingUrl, setLoadingUrl] = useState(false);
 
   // Filtro de tipo nos documentos do agente
   const [filtroTipoDoc, setFiltroTipoDoc] = useState('');
@@ -77,6 +79,12 @@ export default function DocumentacaoAgentes() {
       { busca: filtroBusca || undefined },
       { refetchOnWindowFocus: false }
     );
+
+  // Query: URL assinada para visualização
+  const getUrlAssinadaQuery = trpc.documentosAgentes.getUrlAssinada.useQuery(
+    { arquivoKey: docVisualizar?.arquivoKey ?? '' },
+    { enabled: !!docVisualizar?.arquivoKey, refetchOnWindowFocus: false }
+  );
 
   // Query: documentos do agente selecionado
   const { data: documentosAgente = [], isLoading: loadingDocs, refetch: refetchDocs } =
@@ -348,38 +356,51 @@ export default function DocumentacaoAgentes() {
                 {docVisualizar?.arquivoNome}
               </DialogTitle>
             </DialogHeader>
-            {docVisualizar && (
-              <div className="space-y-3">
-                <div className="flex flex-wrap gap-2 text-sm">
-                  <span className={`px-2 py-1 rounded text-xs font-semibold ${CORES_TIPO[docVisualizar.tipoDocumento] ?? 'bg-gray-100 text-gray-700'}`}>
-                    {docVisualizar.tipoDocumento}
-                  </span>
-                  {docVisualizar.descricao && <span className="text-gray-500">{docVisualizar.descricao}</span>}
-                </div>
-                <div className="border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center" style={{ minHeight: 400 }}>
-                  {docVisualizar.arquivoTipo?.startsWith('image/') ? (
-                    <img src={docVisualizar.arquivoUrl} alt={docVisualizar.arquivoNome}
-                      className="max-w-full max-h-[60vh] object-contain" />
-                  ) : docVisualizar.arquivoTipo === 'application/pdf' ? (
-                    <iframe src={docVisualizar.arquivoUrl} className="w-full" style={{ height: '60vh' }} title={docVisualizar.arquivoNome} />
-                  ) : (
-                    <div className="text-center text-gray-500 py-8">
-                      <File className="w-12 h-12 mx-auto mb-2" />
-                      <p>Pré-visualização não disponível</p>
-                    </div>
-                  )}
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">
-                    {docVisualizar.createdAt ? new Date(docVisualizar.createdAt).toLocaleDateString('pt-BR') : '—'}
-                  </span>
-                  <a href={docVisualizar.arquivoUrl} target="_blank" rel="noopener noreferrer"
+        {docVisualizar && (() => {
+          const urlFinal = getUrlAssinadaQuery.data?.url ?? docVisualizar.arquivoUrl;
+          const carregando = getUrlAssinadaQuery.isLoading;
+          return (
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2 text-sm">
+                <span className={`px-2 py-1 rounded text-xs font-semibold ${CORES_TIPO[docVisualizar.tipoDocumento] ?? 'bg-gray-100 text-gray-700'}`}>
+                  {docVisualizar.tipoDocumento}
+                </span>
+                {docVisualizar.descricao && <span className="text-gray-500">{docVisualizar.descricao}</span>}
+              </div>
+              <div className="border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center" style={{ minHeight: 400 }}>
+                {carregando ? (
+                  <div className="text-center text-gray-500 py-8">
+                    <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-2" />
+                    <p>Carregando arquivo...</p>
+                  </div>
+                ) : docVisualizar.arquivoTipo?.startsWith('image/') ? (
+                  <img src={urlFinal} alt={docVisualizar.arquivoNome}
+                    className="max-w-full max-h-[60vh] object-contain" />
+                ) : docVisualizar.arquivoTipo === 'application/pdf' ? (
+                  <iframe src={urlFinal} className="w-full" style={{ height: '60vh' }} title={docVisualizar.arquivoNome} />
+                ) : (
+                  <div className="text-center text-gray-500 py-8">
+                    <File className="w-12 h-12 mx-auto mb-2" />
+                    <p>Pré-visualização não disponível</p>
+                    <a href={urlFinal} target="_blank" rel="noopener noreferrer"
+                      className="mt-2 text-sm text-blue-600 hover:underline">Baixar arquivo</a>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-500">
+                  {docVisualizar.createdAt ? new Date(docVisualizar.createdAt).toLocaleDateString('pt-BR') : '—'}
+                </span>
+                {!carregando && (
+                  <a href={urlFinal} target="_blank" rel="noopener noreferrer"
                     className="text-sm text-blue-600 hover:underline flex items-center gap-1">
                     <Eye className="w-4 h-4" /> Abrir em nova aba
                   </a>
-                </div>
+                )}
               </div>
-            )}
+            </div>
+          );
+        })()}
           </DialogContent>
         </Dialog>
       </div>

@@ -4,7 +4,7 @@ import { getDb } from "../db";
 import { documentosAgentes, agentes } from "../../drizzle/schema";
 import { eq, and, like, or, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { storagePut } from "../storage";
+import { storagePut, storageGetSignedUrl } from "../storage";
 
 const TIPOS_DOCUMENTO = [
   "Contrato",
@@ -131,6 +131,18 @@ export const documentosAgentesRouter = router({
   tiposDocumento: publicProcedure.query(() => {
     return [...TIPOS_DOCUMENTO];
   }),
+
+  // Gerar URL assinada para visualização de arquivo
+  getUrlAssinada: publicProcedure
+    .input(z.object({ arquivoKey: z.string().min(1) }))
+    .query(async ({ input }) => {
+      try {
+        const url = await storageGetSignedUrl(input.arquivoKey);
+        return { url };
+      } catch (e) {
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Não foi possível gerar URL de visualização' });
+      }
+    }),
 
   // Listar todos os agentes do cadastro com contagem de documentos
   listarAgentesComDocs: publicProcedure
