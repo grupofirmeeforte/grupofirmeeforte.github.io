@@ -270,18 +270,18 @@ export default function TabelaComissao() {
         (r.mesesAte || '').includes(q)
       );
     })();
-    // Ordenar por: Empresa → Convênio → Prazo (mesesDe) → Juros (txJurosDe)
+    // Ordenar por: Empresa → Convênio → Juros (txJurosDe) → Prazo (mesesDe)
     return [...filtered].sort((a, b) => {
       const emp = (a.empresa || '').localeCompare(b.empresa || '', 'pt-BR');
       if (emp !== 0) return emp;
       const conv = (a.convenio || '').localeCompare(b.convenio || '', 'pt-BR');
       if (conv !== 0) return conv;
-      const prazoA = parseInt(a.mesesDe || '0', 10);
-      const prazoB = parseInt(b.mesesDe || '0', 10);
-      if (prazoA !== prazoB) return prazoA - prazoB;
       const jurosA = parseFloat((a.txJurosDe || '0').replace(',', '.'));
       const jurosB = parseFloat((b.txJurosDe || '0').replace(',', '.'));
-      return jurosA - jurosB;
+      if (jurosA !== jurosB) return jurosA - jurosB;
+      const prazoA = parseInt(a.mesesDe || '0', 10);
+      const prazoB = parseInt(b.mesesDe || '0', 10);
+      return prazoA - prazoB;
     });
   }, [rows, busca]);
 
