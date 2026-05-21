@@ -143,18 +143,10 @@ export default function TabelaComissao() {
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [savingCell, setSavingCell] = useState<string | null>(null);
-  const [valoresAtivos, setValoresAtivos] = useState<Record<string, string>>({
-    'Ativo01': '',
-    'Ativo02': '',
-    'Ativo03': '',
-    'Ativo04': '',
-    'Ativo05': '',
-    'Ativo06': '',
-    'Ativo07': '',
-    'Ativo08': '',
-    'Ativo09': '',
-    'Ativo10': '',
-  });
+  const NIVEIS = ['Ativo01','Ativo02','Ativo03','Ativo04','Ativo05','Ativo06','Ativo07','Ativo08','Ativo09','Ativo10'];
+  const [valoresAtivos, setValoresAtivos] = useState<Record<string, string>>(
+    NIVEIS.reduce((acc, n) => ({ ...acc, [n]: '', [`${n}De`]: '', [`${n}Ate`]: '' }), {})
+  );
   const [editingValor, setEditingValor] = useState<string | null>(null);
   const [tempValueValor, setTempValueValor] = useState<string>('');
 
@@ -299,65 +291,47 @@ export default function TabelaComissao() {
           <div className="flex justify-between items-center mb-2">
             <label className="text-sm font-semibold text-blue-900 block">Valores para Cálculo por Nível:</label>
             <Button
-              onClick={() => {
-                const dadosAtualizar: Record<string, string> = {};
-                Object.keys(valoresAtivos).forEach(nivel => {
-                  dadosAtualizar[nivel.toLowerCase()] = valoresAtivos[nivel];
-                });
-                salvarValoresLocalmente(valoresAtivos);
-              }}
+              onClick={() => salvarValoresLocalmente(valoresAtivos)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 text-sm rounded"
             >
               💾 Salvar Tudo
             </Button>
           </div>
+          {/* Grid: cada Ativo ocupa uma coluna com label + campos De e Até */}
           <div className="grid grid-cols-5 gap-3">
-            {Object.keys(valoresAtivos).map((nivel) => (
-              <div key={nivel}>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">{nivel.replace('Ativo', 'Ativo ')}</label>
-                {editingValor === nivel ? (
-                  <div className="flex gap-1">
-                    <input
-                      autoFocus
-                      type="number"
-                      step="0.01"
-                      value={tempValueValor}
-                      onChange={(e) => setTempValueValor(e.target.value)}
-                      onBlur={() => {
-                        setValoresAtivos({...valoresAtivos, [nivel]: tempValueValor});
-                        const dadosAtualizar: Record<string, string> = {};
-                        dadosAtualizar[nivel.toLowerCase()] = tempValueValor;
-                        salvarValoresLocalmente(valoresAtivos);
-                        setEditingValor(null);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          setValoresAtivos({...valoresAtivos, [nivel]: tempValueValor});
-                          const dadosAtualizar: Record<string, string> = {};
-                          dadosAtualizar[nivel.toLowerCase()] = tempValueValor;
-                          salvarValoresLocalmente(valoresAtivos);
-                          setEditingValor(null);
-                        } else if (e.key === 'Escape') {
-                          setEditingValor(null);
-                        }
-                      }}
-                      className="flex-1 px-2 py-1.5 border border-blue-400 rounded bg-white text-right text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
+            {NIVEIS.map((nivel) => {
+              const keyDe = `${nivel}De`;
+              const keyAte = `${nivel}Ate`;
+              return (
+                <div key={nivel} className="bg-white rounded-lg border border-blue-200 p-2">
+                  <div className="text-xs font-semibold text-blue-800 mb-1.5 text-center">{nivel.replace('Ativo', 'Ativo ')}</div>
+                  <div className="space-y-1">
+                    <div>
+                      <label className="text-[10px] text-gray-500">De</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={valoresAtivos[keyDe] || ''}
+                        onChange={(e) => setValoresAtivos(prev => ({ ...prev, [keyDe]: e.target.value }))}
+                        placeholder="0,00"
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-right text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-gray-500">Até</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={valoresAtivos[keyAte] || ''}
+                        onChange={(e) => setValoresAtivos(prev => ({ ...prev, [keyAte]: e.target.value }))}
+                        placeholder="0,00"
+                        className="w-full px-2 py-1 border border-gray-300 rounded text-right text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      />
+                    </div>
                   </div>
-                ) : (
-                  <div
-                    onClick={() => {
-                      setEditingValor(nivel);
-                      setTempValueValor(valoresAtivos[nivel]);
-                    }}
-                    className="px-2 py-1.5 border border-gray-300 rounded bg-white text-right text-sm cursor-pointer hover:bg-blue-50 hover:border-blue-400 transition-all"
-                    title="Clique para editar"
-                  >
-                    {moeda(valoresAtivos[nivel])}
-                  </div>
-                )}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

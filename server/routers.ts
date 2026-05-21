@@ -524,11 +524,16 @@ export const appRouter = router({
         txJurosDe: z.string().optional(), txJurosAte: z.string().optional(),
         valorMinimo: z.string().optional(),
         mesesDe: z.string().optional(), mesesAte: z.string().optional(),
-        ativo01: z.string().optional(), ativo02: z.string().optional(),
-        ativo03: z.string().optional(), ativo04: z.string().optional(),
-        ativo05: z.string().optional(), ativo06: z.string().optional(),
-        ativo07: z.string().optional(), ativo08: z.string().optional(),
-        ativo09: z.string().optional(), ativo10: z.string().optional(),
+        ativo01: z.string().optional(), ativo01De: z.string().optional(), ativo01Ate: z.string().optional(),
+        ativo02: z.string().optional(), ativo02De: z.string().optional(), ativo02Ate: z.string().optional(),
+        ativo03: z.string().optional(), ativo03De: z.string().optional(), ativo03Ate: z.string().optional(),
+        ativo04: z.string().optional(), ativo04De: z.string().optional(), ativo04Ate: z.string().optional(),
+        ativo05: z.string().optional(), ativo05De: z.string().optional(), ativo05Ate: z.string().optional(),
+        ativo06: z.string().optional(), ativo06De: z.string().optional(), ativo06Ate: z.string().optional(),
+        ativo07: z.string().optional(), ativo07De: z.string().optional(), ativo07Ate: z.string().optional(),
+        ativo08: z.string().optional(), ativo08De: z.string().optional(), ativo08Ate: z.string().optional(),
+        ativo09: z.string().optional(), ativo09De: z.string().optional(), ativo09Ate: z.string().optional(),
+        ativo10: z.string().optional(), ativo10De: z.string().optional(), ativo10Ate: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const db = await getDb();
@@ -548,11 +553,16 @@ export const appRouter = router({
         txJurosDe: z.string().optional(), txJurosAte: z.string().optional(),
         valorMinimo: z.string().optional(),
         mesesDe: z.string().optional(), mesesAte: z.string().optional(),
-        ativo01: z.string().optional(), ativo02: z.string().optional(),
-        ativo03: z.string().optional(), ativo04: z.string().optional(),
-        ativo05: z.string().optional(), ativo06: z.string().optional(),
-        ativo07: z.string().optional(), ativo08: z.string().optional(),
-        ativo09: z.string().optional(), ativo10: z.string().optional(),
+        ativo01: z.string().optional(), ativo01De: z.string().optional(), ativo01Ate: z.string().optional(),
+        ativo02: z.string().optional(), ativo02De: z.string().optional(), ativo02Ate: z.string().optional(),
+        ativo03: z.string().optional(), ativo03De: z.string().optional(), ativo03Ate: z.string().optional(),
+        ativo04: z.string().optional(), ativo04De: z.string().optional(), ativo04Ate: z.string().optional(),
+        ativo05: z.string().optional(), ativo05De: z.string().optional(), ativo05Ate: z.string().optional(),
+        ativo06: z.string().optional(), ativo06De: z.string().optional(), ativo06Ate: z.string().optional(),
+        ativo07: z.string().optional(), ativo07De: z.string().optional(), ativo07Ate: z.string().optional(),
+        ativo08: z.string().optional(), ativo08De: z.string().optional(), ativo08Ate: z.string().optional(),
+        ativo09: z.string().optional(), ativo09De: z.string().optional(), ativo09Ate: z.string().optional(),
+        ativo10: z.string().optional(), ativo10De: z.string().optional(), ativo10Ate: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const db = await getDb();
