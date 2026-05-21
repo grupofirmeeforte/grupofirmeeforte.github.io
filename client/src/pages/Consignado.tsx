@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Pencil, Trash2, Upload, Search, X, Download, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Upload, Search, X, Download, RefreshCw, Calculator } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 type Consignado = {
@@ -131,6 +131,7 @@ export default function Consignado() {
   const [confirmandoExclusao, setConfirmandoExclusao] = useState<number | null>(null);
   const [selecionados, setSelecionados] = useState<Set<number>>(new Set());
   const [modoSelecao, setModoSelecao] = useState(false);
+  const [modalEnviarCalculo, setModalEnviarCalculo] = useState(false);
   const [valoresAtivos, setValoresAtivos] = useState<Record<string, string>>({
     'Ativo01': '',
     'Ativo02': '',
@@ -205,6 +206,17 @@ export default function Consignado() {
   });
 
   const marcarDuplicatas = trpc.consignado.marcarDuplicatas.useMutation();
+
+  const enviarParaCalculo = trpc.consignado.enviarParaCalculo.useMutation({
+    onSuccess: (r) => {
+      utils.consignado.listar.invalidate();
+      toast.success(`Enviado! ${r.criados} criado(s) e ${r.atualizados} atualizado(s) no Cálculo.`);
+      setModalEnviarCalculo(false);
+      setSelecionados(new Set());
+      setModoSelecao(false);
+    },
+    onError: (e) => toast.error('Erro ao enviar para cálculo: ' + e.message),
+  });
 
   const recalcularMes = trpc.consignado.recalcularMes.useMutation({
     onSuccess: (r) => {
@@ -535,6 +547,16 @@ export default function Consignado() {
             >
               <RefreshCw className={`w-4 h-4 ${recalcularMes.isPending ? 'animate-spin' : ''}`} />
               {recalcularMes.isPending ? 'Calculando...' : 'Recalcular Mês'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setModalEnviarCalculo(true)}
+              disabled={enviarParaCalculo.isPending}
+              className="flex items-center gap-2 border-emerald-600 text-emerald-700 hover:bg-emerald-50"
+              title="Enviar registros para a aba Cálculo"
+            >
+              <Calculator className="w-4 h-4" />
+              Enviar p/ Cálculo
             </Button>
             <Button onClick={openNovo} className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800">
               <Plus className="w-4 h-4" /> Novo
@@ -881,6 +903,60 @@ export default function Consignado() {
             <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
             <Button onClick={handleSalvar} disabled={criar.isPending || atualizar.isPending} className="bg-blue-700 hover:bg-blue-800">
               {criar.isPending || atualizar.isPending ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal Enviar para Cálculo */}
+      <Dialog open={modalEnviarCalculo} onOpenChange={setModalEnviarCalculo}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Calculator className="w-5 h-5 text-emerald-600" />
+              Enviar para Cálculo
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-2 space-y-3">
+            <p className="text-sm text-gray-600">
+              Escolha como deseja enviar os registros para a aba <strong>Cálculo</strong>:
+            </p>
+            <div className="bg-blue-50 rounded-md p-3 text-xs text-blue-800">
+              <p className="font-semibold mb-1">ℹ️ Regras de envio:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Chaves repetidas são agrupadas e os totais são somados</li>
+                <li>Se já existe registro no Cálculo para a chave+mês, o campo <strong>Comissão Consig</strong> é atualizado</li>
+                <li>Se não existe, um novo registro é criado com os dados do agente</li>
+              </ul>
+            </div>
+            {selecionados.size > 0 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-md p-2 text-xs text-amber-800">
+                <strong>{selecionados.size}</strong> registro(s) selecionado(s) para envio individual
+              </div>
+            )}
+          </div>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setModalEnviarCalculo(false)} className="w-full sm:w-auto">
+              Cancelar
+            </Button>
+            {selecionados.size > 0 && (
+              <Button
+                onClick={() => enviarParaCalculo.mutate({ ids: Array.from(selecionados) })}
+                disabled={enviarParaCalculo.isPending}
+                className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700"
+              >
+                {enviarParaCalculo.isPending ? 'Enviando...' : `Enviar Selecionados (${selecionados.size})`}
+              </Button>
+            )}
+            <Button
+              onClick={() => {
+                if (!filtroMes) { toast.error('Selecione um mês no filtro antes de enviar.'); return; }
+                enviarParaCalculo.mutate({ mes: filtroMes });
+              }}
+              disabled={enviarParaCalculo.isPending}
+              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700"
+            >
+              {enviarParaCalculo.isPending ? 'Enviando...' : `Enviar Todo o Mês${filtroMes ? ` (${filtroMes})` : ''}`}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1094,6 +1094,123 @@ export const appRouter = router({
 
         return { count: atualizados, total: registros.length };
       }),
+
+    // Enviar registros para a aba Cálculo (tabela calculos)
+    // Agrupa por chaveJ+empresa+mes, soma totalComissao
+    // Se já existe registro em calculos para chaveJ+mesRef → atualiza comissaoConsig
+    // Se não existe → cria novo registro com dados do agente
+    enviarParaCalculo: publicProcedure
+      .input(z.object({
+        mes: z.string().optional(),       // Enviar todo o mês
+        ids: z.array(z.number()).optional(), // Enviar selecionados (uma por uma)
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { consignados, calculos, agentes: agentesTable } = await import('../drizzle/schema');
+        const { eq, and, sql: sqlD } = await import('drizzle-orm');
+
+        // 1. Buscar registros a processar
+        let registros: any[] = [];
+        if (input.ids && input.ids.length > 0) {
+          // Uma por uma: buscar pelos IDs selecionados
+          registros = await db.select().from(consignados)
+            .where(sqlD`${consignados.id} IN (${sqlD.join(input.ids.map(id => sqlD`${id}`), sqlD`, `)})`);
+        } else if (input.mes) {
+          // Todo o mês
+          registros = await db.select().from(consignados).where(eq(consignados.mes, input.mes));
+        } else {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Informe o mês ou selecione registros' });
+        }
+
+        if (registros.length === 0) {
+          return { criados: 0, atualizados: 0, total: 0 };
+        }
+
+        // 2. Agrupar por chaveJ + empresa + mes, somando totalComissao
+        const grupos = new Map<string, { chaveJ: string; empresa: string; mes: string; totalComissao: number }>();
+        for (const r of registros) {
+          const chaveJ = r.chaveJ ?? '';
+          const empresa = r.empresa ?? '';
+          const mes = r.mes ?? '';
+          if (!chaveJ || !mes) continue;
+          const key = `${chaveJ}|${empresa}|${mes}`;
+          const comissao = parseFloat(String(r.totalComissao ?? 0)) || 0;
+          if (grupos.has(key)) {
+            grupos.get(key)!.totalComissao += comissao;
+          } else {
+            grupos.set(key, { chaveJ, empresa, mes, totalComissao: comissao });
+          }
+        }
+
+        let criados = 0;
+        let atualizados = 0;
+
+        for (const grupo of Array.from(grupos.values())) {
+          const { chaveJ, empresa, mes, totalComissao } = grupo;
+          // mes no consignado é MM/AAAA
+          const mesRef = mes;
+
+          // 3. Verificar se já existe registro em calculos para chaveJ + empresa + mesRef
+          const existente = await db.select().from(calculos)
+            .where(and(eq(calculos.chaveJ, chaveJ), eq(calculos.empresa, empresa), eq(calculos.mesRef, mesRef)))
+            .limit(1);
+
+          if (existente.length > 0) {
+            // Atualizar comissaoConsig e recalcular comissaoTotal
+            const reg = existente[0];
+            const toN = (v: any) => parseFloat(String(v ?? 0)) || 0;
+            const novaComissaoTotal =
+              totalComissao +
+              toN(reg.comissaoConsorcio) +
+              toN(reg.comissaoOurocap) +
+              toN(reg.comissaoCc) +
+              toN(reg.comissaoSeguros) +
+              toN(reg.ajudaCusto) +
+              toN(reg.creditosDebitos) -
+              toN(reg.adiantamento);
+
+            await db.update(calculos).set({
+              comissaoConsig: String(totalComissao),
+              comissaoTotal: String(novaComissaoTotal),
+            }).where(eq(calculos.id, reg.id));
+            atualizados++;
+          } else {
+            // Criar novo registro — buscar dados do agente
+            let nomeAgente: string | null = null;
+            let cidade: string | null = null;
+            let situacao: string | null = null;
+
+            const agenteRows = await db.select().from(agentesTable)
+              .where(eq(agentesTable.chaveJ, chaveJ)).limit(1);
+            if (agenteRows.length > 0) {
+              const a = agenteRows[0];
+              nomeAgente = a.nomeAgente ?? null;
+              cidade = a.cidade ? (a.uf ? `${a.cidade}/${a.uf}` : a.cidade) : null;
+              situacao = a.situacao ?? null;
+            } else {
+              // fallback: pegar do próprio consignado
+              const r = registros.find(x => x.chaveJ === chaveJ);
+              nomeAgente = r?.nomeAgente ?? null;
+            }
+
+            await db.insert(calculos).values({
+              tipoPagamento: 'Comissão',
+              mesRef,
+              empresa: empresa || null,
+              chaveJ: chaveJ || null,
+              nomeAgente,
+              cidade,
+              situacao,
+              comissaoConsig: String(totalComissao),
+              comissaoTotal: String(totalComissao),
+            } as any);
+            criados++;
+          }
+        }
+
+        return { criados, atualizados, total: grupos.size };
+      }),
   }),
 
   contaCorrente: router({

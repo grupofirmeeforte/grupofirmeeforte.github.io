@@ -576,3 +576,12 @@
 - [x] Adiantamento buscado automaticamente na tabela pagamentos (tipoPagto = 'Adto') ao recalcular
 - [x] Botão 'Recalcular Totais' (âmbar) na barra de ações do Cálculo, ao lado de 'Enviar Para Pagto'
 - [x] Confirmação antes de recalcular exibe a fórmula utilizada
+
+## FASE 38: BOTÃO ENVIAR PARA CÁLCULO NO CONSIGNADO
+- [x] Criar mutation enviarParaCalculo no router de consignado (backend)
+- [x] Agrupar registros por chaveJ+empresa+mes, somando totalComissao
+- [x] Se já existe registro em calculos para chaveJ+mesRef → atualizar comissaoConsig
+- [x] Se não existe → criar novo registro com dados do agente
+- [x] Botão "Enviar p/ Cálculo" (verde) na barra do Consignado
+- [x] Modal com duas opções: "Enviar Todo o Mês" e "Enviar Selecionados (uma por uma)"
+- [x] Feedback de quantos registros foram criados/atualizados
