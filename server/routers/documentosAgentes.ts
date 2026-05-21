@@ -48,7 +48,7 @@ export const documentosAgentesRouter = router({
       const db = await getDb();
       if (!db) return [];
       const conditions: any[] = [];
-      if (input?.busca) {
+      if (input?.busca && input.busca.trim()) {
         conditions.push(
           or(
             like(agentes.chaveJ, `%${input.busca}%`),
@@ -65,7 +65,7 @@ export const documentosAgentesRouter = router({
         .from(agentes)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(agentes.nomeAgente)
-        .limit(50);
+        .limit(500);
       return rows.filter(r => r.chaveJ);
     }),
 

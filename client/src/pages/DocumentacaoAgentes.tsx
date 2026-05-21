@@ -79,8 +79,15 @@ export default function DocumentacaoAgentes() {
 
   const { data: agentesLista = [] } = trpc.documentosAgentes.buscarAgentes.useQuery(
     { busca: buscaAgente },
-    { enabled: buscaAgente.length >= 2 }
+    { enabled: modalUpload } // carrega todos quando modal abre
   );
+
+  // Filtrar sugestões localmente para resposta imediata
+  const sugestoesFiltradas = agentesLista.filter(a => {
+    if (!buscaAgente.trim()) return true;
+    const b = buscaAgente.toLowerCase();
+    return (a.chaveJ ?? '').toLowerCase().includes(b) || (a.nomeAgente ?? '').toLowerCase().includes(b);
+  }).slice(0, 100);
 
   // Mutations
   const uploadMutation = trpc.documentosAgentes.upload.useMutation({
@@ -327,9 +334,9 @@ export default function DocumentacaoAgentes() {
                   className="pl-9"
                 />
               </div>
-              {mostrarSugestoes && buscaAgente.length >= 2 && agentesLista.length > 0 && (
+              {mostrarSugestoes && !uploadForm.chaveJ && sugestoesFiltradas.length > 0 && (
                 <div className="absolute z-50 w-full bg-white border rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
-                  {agentesLista.map(a => (
+                  {sugestoesFiltradas.map(a => (
                     <button
                       key={a.chaveJ}
                       className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center gap-2 text-sm"
