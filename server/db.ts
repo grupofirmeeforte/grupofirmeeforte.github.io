@@ -369,11 +369,22 @@ export async function atualizarValoresCalculo(dados: Partial<ValoresCalculo>): P
   try {
     const updateData: Record<string, unknown> = {};
     
-    const campos = ['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10'] as const;
+    const campos = [
+      'ativo01', 'ativo01De', 'ativo01Ate',
+      'ativo02', 'ativo02De', 'ativo02Ate',
+      'ativo03', 'ativo03De', 'ativo03Ate',
+      'ativo04', 'ativo04De', 'ativo04Ate',
+      'ativo05', 'ativo05De', 'ativo05Ate',
+      'ativo06', 'ativo06De', 'ativo06Ate',
+      'ativo07', 'ativo07De', 'ativo07Ate',
+      'ativo08', 'ativo08De', 'ativo08Ate',
+      'ativo09', 'ativo09De', 'ativo09Ate',
+      'ativo10', 'ativo10De', 'ativo10Ate',
+    ] as const;
     
     campos.forEach(campo => {
-      if (dados[campo] !== undefined) {
-        updateData[campo] = dados[campo];
+      if (dados[campo as keyof ValoresCalculo] !== undefined) {
+        updateData[campo] = dados[campo as keyof ValoresCalculo];
       }
     });
 

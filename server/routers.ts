@@ -1300,25 +1300,42 @@ export const appRouter = router({
     }),
     atualizar: publicProcedure
       .input(z.object({
-        ativo01: z.string().optional(),
-        ativo02: z.string().optional(),
-        ativo03: z.string().optional(),
-        ativo04: z.string().optional(),
-        ativo05: z.string().optional(),
-        ativo06: z.string().optional(),
-        ativo07: z.string().optional(),
-        ativo08: z.string().optional(),
-        ativo09: z.string().optional(),
-        ativo10: z.string().optional(),
+        ativo01: z.string().optional(), ativo01De: z.string().optional(), ativo01Ate: z.string().optional(),
+        ativo02: z.string().optional(), ativo02De: z.string().optional(), ativo02Ate: z.string().optional(),
+        ativo03: z.string().optional(), ativo03De: z.string().optional(), ativo03Ate: z.string().optional(),
+        ativo04: z.string().optional(), ativo04De: z.string().optional(), ativo04Ate: z.string().optional(),
+        ativo05: z.string().optional(), ativo05De: z.string().optional(), ativo05Ate: z.string().optional(),
+        ativo06: z.string().optional(), ativo06De: z.string().optional(), ativo06Ate: z.string().optional(),
+        ativo07: z.string().optional(), ativo07De: z.string().optional(), ativo07Ate: z.string().optional(),
+        ativo08: z.string().optional(), ativo08De: z.string().optional(), ativo08Ate: z.string().optional(),
+        ativo09: z.string().optional(), ativo09De: z.string().optional(), ativo09Ate: z.string().optional(),
+        ativo10: z.string().optional(), ativo10De: z.string().optional(), ativo10Ate: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        const dados: Record<string, string | number> = {};
-        const campos = ['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10'] as const;
+        const dados: Record<string, string | number | null> = {};
+        const allCampos = [
+          'ativo01', 'ativo01De', 'ativo01Ate',
+          'ativo02', 'ativo02De', 'ativo02Ate',
+          'ativo03', 'ativo03De', 'ativo03Ate',
+          'ativo04', 'ativo04De', 'ativo04Ate',
+          'ativo05', 'ativo05De', 'ativo05Ate',
+          'ativo06', 'ativo06De', 'ativo06Ate',
+          'ativo07', 'ativo07De', 'ativo07Ate',
+          'ativo08', 'ativo08De', 'ativo08Ate',
+          'ativo09', 'ativo09De', 'ativo09Ate',
+          'ativo10', 'ativo10De', 'ativo10Ate',
+        ] as const;
         
-        campos.forEach(campo => {
-          if (input[campo] !== undefined && input[campo] !== '') {
-            const normalized = String(input[campo]).replace(',', '.');
-            dados[campo] = parseFloat(normalized) || 0;
+        allCampos.forEach(campo => {
+          const val = (input as any)[campo];
+          if (val !== undefined) {
+            if (val === '' || val === null) {
+              dados[campo] = null;
+            } else {
+              const normalized = String(val).replace(',', '.');
+              const num = parseFloat(normalized);
+              dados[campo] = isNaN(num) ? null : num;
+            }
           }
         });
 

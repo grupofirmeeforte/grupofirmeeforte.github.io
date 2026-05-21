@@ -160,21 +160,38 @@ export default function TabelaComissao() {
   const { data: empresas = [] } = trpc.tabelaComissao.listarEmpresas.useQuery();
   const { data: convenios = [] } = trpc.tabelaComissao.listarConvenios.useQuery();
 
-  // Carregar valores do localStorage ao montar
+  // Carregar valores do banco ao montar
+  const { data: valoresDB } = trpc.valoresCalculo.obter.useQuery();
   useEffect(() => {
-    const saved = localStorage.getItem('valoresAtivos');
-    if (saved) {
-      try {
-        setValoresAtivos(JSON.parse(saved));
-      } catch (e) {
-        console.error('Erro ao carregar valores:', e);
-      }
-    }
-  }, []);
+    if (!valoresDB) return;
+    const novo: Record<string, string> = {};
+    NIVEIS.forEach(n => {
+      const db = valoresDB as Record<string, unknown>;
+      const key = n.toLowerCase();
+      novo[n] = db[key] != null ? String(db[key]) : '';
+      novo[`${n}De`] = db[`${key}De`] != null ? String(db[`${key}De`]) : '';
+      novo[`${n}Ate`] = db[`${key}Ate`] != null ? String(db[`${key}Ate`]) : '';
+    });
+    setValoresAtivos(novo);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valoresDB]);
 
-  const salvarValoresLocalmente = (valores: Record<string, string>) => {
-    localStorage.setItem('valoresAtivos', JSON.stringify(valores));
-    toast.success('Valores salvos!');
+  const salvarValoresMutation = trpc.valoresCalculo.atualizar.useMutation({
+    onSuccess: () => {
+      utils.valoresCalculo.obter.invalidate();
+      toast.success('Valores salvos no banco!');
+    },
+    onError: (e) => toast.error('Erro ao salvar: ' + e.message),
+  });
+
+  const salvarValoresNoBanco = (valores: Record<string, string>) => {
+    const payload: Record<string, string> = {};
+    NIVEIS.forEach(n => {
+      if (valores[n] !== undefined) payload[n.toLowerCase()] = valores[n];
+      if (valores[`${n}De`] !== undefined) payload[`${n.toLowerCase()}De`] = valores[`${n}De`];
+      if (valores[`${n}Ate`] !== undefined) payload[`${n.toLowerCase()}Ate`] = valores[`${n}Ate`];
+    });
+    salvarValoresMutation.mutate(payload as any);
   };
 
   const criarMutation = trpc.tabelaComissao.criar.useMutation({
@@ -291,7 +308,8 @@ export default function TabelaComissao() {
           <div className="flex justify-between items-center mb-2">
             <label className="text-sm font-semibold text-blue-900 block">Valores para Cálculo por Nível:</label>
             <Button
-              onClick={() => salvarValoresLocalmente(valoresAtivos)}
+              onClick={() => salvarValoresNoBanco(valoresAtivos)}
+              disabled={salvarValoresMutation.isPending}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 text-sm rounded"
             >
               💾 Salvar Tudo
