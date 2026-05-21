@@ -76,20 +76,20 @@ function moeda(val: string | null | undefined) {
   return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// Para valores que já são percentuais (ex: 2.40 = 2,40%)
-function pctDirect(val: string | null | undefined) {
+// Para juros: valor já é percentual direto (ex: 1.85 = 1,85%)
+function pctJuros(val: string | null | undefined) {
   if (!val) return '-';
   const n = parseFloat(val);
   if (isNaN(n)) return val;
   return n.toFixed(2).replace('.', ',') + '%';
 }
 
-// Para valores decimais que precisam ser multiplicados por 100 (ex: 0.0323 = 3,23%)
+// Para percPago: valor decimal que precisa ×100 (ex: 0.0065 → 0,65%)
 function pct(val: string | null | undefined) {
   if (!val) return '-';
   const n = parseFloat(val);
   if (isNaN(n)) return val;
-  return n.toFixed(2).replace('.', ',') + '%';
+  return (n * 100).toFixed(2).replace('.', ',') + '%';
 }
 
 function strVal(val: string | Date | null | undefined) {
@@ -731,7 +731,7 @@ export default function Consignado() {
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.dtContratacao)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.produto)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 max-w-32 truncate" title={r.descricaoProduto || ''}>{strVal(r.descricaoProduto)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.juros)}</td>
+                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pctJuros(r.juros)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.restricaoSRCC)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.percPago)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right font-semibold text-green-700">{moeda(r.totalComissao)}</td>
