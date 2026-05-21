@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save, Shield } from "lucide-react";
+import { ArrowLeft, Save, Shield, Eye, EyeOff } from 'lucide-react';
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -117,6 +117,16 @@ export default function AgentesFormPage() {
 
   const [permissoesModulos, setPermissoesModulos] = useState<PermissoesMap>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+
+  // Agentes protegidos: o olho de senha não é exibido para eles
+  const AGENTES_PROTEGIDOS = [
+    'sidnei honorato ultramare',
+    'thiago viana ultramare',
+    'thales viana ultramare',
+  ];
+  const nomeNormalizado = formData.nomeAgente.trim().toLowerCase();
+  const isAgenteProtegido = AGENTES_PROTEGIDOS.includes(nomeNormalizado);
 
   const { data: agente } = trpc.agentes.getById.useQuery(
     { id: agenteId! },
@@ -336,13 +346,26 @@ export default function AgentesFormPage() {
               </div>
               <div>
                 <Label htmlFor="senha">Senha</Label>
-                <Input
-                  id="senha"
-                  name="senha"
-                  type="password"
-                  value={formData.senha}
-                  onChange={handleInputChange}
-                />
+                <div className="relative">
+                  <Input
+                    id="senha"
+                    name="senha"
+                    type={mostrarSenha && !isAgenteProtegido ? 'text' : 'password'}
+                    value={formData.senha}
+                    onChange={handleInputChange}
+                    className="pr-10"
+                  />
+                  {!isAgenteProtegido && (
+                    <button
+                      type="button"
+                      onClick={() => setMostrarSenha(v => !v)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      tabIndex={-1}
+                    >
+                      {mostrarSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  )}
+                </div>
               </div>
               <div>
                 <Label htmlFor="dataAdmissao">Data de Admissão</Label>
