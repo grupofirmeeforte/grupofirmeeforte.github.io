@@ -121,18 +121,17 @@ function LGPDGate() {
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function GeoGate() {
-  const geo = useGeolocalizacao();
-
-  if (geo.status !== 'autorizado') {
-    return (
-      <BloqueioGeolocalizacao
-        status={geo.status}
-        mensagem={geo.mensagem}
-        tentarNovamente={geo.tentarNovamente}
-      />
-    );
-  }
-
+  // Geolocalização desativada provisoriamente (problemas no Windows)
+  // const geo = useGeolocalizacao();
+  // if (geo.status !== 'autorizado') {
+  //   return (
+  //     <BloqueioGeolocalizacao
+  //       status={geo.status}
+  //       mensagem={geo.mensagem}
+  //       tentarNovamente={geo.tentarNovamente}
+  //     />
+  //   );
+  // }
   return <LGPDGate />;
 }
 
