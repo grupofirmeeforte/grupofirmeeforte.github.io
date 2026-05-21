@@ -611,9 +611,9 @@ export const appRouter = router({
         if (input?.chaveJ) conditions.push(like(consignados.chaveJ, `%${input.chaveJ}%`));
         if (input?.convenio) conditions.push(eq(consignados.convenio, input.convenio));
         const { desc, asc, sql: sqlOrd } = await import('drizzle-orm');
-        // Ordenar por mês DESC (maior = mais recente) convertendo MMAA para AAAAMM
-        // ex: "126" (jan/2026) → LPAD(SUBSTRING(mes,1,LENGTH(mes)-2),2,'0') + '20' + RIGHT(mes,2)
-        const mesOrdem = sqlOrd`CAST(CONCAT('20', RIGHT(mes, 2), LPAD(FLOOR(CAST(mes AS UNSIGNED) / 100), 2, '0')) AS UNSIGNED)`;
+        // Ordenar por mês DESC (mais novo primeiro) — formato MM/AAAA → AAAAMM para comparação
+        // ex: "04/2026" → CONCAT(RIGHT(mes,4), LEFT(mes,2)) = "202604"
+        const mesOrdem = sqlOrd`CONCAT(RIGHT(mes, 4), LEFT(mes, 2))`;
         return await db.select().from(consignados).where(and(...conditions)).orderBy(desc(mesOrdem), asc(consignados.empresa), asc(consignados.chaveJ));
       }),
 
@@ -691,7 +691,7 @@ export const appRouter = router({
         if (input?.chaveJ) conditions.push(like(consignados.chaveJ, `%${input.chaveJ}%`));
         if (input?.nomeAgente) conditions.push(like(consignados.nomeAgente, `%${input.nomeAgente}%`));
         const { desc: descOrd2, asc: ascOrd2, sql: sqlOrd2 } = await import('drizzle-orm');
-        const mesOrdem2 = sqlOrd2`CAST(CONCAT('20', RIGHT(mes, 2), LPAD(FLOOR(CAST(mes AS UNSIGNED) / 100), 2, '0')) AS UNSIGNED)`;
+        const mesOrdem2 = sqlOrd2`CONCAT(RIGHT(mes, 4), LEFT(mes, 2))`;
         return conditions.length > 0
           ? await db.select().from(consignados).where(and(...conditions)).orderBy(descOrd2(mesOrdem2), ascOrd2(consignados.empresa), ascOrd2(consignados.chaveJ))
           : await db.select().from(consignados).orderBy(descOrd2(mesOrdem2), ascOrd2(consignados.empresa), ascOrd2(consignados.chaveJ));
@@ -792,7 +792,7 @@ export const appRouter = router({
       if (!db) return [];
       const { consignados } = await import('../drizzle/schema');
       const { desc: dMes, sql: sqlMes } = await import('drizzle-orm');
-      const mesOrd = sqlMes`CAST(CONCAT('20', RIGHT(mes, 2), LPAD(FLOOR(CAST(mes AS UNSIGNED) / 100), 2, '0')) AS UNSIGNED)`;
+      const mesOrd = sqlMes`CONCAT(RIGHT(mes, 4), LEFT(mes, 2))`;
       const rows = await db.selectDistinct({ mes: consignados.mes }).from(consignados).orderBy(dMes(mesOrd));
       return rows.map(r => r.mes).filter(Boolean) as string[];
     }),
