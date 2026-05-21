@@ -27,6 +27,7 @@ import Consorcio from './pages/Consorcio';
 import MensagemVersiculos from './pages/MensagemVersiculos';
 import MensagemSalmos from './pages/MensagemSalmos';
 import MensagemMinutosSabedoria from './pages/MensagemMinutosSabedoria';
+import MensagemHoroscopo from './pages/MensagemHoroscopo';
 import DocumentacaoAgentes from './pages/DocumentacaoAgentes';
 
 // import ChangePasswordPage from "./pages/change-password";
@@ -77,6 +78,7 @@ function RouterWithInactivity() {
       <Route path={"/mensagem-do-dia/versiculos"} component={MensagemVersiculos} />
       <Route path={"/mensagem-do-dia/salmos"} component={MensagemSalmos} />
       <Route path={"/mensagem-do-dia/minutos-sabedoria"} component={MensagemMinutosSabedoria} />
+      <Route path={"/mensagem-do-dia/horoscopo"} component={MensagemHoroscopo} />
       <Route path={"/cadastro/documentacao-agentes"} component={DocumentacaoAgentes} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
