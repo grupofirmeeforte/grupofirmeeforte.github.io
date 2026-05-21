@@ -803,7 +803,7 @@ export default function Consignado() {
             </div>
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Parcela</label>
-              <Input type="number" value={form.parcela || ''} onChange={e => setField('parcela', e.target.value)} placeholder="0" />
+              <Input type="number" value={form.parcela ?? ''} onChange={e => setForm(prev => ({ ...prev, parcela: e.target.value === '' ? undefined : Number(e.target.value) }))} placeholder="0" />
             </div>
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Prefixo BB</label>
@@ -828,41 +828,11 @@ export default function Consignado() {
               <Input value={form.juros || ''} onChange={e => setField('juros', e.target.value)} placeholder="0.0195" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Tabela Mês</label>
-              <Input value={form.tabelaMes || ''} onChange={e => setField('tabelaMes', e.target.value)} />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Perc. À Vista</label>
-              <Input value={form.percAVista || ''} onChange={e => setField('percAVista', e.target.value)} placeholder="0.0065" />
-            </div>
-            {/* Linha 7 */}
-            <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Restrição SRCC</label>
-              <Input value={form.restricaoSRCC || ''} onChange={e => setField('restricaoSRCC', e.target.value)} />
+              <Input value={form.restricaoSRCC || ''} onChange={e => setField('restricaoSRCC', e.target.value)} placeholder="Sim / Não" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">SRCC</label>
-              <Input value={form.srcc || ''} onChange={e => setField('srcc', e.target.value)} placeholder="0.00" />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Vr. Líquido - SRCC</label>
-              <Input value={form.vrLiquidoSrcc || ''} readOnly className="bg-amber-50 text-amber-800 font-medium cursor-default" placeholder="auto: Vr.Líquido - SRCC" />
-            </div>
-            {/* Linha 8 */}
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Perc. Pago (fórmula)</label>
-              <Input value={form.percPago || ''} readOnly className="bg-green-50 text-green-800 font-medium cursor-default" placeholder="auto: Tabela Comissão" />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Total Comissão (fórmula)</label>
-              <Input value={form.totalComissao || ''} readOnly className="bg-green-50 text-green-800 font-medium cursor-default" placeholder="auto: Vr.Líquido × Perc.Pago" />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Tabela (fórmula)</label>
-              <Input value={form.tabela || ''} onChange={e => setField('tabela', e.target.value)} placeholder="calculado" />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Supervisor (fórmula)</label>
+              <label className="text-xs font-medium text-gray-600 mb-1 block">Supervisor</label>
               <Input value={form.supervisor || ''} readOnly className="bg-blue-50 text-blue-800 font-medium cursor-default" placeholder="auto: busca pelo ChaveJ" />
             </div>
           </div>
