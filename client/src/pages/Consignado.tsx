@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Pencil, Trash2, Upload, Search, X } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Upload, Search, X, Download } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 type Consignado = {
@@ -485,6 +485,13 @@ export default function Consignado() {
             <p className="text-xs text-gray-500">Operações de crédito consignado</p>
           </div>
           <div className="ml-auto flex gap-2">
+            <a
+              href="/manus-storage/template_consignado_cd6bf8bb.xlsx"
+              download="template_consignado.xlsx"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-md border border-purple-500 text-purple-700 hover:bg-purple-50 transition-colors"
+            >
+              <Download className="w-4 h-4" /> Template
+            </a>
             <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 border-green-500 text-green-700 hover:bg-green-50">
               <Upload className="w-4 h-4" /> Importar
             </Button>
