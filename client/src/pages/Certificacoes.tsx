@@ -272,7 +272,7 @@ export default function Certificacoes() {
                 <TableHead className="text-white font-semibold">Nome Agente</TableHead>
                 <TableHead className="text-white font-semibold">CPF</TableHead>
                 <TableHead className="text-white font-semibold">Situação</TableHead>
-                <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação CONSIG</TableHead>
+                <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação CONSIG / LGPD</TableHead>
                 <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação LGPD</TableHead>
                 <TableHead className="text-white font-semibold">Ações</TableHead>
               </TableRow>
@@ -401,7 +401,7 @@ export default function Certificacoes() {
               <Input value={form.situacao || ''} onChange={e => setForm(p => ({ ...p, situacao: e.target.value }))} />
             </div>
             <div className="col-span-2 border-t pt-2">
-              <p className="text-xs font-bold text-blue-700 mb-2">Certificação CONSIG</p>
+              <p className="text-xs font-bold text-blue-700 mb-2">Certificação CONSIG / LGPD</p>
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">Data Certif (AAAA-MM-DD)</label>
