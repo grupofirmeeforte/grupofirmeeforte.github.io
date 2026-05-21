@@ -1017,3 +1017,30 @@ export const pensamentoDoDiaUsuario = mysqlTable("pensamento_do_dia_usuario", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 export type PensamentoDoDiaUsuario = typeof pensamentoDoDiaUsuario.$inferSelect;
+
+
+/**
+ * Tabela de Contas das Lojas
+ * Armazena comprovantes (PDF/imagem) de despesas das lojas com controle de pagamento
+ */
+export const contasLojas = mysqlTable("contasLojas", {
+  id: int("id").autoincrement().primaryKey(),
+  loja: varchar("loja", { length: 100 }).notNull(),          // Nome/identificação da loja
+  tipo: varchar("tipo", { length: 100 }).notNull(),           // Água, Energia, Aluguel, Internet, etc.
+  mesAno: varchar("mesAno", { length: 7 }),                   // MM/AAAA
+  valor: varchar("valor", { length: 20 }),                    // Valor da conta
+  vencimento: varchar("vencimento", { length: 10 }),          // DD/MM/AAAA
+  pago: boolean("pago").default(false).notNull(),
+  dataPagto: varchar("dataPagto", { length: 10 }),            // DD/MM/AAAA
+  observacao: text("observacao"),
+  arquivoUrl: varchar("arquivoUrl", { length: 500 }),         // URL do arquivo no S3
+  arquivoKey: varchar("arquivoKey", { length: 500 }),         // Chave S3
+  arquivoNome: varchar("arquivoNome", { length: 255 }),       // Nome original do arquivo
+  adicionadoPor: varchar("adicionadoPor", { length: 100 }),   // Nome de quem adicionou
+  pagoPor: varchar("pagoPor", { length: 100 }),               // Nome de quem marcou como pago
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ContaLoja = typeof contasLojas.$inferSelect;
+export type InsertContaLoja = typeof contasLojas.$inferInsert;

@@ -20,6 +20,7 @@ import PagamentosPage from './pages/Pagamentos';
 import ExtratosPage from './pages/Extratos';
 import ProRataPage from './pages/ProRata';
 import DespesasFixasPage from './pages/DespesasFixas';
+import ContasLojasPage from './pages/ContasLojas';
 import CRMPage from './pages/CRM';
 import AcompanhamentoDiario from './pages/AcompanhamentoDiario';
 import Consorcio from './pages/Consorcio';
@@ -67,6 +68,7 @@ function RouterWithInactivity() {
       <Route path={"/febraban/acompanhamento-diario"} component={AcompanhamentoDiario} />
       <Route path={"/pagamentos"} component={PagamentosPage} />
       <Route path={"/fornecedores"} component={DespesasFixasPage} />
+      <Route path={"/contas-lojas"} component={ContasLojasPage} />
       <Route path={"/crm"} component={CRMPage} />
       <Route path={"/extratos"} component={ExtratosPage} />
       <Route path={"/pro-rata"} component={ProRataPage} />
