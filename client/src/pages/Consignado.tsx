@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Pencil, Trash2, Upload, Search, X, Download } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Upload, Search, X, Download, RefreshCw } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
 type Consignado = {
@@ -145,7 +145,7 @@ export default function Consignado() {
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Estado para controlar quando calcular fórmulas (só quando chaveJ tem 7+ chars)
-  const [calcInput, setCalcInput] = useState<{chaveJ: string; convenio?: string; juros?: string; meses?: string; valorLiquido?: string; rbm?: string} | null>(null);
+  const [calcInput, setCalcInput] = useState<{chaveJ: string; convenio?: string; descricaoProduto?: string; juros?: string; meses?: string; valorLiquido?: string; rbm?: string; mes?: string} | null>(null);
 
   // Hook de cálculo automático
   const { data: formulasData } = trpc.consignado.calcularFormulas.useQuery(
@@ -206,6 +206,18 @@ export default function Consignado() {
 
   const marcarDuplicatas = trpc.consignado.marcarDuplicatas.useMutation();
 
+  const recalcularMes = trpc.consignado.recalcularMes.useMutation({
+    onSuccess: (r) => {
+      utils.consignado.listar.invalidate();
+      if ('mensagem' in r) {
+        toast.error(r.mensagem as string);
+      } else {
+        toast.success(`Recalculado! ${r.count} de ${r.total} registros atualizados.`);
+      }
+    },
+    onError: (e) => toast.error('Erro ao recalcular: ' + e.message),
+  });
+
   const importar = trpc.consignado.importar.useMutation({
     onSuccess: (r) => {
       utils.consignado.listar.invalidate();
@@ -246,16 +258,18 @@ export default function Consignado() {
       }
       
       // Recalcular fórmulas quando campos-chave mudam
-      if (['chaveJ', 'convenio', 'juros', 'valorLiquido', 'rbm', 'tabelaMes'].includes(field)) {
+      if (['chaveJ', 'convenio', 'descricaoProduto', 'juros', 'valorLiquido', 'rbm', 'tabelaMes', 'mes', 'parcela'].includes(field)) {
         const chaveJ = field === 'chaveJ' ? value : (prev.chaveJ || '');
         if (chaveJ.length >= 5) {
           setCalcInput({
             chaveJ,
             convenio: field === 'convenio' ? value : prev.convenio,
+            descricaoProduto: field === 'descricaoProduto' ? value : prev.descricaoProduto,
             juros: field === 'juros' ? value : prev.juros,
             valorLiquido: field === 'valorLiquido' ? value : prev.valorLiquido,
             rbm: field === 'rbm' ? value : prev.rbm,
-            meses: field === 'tabelaMes' ? value : prev.tabelaMes,
+            meses: field === 'tabelaMes' ? value : (field === 'parcela' ? value : prev.tabelaMes),
+            mes: field === 'mes' ? value : prev.mes,
           });
         }
       }
@@ -341,6 +355,19 @@ export default function Consignado() {
       totalComissao: r.totalComissao, difEmpresa: r.difEmpresa, tabela: r.tabela,
       supervisor: r.supervisor,
     } as FormData);
+    // Disparar cálculo automático ao abrir edição
+    if (r.chaveJ && r.chaveJ.length >= 5) {
+      setCalcInput({
+        chaveJ: r.chaveJ,
+        convenio: r.convenio || undefined,
+        descricaoProduto: r.descricaoProduto || undefined,
+        juros: r.juros || undefined,
+        valorLiquido: r.valorLiquido || undefined,
+        rbm: r.rbm || undefined,
+        meses: r.parcela ? String(r.parcela) : (r.tabelaMes || undefined),
+        mes: r.mes || undefined,
+      });
+    }
     setEditandoId(r.id);
     setModalAberto(true);
   }
@@ -494,6 +521,20 @@ export default function Consignado() {
             </a>
             <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 border-green-500 text-green-700 hover:bg-green-50">
               <Upload className="w-4 h-4" /> Importar
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const mes = filtroMes || '';
+                if (!mes) { toast.error('Selecione um mês no filtro antes de recalcular.'); return; }
+                recalcularMes.mutate({ mes });
+              }}
+              disabled={recalcularMes.isPending}
+              className="flex items-center gap-2 border-purple-500 text-purple-700 hover:bg-purple-50"
+              title="Recalcular Perc. Pago para todos os registros do mês selecionado"
+            >
+              <RefreshCw className={`w-4 h-4 ${recalcularMes.isPending ? 'animate-spin' : ''}`} />
+              {recalcularMes.isPending ? 'Calculando...' : 'Recalcular Mês'}
             </Button>
             <Button onClick={openNovo} className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800">
               <Plus className="w-4 h-4" /> Novo

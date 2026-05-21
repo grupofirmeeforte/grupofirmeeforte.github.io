@@ -1,6 +1,6 @@
 import { eq, and, lt, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao, mensagens, InsertMensagem, Mensagem, valoresCalculo, ValoresCalculo, consignados } from "../drizzle/schema";
+import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao, mensagens, InsertMensagem, Mensagem, valoresCalculo, ValoresCalculo, consignados, tabelasComissao } from "../drizzle/schema";
 import { ENV } from './_core/env';
 import { or } from "drizzle-orm";
 
@@ -394,9 +394,10 @@ export async function calcularPercPago(
   situacao: string,
   chaveJ: string,
   empresa: string,
-  parcela: string,
+  parcela: string | number,
   descricao: string,
-  juros: string
+  juros: string | number,
+  mes?: string // mês no formato MM/AAAA — só calcula a partir de 05/2026
 ): Promise<number> {
   const db = await getDb();
   if (!db) {
@@ -405,77 +406,129 @@ export async function calcularPercPago(
   }
 
   try {
+    // Regra 0: Só aplica a partir de 05/2026
+    if (mes) {
+      const [mesNum, anoNum] = mes.split('/').map(Number);
+      const mesAno = anoNum * 100 + mesNum; // ex: 202605
+      if (mesAno < 202605) return 0;
+    }
+
     // Regra 1: Se RBM é zero ou vazio, Perc. Pago = 0%
     if (!rbm || rbm === 0) return 0;
 
-    // Buscar valores de cálculo salvos
-    const valoresResult = await db.select().from(valoresCalculo).where(eq(valoresCalculo.id, 1)).limit(1);
-    const valores = valoresResult.length > 0 ? valoresResult[0] : null;
+    // 2. Determinar nível do agente
+    // Se situação é Ativo01-Ativo10, usar direto (sem calcular faixa)
+    let nivelNum: number | null = null;
+    const nivelMatch = situacao.match(/^Ativo(\d{1,2})$/i);
+    if (nivelMatch) {
+      nivelNum = parseInt(nivelMatch[1]);
+    }
 
-    if (!valores) {
+    // Se situação é "Ativo" simples, calcular pela soma do VrLíquido no mês
+    if (!nivelNum && situacao.toLowerCase() === 'ativo') {
+      // Buscar faixas de nível na tabela valoresCalculo
+      const valoresResult = await db.select().from(valoresCalculo).where(eq(valoresCalculo.id, 1)).limit(1);
+      const valores = valoresResult.length > 0 ? valoresResult[0] : null;
+
+      if (valores) {
+        // Somar VrLíquido do agente no mês (todos os registros do mesmo mês)
+        const whereClause: any[] = [eq(consignados.chaveJ, chaveJ)];
+        if (mes) whereClause.push(eq(consignados.mes, mes));
+
+        const consignadosList = await db.select({ valorLiquido: consignados.valorLiquido, restricaoSRCC: consignados.restricaoSRCC })
+          .from(consignados)
+          .where(and(...whereClause));
+
+        // Soma VrLíquido excluindo registros com SRCC = Sim
+        let somaVrLiquido = 0;
+        for (const cons of consignadosList) {
+          const srcc = (cons.restricaoSRCC || '').toLowerCase();
+          if (srcc !== 'sim' && srcc !== 's') {
+            somaVrLiquido += (cons.valorLiquido ? Number(cons.valorLiquido) : 0);
+          }
+        }
+
+        // Encontrar nível pelo valor acumulado
+        const faixas = [
+          { num: 1, ate: Number(valores.ativo01) || 0 },
+          { num: 2, ate: Number(valores.ativo02) || 0 },
+          { num: 3, ate: Number(valores.ativo03) || 0 },
+          { num: 4, ate: Number(valores.ativo04) || 0 },
+          { num: 5, ate: Number(valores.ativo05) || 0 },
+          { num: 6, ate: Number(valores.ativo06) || 0 },
+          { num: 7, ate: Number(valores.ativo07) || 0 },
+          { num: 8, ate: Number(valores.ativo08) || 0 },
+          { num: 9, ate: Number(valores.ativo09) || 0 },
+          { num: 10, ate: Number(valores.ativo10) || 0 },
+        ];
+
+        for (const faixa of faixas) {
+          if (faixa.ate > 0 && somaVrLiquido <= faixa.ate) {
+            nivelNum = faixa.num;
+            break;
+          }
+        }
+        // Se ultrapassou tudo, usa nível 10
+        if (!nivelNum) nivelNum = 10;
+      }
+    }
+
+    // Se ainda não tem nível, usa 1 como padrão
+    if (!nivelNum) nivelNum = 1;
+
+    const ativoCol = `ativo${String(nivelNum).padStart(2, '0')}`;
+
+    // 3. Buscar percentual na Tabela de Comissão
+    // Filtrar por: empresa + convênio (match com descricaoProduto) + parcela + juros
+    const parcelaNum = typeof parcela === 'string' ? parseInt(parcela) || 0 : parcela;
+    const jurosNum = typeof juros === 'string' ? parseFloat(juros.replace(',', '.')) || 0 : juros;
+
+    // Buscar todas as linhas da tabela para a empresa
+    const todasLinhas = await db.select().from(tabelasComissao)
+      .where(eq(tabelasComissao.empresa, empresa));
+
+    // Filtrar por convênio: match exato ou descricaoProduto contém convenio ou vice-versa
+    const linhasFiltradas = todasLinhas.filter(t => {
+      if (!t.convenio) return false;
+      const conv = t.convenio.toUpperCase().trim();
+      const desc = (descricao || '').toUpperCase().trim();
+      return conv === desc || desc.includes(conv) || conv.includes(desc);
+    });
+
+    // Filtrar por parcela e juros
+    let tabelaMatch = linhasFiltradas.find(t => {
+      const mDe = t.mesesDe ? parseInt(t.mesesDe) : 0;
+      const mAte = t.mesesAte ? parseInt(t.mesesAte) : 9999;
+      const jDe = t.txJurosDe ? parseFloat(t.txJurosDe) : 0;
+      const jAte = t.txJurosAte && t.txJurosAte !== 'acima' ? parseFloat(t.txJurosAte) : 9999;
+      return parcelaNum >= mDe && parcelaNum <= mAte && jurosNum >= jDe && jurosNum <= jAte;
+    });
+
+    // Se não achou com juros, tenta só por parcela
+    if (!tabelaMatch) {
+      tabelaMatch = linhasFiltradas.find(t => {
+        const mDe = t.mesesDe ? parseInt(t.mesesDe) : 0;
+        const mAte = t.mesesAte ? parseInt(t.mesesAte) : 9999;
+        return parcelaNum >= mDe && parcelaNum <= mAte;
+      });
+    }
+
+    // Se não achou por parcela, pega a primeira linha do convênio
+    if (!tabelaMatch && linhasFiltradas.length > 0) {
+      tabelaMatch = linhasFiltradas[0];
+    }
+
+    if (!tabelaMatch) {
+      console.warn(`[calcularPercPago] Nenhuma linha encontrada na tabela para empresa=${empresa}, descricao=${descricao}, parcela=${parcelaNum}, juros=${jurosNum}`);
       return 0;
     }
 
-    // 3. Se situação é Ativo01-Ativo10, usar direto
-    if (situacao.match(/^Ativo(\d+)$/)) {
-      const match = situacao.match(/^Ativo(\d+)$/);
-      if (match) {
-        const ativoNum = parseInt(match[1]);
-        const campoAtivo = `ativo${String(ativoNum).padStart(2, '0')}` as keyof ValoresCalculo;
-        const valor = valores[campoAtivo] as number | undefined;
-        return valor ? (valor / 100) : 0; // Converter de centavos para percentual
-      }
-    }
+    const percPagoVal = (tabelaMatch as any)[ativoCol];
+    if (!percPagoVal) return 0;
 
-    // 2. Se situação é "Ativo", calcular baseado na soma de Vr. Líquido
-    if (situacao === 'Ativo') {
-      // Buscar consignados com mesma ChaveJ, Empresa, Parcela, Descrição e Juros
-      const consignadosList = await db.select()
-        .from(consignados)
-        .where(
-          and(
-            eq(consignados.chaveJ, chaveJ),
-            eq(consignados.empresa, empresa),
-            eq(consignados.parcela, parseInt(parcela) || 0),
-            eq(consignados.descricaoProduto, descricao),
-            eq(consignados.juros, juros)
-          )
-        );
+    const perc = parseFloat(String(percPagoVal));
+    return isNaN(perc) ? 0 : perc;
 
-      // Somar Vr. Líquido
-      let somaVrLiquido = 0;
-      for (const cons of consignadosList) {
-        somaVrLiquido += (cons.valorLiquido ? Number(cons.valorLiquido) : 0);
-      }
-
-      // Encontrar qual Ativo encaixa
-      const ativos = [
-        { num: 1, valor: Number(valores.ativo01) || 0 },
-        { num: 2, valor: Number(valores.ativo02) || 0 },
-        { num: 3, valor: Number(valores.ativo03) || 0 },
-        { num: 4, valor: Number(valores.ativo04) || 0 },
-        { num: 5, valor: Number(valores.ativo05) || 0 },
-        { num: 6, valor: Number(valores.ativo06) || 0 },
-        { num: 7, valor: Number(valores.ativo07) || 0 },
-        { num: 8, valor: Number(valores.ativo08) || 0 },
-        { num: 9, valor: Number(valores.ativo09) || 0 },
-        { num: 10, valor: Number(valores.ativo10) || 0 },
-      ];
-
-      // Encontrar o primeiro Ativo onde somaVrLiquido <= valor
-      for (const ativo of ativos) {
-        if (somaVrLiquido <= ativo.valor) {
-          return (ativo.valor / 100); // Converter de centavos para percentual
-        }
-      }
-
-      // Se passou de todos, usar o último (Ativo 10)
-      return ((Number(valores.ativo10) || 0) / 100);
-    }
-
-    // 3. Se não é Ativo nem Ativo01-10, usar Ativo 01 como padrão
-    // Para situações genéricas como "CONSIGNADO INSS"
-    return (Number(valores.ativo01) || 0) / 100;
   } catch (error) {
     console.error("[Database] Error calculating perc pago:", error);
     return 0;

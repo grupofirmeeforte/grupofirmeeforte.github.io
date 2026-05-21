@@ -1,71 +1,44 @@
 import { describe, it, expect } from 'vitest';
 import { calcularPercPago } from './db';
 
-describe('calcularPercPago', () => {
-  it('deve retornar valor numérico entre 0 e 100', async () => {
-    const result = await calcularPercPago({
-      situacao: 'Ativo',
-      juros: '3',
-      rbm: '1000',
-      valorLiquido: '5000',
-      nrOperacao: 'OP001',
-    });
-    expect(typeof result).toBe('number');
-    expect(result).toBeGreaterThanOrEqual(0);
-    expect(result).toBeLessThanOrEqual(100);
-  });
-
-  it('deve retornar 0 para nrOperacao vazio', async () => {
-    const result = await calcularPercPago({
-      situacao: 'Ativo',
-      juros: '3',
-      rbm: '1000',
-      valorLiquido: '5000',
-      nrOperacao: '',
-    });
+describe('calcularPercPago - regras de negócio', () => {
+  it('deve retornar 0 quando RBM é zero', async () => {
+    const result = await calcularPercPago(0, 'Ativo01', 'J1234567', 'FLEX', '60', 'CONVENIOS BANCO DO BRASIL', '2.40', '05/2026');
     expect(result).toBe(0);
   });
 
-  it('deve calcular mesmo com RBM zerado', async () => {
-    const result = await calcularPercPago({
-      situacao: 'Ativo',
-      juros: '3',
-      rbm: '0',
-      valorLiquido: '5000',
-      nrOperacao: 'OP003',
-    });
-    expect(typeof result).toBe('number');
-    expect(result).toBeGreaterThanOrEqual(0);
-    expect(result).toBeLessThanOrEqual(100);
+  it('deve retornar 0 quando mês é anterior a 05/2026', async () => {
+    const result = await calcularPercPago(5000, 'Ativo01', 'J1234567', 'FLEX', '60', 'CONVENIOS BANCO DO BRASIL', '2.40', '04/2026');
+    expect(result).toBe(0);
   });
 
-  it('deve lidar com valores nulos', async () => {
-    const result = await calcularPercPago({
-      situacao: 'Ativo',
-      juros: '',
-      rbm: '',
-      valorLiquido: '',
-      nrOperacao: 'OP004',
-    });
-    expect(typeof result).toBe('number');
-    expect(result).toBeGreaterThanOrEqual(0);
-    expect(result).toBeLessThanOrEqual(100);
+  it('deve retornar 0 quando mês é 12/2025', async () => {
+    const result = await calcularPercPago(5000, 'Ativo01', 'J1234567', 'FLEX', '60', 'CONVENIOS BANCO DO BRASIL', '2.40', '12/2025');
+    expect(result).toBe(0);
   });
 
-  it('deve retornar número para diferentes situações', async () => {
-    const situacoes = ['Ativo', 'Ativo01-10', 'CONSIGNADO INSS', 'Inativo'];
-    
-    for (const situacao of situacoes) {
-      const result = await calcularPercPago({
-        situacao,
-        juros: '2.5',
-        rbm: '1000',
-        valorLiquido: '5000',
-        nrOperacao: `OP_${situacao}`,
-      });
-      expect(typeof result).toBe('number');
-      expect(result).toBeGreaterThanOrEqual(0);
-      expect(result).toBeLessThanOrEqual(100);
-    }
+  it('deve retornar número >= 0 para mês 05/2026 (mesmo sem dados no banco)', async () => {
+    const result = await calcularPercPago(5000, 'Ativo01', 'JNAOEXISTE', 'FLEX', '60', 'CONVENIOS BANCO DO BRASIL', '2.40', '05/2026');
+    expect(typeof result).toBe('number');
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+
+  it('deve retornar número >= 0 para mês 06/2026', async () => {
+    const result = await calcularPercPago(5000, 'Ativo01', 'JNAOEXISTE', 'FLEX', '60', 'CONVENIOS BANCO DO BRASIL', '2.40', '06/2026');
+    expect(typeof result).toBe('number');
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+
+  it('deve retornar número >= 0 para situação vazia (pode usar ativo01 como padrão)', async () => {
+    const result = await calcularPercPago(5000, '', 'JNAOEXISTE', 'FLEX', '60', 'CONVENIOS BANCO DO BRASIL', '2.40', '05/2026');
+    // Quando situação é vazia, pode usar ativo01 como padrão se encontrar na tabela
+    expect(typeof result).toBe('number');
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
+
+  it('não deve lançar exceção para qualquer combinação de parâmetros', async () => {
+    await expect(
+      calcularPercPago(1000, 'Ativo', 'JNAOEXISTE', 'EMPRESA_TESTE', '48', 'INSS', '1.80', '05/2026')
+    ).resolves.not.toThrow();
   });
 });

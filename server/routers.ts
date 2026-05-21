@@ -714,67 +714,59 @@ export const appRouter = router({
       .input(z.object({
         chaveJ: z.string(),
         convenio: z.string().optional(),
+        descricaoProduto: z.string().optional(),
         juros: z.string().optional(),
         meses: z.string().optional(),
         valorLiquido: z.string().optional(),
         rbm: z.string().optional(),
+        mes: z.string().optional(),
       }))
       .query(async ({ input }) => {
         const db = await getDb();
         if (!db) return null;
-        const { agentes, tabelasComissao } = await import('../drizzle/schema');
-        const { eq, and, lte, gte, or, isNull } = await import('drizzle-orm');
+        const { agentes } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+
+        // Buscar agente
+        const [agente] = await db.select().from(agentes).where(eq(agentes.chaveJ, input.chaveJ)).limit(1);
 
         // Regra 1: Se RBM é zero ou vazio, Perc. Pago = 0%
         const rbmValCheck = input.rbm ? parseFloat(input.rbm.replace(',', '.').replace(/[^0-9.]/g, '')) : 0;
         if (!input.rbm || rbmValCheck === 0) {
-          // Ainda busca dados do agente para preencher empresa/nome
-          const [agenteBasico] = await db.select().from(agentes).where(eq(agentes.chaveJ, input.chaveJ)).limit(1);
           return {
-            empresa: agenteBasico?.empresa || null,
-            nomeAgente: agenteBasico?.nomeAgente || null,
-            supervisor: agenteBasico?.supervisor || null,
+            empresa: agente?.empresa || null,
+            nomeAgente: agente?.nomeAgente || null,
+            supervisor: agente?.supervisor || null,
             percPago: '0',
             totalComissao: '0',
             difEmpresa: input.rbm ? '0' : null,
           };
         }
 
-        // 1. Buscar agente pelo chaveJ
-        const [agente] = await db.select().from(agentes).where(eq(agentes.chaveJ, input.chaveJ)).limit(1);
         if (!agente) return { erro: 'Agente não encontrado' };
 
-        // 2. Determinar nível do agente (situacao: Ativo01..Ativo10 → ativo01..ativo10)
+        // Usar descricaoProduto (preferência) ou convenio como fallback
+        const descricao = input.descricaoProduto || input.convenio || '';
+        const empresa = agente.empresa || '';
         const situacao = agente.situacao || '';
-        const nivelMatch = situacao.match(/Ativo(\d{2})/i);
-        const nivelNum = nivelMatch ? parseInt(nivelMatch[1]) : null;
-        const ativoCol = nivelNum ? `ativo${String(nivelNum).padStart(2, '0')}` : null;
+        const parcela = input.meses || '';
+        const juros = input.juros || '';
+        const mes = input.mes || '';
 
-        // 3. Buscar percentual na Tabela Comissão pelo convênio
-        let percPago: string | null = null;
-        if (input.convenio && ativoCol) {
-          const tabelas = await db.select().from(tabelasComissao)
-            .where(eq(tabelasComissao.convenio, input.convenio))
-            .limit(20);
-          // Filtrar pela faixa de juros e meses se fornecidos
-          let tabelaMatch = tabelas[0];
-          if (input.juros && input.meses) {
-            const jurosNum = parseFloat(input.juros.replace(',', '.'));
-            const mesesNum = parseInt(input.meses);
-            tabelaMatch = tabelas.find(t => {
-              const jDe = t.txJurosDe ? parseFloat(t.txJurosDe) : 0;
-              const jAte = t.txJurosAte && t.txJurosAte !== 'acima' ? parseFloat(t.txJurosAte) : 999;
-              const mDe = t.mesesDe ? parseInt(t.mesesDe) : 0;
-              const mAte = t.mesesAte ? parseInt(t.mesesAte) : 999;
-              return jurosNum >= jDe && jurosNum <= jAte && mesesNum >= mDe && mesesNum <= mAte;
-            }) || tabelas[0];
-          }
-          if (tabelaMatch) {
-            percPago = (tabelaMatch as any)[ativoCol] || null;
-          }
-        }
+        const percPagoNum = await calcularPercPago(
+          rbmValCheck,
+          situacao,
+          input.chaveJ,
+          empresa,
+          parcela,
+          descricao,
+          juros,
+          mes
+        );
 
-        // 4. Calcular totalComissao e difEmpresa
+        const percPago = percPagoNum > 0 ? String(percPagoNum) : null;
+
+        // Calcular totalComissao e difEmpresa
         let totalComissao: string | null = null;
         let difEmpresa: string | null = null;
         if (percPago && input.valorLiquido) {
@@ -924,101 +916,47 @@ export const appRouter = router({
                   if (!processed.nomeAgente) processed.nomeAgente = agente.nomeAgente || undefined;
                   if (!processed.supervisor) processed.supervisor = agente.supervisor || undefined;
                   
-                  // 2. Determinar nível do agente
-                  // Tentar primeiro usar o campo 'nivel', depois 'situacao' como fallback
-                  let nivelNum: number | null = null;
-                  
-                  if (agente.nivel) {
-                    const nivelMatch = agente.nivel.match(/\d{2}/);
-                    nivelNum = nivelMatch ? parseInt(nivelMatch[0]) : null;
-                  }
-                  
-                  if (!nivelNum) {
-                    const situacao = agente.situacao || '';
-                    const nivelMatch = situacao.match(/Ativo(\d{2})/i);
-                    nivelNum = nivelMatch ? parseInt(nivelMatch[1]) : null;
-                  }
-                  
-                  const ativoCol = nivelNum ? `ativo${String(nivelNum).padStart(2, '0')}` : null;
-                  
                   // Regra 1: Se RBM é zero ou vazio, Perc. Pago = 0%
                   const rbmImportCheck = record.rbm ? parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, '')) : 0;
                   if (!record.rbm || rbmImportCheck === 0) {
                     processed.percPago = '0';
                     processed.totalComissao = '0';
-                  }
+                  } else {
+                    // Usar calcularPercPago unificado (usa descricaoProduto, empresa, parcela, juros, mes)
+                    const situacaoAgente = agente.situacao || '';
+                    const chaveJAgente = record.chaveJ || '';
+                    const empresaAgente = record.empresa || agente.empresa || '';
+                    const parcelaRec = String(record.parcela || '');
+                    const descricaoRec = record.descricaoProduto || '';
+                    const jurosRec = record.juros || '';
+                    const mesRec = record.mes || '';
 
-                  // 3. Buscar percentual na Tabela Comissão (apenas se RBM > 0)
-                  if (record.rbm && rbmImportCheck > 0 && record.convenio && ativoCol) {
-                    const tabelas = await db.select().from(tabelasComissao)
-                      .where(eq(tabelasComissao.convenio, record.convenio))
-                      .limit(20);
-                    
-                    let tabelaMatch = tabelas[0];
-                    if (record.juros && record.tabelaMes) {
-                      const jurosNum = parseFloat((record.juros as string).replace(',', '.'));
-                      const mesesNum = parseInt(record.tabelaMes);
-                      tabelaMatch = tabelas.find(t => {
-                        const jDe = t.txJurosDe ? parseFloat(t.txJurosDe) : 0;
-                        const jAte = t.txJurosAte && t.txJurosAte !== 'acima' ? parseFloat(t.txJurosAte) : 999;
-                        const mDe = t.mesesDe ? parseInt(t.mesesDe) : 0;
-                        const mAte = t.mesesAte ? parseInt(t.mesesAte) : 999;
-                        return jurosNum >= jDe && jurosNum <= jAte && mesesNum >= mDe && mesesNum <= mAte;
-                      }) || tabelas[0];
-                    }
-                    
-                    if (tabelaMatch) {
-                      const percPagoVal = (tabelaMatch as any)[ativoCol];
-                      if (percPagoVal) {
-                        processed.percPago = String(percPagoVal);
-                        processed.tabela = tabelaMatch.convenio || undefined;
-                        
-                        // 4. Calcular totalComissao
-                        if (record.valorLiquido) {
-                          const vl = parseFloat((record.valorLiquido as string).replace(',', '.').replace(/[^0-9.]/g, ''));
-                          const pp = parseFloat(String(percPagoVal)) > 1 ? parseFloat(String(percPagoVal)) / 100 : parseFloat(String(percPagoVal));
-                          if (!isNaN(vl) && !isNaN(pp)) {
-                            processed.totalComissao = String((vl * pp).toFixed(2));
-                            
-                            // 5. Calcular difEmpresa
-                            if (record.rbm) {
-                              const rbmNum = parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, ''));
-                              if (!isNaN(rbmNum)) {
-                                processed.difEmpresa = String((rbmNum - vl * pp).toFixed(2));
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  } else if (ativoCol && record.rbm && rbmImportCheck > 0) {
-                    // Se não tem convenio, usar calcularPercPago com RBM
-                    const rbmNum = parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, '')) || 0;
-                    const situacao = agente.situacao || '';
-                    const chaveJ = record.chaveJ || '';
-                    const empresa = record.empresa || agente.empresa || '';
-                    const parcela = String(record.parcela || '');
-                    const descricao = record.descricaoProduto || '';
-                    const juros = record.juros || '';
-                    
-                    // Chamar calcularPercPago (já importado no topo)
-                    const percPagoVal = await calcularPercPago(rbmNum, situacao, chaveJ, empresa, parcela, descricao, juros);
-                    
+                    const percPagoVal = await calcularPercPago(
+                      rbmImportCheck,
+                      situacaoAgente,
+                      chaveJAgente,
+                      empresaAgente,
+                      parcelaRec,
+                      descricaoRec,
+                      jurosRec,
+                      mesRec
+                    );
+
                     if (percPagoVal > 0) {
                       processed.percPago = String(percPagoVal);
-                      
-                      // 4. Calcular totalComissao
+
+                      // Calcular totalComissao
                       if (record.valorLiquido) {
                         const vl = parseFloat((record.valorLiquido as string).replace(',', '.').replace(/[^0-9.]/g, ''));
                         const pp = percPagoVal > 1 ? percPagoVal / 100 : percPagoVal;
                         if (!isNaN(vl) && !isNaN(pp)) {
                           processed.totalComissao = String((vl * pp).toFixed(2));
-                          
-                          // 5. Calcular difEmpresa
+
+                          // Calcular difEmpresa
                           if (record.rbm) {
-                            const rbmNum2 = parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, ''));
-                            if (!isNaN(rbmNum2)) {
-                              processed.difEmpresa = String((rbmNum2 - vl * pp).toFixed(2));
+                            const rbmNum = parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, ''));
+                            if (!isNaN(rbmNum)) {
+                              processed.difEmpresa = String((rbmNum - vl * pp).toFixed(2));
                             }
                           }
                         }
@@ -1093,6 +1031,68 @@ export const appRouter = router({
         
         const rows = await db.select({ chaveJ: consignados.chaveJ }).from(consignados).where(eq(consignados.mes, input.mes));
         return rows.map(r => r.chaveJ).filter(Boolean) as string[];
+      }),
+
+    // Recalcular Perc. Pago e Total Comissão para todos os registros de um mês
+    recalcularMes: publicProcedure
+      .input(z.object({ mes: z.string() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { consignados, agentes } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+
+        // Verificar se mês é >= 05/2026
+        const [mesNum, anoNum] = input.mes.split('/').map(Number);
+        if (anoNum * 100 + mesNum < 202605) {
+          return { count: 0, mensagem: 'Cálculo só se aplica a partir de 05/2026' };
+        }
+
+        // Buscar todos os registros do mês
+        const registros = await db.select().from(consignados).where(eq(consignados.mes, input.mes));
+        let atualizados = 0;
+
+        for (const reg of registros) {
+          if (!reg.chaveJ) continue;
+
+          // Buscar agente
+          const [agente] = await db.select().from(agentes).where(eq(agentes.chaveJ, reg.chaveJ)).limit(1);
+          if (!agente) continue;
+
+          const rbmNum = reg.rbm ? Number(reg.rbm) : 0;
+          if (rbmNum === 0) {
+            await db.update(consignados).set({ percPago: '0', totalComissao: '0' }).where(eq(consignados.id, reg.id));
+            atualizados++;
+            continue;
+          }
+
+          const percPagoVal = await calcularPercPago(
+            rbmNum,
+            agente.situacao || '',
+            reg.chaveJ,
+            agente.empresa || reg.empresa || '',
+            String(reg.parcela || ''),
+            reg.descricaoProduto || '',
+            reg.juros || '',
+            input.mes
+          );
+
+          if (percPagoVal > 0) {
+            const vl = reg.valorLiquido ? Number(reg.valorLiquido) : 0;
+            const pp = percPagoVal > 1 ? percPagoVal / 100 : percPagoVal;
+            const totalComissao = !isNaN(vl) && !isNaN(pp) ? (vl * pp).toFixed(2) : null;
+            const difEmpresa = !isNaN(rbmNum) && totalComissao ? (rbmNum - parseFloat(totalComissao)).toFixed(2) : null;
+
+            await db.update(consignados).set({
+              percPago: String(percPagoVal),
+              totalComissao: totalComissao || undefined,
+              difEmpresa: difEmpresa || undefined,
+            }).where(eq(consignados.id, reg.id));
+            atualizados++;
+          }
+        }
+
+        return { count: atualizados, total: registros.length };
       }),
   }),
 
@@ -1278,6 +1278,7 @@ export const appRouter = router({
         parcela: z.string(),
         descricao: z.string(),
         juros: z.string(),
+        mes: z.string().optional(),
       }))
       .query(async ({ input }) => {
         const resultado = await calcularPercPago(
@@ -1287,7 +1288,8 @@ export const appRouter = router({
           input.empresa,
           input.parcela,
           input.descricao,
-          input.juros
+          input.juros,
+          input.mes
         );
         return { percPago: resultado };
       }),
