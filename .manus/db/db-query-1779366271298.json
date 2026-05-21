@@ -1,0 +1,28 @@
+{
+  "query": "SELECT COUNT(*) as sem_empresa FROM consignados WHERE empresa IS NULL OR empresa = '' OR empresa = '-'; SELECT DISTINCT empresa FROM consignados ORDER BY empresa;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COUNT(*) as sem_empresa FROM consignados WHERE empresa IS NULL OR empresa = '' OR empresa = '-'; SELECT DISTINCT empresa FROM consignados ORDER BY empresa;",
+  "rows": [
+    {
+      "sem_empresa": "1"
+    },
+    {
+      "sem_empresa": "empresa"
+    },
+    {
+      "sem_empresa": "NULL"
+    },
+    {
+      "sem_empresa": "0"
+    },
+    {
+      "sem_empresa": "BMF"
+    },
+    {
+      "sem_empresa": "FLEX"
+    }
+  ],
+  "messages": [],
+  "stdout": "sem_empresa\n1\nempresa\nNULL\n0\nBMF\nFLEX\n",
+  "stderr": "",
+  "execution_time_ms": 293
+}
