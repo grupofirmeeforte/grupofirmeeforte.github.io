@@ -273,7 +273,7 @@ export default function Certificacoes() {
                 <TableHead className="text-white font-semibold">CPF</TableHead>
                 <TableHead className="text-white font-semibold">Situação</TableHead>
                 <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação CONSIG / LGPD</TableHead>
-                <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação LGPD</TableHead>
+                <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação PLDFT</TableHead>
                 <TableHead className="text-white font-semibold">Ações</TableHead>
               </TableRow>
               <TableRow className="bg-blue-600 hover:bg-blue-600">
@@ -416,7 +416,7 @@ export default function Certificacoes() {
               <Input value={form.nrCertificadoConsig || ''} onChange={e => setForm(p => ({ ...p, nrCertificadoConsig: e.target.value }))} />
             </div>
             <div className="col-span-2 border-t pt-2">
-              <p className="text-xs font-bold text-purple-700 mb-2">Certificação LGPD</p>
+              <p className="text-xs font-bold text-purple-700 mb-2">Certificação PLDFT</p>
             </div>
             <div>
               <label className="text-xs font-medium text-slate-600">Data Certif 2 (AAAA-MM-DD)</label>
@@ -427,7 +427,7 @@ export default function Certificacoes() {
               <Input type="date" value={form.ventoCertif3 || ''} onChange={e => setForm(p => ({ ...p, ventoCertif3: e.target.value }))} />
             </div>
             <div className="col-span-2">
-              <label className="text-xs font-medium text-slate-600">Nr. Certificado LGPD</label>
+              <label className="text-xs font-medium text-slate-600">Nr. Certificado PLDFT</label>
               <Input value={form.nrCertificadoPldft || ''} onChange={e => setForm(p => ({ ...p, nrCertificadoPldft: e.target.value }))} />
             </div>
           </div>
