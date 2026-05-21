@@ -260,15 +260,26 @@ export default function TabelaComissao() {
   }
 
   const filteredRows = useMemo(() => {
-    if (!busca.trim()) return rows;
-    const q = busca.toLowerCase();
-    return rows.filter(r =>
-      (r.empresa || '').toLowerCase().includes(q) ||
-      (r.convenio || '').toLowerCase().includes(q) ||
-      (r.txJurosDe || '').includes(q) ||
-      (r.mesesDe || '').includes(q) ||
-      (r.mesesAte || '').includes(q)
-    );
+    const filtered = !busca.trim() ? rows : (() => {
+      const q = busca.toLowerCase();
+      return rows.filter(r =>
+        (r.empresa || '').toLowerCase().includes(q) ||
+        (r.convenio || '').toLowerCase().includes(q) ||
+        (r.txJurosDe || '').includes(q) ||
+        (r.mesesDe || '').includes(q) ||
+        (r.mesesAte || '').includes(q)
+      );
+    })();
+    // Ordenar por: Empresa → Convênio → Prazo (mesesDe numérico)
+    return [...filtered].sort((a, b) => {
+      const emp = (a.empresa || '').localeCompare(b.empresa || '', 'pt-BR');
+      if (emp !== 0) return emp;
+      const conv = (a.convenio || '').localeCompare(b.convenio || '', 'pt-BR');
+      if (conv !== 0) return conv;
+      const prazoA = parseInt(a.mesesDe || '0', 10);
+      const prazoB = parseInt(b.mesesDe || '0', 10);
+      return prazoA - prazoB;
+    });
   }, [rows, busca]);
 
   function openNovo() {
