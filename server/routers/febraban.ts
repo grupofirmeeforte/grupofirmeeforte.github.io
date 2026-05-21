@@ -736,7 +736,7 @@ export const febrabanRouter = {
     .input(z.object({
       empresa: z.enum(['BMF', 'FLEX']),
       mes: z.number().min(1).max(12),
-      ano: z.number().min(2026),
+      ano: z.number().min(2025),
     }))
     .query(async ({ input }) => {
       const db = await getDb();

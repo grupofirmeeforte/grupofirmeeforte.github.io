@@ -1,0 +1,22 @@
+{
+  "query": "SELECT situacao, COUNT(*) as total FROM febraban WHERE empresa = 'BMF' AND mesano = 525 GROUP BY situacao ORDER BY total DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT situacao, COUNT(*) as total FROM febraban WHERE empresa = 'BMF' AND mesano = 525 GROUP BY situacao ORDER BY total DESC;",
+  "rows": [
+    {
+      "situacao": "Contratada",
+      "total": "270"
+    },
+    {
+      "situacao": "Cancelada",
+      "total": "77"
+    },
+    {
+      "situacao": "Pendente",
+      "total": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "situacao\ttotal\nContratada\t270\nCancelada\t77\nPendente\t1\n",
+  "stderr": "",
+  "execution_time_ms": 276
+}

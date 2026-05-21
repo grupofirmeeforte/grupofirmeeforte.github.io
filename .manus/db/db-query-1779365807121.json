@@ -1,0 +1,165 @@
+{
+  "query": "SELECT empresa, mesano, COUNT(*) as total FROM febraban WHERE mesano BETWEEN 125 AND 1225 GROUP BY empresa, mesano ORDER BY empresa, mesano;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT empresa, mesano, COUNT(*) as total FROM febraban WHERE mesano BETWEEN 125 AND 1225 GROUP BY empresa, mesano ORDER BY empresa, mesano;",
+  "rows": [
+    {
+      "empresa": "BMF",
+      "mesano": "125",
+      "total": "376"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "126",
+      "total": "161"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "225",
+      "total": "339"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "226",
+      "total": "356"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "325",
+      "total": "291"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "326",
+      "total": "208"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "425",
+      "total": "486"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "426",
+      "total": "186"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "525",
+      "total": "348"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "526",
+      "total": "118"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "625",
+      "total": "378"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "725",
+      "total": "470"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "825",
+      "total": "348"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "925",
+      "total": "287"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "1025",
+      "total": "287"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "1125",
+      "total": "193"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "1225",
+      "total": "184"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "126",
+      "total": "316"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "226",
+      "total": "513"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "326",
+      "total": "445"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "425",
+      "total": "97"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "426",
+      "total": "277"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "525",
+      "total": "102"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "526",
+      "total": "154"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "625",
+      "total": "85"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "725",
+      "total": "177"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "825",
+      "total": "210"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "925",
+      "total": "305"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "1025",
+      "total": "364"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "1125",
+      "total": "352"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "1225",
+      "total": "330"
+    }
+  ],
+  "messages": [],
+  "stdout": "empresa\tmesano\ttotal\nBMF\t125\t376\nBMF\t126\t161\nBMF\t225\t339\nBMF\t226\t356\nBMF\t325\t291\nBMF\t326\t208\nBMF\t425\t486\nBMF\t426\t186\nBMF\t525\t348\nBMF\t526\t118\nBMF\t625\t378\nBMF\t725\t470\nBMF\t825\t348\nBMF\t925\t287\nBMF\t1025\t287\nBMF\t1125\t193\nBMF\t1225\t184\nFLEX\t126\t316\nFLEX\t226\t513\nFLEX\t326\t445\nFLEX\t425\t97\nFLEX\t426\t277\nFLEX\t525\t102\nFLEX\t526\t154\nFLEX\t625\t85\nFLEX\t725\t177\nFLEX\t825\t210\nFLEX\t925\t305\nFLEX\t1025\t364\nFLEX\t1125\t352\nFLEX\t1225\t330\n",
+  "stderr": "",
+  "execution_time_ms": 284
+}
