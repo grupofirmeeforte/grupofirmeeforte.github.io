@@ -112,6 +112,7 @@ export default function AgentesFormPage() {
     pix: "",
     dataNascimento: "",
     celular: "",
+    signo: "",
     permissoes: "leitor",
   });
 
@@ -270,6 +271,7 @@ export default function AgentesFormPage() {
         pix: agente.pix || "",
         dataNascimento: agente.dataNascimento || "", // Manter como string YYYY-MM-DD
         celular: agente.celular || "",
+        signo: (agente as any).signo || "",
         permissoes: agente.permissoes || "leitor",
       });
       // Carregar permissoesModulos do JSON
@@ -559,6 +561,30 @@ export default function AgentesFormPage() {
                   value={formData.celular}
                   onChange={handleInputChange}
                 />
+              </div>
+              <div>
+                <Label htmlFor="signo">Signo</Label>
+                <select
+                  id="signo"
+                  name="signo"
+                  value={formData.signo}
+                  onChange={handleInputChange as any}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="">-- Selecione --</option>
+                  <option value="Áries">♈ Áries (21/03 - 19/04)</option>
+                  <option value="Touro">♉ Touro (20/04 - 20/05)</option>
+                  <option value="Gêmeos">♊ Gêmeos (21/05 - 20/06)</option>
+                  <option value="Câncer">♋ Câncer (21/06 - 22/07)</option>
+                  <option value="Leão">♌ Leão (23/07 - 22/08)</option>
+                  <option value="Virgem">♍ Virgem (23/08 - 22/09)</option>
+                  <option value="Libra">♎ Libra (23/09 - 22/10)</option>
+                  <option value="Escorpião">♏ Escorpião (23/10 - 21/11)</option>
+                  <option value="Sagitário">♐ Sagitário (22/11 - 21/12)</option>
+                  <option value="Capricórnio">♑ Capricórnio (22/12 - 19/01)</option>
+                  <option value="Aquário">♒ Aquário (20/01 - 18/02)</option>
+                  <option value="Peixes">♓ Peixes (19/02 - 20/03)</option>
+                </select>
               </div>
             </div>
           </CardContent>

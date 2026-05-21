@@ -18,6 +18,7 @@ import { supervisoresRouter } from "./routers/supervisores";
 import { minutosSabedoriaRouter } from "./routers/minutosSabedoria";
 import { contasLojasRouter } from "./routers/contasLojas";
 import { documentosAgentesRouter } from "./routers/documentosAgentes";
+import { horoscopoRouter } from "./routers/horoscopo";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
 import { users, agentes, despesasFixas, pagamentos } from "../drizzle/schema";
@@ -356,6 +357,7 @@ export const appRouter = router({
   minutosSabedoria: minutosSabedoriaRouter,
   contasLojas: contasLojasRouter,
   documentosAgentes: documentosAgentesRouter,
+  horoscopo: horoscopoRouter,
   sessoes: router({
     // Obter todas as sessões ativas
     getAtivas: publicProcedure.query(async () => {

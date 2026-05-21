@@ -47,7 +47,7 @@ export type InsertUser = typeof users.$inferInsert;
  * Tabela de Agentes
  * Armazena informações de todos os agentes do sistema
  */
-export const agentes = mysqlTable("agentes", {
+export const agentes = mysqlTable('agentes', {
   id: int("id").autoincrement().primaryKey(),
   numCadastro: varchar("numCadastro", { length: 50 }).unique(),
   empresa: varchar("empresa", { length: 100 }),
@@ -76,6 +76,7 @@ export const agentes = mysqlTable("agentes", {
   celular: varchar("celular", { length: 20 }),
   permissoes: varchar("permissoes", { length: 50 }).default("leitor"), // admin, editor, leitor, sem_acesso
   permissoesModulos: text("permissoesModulos"), // JSON com permissoes por sub-aba: {modulo: {subaba: nivel}}
+  signo: varchar("signo", { length: 20 }), // signo zodiacal para horóscopo diário
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
