@@ -229,6 +229,36 @@ export default function TabelaComissao() {
     onError: (e) => toast.error('Erro ao excluir: ' + e.message),
   });
 
+  // Mapa de cores por convênio (degradê por grupo)
+  const CONVENIO_COLORS: Record<string, { row: string; badge: string }> = {
+    'CONVENIOS BANCO DO BRASIL': { row: 'bg-gradient-to-r from-yellow-50 to-amber-50 hover:from-yellow-100 hover:to-amber-100', badge: 'bg-yellow-200 text-yellow-900 border border-yellow-400' },
+    'CREDITO PESSOAL':           { row: 'bg-gradient-to-r from-blue-50 to-sky-50 hover:from-blue-100 hover:to-sky-100',       badge: 'bg-blue-200 text-blue-900 border border-blue-400' },
+    'FEDERAL':                   { row: 'bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100', badge: 'bg-green-200 text-green-900 border border-green-400' },
+    'FGTS':                      { row: 'bg-gradient-to-r from-orange-50 to-amber-50 hover:from-orange-100 hover:to-amber-100', badge: 'bg-orange-200 text-orange-900 border border-orange-400' },
+    'INSS':                      { row: 'bg-gradient-to-r from-purple-50 to-violet-50 hover:from-purple-100 hover:to-violet-100', badge: 'bg-purple-200 text-purple-900 border border-purple-400' },
+    'CONSIGNADO INSS':           { row: 'bg-gradient-to-r from-purple-50 to-violet-50 hover:from-purple-100 hover:to-violet-100', badge: 'bg-purple-200 text-purple-900 border border-purple-400' },
+    'SIAPE':                     { row: 'bg-gradient-to-r from-teal-50 to-cyan-50 hover:from-teal-100 hover:to-cyan-100',       badge: 'bg-teal-200 text-teal-900 border border-teal-400' },
+    'PREFEITURA':                { row: 'bg-gradient-to-r from-rose-50 to-pink-50 hover:from-rose-100 hover:to-pink-100',       badge: 'bg-rose-200 text-rose-900 border border-rose-400' },
+  };
+
+  function getConvenioColor(convenio: string | null) {
+    if (!convenio) return { row: 'bg-white hover:bg-gray-50', badge: 'bg-gray-100 text-gray-700 border border-gray-300' };
+    const upper = convenio.toUpperCase();
+    for (const [key, val] of Object.entries(CONVENIO_COLORS)) {
+      if (upper.includes(key)) return val;
+    }
+    // Fallback: gera cor baseada no hash do nome
+    const hash = convenio.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    const palettes = [
+      { row: 'bg-gradient-to-r from-indigo-50 to-blue-50 hover:from-indigo-100 hover:to-blue-100', badge: 'bg-indigo-200 text-indigo-900 border border-indigo-400' },
+      { row: 'bg-gradient-to-r from-lime-50 to-green-50 hover:from-lime-100 hover:to-green-100',   badge: 'bg-lime-200 text-lime-900 border border-lime-400' },
+      { row: 'bg-gradient-to-r from-fuchsia-50 to-pink-50 hover:from-fuchsia-100 hover:to-pink-100', badge: 'bg-fuchsia-200 text-fuchsia-900 border border-fuchsia-400' },
+      { row: 'bg-gradient-to-r from-cyan-50 to-sky-50 hover:from-cyan-100 hover:to-sky-100',       badge: 'bg-cyan-200 text-cyan-900 border border-cyan-400' },
+      { row: 'bg-gradient-to-r from-red-50 to-rose-50 hover:from-red-100 hover:to-rose-100',       badge: 'bg-red-200 text-red-900 border border-red-400' },
+    ];
+    return palettes[hash % palettes.length];
+  }
+
   const filteredRows = useMemo(() => {
     if (!busca.trim()) return rows;
     const q = busca.toLowerCase();
@@ -447,8 +477,10 @@ export default function TabelaComissao() {
                     <td colSpan={19} className="text-center py-8 text-gray-500">Nenhum registro encontrado</td>
                   </tr>
                 ) : (
-                  filteredRows.map((row, idx) => (
-                    <tr key={row.id} className={idx % 2 === 0 ? 'bg-white hover:bg-blue-50/50 transition-colors' : 'bg-gradient-to-r from-blue-50/70 to-indigo-50/50 hover:from-blue-100/70 hover:to-indigo-100/50 transition-colors'}>
+                  filteredRows.map((row) => {
+                    const convColor = getConvenioColor(row.convenio);
+                    return (
+                      <tr key={row.id} className={`${convColor.row} transition-colors`}>
                       <td className="px-3 py-1.5 font-medium text-gray-900 whitespace-nowrap">
                         <EditableCell
                           value={row.empresa}
@@ -463,12 +495,10 @@ export default function TabelaComissao() {
                           isSaving={savingCell === `${row.id}-codigo`}
                         />
                       </td>
-                      <td className="px-3 py-1.5 text-gray-700 whitespace-nowrap max-w-[180px] truncate">
-                        <EditableCell
-                          value={row.convenio}
-                          onSave={(v) => handleCellSave(row.id, 'convenio', v)}
-                          isSaving={savingCell === `${row.id}-convenio`}
-                        />
+                      <td className="px-3 py-1.5 whitespace-nowrap max-w-[200px]">
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold truncate max-w-[180px] ${convColor.badge}`}>
+                          {row.convenio || '-'}
+                        </span>
                       </td>
                       <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
                         <EditableCell
@@ -610,7 +640,8 @@ export default function TabelaComissao() {
                         </div>
                       </td>
                     </tr>
-                  ))
+                    );
+                  })
                 )}
               </tbody>
             </table>
