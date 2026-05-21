@@ -131,4 +131,57 @@ export const documentosAgentesRouter = router({
   tiposDocumento: publicProcedure.query(() => {
     return [...TIPOS_DOCUMENTO];
   }),
+
+  // Listar todos os agentes do cadastro com contagem de documentos
+  listarAgentesComDocs: publicProcedure
+    .input(z.object({ busca: z.string().optional() }).optional())
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return [];
+      const { sql: sqlD, count } = await import('drizzle-orm');
+
+      // Buscar todos os agentes
+      const conditions: any[] = [];
+      if (input?.busca && input.busca.trim()) {
+        conditions.push(
+          or(
+            like(agentes.chaveJ, `%${input.busca}%`),
+            like(agentes.nomeAgente, `%${input.busca}%`)
+          )
+        );
+      }
+
+      const listaAgentes = await db
+        .select({
+          chaveJ: agentes.chaveJ,
+          nomeAgente: agentes.nomeAgente,
+          empresa: agentes.empresa,
+          situacao: agentes.situacao,
+        })
+        .from(agentes)
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .orderBy(agentes.nomeAgente)
+        .limit(1000);
+
+      // Buscar contagem de documentos por chaveJ
+      const contagens = await db
+        .select({
+          chaveJ: documentosAgentes.chaveJ,
+          qtd: sqlD<number>`COUNT(*)`,
+        })
+        .from(documentosAgentes)
+        .groupBy(documentosAgentes.chaveJ);
+
+      const contagemMap = new Map<string, number>();
+      for (const c of contagens) {
+        if (c.chaveJ) contagemMap.set(c.chaveJ, Number(c.qtd));
+      }
+
+      return listaAgentes
+        .filter(a => a.chaveJ)
+        .map(a => ({
+          ...a,
+          qtdDocumentos: contagemMap.get(a.chaveJ!) ?? 0,
+        }));
+    }),
 });
