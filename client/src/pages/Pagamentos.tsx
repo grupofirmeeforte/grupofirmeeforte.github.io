@@ -123,6 +123,7 @@ export default function PagamentosPage() {
   const [editandoDtPagto, setEditandoDtPagto] = useState<number | null>(null);
   const [valorDtPagto, setValorDtPagto] = useState("");
   const dtPagtoRef = useRef<HTMLInputElement>(null);
+  const dtPagtoRowIndexRef = useRef<number>(-1);
 
   const utils = trpc.useUtils();
   const { data: nextCodigo } = trpc.pagamentos.nextCodigo.useQuery();
@@ -146,9 +147,10 @@ export default function PagamentosPage() {
     onError: (e) => toast.error(e.message),
   });
 
-  const iniciarEdicaoDtPagto = (row: UnifiedRow) => {
+  const iniciarEdicaoDtPagto = (row: UnifiedRow, rowIndex?: number) => {
     setEditandoDtPagto(row.id);
     setValorDtPagto(row.dataPagto ?? "");
+    dtPagtoRowIndexRef.current = rowIndex ?? -1;
     setTimeout(() => dtPagtoRef.current?.focus(), 50);
   };
 
@@ -483,24 +485,29 @@ export default function PagamentosPage() {
                       onChange={(e) => {
                         const v = maskData(e.target.value);
                         setValorDtPagto(v);
-                        if (v.length === 10) {
-                          const pago = true;
-                          if (row._fonte === 'pagamento') {
-                            editarDtPagtoMutation.mutate({ id: row.id, dataPagto: v, pago });
-                          } else {
-                            editarDtPagtoDesp.mutate({ id: row.id, dataPagto: v, pago });
-                          }
-                        }
                       }}
                       onBlur={() => row._fonte === 'pagamento' ? salvarDtPagto(row.id) : salvarDtPagtoDesp(row.id)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter") row._fonte === 'pagamento' ? salvarDtPagto(row.id) : salvarDtPagtoDesp(row.id);
+                        if (e.key === "Enter") {
+                          // Salva a data atual
+                          if (row._fonte === 'pagamento') salvarDtPagto(row.id);
+                          else salvarDtPagtoDesp(row.id);
+                          // Avança para a próxima linha não paga
+                          const currentIdx = dtPagtoRowIndexRef.current;
+                          if (currentIdx >= 0) {
+                            const nextRow = rows.slice(currentIdx + 1).find(r => !r.dataPagto && !r.pago);
+                            if (nextRow) {
+                              const nextIdx = rows.findIndex(r => r.id === nextRow.id && r._fonte === nextRow._fonte);
+                              setTimeout(() => iniciarEdicaoDtPagto(nextRow, nextIdx), 100);
+                            }
+                          }
+                        }
                         if (e.key === "Escape") setEditandoDtPagto(null);
                       }}
                       placeholder="DD/MM/AAAA" maxLength={10}
                       className="w-28 border border-blue-500 rounded px-1.5 py-0.5 text-xs focus:outline-none bg-gray-800 text-white" />
                   ) : (
-                    <span onClick={() => iniciarEdicaoDtPagto(row)}
+                    <span onClick={() => iniciarEdicaoDtPagto(row, i)}
                       className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[6rem] inline-block border border-transparent hover:border-blue-600"
                       title="Clique para editar">
                       {row.dataPagto || <span className="text-gray-500 italic text-xs">DD/MM/AAAA</span>}
