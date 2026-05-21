@@ -96,7 +96,7 @@ export const documentosAgentesRouter = router({
       const timestamp = Date.now();
       const fileKey = `docs-agentes/${input.chaveJ}/${timestamp}-${input.arquivoNome.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
 
-      const { url } = await storagePut(fileKey, buffer, input.arquivoTipo);
+      const { url, key: savedKey } = await storagePut(fileKey, buffer, input.arquivoTipo);
 
       // Salvar no banco
       await db.insert(documentosAgentes).values({
@@ -106,7 +106,7 @@ export const documentosAgentesRouter = router({
         tipoDocumento: input.tipoDocumento,
         descricao: input.descricao ?? null,
         arquivoUrl: url,
-        arquivoKey: fileKey,
+        arquivoKey: savedKey, // key real com hash gerado pelo storagePut
         arquivoNome: input.arquivoNome,
         arquivoTipo: input.arquivoTipo,
         tamanho: input.tamanho ?? buffer.length,
