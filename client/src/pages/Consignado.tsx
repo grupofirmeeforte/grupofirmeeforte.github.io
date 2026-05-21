@@ -850,11 +850,6 @@ export default function Consignado() {
               <label className="text-xs font-medium text-gray-600 mb-1 block">Total Comissão (fórmula)</label>
               <Input value={form.totalComissao || ''} readOnly className="bg-green-50 text-green-800 font-medium cursor-default" placeholder="auto: Vr.Líquido × Perc.Pago" />
             </div>
-            {/* Linha 8 */}
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1 block">Dif. Empresa (fórmula)</label>
-              <Input value={form.difEmpresa || ''} readOnly className="bg-amber-50 text-amber-800 font-medium cursor-default" placeholder="auto: RBM − Total Comissão" />
-            </div>
             <div>
               <label className="text-xs font-medium text-gray-600 mb-1 block">Tabela (fórmula)</label>
               <Input value={form.tabela || ''} onChange={e => setField('tabela', e.target.value)} placeholder="calculado" />
