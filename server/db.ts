@@ -506,23 +506,33 @@ export async function calcularPercPago(
       return conv === desc || desc.includes(conv) || conv.includes(desc);
     });
 
-    // Filtrar por parcela e juros
-    let tabelaMatch = linhasFiltradas.find(t => {
+    // Filtrar por parcela e juros — ordenar por especificidade:
+    // Faixas com txJurosAte numérico (específico) têm prioridade sobre "acima"
+    const linhasComParcela = linhasFiltradas.filter(t => {
       const mDe = t.mesesDe ? parseInt(t.mesesDe) : 0;
       const mAte = t.mesesAte ? parseInt(t.mesesAte) : 9999;
-      const jDe = t.txJurosDe ? parseFloat(t.txJurosDe) : 0;
-      const jAte = t.txJurosAte && t.txJurosAte !== 'acima' ? parseFloat(t.txJurosAte) : 9999;
-      return parcelaNum >= mDe && parcelaNum <= mAte && jurosNum >= jDe && jurosNum <= jAte;
+      return parcelaNum >= mDe && parcelaNum <= mAte;
     });
 
-    // Se não achou com juros, tenta só por parcela
-    if (!tabelaMatch) {
-      tabelaMatch = linhasFiltradas.find(t => {
-        const mDe = t.mesesDe ? parseInt(t.mesesDe) : 0;
-        const mAte = t.mesesAte ? parseInt(t.mesesAte) : 9999;
-        return parcelaNum >= mDe && parcelaNum <= mAte;
-      });
-    }
+    // Normalizar valor de juros: tratar vírgula como separador decimal
+    const parseJuros = (v: string | null | undefined): number => {
+      if (!v) return 0;
+      const s = v.trim().toLowerCase();
+      if (s === 'acima') return 9999; // fallback para "acima" ainda existente
+      return parseFloat(s.replace(',', '.')) || 0;
+    };
+
+    // Filtrar por faixa de juros (prioridade: faixa mais específica = menor jAte)
+    const linhasComJuros = linhasComParcela.filter(t => {
+      const jDe = parseJuros(t.txJurosDe);
+      const jAte = parseJuros(t.txJurosAte);
+      return jurosNum >= jDe && jurosNum <= jAte;
+    });
+
+    // Ordenar por especificidade: menor jAte primeiro (faixa mais restrita tem prioridade)
+    linhasComJuros.sort((a, b) => parseJuros(a.txJurosAte) - parseJuros(b.txJurosAte));
+
+    let tabelaMatch = linhasComJuros[0] ?? linhasComParcela[0];
 
     // Se não achou por parcela, pega a primeira linha do convênio
     if (!tabelaMatch && linhasFiltradas.length > 0) {
