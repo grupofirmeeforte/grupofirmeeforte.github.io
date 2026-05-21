@@ -139,6 +139,23 @@ export default function AcompanhamentoDiario() {
               </Button>
             </div>
 
+            {/* Seletor de ano */}
+            <div className="flex gap-1">
+              {[2025, 2026].map(a => (
+                <button
+                  key={a}
+                  onClick={() => setAno(a)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
+                    ano === a
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                  }`}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+
             {/* Abas BMF / FLEX */}
             <div className="flex gap-2">
               {(["BMF","FLEX"] as Empresa[]).map(e => (
