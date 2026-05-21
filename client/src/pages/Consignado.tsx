@@ -89,7 +89,7 @@ function pct(val: string | null | undefined) {
   if (!val) return '-';
   const n = parseFloat(val);
   if (isNaN(n)) return val;
-  return (n * 100).toFixed(2).replace('.', ',') + '%';
+  return n.toFixed(2).replace('.', ',') + '%';
 }
 
 function strVal(val: string | Date | null | undefined) {
