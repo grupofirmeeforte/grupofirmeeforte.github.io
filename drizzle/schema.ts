@@ -1064,3 +1064,28 @@ export const contasLojas = mysqlTable("contasLojas", {
 
 export type ContaLoja = typeof contasLojas.$inferSelect;
 export type InsertContaLoja = typeof contasLojas.$inferInsert;
+
+/**
+ * Tabela de Documentação de Agentes
+ * Armazena cópias de documentos dos agentes (RG, CPF, Contrato, etc.)
+ */
+export const documentosAgentes = mysqlTable("documentosAgentes", {
+  id: int("id").autoincrement().primaryKey(),
+  chaveJ: varchar("chaveJ", { length: 50 }).notNull(),          // Chave J do agente
+  nomeAgente: varchar("nomeAgente", { length: 255 }),            // Nome do agente (denormalizado para exibição)
+  empresa: varchar("empresa", { length: 100 }),                  // Empresa do agente
+  tipoDocumento: varchar("tipoDocumento", { length: 100 }).notNull(), // Contrato, RG, CPF, Endereço, CNH, Conta Bancária, Foto 3x4, Outros
+  descricao: varchar("descricao", { length: 255 }),              // Descrição adicional
+  arquivoUrl: varchar("arquivoUrl", { length: 500 }),            // URL do arquivo no S3
+  arquivoKey: varchar("arquivoKey", { length: 500 }),            // Chave S3
+  arquivoNome: varchar("arquivoNome", { length: 255 }),          // Nome original do arquivo
+  arquivoTipo: varchar("arquivoTipo", { length: 100 }),          // MIME type (image/jpeg, application/pdf, etc.)
+  tamanho: int("tamanho"),                                       // Tamanho em bytes
+  adicionadoPor: varchar("adicionadoPor", { length: 100 }),      // Nome de quem adicionou
+  observacao: text("observacao"),                                // Observações livres
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DocumentoAgente = typeof documentosAgentes.$inferSelect;
+export type InsertDocumentoAgente = typeof documentosAgentes.$inferInsert;

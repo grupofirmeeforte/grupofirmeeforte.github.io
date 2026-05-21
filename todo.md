@@ -585,3 +585,14 @@
 - [x] Botão "Enviar p/ Cálculo" (verde) na barra do Consignado
 - [x] Modal com duas opções: "Enviar Todo o Mês" e "Enviar Selecionados (uma por uma)"
 - [x] Feedback de quantos registros foram criados/atualizados
+
+## FASE 39: ABA DOCUMENTAÇÃO AGENTES NO CADASTRO
+- [x] Criar tabela documentosAgentes no banco (id, chaveJ, nomeAgente, empresa, tipoDocumento, descricao, arquivoUrl, arquivoKey, arquivoNome, arquivoTipo, tamanho, adicionadoPor, observacao)
+- [x] Criar router tRPC: listar, buscarAgentes (autocomplete do cadastro), upload S3, deletar
+- [x] Criar página DocumentacaoAgentes.tsx com tabela, filtros por Chave J/Nome/Tipo
+- [x] Modal de upload com busca autocomplete de agente (Chave J + Nome buscados do cadastro)
+- [x] Tipos de documento: Contrato, RG, CPF, Comprovante de Endereço, CNH, Conta Bancária, Foto 3x4, Outros
+- [x] Visualização de documentos (imagem inline, PDF em iframe, link para abrir em nova aba)
+- [x] Botão Voltar estilo escuro conforme padrão
+- [x] Registrar rota /cadastro/documentacao-agentes no App.tsx
+- [x] Adicionar card "Documentação Agentes" no grupo Cadastros da Home

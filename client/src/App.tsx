@@ -27,6 +27,7 @@ import Consorcio from './pages/Consorcio';
 import MensagemVersiculos from './pages/MensagemVersiculos';
 import MensagemSalmos from './pages/MensagemSalmos';
 import MensagemMinutosSabedoria from './pages/MensagemMinutosSabedoria';
+import DocumentacaoAgentes from './pages/DocumentacaoAgentes';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -76,6 +77,7 @@ function RouterWithInactivity() {
       <Route path={"/mensagem-do-dia/versiculos"} component={MensagemVersiculos} />
       <Route path={"/mensagem-do-dia/salmos"} component={MensagemSalmos} />
       <Route path={"/mensagem-do-dia/minutos-sabedoria"} component={MensagemMinutosSabedoria} />
+      <Route path={"/cadastro/documentacao-agentes"} component={DocumentacaoAgentes} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />
