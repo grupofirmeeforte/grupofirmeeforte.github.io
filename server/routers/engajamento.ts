@@ -2,7 +2,7 @@ import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { sql, eq, and, desc, isNotNull } from "drizzle-orm";
 import {
-  agentes, calculos, agenteStreak, agenteMetas, agenteConquistas
+  agentes, calculos, febraban, agenteStreak, agenteMetas, agenteConquistas
 } from "../../drizzle/schema";
 import { z } from "zod";
 
@@ -18,6 +18,20 @@ function getMesAtualBrasilia(): string {
   const mes = String(brt.getMonth() + 1).padStart(2, '0');
   const ano = brt.getFullYear();
   return `${mes}/${ano}`;
+}
+
+// Converte "MM/YYYY" para o formato numérico do febraban (ex: "05/2026" → 526)
+function mesAnoParaFebMesano(mesAno: string): number {
+  const [mes, ano] = mesAno.split('/');
+  return parseInt(mes, 10) * 100 + (parseInt(ano, 10) % 100);
+}
+
+// Converte mesano numérico do febraban para "MM/YYYY" (ex: 526 → "05/2026")
+function febMesanoParaMesAno(mesano: number): string {
+  const mes = Math.floor(mesano / 100);
+  const anoSufixo = mesano % 100;
+  const anoCompleto = anoSufixo + (anoSufixo < 50 ? 2000 : 1900);
+  return `${String(mes).padStart(2, '0')}/${anoCompleto}`;
 }
 
 async function getChaveJFromCtx(ctx: { user: { email?: string | null; openId?: string | null } }, db: Awaited<ReturnType<typeof getDb>>): Promise<string | null> {
@@ -86,13 +100,25 @@ export const engajamentoRouter = router({
     const chaveJ = await getChaveJFromCtx(ctx, db);
     if (!chaveJ) return null;
     const mesAtual = getMesAtualBrasilia();
+    const febMesano = mesAnoParaFebMesano(mesAtual);
     try {
       const [agente] = await db.select().from(agentes).where(eq(agentes.chaveJ, chaveJ)).limit(1);
 
-      const [producaoMes] = await db
+      // Produção BB: soma troco das operações Contratadas na tabela febraban
+      const [producaoFeb] = await db
         .select({
-          vrLiquidoC2: sql<number>`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)`,
-          vrLiquidoSrcc: sql<number>`COALESCE(SUM(${calculos.vrLiquidoSrcc}), 0)`,
+          totalTroco: sql<number>`COALESCE(SUM(${febraban.troco}), 0)`,
+        })
+        .from(febraban)
+        .where(and(
+          eq(febraban.operador, chaveJ),
+          eq(febraban.mesano, febMesano),
+          eq(febraban.situacao, 'Contratada')
+        ));
+
+      // Outros produtos (consórcio, ourocap, c/c, seguros) ainda vêm de calculos
+      const [producaoCalc] = await db
+        .select({
           comissaoConsorcio: sql<number>`COALESCE(SUM(${calculos.comissaoConsorcio}), 0)`,
           comissaoOurocap: sql<number>`COALESCE(SUM(${calculos.comissaoOurocap}), 0)`,
           comissaoCc: sql<number>`COALESCE(SUM(${calculos.comissaoCc}), 0)`,
@@ -112,21 +138,29 @@ export const engajamentoRouter = router({
         .where(eq(agenteConquistas.chaveJ, chaveJ))
         .orderBy(desc(agenteConquistas.conquistadoEm));
 
+      // Ranking usa febraban.troco (Produção BB) — apenas Contratadas
       const rankingRows = await db
-        .select({ chaveJ: calculos.chaveJ, total: sql<number>`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)` })
-        .from(calculos)
-        .where(eq(calculos.mesRef, mesAtual))
-        .groupBy(calculos.chaveJ)
-        .orderBy(desc(sql`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)`));
-      const posicaoRanking = rankingRows.findIndex(r => r.chaveJ === chaveJ) + 1;
+        .select({
+          operador: febraban.operador,
+          total: sql<number>`COALESCE(SUM(${febraban.troco}), 0)`,
+        })
+        .from(febraban)
+        .where(and(eq(febraban.mesano, febMesano), eq(febraban.situacao, 'Contratada')))
+        .groupBy(febraban.operador)
+        .orderBy(desc(sql`COALESCE(SUM(${febraban.troco}), 0)`));
+      const posicaoRanking = rankingRows.findIndex(r => r.operador === chaveJ) + 1;
       const totalRanking = rankingRows.length;
 
-      const historico = await db
-        .select({ mesRef: calculos.mesRef, total: sql<number>`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)` })
-        .from(calculos)
-        .where(eq(calculos.chaveJ, chaveJ))
-        .groupBy(calculos.mesRef)
-        .orderBy(desc(calculos.mesRef))
+      // Histórico usa febraban.troco por mesano
+      const historicoFeb = await db
+        .select({
+          mesano: febraban.mesano,
+          total: sql<number>`COALESCE(SUM(${febraban.troco}), 0)`,
+        })
+        .from(febraban)
+        .where(and(eq(febraban.operador, chaveJ), eq(febraban.situacao, 'Contratada')))
+        .groupBy(febraban.mesano)
+        .orderBy(desc(febraban.mesano))
         .limit(6);
 
       // Verificar conquistas de ranking
@@ -137,7 +171,9 @@ export const engajamentoRouter = router({
         await inserirConquista(db, chaveJ, 'top3_ranking', 'Top 3', 'Ficou entre os 3 primeiros do ranking', 'medal');
       }
 
-      const comissaoAtual = Number(producaoMes?.vrLiquidoC2 ?? 0) + Number(producaoMes?.vrLiquidoSrcc ?? 0) + Number(producaoMes?.comissaoConsorcio ?? 0) + Number(producaoMes?.comissaoOurocap ?? 0) + Number(producaoMes?.comissaoCc ?? 0) + Number(producaoMes?.comissaoSeguros ?? 0);
+      const totalFeb = Number(producaoFeb?.totalTroco ?? 0);
+      const totalOutros = Number(producaoCalc?.comissaoConsorcio ?? 0) + Number(producaoCalc?.comissaoOurocap ?? 0) + Number(producaoCalc?.comissaoCc ?? 0) + Number(producaoCalc?.comissaoSeguros ?? 0);
+      const comissaoAtual = totalFeb + totalOutros;
       const metaTotalVal = Number(meta?.metaTotal ?? 0);
       if (metaTotalVal > 0 && comissaoAtual >= metaTotalVal) {
         await inserirConquista(db, chaveJ, 'meta_batida', 'Meta Batida!', 'Atingiu 100% da meta mensal', 'trophy');
@@ -150,14 +186,14 @@ export const engajamentoRouter = router({
         agente: agente ?? null,
         mesAtual,
         producaoMes: {
-          vrLiquidoC2: Number(producaoMes?.vrLiquidoC2 ?? 0),
-          vrLiquidoSrcc: Number(producaoMes?.vrLiquidoSrcc ?? 0),
-          comissaoConsorcio: Number(producaoMes?.comissaoConsorcio ?? 0),
-          comissaoOurocap: Number(producaoMes?.comissaoOurocap ?? 0),
-          comissaoCc: Number(producaoMes?.comissaoCc ?? 0),
-          comissaoSeguros: Number(producaoMes?.comissaoSeguros ?? 0),
-          rbmTotal: Number(producaoMes?.rbmTotal ?? 0),
-          total: Number(producaoMes?.vrLiquidoC2 ?? 0) + Number(producaoMes?.vrLiquidoSrcc ?? 0) + Number(producaoMes?.comissaoConsorcio ?? 0) + Number(producaoMes?.comissaoOurocap ?? 0) + Number(producaoMes?.comissaoCc ?? 0) + Number(producaoMes?.comissaoSeguros ?? 0),
+          vrLiquidoC2: totalFeb,          // troco do Febraban (Produção BB) — Contratadas
+          vrLiquidoSrcc: 0,
+          comissaoConsorcio: Number(producaoCalc?.comissaoConsorcio ?? 0),
+          comissaoOurocap: Number(producaoCalc?.comissaoOurocap ?? 0),
+          comissaoCc: Number(producaoCalc?.comissaoCc ?? 0),
+          comissaoSeguros: Number(producaoCalc?.comissaoSeguros ?? 0),
+          rbmTotal: Number(producaoCalc?.rbmTotal ?? 0),
+          total: comissaoAtual,
         },
         meta: meta ? {
           metaTotal: Number(meta.metaTotal),
@@ -179,7 +215,10 @@ export const engajamentoRouter = router({
           conquistadoEm: c.conquistadoEm,
         })),
         ranking: { posicao: posicaoRanking, total: totalRanking },
-        historico: historico.map(h => ({ mesRef: h.mesRef, total: Number(h.total) })),
+        historico: historicoFeb.map(h => ({
+          mesRef: h.mesano != null ? febMesanoParaMesAno(Number(h.mesano)) : '',
+          total: Number(h.total),
+        })),
         docsVencendo: [],
       };
     } catch (err) {
@@ -193,32 +232,44 @@ export const engajamentoRouter = router({
     if (!db) return [];
     const mesRef = input.mesRef || getMesAtualBrasilia();
     const chaveJLogado = await getChaveJFromCtx(ctx, db);
+    const febMesanoRanking = mesAnoParaFebMesano(mesRef);
     try {
-      const rankingRows = await db
+      // Ranking usa febraban.troco (Produção BB) — apenas Contratadas
+      const rankingFeb = await db
         .select({
-          chaveJ: calculos.chaveJ,
-          nomeAgente: calculos.nomeAgente,
-          empresa: calculos.empresa,
-          cidade: calculos.cidade,
-          vrLiquido: sql<number>`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)`,
-          rbmTotal: sql<number>`COALESCE(SUM(${calculos.rbmTotal}), 0)`,
+          operador: febraban.operador,
+          vrLiquido: sql<number>`COALESCE(SUM(${febraban.troco}), 0)`,
         })
-        .from(calculos)
-        .where(eq(calculos.mesRef, mesRef))
-        .groupBy(calculos.chaveJ, calculos.nomeAgente, calculos.empresa, calculos.cidade)
-        .orderBy(desc(sql`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)`))
+        .from(febraban)
+        .where(and(eq(febraban.mesano, febMesanoRanking), eq(febraban.situacao, 'Contratada')))
+        .groupBy(febraban.operador)
+        .orderBy(desc(sql`COALESCE(SUM(${febraban.troco}), 0)`))
         .limit(20);
 
-      return rankingRows.map((r, i) => ({
-        posicao: i + 1,
-        chaveJ: r.chaveJ,
-        nomeAgente: r.nomeAgente,
-        empresa: r.empresa,
-        cidade: r.cidade,
-        vrLiquido: Number(r.vrLiquido),
-          rbmTotal: Number(r.rbmTotal),
-        isMe: r.chaveJ === chaveJLogado,
-      }));
+      // Buscar nomes dos agentes pelo chaveJ (operador) — exibir apenas primeiro nome
+      const chaveJs = rankingFeb.map(r => r.operador).filter(Boolean) as string[];
+      const agentesRanking = chaveJs.length > 0
+        ? await db.select({ chaveJ: agentes.chaveJ, nomeAgente: agentes.nomeAgente, empresa: agentes.empresa })
+            .from(agentes)
+            .where(sql`${agentes.chaveJ} IN (${sql.join(chaveJs.map(c => sql`${c}`), sql`, `)})`)
+        : [];
+      const agentesMap = new Map(agentesRanking.map(a => [a.chaveJ, a]));
+
+      return rankingFeb.map((r, i) => {
+        const ag = agentesMap.get(r.operador ?? '');
+        const nomeCompleto = ag?.nomeAgente ?? '';
+        const primeiroNome = nomeCompleto.split(' ')[0] || '—';
+        return {
+          posicao: i + 1,
+          chaveJ: r.operador,
+          nomeAgente: primeiroNome,
+          empresa: ag?.empresa ?? null,
+          cidade: null as string | null,
+          vrLiquido: Number(r.vrLiquido),
+          rbmTotal: 0,
+          isMe: r.operador === chaveJLogado,
+        };
+      });
     } catch (err) {
       console.error("[engajamento.rankingMes] Erro:", err);
       return [];
@@ -274,13 +325,16 @@ export const engajamentoRouter = router({
     const db = await getDb();
     if (!db) return [];
     try {
+      // Usa febraban.mesano para listar meses disponíveis
       const rows = await db
-        .selectDistinct({ mesRef: calculos.mesRef })
-        .from(calculos)
-        .where(isNotNull(calculos.mesRef))
-        .orderBy(desc(calculos.mesRef))
+        .selectDistinct({ mesano: febraban.mesano })
+        .from(febraban)
+        .where(isNotNull(febraban.mesano))
+        .orderBy(desc(febraban.mesano))
         .limit(12);
-      return rows.map(r => r.mesRef).filter(Boolean);
+      return rows
+        .map(r => r.mesano != null ? febMesanoParaMesAno(Number(r.mesano)) : null)
+        .filter(Boolean);
     } catch {
       return [];
     }

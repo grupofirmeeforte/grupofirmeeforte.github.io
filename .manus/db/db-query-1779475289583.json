@@ -1,0 +1,60 @@
+{
+  "query": "SELECT operador, COUNT(*) as qtd, SUM(troco) as total_troco FROM febraban WHERE mesano = 526 AND situacao = 'Contratada' GROUP BY operador ORDER BY total_troco DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT operador, COUNT(*) as qtd, SUM(troco) as total_troco FROM febraban WHERE mesano = 526 AND situacao = 'Contratada' GROUP BY operador ORDER BY total_troco DESC LIMIT 10;",
+  "rows": [
+    {
+      "operador": "JJ596288",
+      "qtd": "19",
+      "total_troco": "166541.21"
+    },
+    {
+      "operador": "JJ425794",
+      "qtd": "8",
+      "total_troco": "130000.00"
+    },
+    {
+      "operador": "JJ596263",
+      "qtd": "11",
+      "total_troco": "125816.00"
+    },
+    {
+      "operador": "JJ124185",
+      "qtd": "17",
+      "total_troco": "122999.98"
+    },
+    {
+      "operador": "JJ204048",
+      "qtd": "21",
+      "total_troco": "116387.36"
+    },
+    {
+      "operador": "JJ058926",
+      "qtd": "6",
+      "total_troco": "112600.00"
+    },
+    {
+      "operador": "J9663285",
+      "qtd": "19",
+      "total_troco": "111834.28"
+    },
+    {
+      "operador": "JJ596281",
+      "qtd": "15",
+      "total_troco": "101308.68"
+    },
+    {
+      "operador": "JI819740",
+      "qtd": "13",
+      "total_troco": "99407.55"
+    },
+    {
+      "operador": "J9661460",
+      "qtd": "23",
+      "total_troco": "98816.11"
+    }
+  ],
+  "messages": [],
+  "stdout": "operador\tqtd\ttotal_troco\nJJ596288\t19\t166541.21\nJJ425794\t8\t130000.00\nJJ596263\t11\t125816.00\nJJ124185\t17\t122999.98\nJJ204048\t21\t116387.36\nJJ058926\t6\t112600.00\nJ9663285\t19\t111834.28\nJJ596281\t15\t101308.68\nJI819740\t13\t99407.55\nJ9661460\t23\t98816.11\n",
+  "stderr": "",
+  "execution_time_ms": 268
+}

@@ -98,6 +98,11 @@ export default function Home() {
       bgColor: 'from-indigo-50 to-purple-50',
       subModules: [
         { title: 'Meu Painel', description: 'Produção, ranking, metas, streak e conquistas', icon: LayoutDashboard, color: 'bg-indigo-700', path: '/painel-agente', subKey: 'painel-agente' },
+        { title: 'Mensagem do Dia', description: 'Versículos, Salmos, Motivacional e Horóscopo', icon: Mail, color: 'bg-rose-600', path: '/mensagem-do-dia/motivacional', subKey: 'mensagem-do-dia' },
+        { title: 'Minutos de Sabedoria', description: 'Reflexões diárias de sabedoria', icon: Sparkles, color: 'bg-purple-600', path: '/mensagem-do-dia/minutos-sabedoria', subKey: 'minutos-sabedoria' },
+        { title: 'Salmos', description: 'Salmos do dia', icon: BookOpen, color: 'bg-amber-600', path: '/mensagem-do-dia/salmos', subKey: 'salmos' },
+        { title: 'Versículos', description: 'Versículos motivacionais do dia', icon: BookMarked, color: 'bg-rose-600', path: '/mensagem-do-dia/versiculos', subKey: 'versiculos' },
+        { title: 'Horóscopo', description: 'Horóscopo diário por signo', icon: Star, color: 'bg-indigo-600', path: '/mensagem-do-dia/horoscopo', subKey: 'horoscopo' },
       ],
     },
     {
@@ -190,23 +195,7 @@ export default function Home() {
       ],
     },
 
-    {
-      type: 'group',
-      key: 'mailing',
-      title: 'Mensagem do Dia',
-      description: 'Versículos e Salmos do dia',
-      icon: Mail,
-      color: 'bg-rose-600',
-      borderColor: 'border-rose-200',
-      bgColor: 'from-rose-50 to-pink-50',
-      subModules: [
-        { title: 'Minutos de Sabedoria', description: 'Reflexões diárias de sabedoria', icon: Sparkles, color: 'bg-purple-600', path: '/mensagem-do-dia/minutos-sabedoria', subKey: 'minutos-sabedoria' },
-        { title: 'Motivacional', description: 'Mensagem de otimismo e superação do dia', icon: Zap, color: 'bg-amber-600', path: '/mensagem-do-dia/motivacional', subKey: 'motivacional' },
-        { title: 'Salmos', description: 'Salmos do dia', icon: BookOpen, color: 'bg-amber-600', path: '/mensagem-do-dia/salmos', subKey: 'salmos' },
-        { title: 'Versículos', description: 'Versículos motivacionais do dia', icon: BookMarked, color: 'bg-rose-600', path: '/mensagem-do-dia/versiculos', subKey: 'versiculos' },
-        { title: 'Horóscopo', description: 'Horóscopo diário por signo', icon: Star, color: 'bg-indigo-600', path: '/mensagem-do-dia/horoscopo', subKey: 'horoscopo' },
-      ],
-    },
+
 
     {
       type: 'group',

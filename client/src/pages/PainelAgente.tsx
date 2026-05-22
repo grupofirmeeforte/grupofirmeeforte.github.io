@@ -41,6 +41,7 @@ export default function PainelAgente() {
   const [modalMeta, setModalMeta] = useState(false);
   const [metaInput, setMetaInput] = useState("");
   const [mesRankFiltro, setMesRankFiltro] = useState<string | undefined>(undefined);
+  const [modalMetaInicial, setModalMetaInicial] = useState(false);
 
   // Registrar acesso (streak)
   const registrarAcesso = trpc.engajamento.registrarAcesso.useMutation();
@@ -59,6 +60,7 @@ export default function PainelAgente() {
   );
 
   const { data: meses } = trpc.engajamento.mesesDisponiveis.useQuery();
+  const { data: msgDia } = trpc.mensagensMotivacionais.getDoDia.useQuery(undefined, { refetchOnWindowFocus: false });
 
   const salvarMeta = trpc.engajamento.salvarMeta.useMutation({
     onSuccess: () => {
@@ -85,6 +87,17 @@ export default function PainelAgente() {
     });
   };
 
+  // Abrir pop-up de meta quando o painel carregar e não houver meta definida
+  useEffect(() => {
+    if (painel && !painel.meta) {
+      const jaViu = sessionStorage.getItem(`meta-prompt-${painel.mesAtual}`);
+      if (!jaViu) {
+        setModalMetaInicial(true);
+        sessionStorage.setItem(`meta-prompt-${painel.mesAtual}`, '1');
+      }
+    }
+  }, [painel]);
+
   const comissaoAtual = painel?.producaoMes?.total ?? 0;
   const metaTotal = painel?.meta?.metaTotal ?? 0;
   const percMeta = metaTotal > 0 ? Math.min((comissaoAtual / metaTotal) * 100, 100) : 0;
@@ -97,6 +110,39 @@ export default function PainelAgente() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Modal Meta Inicial */}
+      <Dialog open={modalMetaInicial} onOpenChange={setModalMetaInicial}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-yellow-400 flex items-center gap-2">
+              <Target className="w-5 h-5" /> Defina sua meta para {painel?.mesAtual}!
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-slate-300 text-sm">Você ainda não definiu sua meta para este mês. Que tal definir agora e se desafiar a conquistá-la?</p>
+          <div className="space-y-2">
+            <Label className="text-slate-300">Valor da meta (R$)</Label>
+            <Input
+              value={metaInput}
+              onChange={e => setMetaInput(e.target.value)}
+              placeholder="Ex: 5000"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+              autoFocus
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setModalMetaInicial(false)} className="border-slate-600 text-slate-300 bg-transparent hover:bg-slate-700">
+              Agora não
+            </Button>
+            <Button
+              onClick={() => { handleSalvarMeta(); setModalMetaInicial(false); }}
+              className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
+            >
+              <Trophy className="w-4 h-4 mr-1" /> Definir minha meta!
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Header */}
       <div style={{ background: 'linear-gradient(135deg, #002776 0%, #003d99 60%, #c8960c 100%)' }} className="shadow-xl">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -219,26 +265,42 @@ export default function PainelAgente() {
               <CardContent className="space-y-4">
                 {metaTotal > 0 ? (
                   <>
-                    <div className="flex justify-between items-end">
-                      <div>
-                        <div className="text-3xl font-black" style={{ color: percMetaReal >= 100 ? '#4ade80' : percMetaReal >= 70 ? '#facc15' : '#f87171' }}>
-                          {percMetaReal.toFixed(1)}%
+                    {percMetaReal >= 100 ? (
+                      /* SELO DE PARABÉNS */
+                      <div className="text-center py-2 animate-pulse">
+                        <div className="text-5xl mb-2">🏆</div>
+                        <div className="text-2xl font-black text-yellow-400 mb-1">PARABÉNS!</div>
+                        <div className="text-green-400 font-bold text-lg mb-1">Você bateu sua meta!</div>
+                        <div className="text-slate-300 text-sm mb-3">{fmt(comissaoAtual)} de {fmt(metaTotal)}</div>
+                        <div className="flex justify-center gap-2">
+                          <Badge className="bg-yellow-500 text-black font-bold text-sm px-3 py-1">🥇 Meta Conquistada!</Badge>
                         </div>
-                        <div className="text-slate-400 text-xs">de {fmt(metaTotal)}</div>
+                        <Progress value={100} className="h-3 bg-slate-700 mt-3" />
                       </div>
-                      <div className="text-right text-sm">
-                        {percMetaReal >= 100 ? (
-                          <Badge className="bg-green-600 text-white">✓ Meta batida!</Badge>
-                        ) : (
-                          <div className="text-slate-400">faltam {fmt(Math.max(0, metaTotal - comissaoAtual))}</div>
-                        )}
-                      </div>
-                    </div>
-                    <Progress
-                      value={percMeta}
-                      className="h-4 bg-slate-700"
-                      style={{ '--progress-color': percMetaReal >= 100 ? '#4ade80' : percMetaReal >= 70 ? '#facc15' : '#f87171' } as React.CSSProperties}
-                    />
+                    ) : (
+                      <>
+                        <div className="flex justify-between items-end">
+                          <div>
+                            <div className="text-3xl font-black" style={{ color: percMetaReal >= 70 ? '#facc15' : '#f87171' }}>
+                              {percMetaReal.toFixed(1)}%
+                            </div>
+                            <div className="text-slate-400 text-xs">de {fmt(metaTotal)}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-slate-300 text-sm font-semibold">Falta</div>
+                            <div className="text-red-400 font-black text-xl">{fmt(Math.max(0, metaTotal - comissaoAtual))}</div>
+                          </div>
+                        </div>
+                        <Progress
+                          value={percMeta}
+                          className="h-4 bg-slate-700"
+                          style={{ '--progress-color': percMetaReal >= 70 ? '#facc15' : '#f87171' } as React.CSSProperties}
+                        />
+                        <p className="text-xs text-slate-400 text-center">
+                          {percMetaReal >= 70 ? '🔥 Quase lá! Continue assim!' : percMetaReal >= 40 ? '💪 Bom ritmo! Você consegue!' : '🎯 Foco na meta! Você é capaz!'}
+                        </p>
+                      </>
+                    )}
                   </>
                 ) : (
                   <div className="text-center py-6">
@@ -382,6 +444,26 @@ export default function PainelAgente() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Mensagem do Dia */}
+          {msgDia && (
+            <Card className="border-0 shadow-xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' }}>
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="text-4xl flex-shrink-0">⚡</div>
+                  <div className="flex-1">
+                    <div className="text-xs font-bold text-amber-400 uppercase tracking-widest mb-2">Mensagem do Dia</div>
+                    <blockquote className="text-white text-lg font-medium leading-relaxed italic mb-3">
+                      “{msgDia.conteudo}”
+                    </blockquote>
+                    {msgDia.autor && (
+                      <div className="text-amber-300 text-sm font-semibold">— {msgDia.autor}</div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Histórico */}
           {painel?.historico && painel.historico.length > 0 && (
