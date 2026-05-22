@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles, FolderOpen, Star, Package, Shirt, Zap } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles, FolderOpen, Star, Package, Shirt, Zap, LayoutDashboard } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -87,6 +87,19 @@ export default function Home() {
 
   // Grupos na ordem definida pelo usuário
   const grupos: GroupModule[] = [
+    {
+      type: 'group',
+      key: 'painel',
+      title: 'Meu Painel',
+      description: 'Produção, ranking, metas e conquistas',
+      icon: LayoutDashboard,
+      color: 'bg-indigo-700',
+      borderColor: 'border-indigo-200',
+      bgColor: 'from-indigo-50 to-purple-50',
+      subModules: [
+        { title: 'Meu Painel', description: 'Produção, ranking, metas, streak e conquistas', icon: LayoutDashboard, color: 'bg-indigo-700', path: '/painel-agente', subKey: 'painel-agente' },
+      ],
+    },
     {
       type: 'group',
       key: 'cadastros',

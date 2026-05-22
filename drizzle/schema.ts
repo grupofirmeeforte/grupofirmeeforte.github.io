@@ -1161,3 +1161,40 @@ export const motivacionalDoDiaUsuario = mysqlTable("motivacional_do_dia_usuario"
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 export type MotivacionalDoDiaUsuario = typeof motivacionalDoDiaUsuario.$inferSelect;
+
+// ── Engajamento de Agentes ───────────────────────────────────────────────────
+export const agenteStreak = mysqlTable("agente_streak", {
+  id: int("id").autoincrement().primaryKey(),
+  chaveJ: varchar("chaveJ", { length: 50 }).notNull().unique(),
+  ultimoAcesso: date("ultimoAcesso").notNull(),
+  streakAtual: int("streakAtual").notNull().default(1),
+  maiorStreak: int("maiorStreak").notNull().default(1),
+  totalAcessos: int("totalAcessos").notNull().default(1),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type AgenteStreak = typeof agenteStreak.$inferSelect;
+
+export const agenteMetas = mysqlTable("agente_metas", {
+  id: int("id").autoincrement().primaryKey(),
+  chaveJ: varchar("chaveJ", { length: 50 }).notNull(),
+  mesRef: varchar("mesRef", { length: 10 }).notNull(),
+  metaConsig: decimal("metaConsig", { precision: 15, scale: 2 }).default("0"),
+  metaConsorcio: decimal("metaConsorcio", { precision: 15, scale: 2 }).default("0"),
+  metaOurocap: decimal("metaOurocap", { precision: 15, scale: 2 }).default("0"),
+  metaCc: decimal("metaCc", { precision: 15, scale: 2 }).default("0"),
+  metaTotal: decimal("metaTotal", { precision: 15, scale: 2 }).default("0"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type AgenteMeta = typeof agenteMetas.$inferSelect;
+
+export const agenteConquistas = mysqlTable("agente_conquistas", {
+  id: int("id").autoincrement().primaryKey(),
+  chaveJ: varchar("chaveJ", { length: 50 }).notNull(),
+  codigo: varchar("codigo", { length: 100 }).notNull(),
+  titulo: varchar("titulo", { length: 255 }).notNull(),
+  descricao: text("descricao"),
+  icone: varchar("icone", { length: 50 }).default("trophy"),
+  conquistadoEm: timestamp("conquistadoEm").defaultNow().notNull(),
+});
+export type AgenteConquista = typeof agenteConquistas.$inferSelect;

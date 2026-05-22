@@ -29,7 +29,8 @@ import MensagemSalmos from './pages/MensagemSalmos';
 import MensagemMinutosSabedoria from './pages/MensagemMinutosSabedoria';
 import MensagemHoroscopo from './pages/MensagemHoroscopo';
 import DocumentacaoAgentes from './pages/DocumentacaoAgentes';
-import AtivoImobilizado from './pages/AtivoImobilizado';
+import AtivoImobilizado from "@/pages/AtivoImobilizado";
+import PainelAgente from "@/pages/PainelAgente";
 import UniformesCrachas from './pages/UniformesCrachas';
 import MensagemMotivacional from './pages/MensagemMotivacional';
 
@@ -84,6 +85,7 @@ function RouterWithInactivity() {
       <Route path={"/mensagem-do-dia/horoscopo"} component={MensagemHoroscopo} />
       <Route path={"/cadastro/documentacao-agentes"} component={DocumentacaoAgentes} />
       <Route path={"/relatorios/ativo-imobilizado"} component={AtivoImobilizado} />
+      <Route path={"/painel-agente"} component={PainelAgente} />
       <Route path={"/relatorios/uniformes-crachas"} component={UniformesCrachas} />
       <Route path={"/mensagem-do-dia/motivacional"} component={MensagemMotivacional} />
 
