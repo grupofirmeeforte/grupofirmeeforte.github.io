@@ -329,7 +329,7 @@ export default function TabelaComissao() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader onBack={() => window.history.back()} />
+      <PageHeader />
       {/* Header */}
       <div className="bg-white border-b shadow-sm px-6 py-4">
         <div className="flex items-center gap-3">

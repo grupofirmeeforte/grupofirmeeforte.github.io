@@ -235,7 +235,7 @@ export default function Certificacoes() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <PageHeader onBack={() => window.history.back()} />
+      <PageHeader />
       <div className="bg-white border-b px-6 py-3 flex items-center gap-3">
         <div>
           <h1 className="text-lg font-bold text-slate-800">Certificações</h1>

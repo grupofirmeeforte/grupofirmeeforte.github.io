@@ -524,7 +524,7 @@ export default function FebrabanPage() {
 
   return (
     <div className="space-y-4 p-6">
-      <PageHeader onBack={() => window.history.back()} />
+      <PageHeader />
       {/* Painel de Resumo por Empresa */}
       {resumo && resumo.empresas.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">

@@ -449,7 +449,7 @@ export default function Calculo() {
   return (
     <>
     <div className="min-h-screen bg-slate-50">
-      <PageHeader onBack={() => window.history.back()} />
+      <PageHeader />
       {/* Header */}
       <div className="flex items-center gap-3 px-3 py-2 bg-white border-b border-slate-200">
         <div>

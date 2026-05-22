@@ -160,7 +160,7 @@ export default function AtivoImobilizado() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-4">
-      <PageHeader onBack={() => window.history.back()} />
+      <PageHeader />
       <div className="max-w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

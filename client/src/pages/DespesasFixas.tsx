@@ -237,7 +237,7 @@ export default function DespesasFixasPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
-      <PageHeader onBack={() => window.history.back()} />
+      <PageHeader />
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-3 py-2 flex items-center justify-between">
         <div>

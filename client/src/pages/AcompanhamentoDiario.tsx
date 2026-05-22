@@ -175,7 +175,7 @@ export default function AcompanhamentoDiario() {
             </div>
 
             {/* Botão Voltar */}
-            <Button size="sm" onClick={() => navigate("/febraban")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+            <Button size="sm" onClick={() => navigate("/febraban")} className="gap-1 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600">
               <ArrowLeft className="w-4 h-4" /> Voltar
             </Button>
           </div>

@@ -831,7 +831,7 @@ export default function CRMPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader onBack={() => window.history.back()} />
+      <PageHeader />
       {/* Header */}
       <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
         <div>

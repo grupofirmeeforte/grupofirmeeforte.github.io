@@ -171,7 +171,7 @@ export default function AuditoriaPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <PageHeader onBack={() => window.history.back()} />
+      <PageHeader />
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
