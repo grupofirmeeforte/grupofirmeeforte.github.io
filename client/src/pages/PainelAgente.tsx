@@ -136,9 +136,8 @@ export default function PainelAgente() {
                 </div>
                 <div>
                   <p className="text-slate-400 text-sm">Bem-vindo de volta,</p>
-                  <h2 className="text-2xl font-bold text-white">{painel?.agente?.nomeAgente ?? 'Agente'}</h2>
+                  <h2 className="text-2xl font-bold text-white">{(painel?.agente?.nomeAgente ?? 'Agente').split(' ')[0]}</h2>
                   <div className="flex items-center gap-2 mt-1">
-                    <Badge className="bg-blue-600 text-white text-xs">{painel?.agente?.empresa ?? ''}</Badge>
                     {painel?.agente?.nivel && (
                       <Badge className="bg-amber-600 text-white text-xs">{painel.agente.nivel}</Badge>
                     )}
