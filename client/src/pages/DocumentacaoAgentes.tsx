@@ -166,13 +166,6 @@ export default function DocumentacaoAgentes() {
         {/* Header */}
         <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => { setAgenteSelecionado(null); setFiltroTipoDoc(''); }}
-              className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-700 border-gray-800"
-            >
-              <ArrowLeft className="w-4 h-4" /> Voltar
-            </Button>
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-mono text-blue-700 font-bold text-lg">{agenteSelecionado.chaveJ}</span>
@@ -185,12 +178,21 @@ export default function DocumentacaoAgentes() {
               <p className="text-sm text-gray-500">Documentos do agente</p>
             </div>
           </div>
-          <Button
-            onClick={() => { resetUploadForm(); setModalUpload(true); }}
-            className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800"
-          >
-            <Upload className="w-4 h-4" /> Adicionar Documento
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => { resetUploadForm(); setModalUpload(true); }}
+              className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800"
+            >
+              <Upload className="w-4 h-4" /> Adicionar Documento
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => { setAgenteSelecionado(null); setFiltroTipoDoc(''); }}
+              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white border-0"
+            >
+              <ArrowLeft className="w-4 h-4" /> Voltar
+            </Button>
+          </div>
         </div>
 
         {/* Filtro tipo */}
@@ -412,19 +414,17 @@ export default function DocumentacaoAgentes() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={() => setLocation('/cadastro')}
-            className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-700 border-gray-800"
-          >
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold text-gray-800">Documentação Agentes</h1>
-            <p className="text-sm text-gray-500">Cópias de documentos por agente</p>
-          </div>
+        <div>
+          <h1 className="text-xl font-bold text-gray-800">Documentação Agentes</h1>
+          <p className="text-sm text-gray-500">Cópias de documentos por agente</p>
         </div>
+        <Button
+          size="sm"
+          onClick={() => setLocation('/')}
+          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white border-0"
+        >
+          <ArrowLeft className="w-4 h-4" /> Voltar
+        </Button>
       </div>
 
       {/* Filtro */}
