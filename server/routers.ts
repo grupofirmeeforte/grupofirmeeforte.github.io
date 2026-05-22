@@ -1178,6 +1178,7 @@ export const appRouter = router({
               comissaoConsig: String(totalComissao),
               comissaoTotal: String(novaComissaoTotal),
               rbmTotal: rbmTotal > 0 ? String(rbmTotal) : reg.rbmTotal,
+              rbmCreditoC2: rbmTotal > 0 ? String(rbmTotal) : reg.rbmCreditoC2,
             }).where(eq(calculos.id, reg.id));
             atualizados++;
           } else {
@@ -1210,6 +1211,7 @@ export const appRouter = router({
               comissaoConsig: String(totalComissao),
               comissaoTotal: String(totalComissao),
               rbmTotal: rbmTotal > 0 ? String(rbmTotal) : null,
+              rbmCreditoC2: rbmTotal > 0 ? String(rbmTotal) : null,
             } as any);
             criados++;
           }
