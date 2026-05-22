@@ -244,7 +244,7 @@ export const engajamentoRouter = router({
         .where(and(eq(febraban.mesano, febMesanoRanking), eq(febraban.situacao, 'Contratada')))
         .groupBy(febraban.operador)
         .orderBy(desc(sql`COALESCE(SUM(${febraban.troco}), 0)`))
-        .limit(20);
+        .limit(10);
 
       // Buscar nomes dos agentes pelo chaveJ (operador) — exibir apenas primeiro nome
       const chaveJs = rankingFeb.map(r => r.operador).filter(Boolean) as string[];
