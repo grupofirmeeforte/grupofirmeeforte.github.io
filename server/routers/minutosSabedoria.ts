@@ -1,14 +1,13 @@
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { minutosSabedoria } from "../../drizzle/schema";
-import { eq, sql } from "drizzle-orm";
+import { minutosSabedoria, pensamentoDoDiaUsuario } from "../../drizzle/schema";
+import { eq, sql, and, notInArray, ne } from "drizzle-orm";
 
 /**
  * Retorna a data de hoje no formato YYYY-MM-DD (UTC-3 Brasília)
  */
 function getHojeBrasilia(): string {
   const now = new Date();
-  // UTC-3
   const brt = new Date(now.getTime() - 3 * 60 * 60 * 1000);
   return brt.toISOString().slice(0, 10);
 }
@@ -27,60 +26,75 @@ export const minutosSabedoriaRouter = router({
     const hoje = getHojeBrasilia();
     const userId = String(ctx.user.id);
 
-    // 1. Verificar se já existe pensamento do dia para este usuário hoje (usando SQL raw para evitar problemas de tipo de data)
-    const existentes = await db.execute(
-      sql`SELECT pensamento_id FROM pensamento_do_dia_usuario WHERE user_id = ${userId} AND data_dia = ${hoje} LIMIT 1`
-    );
-
-    const rows = existentes as unknown as Array<{ pensamento_id: number }>;
-
-    if (rows.length > 0) {
-      // Já tem pensamento do dia — retornar o mesmo
-      const pensamentoId = rows[0].pensamento_id;
-      const [pensamento] = await db
-        .select()
-        .from(minutosSabedoria)
-        .where(eq(minutosSabedoria.id, pensamentoId))
-        .limit(1);
-      return pensamento ?? null;
-    }
-
-    // 2. Buscar IDs já vistos por este usuário
-    const vistos = await db.execute(
-      sql`SELECT pensamento_id FROM pensamento_do_dia_usuario WHERE user_id = ${userId}`
-    );
-    const vistosRows = vistos as unknown as Array<{ pensamento_id: number }>;
-    const vistosIds = vistosRows.map((v) => v.pensamento_id);
-
-    // 3. Sortear um pensamento ainda não visto
-    let novoPensamento: typeof minutosSabedoria.$inferSelect | undefined;
-
-    if (vistosIds.length > 0) {
-      const placeholders = vistosIds.map(() => '?').join(',');
-      const result = await db.execute(
-        sql`SELECT * FROM minutos_sabedoria WHERE ativo = 1 AND id NOT IN (${sql.raw(vistosIds.join(','))}) ORDER BY RAND() LIMIT 1`
+    try {
+      // 1. Verificar se já existe pensamento do dia para este usuário hoje
+      // Usa SQL raw para comparar DATE corretamente
+      const existenteResult = await db.execute(
+        sql`SELECT pensamento_id FROM pensamento_do_dia_usuario WHERE user_id = ${userId} AND data_dia = ${hoje} LIMIT 1`
       );
-      const resultRows = result as unknown as Array<typeof minutosSabedoria.$inferSelect>;
-      novoPensamento = resultRows[0];
-    }
 
-    // Se todos já foram vistos, reinicia o ciclo
-    if (!novoPensamento) {
-      const result = await db.execute(
-        sql`SELECT * FROM minutos_sabedoria WHERE ativo = 1 ORDER BY RAND() LIMIT 1`
+      // mysql2 retorna [rows, fields] — pegar o primeiro elemento
+      const existenteRows = (Array.isArray(existenteResult) ? existenteResult[0] : existenteResult) as unknown as Array<{ pensamento_id: number }>;
+
+      if (existenteRows && existenteRows.length > 0) {
+        const pensamentoId = Number(existenteRows[0].pensamento_id);
+        const [pensamento] = await db
+          .select()
+          .from(minutosSabedoria)
+          .where(eq(minutosSabedoria.id, pensamentoId))
+          .limit(1);
+        return pensamento ?? null;
+      }
+
+      // 2. Buscar IDs já vistos por este usuário
+      const vistosResult = await db.execute(
+        sql`SELECT pensamento_id FROM pensamento_do_dia_usuario WHERE user_id = ${userId}`
       );
-      const resultRows = result as unknown as Array<typeof minutosSabedoria.$inferSelect>;
-      novoPensamento = resultRows[0];
+      const vistosRows = (Array.isArray(vistosResult) ? vistosResult[0] : vistosResult) as unknown as Array<{ pensamento_id: number }>;
+      const vistosIds = (vistosRows || []).map((v) => Number(v.pensamento_id)).filter(Boolean);
+
+      // 3. Sortear um pensamento ainda não visto
+      let novoPensamento: typeof minutosSabedoria.$inferSelect | undefined;
+
+      if (vistosIds.length > 0) {
+        // Usar NOT IN com Drizzle
+        const [result] = await db
+          .select()
+          .from(minutosSabedoria)
+          .where(
+            and(
+              eq(minutosSabedoria.ativo, true),
+              notInArray(minutosSabedoria.id, vistosIds)
+            )
+          )
+          .orderBy(sql`RAND()`)
+          .limit(1);
+        novoPensamento = result;
+      }
+
+      // Se todos já foram vistos, reinicia o ciclo
+      if (!novoPensamento) {
+        const [result] = await db
+          .select()
+          .from(minutosSabedoria)
+          .where(eq(minutosSabedoria.ativo, true))
+          .orderBy(sql`RAND()`)
+          .limit(1);
+        novoPensamento = result;
+      }
+
+      if (!novoPensamento) return null;
+
+      // 4. Salvar o pensamento do dia para este usuário
+      await db.execute(
+        sql`INSERT INTO pensamento_do_dia_usuario (user_id, data_dia, pensamento_id, created_at) VALUES (${userId}, ${hoje}, ${novoPensamento.id}, ${Date.now()})`
+      );
+
+      return novoPensamento;
+    } catch (err) {
+      console.error("[minutosSabedoria.getDoDia] Erro:", err);
+      return null;
     }
-
-    if (!novoPensamento) return null;
-
-    // 4. Salvar o pensamento do dia para este usuário
-    await db.execute(
-      sql`INSERT INTO pensamento_do_dia_usuario (user_id, data_dia, pensamento_id, created_at) VALUES (${userId}, ${hoje}, ${novoPensamento.id}, ${Date.now()})`
-    );
-
-    return novoPensamento;
   }),
 
   /**
