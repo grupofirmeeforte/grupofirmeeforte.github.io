@@ -25,27 +25,41 @@ export default function PageHeader({ onBack }: PageHeaderProps) {
         boxShadow: '0 4px 24px 0 rgba(212,160,23,0.18)',
       }}
     >
-      {/* Moldura dourada ao redor da logo */}
-      <div
+      {/* Moldura dourada ao redor da logo — clicável para voltar */}
+      <button
+        onClick={handleBack}
+        title="Clique para voltar"
         style={{
           background: 'radial-gradient(ellipse at center, rgba(212,160,23,0.18) 0%, transparent 70%)',
           borderRadius: '50%',
           padding: '10px',
           marginBottom: '12px',
           boxShadow: '0 0 32px 8px rgba(212,160,23,0.22), 0 0 0 2px rgba(212,160,23,0.35)',
+          border: 'none',
+          cursor: 'pointer',
+          transition: 'transform 0.15s, box-shadow 0.15s',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.transform = 'scale(1.06)';
+          e.currentTarget.style.boxShadow = '0 0 48px 12px rgba(212,160,23,0.38), 0 0 0 2px rgba(212,160,23,0.6)';
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.boxShadow = '0 0 32px 8px rgba(212,160,23,0.22), 0 0 0 2px rgba(212,160,23,0.35)';
         }}
       >
         <img
           src={LOGO_B64}
-          alt="Grupo Firme & Forte"
+          alt="Grupo Firme & Forte — clique para voltar"
           style={{
             height: '90px',
             width: 'auto',
             objectFit: 'contain',
             filter: 'drop-shadow(0 0 12px rgba(212,160,23,0.7))',
+            display: 'block',
           }}
         />
-      </div>
+      </button>
 
       {/* Nome do grupo */}
       <div
