@@ -269,7 +269,7 @@ export default function PainelAgente() {
                   >
                     <option value="">Mês atual</option>
                     {(meses ?? []).map(m => (
-                      <option key={m} value={m}>{m}</option>
+                      <option key={m ?? ''} value={m ?? ''}>{m}</option>
                     ))}
                   </select>
                 </div>
@@ -331,7 +331,7 @@ export default function PainelAgente() {
                     {painel.conquistas.map((c) => (
                       <div key={c.codigo} className="bg-gradient-to-br from-purple-900/50 to-indigo-900/50 border border-purple-500/30 rounded-lg p-3 text-center">
                         <div className="text-purple-300 flex justify-center mb-1">
-                          {ICONE_MAP[c.icone] ?? <Trophy className="w-5 h-5" />}
+                          {ICONE_MAP[c.icone ?? ''] ?? <Trophy className="w-5 h-5" />}
                         </div>
                         <div className="text-white text-xs font-bold">{c.titulo}</div>
                         <div className="text-purple-300 text-xs mt-0.5">{c.descricao}</div>
@@ -358,12 +358,12 @@ export default function PainelAgente() {
                 ) : (
                   <div className="space-y-2">
                     {painel.docsVencendo.map((d, i) => {
-                      const dias = Math.ceil((new Date(d.data_validade).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                      const dias = Math.ceil((new Date((d as any).dataValidade ?? (d as any).data_validade ?? '').getTime() - Date.now()) / (1000 * 60 * 60 * 24));
                       return (
                         <div key={i} className="flex items-center justify-between bg-red-900/30 border border-red-500/30 rounded-lg p-3">
                           <div>
-                            <div className="text-white text-sm font-medium">{d.tipo_documento}</div>
-                            <div className="text-red-300 text-xs">Vence em {new Date(d.data_validade).toLocaleDateString('pt-BR')}</div>
+                            <div className="text-white text-sm font-medium">{(d as any).tipoDocumento ?? (d as any).tipo_documento}</div>
+                            <div className="text-red-300 text-xs">Vence em {new Date((d as any).dataValidade ?? (d as any).data_validade ?? '').toLocaleDateString('pt-BR')}</div>
                           </div>
                           <Badge className={`text-white text-xs ${dias <= 7 ? 'bg-red-600' : 'bg-orange-600'}`}>
                             {dias} dia{dias !== 1 ? 's' : ''}
@@ -388,8 +388,8 @@ export default function PainelAgente() {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                   {painel.historico.map((h, i) => (
-                    <div key={h.mes_ref} className="bg-slate-700/50 rounded-lg p-3 text-center">
-                      <div className="text-slate-400 text-xs mb-1">{h.mes_ref}</div>
+                    <div key={h.mesRef ?? (h as any).mes_ref} className="bg-slate-700/50 rounded-lg p-3 text-center">
+                      <div className="text-slate-400 text-xs mb-1">{h.mesRef ?? (h as any).mes_ref}</div>
                       <div className="text-green-400 font-bold text-sm">{fmt(Number(h.total))}</div>
                       {i > 0 && painel.historico[i - 1] && (
                         <div className="flex items-center justify-center mt-1">

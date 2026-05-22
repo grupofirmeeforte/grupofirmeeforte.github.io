@@ -55,7 +55,7 @@ export const engajamentoRouter = router({
     try {
       const [streakRow] = await db.select().from(agenteStreak).where(eq(agenteStreak.chaveJ, chaveJ)).limit(1);
       if (!streakRow) {
-        await db.insert(agenteStreak).values({ chaveJ, ultimoAcesso: hoje, streakAtual: 1, maiorStreak: 1, totalAcessos: 1 });
+        await db.insert(agenteStreak).values({ chaveJ, ultimoAcesso: new Date(hoje), streakAtual: 1, maiorStreak: 1, totalAcessos: 1 });
         await inserirConquista(db, chaveJ, 'primeiro_acesso', 'Bem-vindo!', 'Primeiro acesso ao sistema', 'star');
         return { streakAtual: 1, maiorStreak: 1, totalAcessos: 1 };
       }
@@ -69,7 +69,7 @@ export const engajamentoRouter = router({
       const novoMaior = Math.max(novoStreak, streakRow.maiorStreak);
       const novoTotal = streakRow.totalAcessos + 1;
       await db.update(agenteStreak)
-        .set({ ultimoAcesso: hoje, streakAtual: novoStreak, maiorStreak: novoMaior, totalAcessos: novoTotal })
+        .set({ ultimoAcesso: new Date(hoje), streakAtual: novoStreak, maiorStreak: novoMaior, totalAcessos: novoTotal })
         .where(eq(agenteStreak.chaveJ, chaveJ));
       if (novoStreak >= 7) await inserirConquista(db, chaveJ, 'streak_7', '7 dias seguidos', 'Acessou o sistema 7 dias consecutivos', 'flame');
       if (novoStreak >= 30) await inserirConquista(db, chaveJ, 'streak_30', 'Mês completo', 'Acessou o sistema 30 dias consecutivos', 'crown');
