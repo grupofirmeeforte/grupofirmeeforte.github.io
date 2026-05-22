@@ -85,7 +85,7 @@ export default function PainelAgente() {
     });
   };
 
-  const comissaoAtual = painel?.producaoMes?.comissaoTotal ?? 0;
+  const comissaoAtual = painel?.producaoMes?.total ?? 0;
   const metaTotal = painel?.meta?.metaTotal ?? 0;
   const percMeta = metaTotal > 0 ? Math.min((comissaoAtual / metaTotal) * 100, 100) : 0;
   const percMetaReal = metaTotal > 0 ? (comissaoAtual / metaTotal) * 100 : 0;
@@ -173,10 +173,11 @@ export default function PainelAgente() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="text-3xl font-black text-green-400">{fmt(comissaoAtual)}</div>
+                <p className="text-xs text-slate-400 italic">* Consignado inclui SRCC</p>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="bg-slate-700/50 rounded-lg p-2">
-                    <div className="text-slate-400 text-xs">Consignado</div>
-                    <div className="font-semibold text-white">{fmt(painel?.producaoMes?.comissaoConsig ?? 0)}</div>
+                    <div className="text-slate-400 text-xs">Consignado *</div>
+                    <div className="font-semibold text-white">{fmt((painel?.producaoMes?.vrLiquidoC2 ?? 0) + (painel?.producaoMes?.vrLiquidoSrcc ?? 0))}</div>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-2">
                     <div className="text-slate-400 text-xs">Consórcio</div>
@@ -190,6 +191,12 @@ export default function PainelAgente() {
                     <div className="text-slate-400 text-xs">C/C</div>
                     <div className="font-semibold text-white">{fmt(painel?.producaoMes?.comissaoCc ?? 0)}</div>
                   </div>
+                  {(painel?.producaoMes?.comissaoSeguros ?? 0) > 0 && (
+                    <div className="bg-slate-700/50 rounded-lg p-2">
+                      <div className="text-slate-400 text-xs">Seguros</div>
+                      <div className="font-semibold text-white">{fmt(painel?.producaoMes?.comissaoSeguros ?? 0)}</div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -300,7 +307,7 @@ export default function PainelAgente() {
                       </div>
                       <div className="text-right flex-shrink-0">
                         <div className={`font-bold text-sm ${r.isMe ? 'text-yellow-300' : 'text-green-400'}`}>
-                          {fmt(r.comissaoTotal)}
+                          {fmt(r.vrLiquido)}
                         </div>
                       </div>
                     </div>

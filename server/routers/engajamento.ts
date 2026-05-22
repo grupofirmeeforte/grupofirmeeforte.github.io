@@ -91,12 +91,13 @@ export const engajamentoRouter = router({
 
       const [producaoMes] = await db
         .select({
-          comissaoTotal: sql<number>`COALESCE(SUM(${calculos.comissaoTotal}), 0)`,
-          rbmTotal: sql<number>`COALESCE(SUM(${calculos.rbmTotal}), 0)`,
-          comissaoConsig: sql<number>`COALESCE(SUM(${calculos.comissaoConsig}), 0)`,
+          vrLiquidoC2: sql<number>`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)`,
+          vrLiquidoSrcc: sql<number>`COALESCE(SUM(${calculos.vrLiquidoSrcc}), 0)`,
           comissaoConsorcio: sql<number>`COALESCE(SUM(${calculos.comissaoConsorcio}), 0)`,
           comissaoOurocap: sql<number>`COALESCE(SUM(${calculos.comissaoOurocap}), 0)`,
           comissaoCc: sql<number>`COALESCE(SUM(${calculos.comissaoCc}), 0)`,
+          comissaoSeguros: sql<number>`COALESCE(SUM(${calculos.comissaoSeguros}), 0)`,
+          rbmTotal: sql<number>`COALESCE(SUM(${calculos.rbmTotal}), 0)`,
         })
         .from(calculos)
         .where(and(eq(calculos.chaveJ, chaveJ), eq(calculos.mesRef, mesAtual)));
@@ -112,16 +113,16 @@ export const engajamentoRouter = router({
         .orderBy(desc(agenteConquistas.conquistadoEm));
 
       const rankingRows = await db
-        .select({ chaveJ: calculos.chaveJ, total: sql<number>`SUM(${calculos.comissaoTotal})` })
+        .select({ chaveJ: calculos.chaveJ, total: sql<number>`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)` })
         .from(calculos)
         .where(eq(calculos.mesRef, mesAtual))
         .groupBy(calculos.chaveJ)
-        .orderBy(desc(sql`SUM(${calculos.comissaoTotal})`));
+        .orderBy(desc(sql`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)`));
       const posicaoRanking = rankingRows.findIndex(r => r.chaveJ === chaveJ) + 1;
       const totalRanking = rankingRows.length;
 
       const historico = await db
-        .select({ mesRef: calculos.mesRef, total: sql<number>`SUM(${calculos.comissaoTotal})` })
+        .select({ mesRef: calculos.mesRef, total: sql<number>`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)` })
         .from(calculos)
         .where(eq(calculos.chaveJ, chaveJ))
         .groupBy(calculos.mesRef)
@@ -136,7 +137,7 @@ export const engajamentoRouter = router({
         await inserirConquista(db, chaveJ, 'top3_ranking', 'Top 3', 'Ficou entre os 3 primeiros do ranking', 'medal');
       }
 
-      const comissaoAtual = Number(producaoMes?.comissaoTotal ?? 0);
+      const comissaoAtual = Number(producaoMes?.vrLiquidoC2 ?? 0) + Number(producaoMes?.vrLiquidoSrcc ?? 0) + Number(producaoMes?.comissaoConsorcio ?? 0) + Number(producaoMes?.comissaoOurocap ?? 0) + Number(producaoMes?.comissaoCc ?? 0) + Number(producaoMes?.comissaoSeguros ?? 0);
       const metaTotalVal = Number(meta?.metaTotal ?? 0);
       if (metaTotalVal > 0 && comissaoAtual >= metaTotalVal) {
         await inserirConquista(db, chaveJ, 'meta_batida', 'Meta Batida!', 'Atingiu 100% da meta mensal', 'trophy');
@@ -149,12 +150,14 @@ export const engajamentoRouter = router({
         agente: agente ?? null,
         mesAtual,
         producaoMes: {
-          comissaoTotal: Number(producaoMes?.comissaoTotal ?? 0),
-          rbmTotal: Number(producaoMes?.rbmTotal ?? 0),
-          comissaoConsig: Number(producaoMes?.comissaoConsig ?? 0),
+          vrLiquidoC2: Number(producaoMes?.vrLiquidoC2 ?? 0),
+          vrLiquidoSrcc: Number(producaoMes?.vrLiquidoSrcc ?? 0),
           comissaoConsorcio: Number(producaoMes?.comissaoConsorcio ?? 0),
           comissaoOurocap: Number(producaoMes?.comissaoOurocap ?? 0),
           comissaoCc: Number(producaoMes?.comissaoCc ?? 0),
+          comissaoSeguros: Number(producaoMes?.comissaoSeguros ?? 0),
+          rbmTotal: Number(producaoMes?.rbmTotal ?? 0),
+          total: Number(producaoMes?.vrLiquidoC2 ?? 0) + Number(producaoMes?.vrLiquidoSrcc ?? 0) + Number(producaoMes?.comissaoConsorcio ?? 0) + Number(producaoMes?.comissaoOurocap ?? 0) + Number(producaoMes?.comissaoCc ?? 0) + Number(producaoMes?.comissaoSeguros ?? 0),
         },
         meta: meta ? {
           metaTotal: Number(meta.metaTotal),
@@ -197,13 +200,13 @@ export const engajamentoRouter = router({
           nomeAgente: calculos.nomeAgente,
           empresa: calculos.empresa,
           cidade: calculos.cidade,
-          comissaoTotal: sql<number>`SUM(${calculos.comissaoTotal})`,
-          rbmTotal: sql<number>`SUM(${calculos.rbmTotal})`,
+          vrLiquido: sql<number>`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)`,
+          rbmTotal: sql<number>`COALESCE(SUM(${calculos.rbmTotal}), 0)`,
         })
         .from(calculos)
         .where(eq(calculos.mesRef, mesRef))
         .groupBy(calculos.chaveJ, calculos.nomeAgente, calculos.empresa, calculos.cidade)
-        .orderBy(desc(sql`SUM(${calculos.comissaoTotal})`))
+        .orderBy(desc(sql`COALESCE(SUM(${calculos.vrLiquidoC2}), 0)`))
         .limit(20);
 
       return rankingRows.map((r, i) => ({
@@ -212,8 +215,8 @@ export const engajamentoRouter = router({
         nomeAgente: r.nomeAgente,
         empresa: r.empresa,
         cidade: r.cidade,
-        comissaoTotal: Number(r.comissaoTotal),
-        rbmTotal: Number(r.rbmTotal),
+        vrLiquido: Number(r.vrLiquido),
+          rbmTotal: Number(r.rbmTotal),
         isMe: r.chaveJ === chaveJLogado,
       }));
     } catch (err) {
