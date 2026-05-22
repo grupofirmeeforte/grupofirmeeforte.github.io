@@ -798,7 +798,7 @@ export default function Consignado() {
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.restricaoSRCC)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.percPago)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right font-semibold text-green-700">{moeda(r.totalComissao)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{r.tabela ? `Tabela ${String(r.tabela).padStart(2, '0')}` : '-'}</td>
+                  <td className="px-2 py-1.5 border-b border-gray-100">{r.tabela && r.tabela !== 'NULL' && r.tabela !== '0' ? r.tabela.replace(/^Tabela(\d+)$/, 'Tabela $1') : '-'}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.supervisor)}</td>
                   <td className="px-2 py-1.5 border-b border-gray-100">
                     <div className="flex gap-1 justify-center">
