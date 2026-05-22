@@ -215,8 +215,8 @@ export default function Home() {
     {
       type: 'group',
       key: 'relatorios',
-      title: 'Relatórios',
-      description: 'Cálculo de comissões e relatórios',
+      title: 'Controle Ativos',
+      description: 'Controle de ativos e patrimônio',
       icon: Landmark,
       color: 'bg-amber-600',
       borderColor: 'border-amber-200',
