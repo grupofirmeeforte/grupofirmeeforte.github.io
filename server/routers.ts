@@ -1129,8 +1129,8 @@ export const appRouter = router({
           return { criados: 0, atualizados: 0, total: 0 };
         }
 
-        // 2. Agrupar por chaveJ + empresa + mes, somando totalComissao
-        const grupos = new Map<string, { chaveJ: string; empresa: string; mes: string; totalComissao: number }>();
+        // 2. Agrupar por chaveJ + empresa + mes, somando totalComissao e rbm
+        const grupos = new Map<string, { chaveJ: string; empresa: string; mes: string; totalComissao: number; rbmTotal: number }>();
         for (const r of registros) {
           const chaveJ = r.chaveJ ?? '';
           const empresa = r.empresa ?? '';
@@ -1138,10 +1138,12 @@ export const appRouter = router({
           if (!chaveJ || !mes) continue;
           const key = `${chaveJ}|${empresa}|${mes}`;
           const comissao = parseFloat(String(r.totalComissao ?? 0)) || 0;
+          const rbm = parseFloat(String(r.rbm ?? 0)) || 0;
           if (grupos.has(key)) {
             grupos.get(key)!.totalComissao += comissao;
+            grupos.get(key)!.rbmTotal += rbm;
           } else {
-            grupos.set(key, { chaveJ, empresa, mes, totalComissao: comissao });
+            grupos.set(key, { chaveJ, empresa, mes, totalComissao: comissao, rbmTotal: rbm });
           }
         }
 
@@ -1149,7 +1151,7 @@ export const appRouter = router({
         let atualizados = 0;
 
         for (const grupo of Array.from(grupos.values())) {
-          const { chaveJ, empresa, mes, totalComissao } = grupo;
+          const { chaveJ, empresa, mes, totalComissao, rbmTotal } = grupo;
           // mes no consignado é MM/AAAA
           const mesRef = mes;
 
@@ -1175,6 +1177,7 @@ export const appRouter = router({
             await db.update(calculos).set({
               comissaoConsig: String(totalComissao),
               comissaoTotal: String(novaComissaoTotal),
+              rbmTotal: rbmTotal > 0 ? String(rbmTotal) : reg.rbmTotal,
             }).where(eq(calculos.id, reg.id));
             atualizados++;
           } else {
@@ -1206,6 +1209,7 @@ export const appRouter = router({
               situacao,
               comissaoConsig: String(totalComissao),
               comissaoTotal: String(totalComissao),
+              rbmTotal: rbmTotal > 0 ? String(rbmTotal) : null,
             } as any);
             criados++;
           }
