@@ -118,6 +118,7 @@ export default function AcompanhamentoDiario() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
+      <PageHeader onBack={() => navigate('/febraban')} />
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-6 py-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
