@@ -297,15 +297,13 @@ export default function Home() {
                       {visibleSubs.length > 0 ? (
                         visibleSubs.map((sub, idx) => {
                           const SubIcon = sub.icon;
-                          // Verde, Amarelo, Azul, Branco — cores da bandeira do Brasil
+                          // Azul e Amarelo Canário alternados
                           type BrasilColor = { bg: string; text: string; border: string; hover: string };
                           const brasilColors: BrasilColor[] = [
-                            { bg: '#16a34a', text: '#ffffff', border: '#15803d', hover: '#15803d' }, // verde
-                            { bg: '#facc15', text: '#1e293b', border: '#ca8a04', hover: '#eab308' }, // amarelo
                             { bg: '#1d4ed8', text: '#ffffff', border: '#1e40af', hover: '#1e40af' }, // azul
-                            { bg: '#ffffff', text: '#1e293b', border: '#cbd5e1', hover: '#f1f5f9' }, // branco
+                            { bg: '#fde047', text: '#1e293b', border: '#facc15', hover: '#facc15' }, // amarelo canário
                           ];
-                          const c = brasilColors[idx % 4];
+                          const c = brasilColors[idx % 2];
                           return (
                             <button
                               key={sub.path}
