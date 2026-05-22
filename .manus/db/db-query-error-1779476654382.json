@@ -1,0 +1,8 @@
+{
+  "query": "\nSELECT a.nomeCompleto, SUM(f.troco) as total_troco\nFROM febraban f\nLEFT JOIN agentes a ON a.chaveJ = f.operador\nWHERE f.mesano = 526 AND f.situacao = 'Contratada'\nGROUP BY f.operador\nHAVING a.nomeCompleto LIKE 'Maria%'\nORDER BY total_troco DESC\nLIMIT 20;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nSELECT a.nomeCompleto, SUM(f.troco) as total_troco\nFROM febraban f\nLEFT JOIN agentes a ON a.chaveJ = f.operador\nWHERE f.mesano = 526 AND f.situacao = 'Contratada'\nGROUP BY f.operador\nHAVING a.nomeCompleto LIKE 'Maria%'\nORDER BY total_troco DESC\nLIMIT 20;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'a.nomeCompleto' in 'having clause'"
+  ]
+}

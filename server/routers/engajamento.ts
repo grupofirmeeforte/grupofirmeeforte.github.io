@@ -255,14 +255,27 @@ export const engajamentoRouter = router({
         : [];
       const agentesMap = new Map(agentesRanking.map(a => [a.chaveJ, a]));
 
+      // Contar primeiros nomes repetidos para desambiguação
+      const contagemPrimeiro: Record<string, number> = {};
+      rankingFeb.forEach(r => {
+        const ag = agentesMap.get(r.operador ?? '');
+        const primeiro = (ag?.nomeAgente ?? '').split(' ')[0];
+        if (primeiro) contagemPrimeiro[primeiro] = (contagemPrimeiro[primeiro] ?? 0) + 1;
+      });
+
       return rankingFeb.map((r, i) => {
         const ag = agentesMap.get(r.operador ?? '');
         const nomeCompleto = ag?.nomeAgente ?? '';
-        const primeiroNome = nomeCompleto.split(' ')[0] || '—';
+        const partes = nomeCompleto.split(' ');
+        const primeiro = partes[0] || '—';
+        // Se o primeiro nome é repetido, exibir também o segundo nome
+        const nomeExibir = (contagemPrimeiro[primeiro] ?? 0) > 1 && partes.length > 1
+          ? `${primeiro} ${partes[1]}`
+          : primeiro;
         return {
           posicao: i + 1,
           chaveJ: r.operador,
-          nomeAgente: primeiroNome,
+          nomeAgente: nomeExibir,
           empresa: ag?.empresa ?? null,
           cidade: null as string | null,
           vrLiquido: Number(r.vrLiquido),
