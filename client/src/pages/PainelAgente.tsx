@@ -301,9 +301,9 @@ export default function PainelAgente() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className={`font-semibold text-sm truncate ${r.isMe ? 'text-yellow-300' : 'text-white'}`}>
-                          {r.nomeAgente} {r.isMe && <span className="text-xs text-yellow-400">(você)</span>}
+                          {(r.nomeAgente ?? '').split(' ')[0]} {r.isMe && <span className="text-xs text-yellow-400">(você)</span>}
                         </div>
-                        <div className="text-xs text-slate-400">{r.empresa} · {r.cidade}</div>
+                        <div className="text-xs text-slate-400">{r.cidade}</div>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <div className={`font-bold text-sm ${r.isMe ? 'text-yellow-300' : 'text-green-400'}`}>
