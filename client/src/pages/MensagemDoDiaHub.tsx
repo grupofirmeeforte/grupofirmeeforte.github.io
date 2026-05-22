@@ -69,9 +69,9 @@ export default function MensagemDoDiaHub() {
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-orange-400 hover:text-orange-300 transition-colors text-sm font-medium"
+            className="group flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform duration-200" />
             Voltar
           </button>
         </div>
