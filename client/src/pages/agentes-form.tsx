@@ -18,10 +18,34 @@ import { useAuth } from "@/hooks/useAuth";
 
 // Definição dos módulos e sub-abas para permissões
 const MODULOS_PERMISSOES = [
+  { modulo: 'meu-painel', label: 'Meu Painel', subabas: [
+    { key: 'painel-agente', label: 'Meu Painel' },
+    { key: 'mensagem-do-dia', label: 'Mensagem do Dia' },
+  ]},
   { modulo: 'cadastros', label: 'Cadastros', subabas: [
     { key: 'agentes', label: 'Agentes' },
     { key: 'certificacoes', label: 'Certificações' },
     { key: 'tabela-comissao', label: 'Tabela Comissão' },
+    { key: 'documentacao-agentes', label: 'Documentação Agentes' },
+  ]},
+  { modulo: 'financeiro', label: 'Financeiro', subabas: [
+    { key: 'calculo', label: 'Cálculo' },
+    { key: 'pagamentos', label: 'Pagamentos' },
+    { key: 'despesas', label: 'Despesas Fixas' },
+    { key: 'contas-lojas', label: 'Contas das Lojas' },
+    { key: 'pro-rata', label: 'Pró Rata' },
+  ]},
+  { modulo: 'producao', label: 'Produção', subabas: [
+    { key: 'bbdental', label: 'BB Dental' },
+    { key: 'consignado-prod', label: 'Consignado' },
+    { key: 'consorcio-prod', label: 'Consórcio' },
+    { key: 'conta-corrente', label: 'Conta Corrente' },
+    { key: 'ourocap-prod', label: 'OuroCap' },
+    { key: 'seguros-prod', label: 'Seguros' },
+  ]},
+  { modulo: 'febraban', label: 'Febraban', subabas: [
+    { key: 'producao-bb', label: 'Produção BB' },
+    { key: 'acompanhamento-diario', label: 'Acompanhamento Diário' },
   ]},
   { modulo: 'extratos', label: 'Extratos', subabas: [
     { key: 'consignado', label: 'Extrato Consignado' },
@@ -32,17 +56,6 @@ const MODULOS_PERMISSOES = [
     { key: 'bbdental', label: 'Extrato BB Dental' },
     { key: 'perspectiva', label: 'Perspectiva de Ganho' },
     { key: 'minha-tabela', label: 'Minha Tabela' },
-  ]},
-  { modulo: 'financeiro', label: 'Financeiro', subabas: [
-    { key: 'calculo', label: 'Cálculo' },
-    { key: 'pagamentos', label: 'Pagamentos' },
-    { key: 'despesas', label: 'Despesas Fixas' },
-    { key: 'pro-rata', label: 'Pró Rata' },
-  ]},
-  { modulo: 'producao', label: 'Produção', subabas: [
-    { key: 'consignado-prod', label: 'Consignado' },
-    { key: 'consorcio-prod', label: 'Consórcio' },
-    { key: 'conta-corrente', label: 'Conta Corrente' },
   ]},
   { modulo: 'crm', label: 'CRM', subabas: [
     { key: 'atendimentos', label: 'Atendimentos' },
@@ -58,9 +71,9 @@ const MODULOS_PERMISSOES = [
     { key: 'versiculos', label: 'Versículos' },
     { key: 'horoscopo', label: 'Horóscopo' },
   ]},
-  { modulo: 'febraban', label: 'Febraban', subabas: [
-    { key: 'producao-bb', label: 'Produção BB' },
-    { key: 'acompanhamento-diario', label: 'Acompanhamento Diário' },
+  { modulo: 'controle-ativos', label: 'Controle Ativos', subabas: [
+    { key: 'ativo-imobilizado', label: 'Ativo Imobilizado' },
+    { key: 'uniformes-crachas', label: 'Uniformes e Crachás' },
   ]},
   { modulo: 'relatorios', label: 'Relatórios', subabas: [
     { key: 'relatorios', label: 'Relatórios' },
