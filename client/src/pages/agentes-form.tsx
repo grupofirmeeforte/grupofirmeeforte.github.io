@@ -56,6 +56,7 @@ const MODULOS_PERMISSOES = [
     { key: 'minutos-sabedoria', label: 'Minutos de Sabedoria' },
     { key: 'salmos', label: 'Salmos' },
     { key: 'versiculos', label: 'Versículos' },
+    { key: 'horoscopo', label: 'Horóscopo' },
   ]},
   { modulo: 'febraban', label: 'Febraban', subabas: [
     { key: 'producao-bb', label: 'Produção BB' },
