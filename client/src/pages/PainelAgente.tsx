@@ -351,21 +351,9 @@ export default function PainelAgente() {
               ) : (
                 <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
                   {(() => {
-                    // Contar quantas vezes cada primeiro nome aparece
-                    const contagemPrimeiro: Record<string, number> = {};
-                    ranking.forEach(r => {
-                      const primeiro = (r.nomeAgente ?? '').split(' ')[0];
-                      contagemPrimeiro[primeiro] = (contagemPrimeiro[primeiro] ?? 0) + 1;
-                    });
-                    // Função para obter nome de exibição
-                    const nomeExibir = (nomeCompleto: string) => {
-                      const partes = (nomeCompleto ?? '').split(' ');
-                      const primeiro = partes[0] ?? '';
-                      if (contagemPrimeiro[primeiro] > 1 && partes.length > 1) {
-                        return `${primeiro} ${partes[1]}`;
-                      }
-                      return primeiro;
-                    };
+                    // Nome já vem tratado pelo servidor (primeiro + segundo nome)
+                    const toTitleCase = (s: string) =>
+                      s.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
                     return ranking.map((r) => (
                     <div
                       key={r.chaveJ}
@@ -379,7 +367,7 @@ export default function PainelAgente() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className={`font-semibold text-sm truncate ${r.isMe ? 'text-yellow-300' : 'text-white'}`}>
-                          {nomeExibir(r.nomeAgente ?? '')} {r.isMe && <span className="text-xs text-yellow-400">(você)</span>}
+                          {toTitleCase(r.nomeAgente ?? '')} {r.isMe && <span className="text-xs text-yellow-400">(você)</span>}
                         </div>
                         <div className="text-xs text-slate-400">{r.cidade}</div>
                       </div>
