@@ -596,3 +596,14 @@
 - [x] Botão Voltar estilo escuro conforme padrão
 - [x] Registrar rota /cadastro/documentacao-agentes no App.tsx
 - [x] Adicionar card "Documentação Agentes" no grupo Cadastros da Home
+
+## FASE: CONTROLE DE ATIVO IMOBILIZADO E UNIFORMES/CRACHÁS
+- [x] Criar tabela ativosImobilizados no schema (id, descricao, categoria, numeroPatrimonio, valorAquisicao, dataAquisicao, vidaUtilAnos, depreciacao, localizacao, responsavel, situacao, observacoes, fotoUrl, fotoKey)
+- [x] Criar tabela uniformesCrachas no schema (id, chaveJ, nomeAgente, tipoItem, tamanho, quantidade, dataEntrega, situacao, observacoes, fotoUrl, fotoKey)
+- [x] Aplicar migration SQL no banco
+- [x] Criar procedures CRUD para ativosImobilizados no routers (incluindo uploadFoto)
+- [x] Criar procedures CRUD para uniformesCrachas no routers (incluindo uploadFoto)
+- [x] Criar página AtivoImobilizado.tsx com listagem, cadastro, edição e upload de foto
+- [x] Criar página UniformesCrachas.tsx com listagem, cadastro, edição e upload de foto
+- [x] Adicionar cards no módulo Relatórios no Home.tsx
+- [x] Adicionar rotas em App.tsx para as novas páginas

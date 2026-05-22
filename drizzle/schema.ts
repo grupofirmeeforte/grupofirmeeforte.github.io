@@ -1090,3 +1090,51 @@ export const documentosAgentes = mysqlTable("documentosAgentes", {
 
 export type DocumentoAgente = typeof documentosAgentes.$inferSelect;
 export type InsertDocumentoAgente = typeof documentosAgentes.$inferInsert;
+
+/**
+ * Tabela de Ativos Imobilizados
+ * Controle de bens patrimoniais (móveis, equipamentos, veículos, etc.)
+ */
+export const ativosImobilizados = mysqlTable("ativosImobilizados", {
+  id: int("id").autoincrement().primaryKey(),
+  descricao: varchar("descricao", { length: 255 }).notNull(),
+  categoria: varchar("categoria", { length: 100 }),             // Móvel, Equipamento, Veículo, Imóvel, Outros
+  numeroPatrimonio: varchar("numeroPatrimonio", { length: 50 }),
+  valorAquisicao: decimal("valorAquisicao", { precision: 15, scale: 2 }),
+  dataAquisicao: varchar("dataAquisicao", { length: 10 }),       // DD/MM/AAAA
+  vidaUtilAnos: int("vidaUtilAnos"),
+  taxaDepreciacao: decimal("taxaDepreciacao", { precision: 8, scale: 4 }),
+  valorResidual: decimal("valorResidual", { precision: 15, scale: 2 }),
+  localizacao: varchar("localizacao", { length: 255 }),
+  responsavel: varchar("responsavel", { length: 255 }),
+  situacao: varchar("situacao", { length: 50 }).default("Ativo"),
+  observacoes: text("observacoes"),
+  fotoUrl: varchar("fotoUrl", { length: 500 }),                  // URL da foto no S3
+  fotoKey: varchar("fotoKey", { length: 500 }),                  // Chave S3
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type AtivoImobilizado = typeof ativosImobilizados.$inferSelect;
+export type InsertAtivoImobilizado = typeof ativosImobilizados.$inferInsert;
+
+/**
+ * Tabela de Uniformes e Crachás
+ * Controle de entrega de uniformes e crachás por agente
+ */
+export const uniformesCrachas = mysqlTable("uniformesCrachas", {
+  id: int("id").autoincrement().primaryKey(),
+  chaveJ: varchar("chaveJ", { length: 20 }),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  tipoItem: varchar("tipoItem", { length: 100 }).notNull(),     // Uniforme, Crachá, Colete, Boné, Outros
+  tamanho: varchar("tamanho", { length: 20 }),                  // PP, P, M, G, GG, XGG
+  quantidade: int("quantidade").default(1),
+  dataEntrega: varchar("dataEntrega", { length: 10 }),          // DD/MM/AAAA
+  situacao: varchar("situacao", { length: 50 }).default("Entregue"), // Entregue, Pendente, Devolvido
+  observacoes: text("observacoes"),
+  fotoUrl: varchar("fotoUrl", { length: 500 }),                  // URL da foto no S3
+  fotoKey: varchar("fotoKey", { length: 500 }),                  // Chave S3
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type UniformeCracha = typeof uniformesCrachas.$inferSelect;
+export type InsertUniformeCracha = typeof uniformesCrachas.$inferInsert;

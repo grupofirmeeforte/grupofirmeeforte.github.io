@@ -15,6 +15,8 @@ import { feriadosRouter } from "./routers/feriados";
 import { consorcioRouter } from "./routers/consorcio";
 import { contaCorrenteRouter } from "./routers/contaCorrente";
 import { supervisoresRouter } from "./routers/supervisores";
+import { ativoImobilizadoRouter } from "./routers/ativoImobilizado";
+import { uniformesCrachasRouter } from "./routers/uniformesCrachas";
 import { minutosSabedoriaRouter } from "./routers/minutosSabedoria";
 import { contasLojasRouter } from "./routers/contasLojas";
 import { documentosAgentesRouter } from "./routers/documentosAgentes";
@@ -354,6 +356,8 @@ export const appRouter = router({
   proRata: proRataRouter,
   calculosImportados: calculosRouter,
   supervisores: supervisoresRouter,
+  ativoImobilizado: ativoImobilizadoRouter,
+  uniformesCrachas: uniformesCrachasRouter,
   minutosSabedoria: minutosSabedoriaRouter,
   contasLojas: contasLojasRouter,
   documentosAgentes: documentosAgentesRouter,

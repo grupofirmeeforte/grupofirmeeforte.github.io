@@ -29,6 +29,8 @@ import MensagemSalmos from './pages/MensagemSalmos';
 import MensagemMinutosSabedoria from './pages/MensagemMinutosSabedoria';
 import MensagemHoroscopo from './pages/MensagemHoroscopo';
 import DocumentacaoAgentes from './pages/DocumentacaoAgentes';
+import AtivoImobilizado from './pages/AtivoImobilizado';
+import UniformesCrachas from './pages/UniformesCrachas';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -80,6 +82,8 @@ function RouterWithInactivity() {
       <Route path={"/mensagem-do-dia/minutos-sabedoria"} component={MensagemMinutosSabedoria} />
       <Route path={"/mensagem-do-dia/horoscopo"} component={MensagemHoroscopo} />
       <Route path={"/cadastro/documentacao-agentes"} component={DocumentacaoAgentes} />
+      <Route path={"/relatorios/ativo-imobilizado"} component={AtivoImobilizado} />
+      <Route path={"/relatorios/uniformes-crachas"} component={UniformesCrachas} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />
