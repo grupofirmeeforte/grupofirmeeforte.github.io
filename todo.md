@@ -607,3 +607,17 @@
 - [x] Criar página UniformesCrachas.tsx com listagem, cadastro, edição e upload de foto
 - [x] Adicionar cards no módulo Relatórios no Home.tsx
 - [x] Adicionar rotas em App.tsx para as novas páginas
+
+## FASE N: PÁGINAS DE PRODUÇÃO (OuroCap, Seguros, BB Dental)
+- [x] Criar tabela `bbdental` no schema Drizzle e aplicar migration no banco
+- [x] Criar router `server/routers/ourocap.ts` com CRUD completo
+- [x] Criar router `server/routers/seguros.ts` com CRUD completo
+- [x] Criar router `server/routers/bbdental.ts` com CRUD completo
+- [x] Registrar routers no `server/routers.ts` (ourocap, seguros, bbdental)
+- [x] Criar página `client/src/pages/Ourocap.tsx` com tabela, filtros e importação XLSX
+- [x] Criar página `client/src/pages/Seguros.tsx` com tabela, filtros e importação XLSX
+- [x] Criar página `client/src/pages/BBDental.tsx` com tabela, filtros e importação XLSX
+- [x] Registrar rotas no App.tsx: /producao/ourocap, /producao/seguros, /producao/bbdental
+- [x] Corrigir PageHeader em ProRata.tsx (remover onBack window.history.back)
+- [x] Corrigir PageHeader em AcompanhamentoDiario.tsx (remover onBack window.history.back)
+- [x] Adicionar PageHeader em DocumentacaoAgentes.tsx (remover botão Voltar antigo)

@@ -24,6 +24,9 @@ import ContasLojasPage from './pages/ContasLojas';
 import CRMPage from './pages/CRM';
 import AcompanhamentoDiario from './pages/AcompanhamentoDiario';
 import Consorcio from './pages/Consorcio';
+import OurocapPage from './pages/Ourocap';
+import SegurosPage from './pages/Seguros';
+import BBDentalPage from './pages/BBDental';
 import MensagemVersiculos from './pages/MensagemVersiculos';
 import MensagemSalmos from './pages/MensagemSalmos';
 import MensagemMinutosSabedoria from './pages/MensagemMinutosSabedoria';
@@ -80,6 +83,9 @@ function RouterWithInactivity() {
       <Route path={"/extratos"} component={ExtratosPage} />
       <Route path={"/pro-rata"} component={ProRataPage} />
       <Route path={"/producao/consorcio"} component={Consorcio} />
+      <Route path={"/producao/ourocap"} component={OurocapPage} />
+      <Route path={"/producao/seguros"} component={SegurosPage} />
+      <Route path={"/producao/bbdental"} component={BBDentalPage} />
       <Route path={"/mensagem-do-dia/versiculos"} component={MensagemVersiculos} />
       <Route path={"/mensagem-do-dia/salmos"} component={MensagemSalmos} />
       <Route path={"/mensagem-do-dia/minutos-sabedoria"} component={MensagemMinutosSabedoria} />

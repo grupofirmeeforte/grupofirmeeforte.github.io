@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { toast } from 'sonner';
 import { ArrowLeft, Upload, Trash2, Eye, Search, X, FileText, Image as ImageIcon, File, FolderOpen, ChevronRight } from 'lucide-react';
 import { useLocation } from 'wouter';
+import PageHeader from '@/components/PageHeader';
 
 const TIPOS_DOCUMENTO = [
   'Contrato',
@@ -163,6 +164,7 @@ export default function DocumentacaoAgentes() {
   if (agenteSelecionado) {
     return (
       <div className="min-h-screen bg-gray-50">
+        <PageHeader />
         {/* Header */}
         <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -412,19 +414,13 @@ export default function DocumentacaoAgentes() {
   // ── VISÃO: Lista de agentes ──
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader />
       {/* Header */}
-      <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
+      <div className="bg-white border-b px-6 py-4">
         <div>
           <h1 className="text-xl font-bold text-gray-800">Documentação Agentes</h1>
           <p className="text-sm text-gray-500">Cópias de documentos por agente</p>
         </div>
-        <Button
-          size="sm"
-          onClick={() => setLocation('/')}
-          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white border-0"
-        >
-          <ArrowLeft className="w-4 h-4" /> Voltar
-        </Button>
       </div>
 
       {/* Filtro */}

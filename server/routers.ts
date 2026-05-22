@@ -23,6 +23,9 @@ import { engajamentoRouter } from "./routers/engajamento";
 import { contasLojasRouter } from "./routers/contasLojas";
 import { documentosAgentesRouter } from "./routers/documentosAgentes";
 import { horoscopoRouter } from "./routers/horoscopo";
+import { ourocapRouter } from "./routers/ourocap";
+import { segurosRouter } from "./routers/seguros";
+import { bbdentalRouter } from "./routers/bbdental";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
 import { users, agentes, despesasFixas, pagamentos } from "../drizzle/schema";
@@ -366,6 +369,9 @@ export const appRouter = router({
   contasLojas: contasLojasRouter,
   documentosAgentes: documentosAgentesRouter,
   horoscopo: horoscopoRouter,
+  ourocap: ourocapRouter,
+  seguros: segurosRouter,
+  bbdental: bbdentalRouter,
   sessoes: router({
     // Obter todas as sessões ativas
     getAtivas: publicProcedure.query(async () => {

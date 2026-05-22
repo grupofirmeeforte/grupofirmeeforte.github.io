@@ -1198,3 +1198,28 @@ export const agenteConquistas = mysqlTable("agente_conquistas", {
   conquistadoEm: timestamp("conquistadoEm").defaultNow().notNull(),
 });
 export type AgenteConquista = typeof agenteConquistas.$inferSelect;
+
+/**
+ * Tabela de BB Dental
+ */
+export const bbdental = mysqlTable("bbdental", {
+  id: int("id").autoincrement().primaryKey(),
+  empresa: varchar("empresa", { length: 100 }),
+  mesAno: varchar("mesAno", { length: 10 }),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  proposta: varchar("proposta", { length: 100 }),
+  cpfCliente: varchar("cpfCliente", { length: 14 }),
+  dtVenda: date("dtVenda"),
+  produto: varchar("produto", { length: 100 }),
+  vrProduto: decimal("vrProduto", { precision: 15, scale: 2 }),
+  rbm: decimal("rbm", { precision: 15, scale: 2 }),
+  comissao: decimal("comissao", { precision: 15, scale: 2 }),
+  supervisor: varchar("supervisor", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesAnoIdx: index("idx_bbdental_mesAno").on(table.mesAno),
+}));
+export type BBDental = typeof bbdental.$inferSelect;
+export type InsertBBDental = typeof bbdental.$inferInsert;

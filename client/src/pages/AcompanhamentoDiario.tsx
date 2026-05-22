@@ -94,7 +94,7 @@ export default function AcompanhamentoDiario() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-      <PageHeader onBack={() => window.history.back()} />
+      <PageHeader />
         <div className="text-gray-400">Carregando...</div>
       </div>
     );
