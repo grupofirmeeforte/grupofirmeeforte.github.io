@@ -1,7 +1,7 @@
 import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { minutosSabedoria, pensamentoDoDiaUsuario } from "../../drizzle/schema";
-import { eq, sql, and, notInArray } from "drizzle-orm";
+import { minutosSabedoria } from "../../drizzle/schema";
+import { eq, sql } from "drizzle-orm";
 
 /**
  * Retorna a data de hoje no formato YYYY-MM-DD (UTC-3 Brasília)
@@ -27,75 +27,58 @@ export const minutosSabedoriaRouter = router({
     const hoje = getHojeBrasilia();
     const userId = String(ctx.user.id);
 
-    // 1. Verificar se já existe pensamento do dia para este usuário hoje
-    const [existente] = await db
-      .select()
-      .from(pensamentoDoDiaUsuario)
-      .where(
-        and(
-          eq(pensamentoDoDiaUsuario.userId, userId),
-          eq(pensamentoDoDiaUsuario.dataDia, hoje as unknown as Date)
-        )
-      )
-      .limit(1);
+    // 1. Verificar se já existe pensamento do dia para este usuário hoje (usando SQL raw para evitar problemas de tipo de data)
+    const existentes = await db.execute(
+      sql`SELECT pensamento_id FROM pensamento_do_dia_usuario WHERE user_id = ${userId} AND data_dia = ${hoje} LIMIT 1`
+    );
 
-    if (existente) {
+    const rows = existentes as unknown as Array<{ pensamento_id: number }>;
+
+    if (rows.length > 0) {
       // Já tem pensamento do dia — retornar o mesmo
+      const pensamentoId = rows[0].pensamento_id;
       const [pensamento] = await db
         .select()
         .from(minutosSabedoria)
-        .where(eq(minutosSabedoria.id, existente.pensamentoId))
+        .where(eq(minutosSabedoria.id, pensamentoId))
         .limit(1);
       return pensamento ?? null;
     }
 
     // 2. Buscar IDs já vistos por este usuário
-    const vistos = await db
-      .select({ pensamentoId: pensamentoDoDiaUsuario.pensamentoId })
-      .from(pensamentoDoDiaUsuario)
-      .where(eq(pensamentoDoDiaUsuario.userId, userId));
-
-    const vistosIds = vistos.map((v) => v.pensamentoId);
+    const vistos = await db.execute(
+      sql`SELECT pensamento_id FROM pensamento_do_dia_usuario WHERE user_id = ${userId}`
+    );
+    const vistosRows = vistos as unknown as Array<{ pensamento_id: number }>;
+    const vistosIds = vistosRows.map((v) => v.pensamento_id);
 
     // 3. Sortear um pensamento ainda não visto
-    let query = db
-      .select()
-      .from(minutosSabedoria)
-      .where(eq(minutosSabedoria.ativo, true))
-      .orderBy(sql`RAND()`)
-      .limit(1);
+    let novoPensamento: typeof minutosSabedoria.$inferSelect | undefined;
 
-    let novoPensamento;
     if (vistosIds.length > 0) {
-      const [result] = await db
-        .select()
-        .from(minutosSabedoria)
-        .where(
-          and(
-            eq(minutosSabedoria.ativo, true),
-            notInArray(minutosSabedoria.id, vistosIds)
-          )
-        )
-        .orderBy(sql`RAND()`)
-        .limit(1);
-      novoPensamento = result;
+      const placeholders = vistosIds.map(() => '?').join(',');
+      const result = await db.execute(
+        sql`SELECT * FROM minutos_sabedoria WHERE ativo = 1 AND id NOT IN (${sql.raw(vistosIds.join(','))}) ORDER BY RAND() LIMIT 1`
+      );
+      const resultRows = result as unknown as Array<typeof minutosSabedoria.$inferSelect>;
+      novoPensamento = resultRows[0];
     }
 
     // Se todos já foram vistos, reinicia o ciclo
     if (!novoPensamento) {
-      const [result] = await query;
-      novoPensamento = result;
+      const result = await db.execute(
+        sql`SELECT * FROM minutos_sabedoria WHERE ativo = 1 ORDER BY RAND() LIMIT 1`
+      );
+      const resultRows = result as unknown as Array<typeof minutosSabedoria.$inferSelect>;
+      novoPensamento = resultRows[0];
     }
 
     if (!novoPensamento) return null;
 
     // 4. Salvar o pensamento do dia para este usuário
-    await db.insert(pensamentoDoDiaUsuario).values({
-      userId,
-      dataDia: hoje as unknown as Date,
-      pensamentoId: novoPensamento.id,
-      createdAt: new Date(),
-    });
+    await db.execute(
+      sql`INSERT INTO pensamento_do_dia_usuario (user_id, data_dia, pensamento_id, created_at) VALUES (${userId}, ${hoje}, ${novoPensamento.id}, ${Date.now()})`
+    );
 
     return novoPensamento;
   }),
