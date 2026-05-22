@@ -1,0 +1,24 @@
+{
+  "query": "SELECT ativo01, ativo01De, ativo01Ate, ativo02, ativo02De, ativo02Ate, ativo03, ativo03De, ativo03Ate, ativo04, ativo04De, ativo04Ate FROM valoresCalculo LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT ativo01, ativo01De, ativo01Ate, ativo02, ativo02De, ativo02Ate, ativo03, ativo03De, ativo03Ate, ativo04, ativo04De, ativo04Ate FROM valoresCalculo LIMIT 1;",
+  "rows": [
+    {
+      "ativo01": "30000.00",
+      "ativo01De": "1000.00",
+      "ativo01Ate": "30000.00",
+      "ativo02": "60000.00",
+      "ativo02De": "30000.01",
+      "ativo02Ate": "60000.00",
+      "ativo03": "90000.00",
+      "ativo03De": "60000.01",
+      "ativo03Ate": "200000.00",
+      "ativo04": "120000.00",
+      "ativo04De": "200000.01",
+      "ativo04Ate": "1000000.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "ativo01\tativo01De\tativo01Ate\tativo02\tativo02De\tativo02Ate\tativo03\tativo03De\tativo03Ate\tativo04\tativo04De\tativo04Ate\n30000.00\t1000.00\t30000.00\t60000.00\t30000.01\t60000.00\t90000.00\t60000.01\t200000.00\t120000.00\t200000.01\t1000000.00\n",
+  "stderr": "",
+  "execution_time_ms": 279
+}

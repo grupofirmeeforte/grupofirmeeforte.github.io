@@ -409,11 +409,11 @@ export async function calcularPercPago(
   descricao: string,
   juros: string | number,
   mes?: string // mês no formato MM/AAAA — só calcula a partir de 05/2026
-): Promise<number> {
+): Promise<{ perc: number; ativoUsado: string | null }> {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot calculate perc pago: database not available");
-    return 0;
+    return { perc: 0, ativoUsado: null };
   }
 
   try {
@@ -421,11 +421,11 @@ export async function calcularPercPago(
     if (mes) {
       const [mesNum, anoNum] = mes.split('/').map(Number);
       const mesAno = anoNum * 100 + mesNum; // ex: 202605
-      if (mesAno < 202605) return 0;
+      if (mesAno < 202605) return { perc: 0, ativoUsado: null };
     }
 
     // Regra 1: Se RBM é zero ou vazio, Perc. Pago = 0%
-    if (!rbm || rbm === 0) return 0;
+    if (!rbm || rbm === 0) return { perc: 0, ativoUsado: null };
 
     // 2. Determinar nível do agente
     // Se situação é Ativo01-Ativo10, usar direto (sem calcular faixa)
@@ -541,17 +541,19 @@ export async function calcularPercPago(
 
     if (!tabelaMatch) {
       console.warn(`[calcularPercPago] Nenhuma linha encontrada na tabela para empresa=${empresa}, descricao=${descricao}, parcela=${parcelaNum}, juros=${jurosNum}`);
-      return 0;
+      return { perc: 0, ativoUsado: null };
     }
 
     const percPagoVal = (tabelaMatch as any)[ativoCol];
-    if (!percPagoVal) return 0;
+    if (!percPagoVal) return { perc: 0, ativoUsado: null };
 
     const perc = parseFloat(String(percPagoVal));
-    return isNaN(perc) ? 0 : perc;
+    // Nome do ativo: ex. ativo01 → Ativo01
+    const ativoNome = `Ativo${String(nivelNum).padStart(2, '0')}`;
+    return { perc: isNaN(perc) ? 0 : perc, ativoUsado: ativoNome };
 
   } catch (error) {
     console.error("[Database] Error calculating perc pago:", error);
-    return 0;
+    return { perc: 0, ativoUsado: null };
   }
 }

@@ -1,0 +1,22 @@
+{
+  "query": "SELECT chaveJ, mes, tabela, totalComissao FROM consignados WHERE mes = '05/2026' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT chaveJ, mes, tabela, totalComissao FROM consignados WHERE mes = '05/2026' LIMIT 5;",
+  "rows": [
+    {
+      "chaveJ": "JI798214",
+      "mes": "05/2026",
+      "tabela": "NULL",
+      "totalComissao": "392.00"
+    },
+    {
+      "chaveJ": "JI798214",
+      "mes": "05/2026",
+      "tabela": "NULL",
+      "totalComissao": "212.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\tmes\ttabela\ttotalComissao\nJI798214\t05/2026\tNULL\t392.00\nJI798214\t05/2026\tNULL\t212.00\n",
+  "stderr": "",
+  "execution_time_ms": 264
+}

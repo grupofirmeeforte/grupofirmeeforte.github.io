@@ -757,7 +757,7 @@ export const appRouter = router({
         const juros = input.juros || '';
         const mes = input.mes || '';
 
-        const percPagoNum = await calcularPercPago(
+        const calcResult = await calcularPercPago(
           rbmValCheck,
           situacao,
           input.chaveJ,
@@ -767,8 +767,8 @@ export const appRouter = router({
           juros,
           mes
         );
-
-        const percPago = percPagoNum > 0 ? String(percPagoNum) : null;
+        const percPagoNum = calcResult.perc;
+        const percPago = percPagoNum > 0 ? String(percPagoNum) : null;;
 
         // Calcular totalComissao e difEmpresa
         let totalComissao: string | null = null;
@@ -935,7 +935,7 @@ export const appRouter = router({
                     const jurosRec = record.juros || '';
                     const mesRec = record.mes || '';
 
-                    const percPagoVal = await calcularPercPago(
+                       const calcImportResult = await calcularPercPago(
                       rbmImportCheck,
                       situacaoAgente,
                       chaveJAgente,
@@ -945,17 +945,16 @@ export const appRouter = router({
                       jurosRec,
                       mesRec
                     );
-
+                    const percPagoVal = calcImportResult.perc;
                     if (percPagoVal > 0) {
                       processed.percPago = String(percPagoVal);
-
+                      processed.tabela = calcImportResult.ativoUsado || undefined;
                       // Calcular totalComissao
                       if (record.valorLiquido) {
                         const vl = parseFloat((record.valorLiquido as string).replace(',', '.').replace(/[^0-9.]/g, ''));
                         const pp = percPagoVal > 1 ? percPagoVal / 100 : percPagoVal;
                         if (!isNaN(vl) && !isNaN(pp)) {
                           processed.totalComissao = String((vl * pp).toFixed(2));
-
                           // Calcular difEmpresa
                           if (record.rbm) {
                             const rbmNum = parseFloat((record.rbm as string).replace(',', '.').replace(/[^0-9.]/g, ''));
@@ -1070,7 +1069,7 @@ export const appRouter = router({
             continue;
           }
 
-          const percPagoVal = await calcularPercPago(
+           const calcRecalcResult = await calcularPercPago(
             rbmNum,
             agente.situacao || '',
             reg.chaveJ,
@@ -1080,22 +1079,21 @@ export const appRouter = router({
             reg.juros || '',
             input.mes
           );
-
+          const percPagoVal = calcRecalcResult.perc;
           if (percPagoVal > 0) {
             const vl = reg.valorLiquido ? Number(reg.valorLiquido) : 0;
             const pp = percPagoVal > 1 ? percPagoVal / 100 : percPagoVal;
             const totalComissao = !isNaN(vl) && !isNaN(pp) ? (vl * pp).toFixed(2) : null;
             const difEmpresa = !isNaN(rbmNum) && totalComissao ? (rbmNum - parseFloat(totalComissao)).toFixed(2) : null;
-
             await db.update(consignados).set({
               percPago: String(percPagoVal),
               totalComissao: totalComissao || undefined,
               difEmpresa: difEmpresa || undefined,
+              tabela: calcRecalcResult.ativoUsado || undefined,
             }).where(eq(consignados.id, reg.id));
-            atualizados++;
+             atualizados++;
           }
         }
-
         return { count: atualizados, total: registros.length };
       }),
 
@@ -1412,7 +1410,7 @@ export const appRouter = router({
           input.juros,
           input.mes
         );
-        return { percPago: resultado };
+        return { percPago: resultado.perc, ativoUsado: resultado.ativoUsado };
       }),
   }),
   valoresCalculo: router({
