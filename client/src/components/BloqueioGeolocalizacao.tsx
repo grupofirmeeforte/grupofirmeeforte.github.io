@@ -7,7 +7,7 @@ interface Props {
   tentarNovamente: () => void;
 }
 
-const logoUrl = '/manus-storage/logo-firme-forte-v2_9bc70f75.png';
+const logoUrl = '/manus-storage/logo-firme-forte-v2_bac9b5e6.png';
 const bgUrl = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663564665591/SMgJn6AGQCNfDq7mPzPqc9/coban-bg-972o7wqxPoimymB3vuTFrF.webp';
 
 export default function BloqueioGeolocalizacao({ status, mensagem, tentarNovamente }: Props) {

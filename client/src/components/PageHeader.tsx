@@ -17,7 +17,7 @@ export default function PageHeader({ onBack }: PageHeaderProps) {
     <div className="flex flex-col items-center pt-6 pb-2 px-4">
       {/* Logo centralizada */}
       <img
-        src="/manus-storage/logo-firme-forte-v2_9bc70f75.png"
+        src="/manus-storage/logo-firme-forte-v2_bac9b5e6.png"
         alt="Grupo Firme & Forte"
         className="h-16 w-auto object-contain drop-shadow-lg mb-4"
       />

@@ -126,7 +126,7 @@ export default function Login() {
             {welcomeData.isAniversario ? (
               <>
                 <div className="flex justify-center mb-4">
-                  <img src="/manus-storage/logo-firme-forte-v2_9bc70f75.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
+                  <img src="/manus-storage/logo-firme-forte-v2_bac9b5e6.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                   🎂 Feliz Aniversário!
@@ -146,7 +146,7 @@ export default function Login() {
             ) : (
               <>
                 <div className="flex justify-center mb-4">
-                  <img src="/manus-storage/logo-firme-forte-v2_9bc70f75.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
+                  <img src="/manus-storage/logo-firme-forte-v2_bac9b5e6.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
                 </div>
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">
                   Seja bem-vindo(a)!
@@ -186,7 +186,7 @@ export default function Login() {
           {/* Logo/Título */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-3">
-              <img src="/manus-storage/logo-firme-forte-v2_9bc70f75.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
+              <img src="/manus-storage/logo-firme-forte-v2_bac9b5e6.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Grupo Firme & Forte
