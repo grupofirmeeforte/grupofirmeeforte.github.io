@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useState, useMemo } from "react";
+import PageHeader from "@/components/PageHeader";
 
 // Função para formatar número como moeda brasileira
 const formatarMoeda = (valor: any) => {
@@ -123,6 +124,7 @@ export default function Relatorios() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-4">
+      <PageHeader onBack={() => window.history.back()} />
       <div className="max-w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -130,9 +132,7 @@ export default function Relatorios() {
             <h1 className="text-4xl font-bold text-slate-900">Cálculo</h1>
             <p className="text-sm text-slate-600">Cálculo de comissões por Chave J</p>
           </div>
-          <Button size="sm" onClick={handleCancel} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
+          
         </div>
 
         {/* Filtros */}
@@ -192,7 +192,7 @@ export default function Relatorios() {
               </thead>
               <tbody>
                 {registrosComMesAno.map((registro: any, index: number) => (
-                  <tr key={index} className="border-b border-slate-200 hover:bg-slate-50">
+                  <tr key={index} className={`border-b border-slate-200 transition-colors ${index % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}`}>
                     {campos.map((campo) => {
                       // Campos que devem ser formatados como moeda
                       const camposMoeda = ['vrLiquidoSoma', 'srccSoma', 'vrLiquidoSrccSoma'];

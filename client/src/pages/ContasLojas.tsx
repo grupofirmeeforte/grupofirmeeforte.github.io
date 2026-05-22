@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import PageHeader from "@/components/PageHeader";
 
 const TIPOS_COMUNS = ["Água", "Energia", "Aluguel", "Internet", "Telefone", "IPTU", "Condomínio", "Gás", "Outros"];
 
@@ -191,6 +192,7 @@ export default function ContasLojas() {
 
   return (
     <div className="p-4 md:p-6 min-h-screen bg-gray-950 text-white">
+      <PageHeader onBack={() => window.history.back()} />
       {/* Cabeçalho */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>

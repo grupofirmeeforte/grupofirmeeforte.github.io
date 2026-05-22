@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Plus, Pencil, Trash2, Camera, X, Eye, Shirt } from "lucide-react";
 import { toast } from "sonner";
+import PageHeader from "@/components/PageHeader";
 
 const TIPOS_ITEM = ["Boné", "Crachá", "Calça", "Camisa", "Colete", "Uniforme", "Outros"];
 const TAMANHOS = ["PP", "P", "M", "G", "GG", "XGG", "Único"];
@@ -153,6 +154,7 @@ export default function UniformesCrachas() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-4">
+      <PageHeader onBack={() => window.history.back()} />
       <div className="max-w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -169,9 +171,7 @@ export default function UniformesCrachas() {
             <Button onClick={() => { setShowForm(true); setEditando(null); setForm(emptyForm); setFotoPreview(null); }} className="bg-green-600 hover:bg-green-700 text-white gap-1">
               <Plus className="w-4 h-4" /> Novo Registro
             </Button>
-            <Button size="sm" onClick={() => navigate("/")} className="bg-orange-500 hover:bg-orange-600 text-white gap-1">
-              <ArrowLeft className="w-4 h-4" /> Voltar
-            </Button>
+            
           </div>
         </div>
 

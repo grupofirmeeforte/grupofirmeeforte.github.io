@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { ArrowLeft, Plus, Pencil, Trash2, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
+import PageHeader from "@/components/PageHeader";
 
 type TabelaRow = {
   id: number;
@@ -328,6 +329,7 @@ export default function TabelaComissao() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader onBack={() => window.history.back()} />
       {/* Header */}
       <div className="bg-white border-b shadow-sm px-6 py-4">
         <div className="flex items-center gap-3">
@@ -339,9 +341,7 @@ export default function TabelaComissao() {
             <Button onClick={openNovo} className="flex items-center gap-2" style={{ backgroundColor: '#002776' }}>
               <Plus className="w-4 h-4" /> Novo
             </Button>
-            <Button size="sm" onClick={() => setLocation('/')} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
-              <ArrowLeft className="w-4 h-4" /> Voltar
-            </Button>
+            
           </div>
         </div>
       </div>

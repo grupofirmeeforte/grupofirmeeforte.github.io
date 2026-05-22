@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ChevronLeft, ChevronRight, Trophy, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import PageHeader from "@/components/PageHeader";
 
 const MESES = [
   "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
@@ -93,6 +94,7 @@ export default function AcompanhamentoDiario() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <PageHeader onBack={() => window.history.back()} />
         <div className="text-gray-400">Carregando...</div>
       </div>
     );

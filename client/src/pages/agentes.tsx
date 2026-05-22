@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit2, Trash2, Search, ExternalLink, GitMerge, ArrowLeft } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, ExternalLink, GitMerge } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 import { useLocation } from "wouter";
 
 // Função para formatar data YYYY-MM-DD para DD/MM/YYYY
@@ -97,6 +98,7 @@ export default function AgentesPage() {
 
   return (
     <div className="space-y-6 p-6">
+      <PageHeader onBack={() => navigate("/")} />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-5xl font-bold">Agentes</h1>
@@ -119,9 +121,6 @@ export default function AgentesPage() {
           >
             <Plus className="w-4 h-4" />
             Novo Agente
-          </Button>
-          <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
-            <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
-import { BookMarked, BookOpen, Sparkles, Star, Zap, ArrowLeft } from "lucide-react";
+import { BookMarked, BookOpen, Sparkles, Star, Zap } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 const cards = [
   {
@@ -64,18 +65,9 @@ export default function MensagemDoDiaHub() {
 
   return (
     <div className="min-h-screen bg-slate-900 px-4 py-6">
+      <PageHeader onBack={() => navigate("/")} />
       {/* Header */}
-      <div className="max-w-2xl mx-auto mb-8">
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={() => navigate("/")}
-            className="group flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg"
-          >
-            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform duration-200" />
-            Voltar
-          </button>
-        </div>
-
+      <div className="max-w-2xl mx-auto mb-8 mt-4">
         <div className="text-center">
           <div className="text-4xl mb-3">💌</div>
           <h1 className="text-3xl font-bold text-white mb-2">Mensagem do Dia</h1>

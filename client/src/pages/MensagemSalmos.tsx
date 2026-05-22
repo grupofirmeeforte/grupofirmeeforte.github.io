@@ -1,7 +1,8 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, BookOpen, Share2 } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
+import { BookOpen, Share2 } from "lucide-react";
 
 const SALMOS = [
   { numero: 1, titulo: "O Homem Feliz", texto: "Bem-aventurado o homem que não anda no conselho dos ímpios, nem se detém no caminho dos pecadores, nem se assenta na roda dos escarnecedores. Antes tem o seu prazer na lei do Senhor, e na sua lei medita de dia e de noite. Será como a árvore plantada junto a ribeiros de águas, a qual dá o seu fruto no tempo certo; as suas folhas não cairão, e tudo quanto fizer prosperará." },
@@ -40,6 +41,7 @@ export default function MensagemSalmos() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50">
+      <PageHeader onBack={() => navigate("/")} />
       <div className="shadow-lg" style={{ background: 'linear-gradient(135deg, #002776 0%, #003d99 60%, #c8960c 100%)' }}>
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -49,10 +51,6 @@ export default function MensagemSalmos() {
               <p className="text-xs text-yellow-300 capitalize">{hoje}</p>
             </div>
           </div>
-          <Button onClick={() => navigate("/")} className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white border-none">
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Button>
         </div>
       </div>
 

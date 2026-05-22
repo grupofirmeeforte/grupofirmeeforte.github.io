@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Star } from "lucide-react";
+import { Star } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 import { trpc } from "@/lib/trpc";
 
 const SIGNO_EMOJIS: Record<string, string> = {
@@ -28,23 +29,15 @@ export default function MensagemHoroscopo() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <PageHeader onBack={() => navigate("/")} />
       {/* Header */}
       <div className="shadow-lg" style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5986 60%, #c8960c 100%)' }}>
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Star className="w-6 h-6 text-yellow-300 fill-yellow-300" />
-            <div>
-              <h1 className="text-xl font-bold text-white">Horóscopo do Dia</h1>
-              <p className="text-xs text-yellow-300 capitalize">{hoje}</p>
-            </div>
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
+          <Star className="w-6 h-6 text-yellow-300 fill-yellow-300" />
+          <div>
+            <h1 className="text-xl font-bold text-white">Horóscopo do Dia</h1>
+            <p className="text-xs text-yellow-300 capitalize">{hoje}</p>
           </div>
-          <Button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white border-none"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Button>
         </div>
       </div>
 

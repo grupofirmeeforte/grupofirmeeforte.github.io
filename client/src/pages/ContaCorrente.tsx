@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Upload, Edit2, Trash2, Search, Calculator, Send, Settings } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
+import PageHeader from "@/components/PageHeader";
 
 // ─── Formatadores ────────────────────────────────────────────────
 function fmtMoeda(v: string | number | null | undefined): string {
@@ -330,6 +331,7 @@ export default function ContaCorrente() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader onBack={() => window.history.back()} />
       {/* Header */}
       <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
         <div>
@@ -379,14 +381,7 @@ export default function ContaCorrente() {
           >
             <Settings className="w-4 h-4" /> Configuração
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => navigate("/")}
-            className="gap-1 bg-orange-500 text-white hover:bg-orange-600 border-orange-500"
-          >
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
+          
         </div>
       </div>
 

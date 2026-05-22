@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Download, Send, Trash2, Pencil, Settings, Plus, X, RefreshCw } from "lucide-react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import PageHeader from "@/components/PageHeader";
 
 const fmtMoeda = (v: any) => {
   if (v === null || v === undefined || v === "" || v === "NULL") return "-";
@@ -448,6 +449,7 @@ export default function Calculo() {
   return (
     <>
     <div className="min-h-screen bg-slate-50">
+      <PageHeader onBack={() => window.history.back()} />
       {/* Header */}
       <div className="flex items-center gap-3 px-3 py-2 bg-white border-b border-slate-200">
         <div>
@@ -479,9 +481,7 @@ export default function Calculo() {
           >
             <Send className="w-3 h-3" /> Enviar Para Pagto
           </Button>
-          <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
+          
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Plus, Pencil, Trash2, Camera, X, Eye, Package } from "lucide-react";
 import { toast } from "sonner";
+import PageHeader from "@/components/PageHeader";
 
 const formatarMoeda = (v: any) => {
   if (!v && v !== 0) return "-";
@@ -159,6 +160,7 @@ export default function AtivoImobilizado() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-4">
+      <PageHeader onBack={() => window.history.back()} />
       <div className="max-w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -175,9 +177,7 @@ export default function AtivoImobilizado() {
             <Button onClick={() => { setShowForm(true); setEditando(null); setForm(emptyForm); setFotoPreview(null); }} className="bg-green-600 hover:bg-green-700 text-white gap-1">
               <Plus className="w-4 h-4" /> Novo Ativo
             </Button>
-            <Button size="sm" onClick={() => navigate("/")} className="bg-orange-500 hover:bg-orange-600 text-white gap-1">
-              <ArrowLeft className="w-4 h-4" /> Voltar
-            </Button>
+            
           </div>
         </div>
 

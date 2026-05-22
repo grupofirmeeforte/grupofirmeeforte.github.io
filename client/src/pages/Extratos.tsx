@@ -8,6 +8,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key, Calendar, TrendingUp } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
+import PageHeader from "@/components/PageHeader";
 
 // ─── TIPOS DE SUBABAS ────────────────────────────────────────────────────────
 type Aba = 'consignado' | 'cc' | 'consorcio' | 'ourocap' | 'seguros' | 'bbdental' | 'perspectiva' | 'minha-tabela';
@@ -131,8 +132,8 @@ function ExtratoConsignado() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {(rows as any[]).map((row: any) => (
-                    <TableRow key={row.id} className="hover:bg-gray-50">
+                  {(rows as any[]).map((row: any, rowIdx: number) => (
+                    <TableRow key={row.id} className={rowIdx % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}>
                       <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
                       <TableCell className="text-gray-700 font-mono text-sm">{row.nrOperacao || '—'}</TableCell>
                       <TableCell className="text-center">
@@ -247,8 +248,8 @@ function PerspectivadeGanho() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  (rows as any[]).map((row: any) => (
-                    <TableRow key={row.id} className="hover:bg-gray-50">
+                  (rows as any[]).map((row: any, rowIdx: number) => (
+                    <TableRow key={row.id} className={rowIdx % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}>
                       <TableCell className="font-mono text-sm font-medium text-gray-800">{row.proposta}</TableCell>
                       <TableCell className="text-gray-700 text-sm">{row.linha ?? '—'}</TableCell>
                       <TableCell>
@@ -621,15 +622,14 @@ export default function ExtratosPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader onBack={() => window.history.back()} />
       {/* Cabeçalho */}
       <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Extratos</h1>
           <p className="text-sm text-gray-500 mt-0.5">{subtituloPagina}</p>
         </div>
-        <Button size="sm" onClick={() => navigate('/')} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
-          <ArrowLeft className="w-4 h-4" /> Voltar
-        </Button>
+        
       </div>
 
       {/* Navegação por abas */}

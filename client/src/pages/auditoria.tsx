@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Download, Search, ArrowLeft, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { toast } from 'sonner';
+import PageHeader from "@/components/PageHeader";
 
 // ─── TIPOS ────────────────────────────────────────────────────────────────────
 type Feriado = {
@@ -170,15 +171,14 @@ export default function AuditoriaPage() {
 
   return (
     <div className="space-y-6 p-6">
+      <PageHeader onBack={() => window.history.back()} />
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Auditoria</h1>
           <p className="text-gray-500 mt-1 text-sm">Logs de acesso e feriados do sistema</p>
         </div>
-        <Button onClick={() => navigate('/')} className="flex items-center gap-2 bg-gray-800 text-white hover:bg-gray-900">
-          <ArrowLeft className="w-4 h-4" /> Voltar
-        </Button>
+        
       </div>
 
       {/* Abas */}

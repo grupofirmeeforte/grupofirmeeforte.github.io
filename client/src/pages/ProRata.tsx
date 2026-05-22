@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
+import PageHeader from "@/components/PageHeader";
 
 const PAGE_SIZE = 100;
 
@@ -313,6 +314,7 @@ export default function ProRataPage() {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <PageHeader onBack={() => window.history.back()} />
         <div className="text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto mb-3"></div>
           <p className="text-gray-500">Verificando acesso...</p>
@@ -332,9 +334,7 @@ export default function ProRataPage() {
           <p className="text-xs text-gray-500">Operações com controle de parcelas pagas e a receber</p>
         </div>
         <div className="ml-auto">
-          <Button size="sm" onClick={() => navigate('/')} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
+          
         </div>
       </div>
 
@@ -494,10 +494,10 @@ export default function ProRataPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {(rows as any[]).map((row: any) => {
+                        {(rows as any[]).map((row: any, rowIdx: number) => {
                           const falta = row.qtdFaltaReceber ?? ((row.qtdParcelasTotal ?? 0) - (row.qtdParcelasPagas ?? 0));
                           return (
-                            <TableRow key={row.id} className="hover:bg-gray-50">
+                            <TableRow key={row.id} className={rowIdx % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}>
                               <TableCell className="text-gray-700 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
                               <TableCell className="text-gray-700 font-mono text-sm font-medium">{row.nrOperacao}</TableCell>
                               <TableCell>

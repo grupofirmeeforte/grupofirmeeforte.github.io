@@ -1,7 +1,8 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Sparkles, BookOpen } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
+import { Sparkles, BookOpen } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 export default function MensagemMinutosSabedoria() {
@@ -16,6 +17,7 @@ export default function MensagemMinutosSabedoria() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50">
+      <PageHeader onBack={() => navigate("/")} />
       {/* Header */}
       <div
         className="shadow-lg"
@@ -29,13 +31,6 @@ export default function MensagemMinutosSabedoria() {
               <p className="text-xs text-yellow-300 capitalize">{hoje}</p>
             </div>
           </div>
-          <Button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white border-none"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Button>
         </div>
       </div>
 

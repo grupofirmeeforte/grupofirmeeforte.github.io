@@ -1,7 +1,8 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Zap, Trophy } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
+import { Zap, Trophy } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 
 export default function MensagemMotivacional() {
@@ -16,26 +17,18 @@ export default function MensagemMotivacional() {
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)' }}>
+      <PageHeader onBack={() => navigate("/")} />
       {/* Header */}
       <div
         className="shadow-lg"
         style={{ background: 'linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%)' }}
       >
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Zap className="w-6 h-6 text-white drop-shadow" />
-            <div>
-              <h1 className="text-xl font-bold text-white">Mensagem Motivacional</h1>
-              <p className="text-xs text-amber-100 capitalize">{hoje}</p>
-            </div>
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
+          <Zap className="w-6 h-6 text-white drop-shadow" />
+          <div>
+            <h1 className="text-xl font-bold text-white">Mensagem Motivacional</h1>
+            <p className="text-xs text-amber-100 capitalize">{hoje}</p>
           </div>
-          <Button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white border-white/30 border"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
-          </Button>
         </div>
       </div>
 

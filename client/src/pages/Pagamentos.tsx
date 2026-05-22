@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { ChaveJRespInput } from "@/components/ChaveJRespInput";
+import PageHeader from "@/components/PageHeader";
 
 const TIPOS_PAGTO = [
   "Adto", "Agua", "Ajuda de Custo", "Aluguel", "Cancelado", "Comissão",
@@ -316,6 +317,7 @@ export default function PagamentosPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
+      <PageHeader onBack={() => window.history.back()} />
       <div className="bg-gray-900 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-bold text-white">Pagamentos</h1>
@@ -324,9 +326,7 @@ export default function PagamentosPage() {
         <div className="flex gap-2">
           <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white">Exportar Excel</Button>
           <Button onClick={abrirNovo} size="sm" className="bg-blue-700 hover:bg-blue-600 text-white">+ Novo Lançamento</Button>
-          <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
+          
         </div>
       </div>
 

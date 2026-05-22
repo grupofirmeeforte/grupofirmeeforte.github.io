@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Upload, Edit2, Trash2, Search, Settings, RefreshCw, Calculator, Send } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
+import PageHeader from "@/components/PageHeader";
 
 // ─── Formatadores ────────────────────────────────────────────────
 function fmtMoeda(v: string | number | null | undefined): string {
@@ -297,6 +298,7 @@ export default function Consorcio() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader onBack={() => window.history.back()} />
       {/* Header */}
       <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
         <div>
@@ -340,9 +342,7 @@ export default function Consorcio() {
             <Send className={`w-4 h-4 ${enviarCalculoMutation.isPending ? 'animate-pulse' : ''}`} />
             {enviarCalculoMutation.isPending ? 'Enviando...' : `Enviar para Cálculo${selectedIds.size > 0 ? ` (${selectedIds.size})` : ''}`}
           </Button>
-          <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
+          
         </div>
       </div>
 

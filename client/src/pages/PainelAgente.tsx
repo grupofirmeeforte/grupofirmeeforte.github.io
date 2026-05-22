@@ -9,10 +9,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  ArrowLeft, Trophy, Flame, Star, Zap, Crown, Medal, Award,
+  Trophy, Flame, Star, Zap, Crown, Medal, Award,
   TrendingUp, Target, Calendar, AlertTriangle, BarChart2,
   ChevronUp, ChevronDown, Minus, User, Edit2
 } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 import { toast } from "sonner";
 
 const ICONE_MAP: Record<string, React.ReactNode> = {
@@ -110,6 +111,7 @@ export default function PainelAgente() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <PageHeader onBack={() => navigate("/")} />
       {/* Modal Meta Inicial */}
       <Dialog open={modalMetaInicial} onOpenChange={setModalMetaInicial}>
         <DialogContent className="bg-slate-800 border-slate-700 text-white">
@@ -145,20 +147,12 @@ export default function PainelAgente() {
 
       {/* Header */}
       <div style={{ background: 'linear-gradient(135deg, #002776 0%, #003d99 60%, #c8960c 100%)' }} className="shadow-xl">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <BarChart2 className="w-6 h-6 text-yellow-300" />
-            <div>
-              <h1 className="text-xl font-bold text-white">Meu Painel</h1>
-              <p className="text-xs text-yellow-300 capitalize">{hoje}</p>
-            </div>
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
+          <BarChart2 className="w-6 h-6 text-yellow-300" />
+          <div>
+            <h1 className="text-xl font-bold text-white">Meu Painel</h1>
+            <p className="text-xs text-yellow-300 capitalize">{hoje}</p>
           </div>
-          <Button
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white border-none"
-          >
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import PageHeader from "@/components/PageHeader";
 import {
   Users, TrendingUp, Phone, CheckSquare, Mail, BarChart2,
   Plus, Search, ArrowLeft, Trash2, Edit, Eye, RefreshCw,
@@ -830,15 +831,14 @@ export default function CRMPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PageHeader onBack={() => window.history.back()} />
       {/* Header */}
       <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
         <div>
           <h1 className="text-lg font-bold text-gray-900">CRM</h1>
           <p className="text-xs text-gray-500">Gestão de Relacionamento com Clientes</p>
         </div>
-        <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
-          <ArrowLeft className="w-4 h-4" /> Voltar
-        </Button>
+        
       </div>
 
       {/* Abas */}

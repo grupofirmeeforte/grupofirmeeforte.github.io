@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Search, Upload, Edit2, Trash2, ArrowLeft, Download, BarChart2 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { formatMesAno } from "@/lib/mesano";
+import PageHeader from "@/components/PageHeader";
 
 // Alias para compatibilidade com código existente
 const mesanoToStr = formatMesAno;
@@ -523,6 +524,7 @@ export default function FebrabanPage() {
 
   return (
     <div className="space-y-4 p-6">
+      <PageHeader onBack={() => window.history.back()} />
       {/* Painel de Resumo por Empresa */}
       {resumo && resumo.empresas.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
@@ -613,7 +615,7 @@ export default function FebrabanPage() {
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
+          
           <Button
             className="gap-2 bg-purple-600 text-white hover:bg-purple-700"
             onClick={() => navigate("/febraban/acompanhamento-diario")}
@@ -782,7 +784,7 @@ export default function FebrabanPage() {
                   <tr><td colSpan={13} className="text-center py-8 text-gray-400">Nenhum registro encontrado.</td></tr>
                 ) : (
                   rows.map((row) => (
-                    <tr key={row.id} className="border-b hover:bg-gray-50 transition-colors">
+                    <tr key={row.id} className={`border-b transition-colors ${rows.indexOf(row) % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}`}>
                       <td className="px-3 py-2 font-medium">{row.empresa || "-"}</td>
                       <td className="px-3 py-2">{mesanoToStr(row.mesano)}</td>
                       <td className="px-3 py-2 font-mono text-xs">{row.proposta}</td>

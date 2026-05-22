@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { BancoSelect } from "@/components/BancoSelect";
 import { ArrowLeft } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 type DespesaFixa = {
   id: number;
@@ -236,6 +237,7 @@ export default function DespesasFixasPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
+      <PageHeader onBack={() => window.history.back()} />
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-3 py-2 flex items-center justify-between">
         <div>
@@ -251,9 +253,7 @@ export default function DespesasFixasPage() {
             {enviarParaPagtoMutation.isPending ? "Enviando..." : "Enviar Para Pagto"}
           </Button>
           <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white text-xs h-7 px-2">Excel</Button>
-          <Button onClick={() => navigate("/")} size="sm" className="gap-1 bg-orange-500 hover:bg-orange-600 text-white text-xs h-7 px-2">
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
+          
         </div>
       </div>
 

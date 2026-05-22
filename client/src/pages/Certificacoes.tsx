@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { toast } from 'sonner';
 import { ArrowLeft, Plus, Pencil, Trash2, Upload, ExternalLink } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import PageHeader from "@/components/PageHeader";
 
 type Cert = {
   id: number;
@@ -234,6 +235,7 @@ export default function Certificacoes() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <PageHeader onBack={() => window.history.back()} />
       <div className="bg-white border-b px-6 py-3 flex items-center gap-3">
         <div>
           <h1 className="text-lg font-bold text-slate-800">Certificações</h1>
@@ -253,9 +255,7 @@ export default function Certificacoes() {
           <Button size="sm" onClick={abrirNovo} className="gap-1">
             <Plus className="w-4 h-4" /> Novo
           </Button>
-          <Button size="sm" onClick={() => setLocation('/')} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </Button>
+          
         </div>
       </div>
 
@@ -307,7 +307,7 @@ export default function Certificacoes() {
                   </TableCell>
                 </TableRow>
               ) : registros.map((c, idx) => (
-                <TableRow key={c.id != null ? c.id : `sint-${idx}`} className="hover:bg-slate-50">
+                <TableRow key={c.id != null ? c.id : `sint-${idx}`} className={idx % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}>
                   <TableCell>{(c as any).empresa || '-'}</TableCell>
                   <TableCell className="font-mono text-sm">{c.chaveJ || '-'}</TableCell>
                   <TableCell>{c.nomeAgente || '-'}</TableCell>
