@@ -277,6 +277,8 @@ export default function Home() {
                   .filter(m => !m.ceoOnly || isCEO)
                   .slice()
                   .sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'));
+                // Ocultar grupo inteiro se não há sub-módulos visíveis
+                if (visibleSubs.length === 0) return null;
                 return (
                   <div
                     key={grupo.key}
@@ -290,16 +292,24 @@ export default function Home() {
                       <span className="text-sm font-bold text-slate-800 text-center leading-tight">{grupo.title}</span>
                     </div>
 
-                    {/* Sub-abas à direita em ordem alfabética */}
+                    {/* Sub-abas à direita em ordem alfabética — cores da bandeira do Brasil */}
                     <div className="flex flex-wrap gap-2 items-center px-4 py-3 flex-1">
                       {visibleSubs.length > 0 ? (
-                        visibleSubs.map(sub => {
+                        visibleSubs.map((sub, idx) => {
                           const SubIcon = sub.icon;
+                          // Verde, Amarelo, Azul, Branco — sequência cíclica
+                          const brasilColors = [
+                            'bg-green-600 hover:bg-green-700 text-white border-green-700',
+                            'bg-yellow-400 hover:bg-yellow-500 text-slate-900 border-yellow-500',
+                            'bg-blue-700 hover:bg-blue-800 text-white border-blue-800',
+                            'bg-white hover:bg-slate-50 text-slate-800 border-slate-300',
+                          ];
+                          const colorClass = brasilColors[idx % 4];
                           return (
                             <button
                               key={sub.path}
                               onClick={() => navigate(sub.path)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 hover:bg-white border border-slate-200 hover:border-slate-300 hover:shadow-sm transition-all text-sm font-medium text-slate-700 hover:text-slate-900"
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-semibold text-sm shadow-sm hover:shadow-md transition-all ${colorClass}`}
                             >
                               <SubIcon className="w-3.5 h-3.5 flex-shrink-0" />
                               {sub.title}
@@ -391,18 +401,20 @@ export default function Home() {
               </button>
             </div>
 
-            {grupoAtual.subModules.length === 0 ? (
-              <div className="text-center py-8 text-slate-400">
-                <p className="text-lg font-medium">Em breve</p>
-                <p className="text-sm mt-1">Este módulo está em desenvolvimento.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {(isAdminOuCeo
-                  ? grupoAtual.subModules
-                  : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
-                  .filter(m => !m.ceoOnly || isCEO)
-                  .map((sub) => {
+            {(() => {
+              const subsVisiveis = (isAdminOuCeo
+                ? grupoAtual.subModules
+                : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
+                .filter(m => !m.ceoOnly || isCEO);
+              if (subsVisiveis.length === 0) return (
+                <div className="text-center py-8 text-slate-400">
+                  <p className="text-lg font-medium">Em breve</p>
+                  <p className="text-sm mt-1">Este módulo está em desenvolvimento.</p>
+                </div>
+              );
+              return (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {subsVisiveis.map((sub) => {
                     const SubIcon = sub.icon;
                     return (
                       <button
@@ -420,8 +432,9 @@ export default function Home() {
                       </button>
                     );
                   })}
-              </div>
-            )}
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}
