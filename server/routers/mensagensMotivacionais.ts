@@ -29,12 +29,12 @@ export const mensagensMotivacionaisRouter = router({
     try {
       // 1. Verificar se já existe mensagem do dia para este usuário hoje
       const existenteResult = await db.execute(
-        sql`SELECT mensagem_id FROM motivacional_do_dia_usuario WHERE user_id = ${userId} AND data_dia = ${hoje} LIMIT 1`
+        sql`SELECT mensagemId FROM motivacional_do_dia_usuario WHERE userId = ${userId} AND dataDia = ${hoje} LIMIT 1`
       );
-      const existenteRows = (Array.isArray(existenteResult) ? existenteResult[0] : existenteResult) as unknown as Array<{ mensagem_id: number }>;
+      const existenteRows = (Array.isArray(existenteResult) ? existenteResult[0] : existenteResult) as unknown as Array<{ mensagemId: number }>;
 
       if (existenteRows && existenteRows.length > 0) {
-        const mensagemId = Number(existenteRows[0].mensagem_id);
+        const mensagemId = Number(existenteRows[0].mensagemId);
         const [mensagem] = await db
           .select()
           .from(mensagensMotivacionais)
@@ -45,10 +45,10 @@ export const mensagensMotivacionaisRouter = router({
 
       // 2. Buscar IDs já vistos por este usuário
       const vistosResult = await db.execute(
-        sql`SELECT mensagem_id FROM motivacional_do_dia_usuario WHERE user_id = ${userId}`
+        sql`SELECT mensagemId FROM motivacional_do_dia_usuario WHERE userId = ${userId}`
       );
-      const vistosRows = (Array.isArray(vistosResult) ? vistosResult[0] : vistosResult) as unknown as Array<{ mensagem_id: number }>;
-      const vistosIds = (vistosRows || []).map((v) => Number(v.mensagem_id)).filter(Boolean);
+      const vistosRows = (Array.isArray(vistosResult) ? vistosResult[0] : vistosResult) as unknown as Array<{ mensagemId: number }>;
+      const vistosIds = (vistosRows || []).map((v) => Number(v.mensagemId)).filter(Boolean);
 
       // 3. Sortear uma mensagem ainda não vista
       let novaMensagem: typeof mensagensMotivacionais.$inferSelect | undefined;
@@ -83,7 +83,7 @@ export const mensagensMotivacionaisRouter = router({
 
       // 4. Salvar a mensagem do dia para este usuário
       await db.execute(
-        sql`INSERT INTO motivacional_do_dia_usuario (user_id, data_dia, mensagem_id) VALUES (${userId}, ${hoje}, ${novaMensagem.id})`
+        sql`INSERT INTO motivacional_do_dia_usuario (userId, dataDia, mensagemId) VALUES (${userId}, ${hoje}, ${novaMensagem.id})`
       );
 
       return novaMensagem;
