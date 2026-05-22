@@ -317,7 +317,7 @@ export default function PainelAgente() {
           <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center justify-between text-slate-200">
-                <span className="flex items-center gap-2"><Trophy className="w-5 h-5 text-yellow-400" /> Ranking do Mês</span>
+                <span className="flex items-center gap-2"><Trophy className="w-5 h-5 text-yellow-400" /> 🏆 Top 10 do Mês</span>
                 <div className="flex items-center gap-2">
                   {painel?.ranking?.posicao && painel.ranking.posicao > 0 && (
                     <Badge className="bg-yellow-600 text-white text-xs">
