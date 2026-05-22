@@ -33,6 +33,7 @@ import AtivoImobilizado from "@/pages/AtivoImobilizado";
 import PainelAgente from "@/pages/PainelAgente";
 import UniformesCrachas from './pages/UniformesCrachas';
 import MensagemMotivacional from './pages/MensagemMotivacional';
+import MensagemDoDiaHub from './pages/MensagemDoDiaHub';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -88,6 +89,7 @@ function RouterWithInactivity() {
       <Route path={"/painel-agente"} component={PainelAgente} />
       <Route path={"/relatorios/uniformes-crachas"} component={UniformesCrachas} />
       <Route path={"/mensagem-do-dia/motivacional"} component={MensagemMotivacional} />
+      <Route path={"/mensagem-do-dia"} component={MensagemDoDiaHub} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />
