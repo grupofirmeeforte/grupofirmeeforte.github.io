@@ -350,7 +350,23 @@ export default function PainelAgente() {
                 <div className="text-center py-8 text-slate-400">Nenhum dado disponível para este mês.</div>
               ) : (
                 <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
-                  {ranking.map((r) => (
+                  {(() => {
+                    // Contar quantas vezes cada primeiro nome aparece
+                    const contagemPrimeiro: Record<string, number> = {};
+                    ranking.forEach(r => {
+                      const primeiro = (r.nomeAgente ?? '').split(' ')[0];
+                      contagemPrimeiro[primeiro] = (contagemPrimeiro[primeiro] ?? 0) + 1;
+                    });
+                    // Função para obter nome de exibição
+                    const nomeExibir = (nomeCompleto: string) => {
+                      const partes = (nomeCompleto ?? '').split(' ');
+                      const primeiro = partes[0] ?? '';
+                      if (contagemPrimeiro[primeiro] > 1 && partes.length > 1) {
+                        return `${primeiro} ${partes[1]}`;
+                      }
+                      return primeiro;
+                    };
+                    return ranking.map((r) => (
                     <div
                       key={r.chaveJ}
                       className={`flex items-center gap-3 p-3 rounded-lg transition-all ${r.isMe
@@ -363,7 +379,7 @@ export default function PainelAgente() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className={`font-semibold text-sm truncate ${r.isMe ? 'text-yellow-300' : 'text-white'}`}>
-                          {(r.nomeAgente ?? '').split(' ')[0]} {r.isMe && <span className="text-xs text-yellow-400">(você)</span>}
+                          {nomeExibir(r.nomeAgente ?? '')} {r.isMe && <span className="text-xs text-yellow-400">(você)</span>}
                         </div>
                         <div className="text-xs text-slate-400">{r.cidade}</div>
                       </div>
@@ -373,7 +389,8 @@ export default function PainelAgente() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  ));
+                  })()}
                 </div>
               )}
             </CardContent>
