@@ -31,6 +31,7 @@ import MensagemHoroscopo from './pages/MensagemHoroscopo';
 import DocumentacaoAgentes from './pages/DocumentacaoAgentes';
 import AtivoImobilizado from './pages/AtivoImobilizado';
 import UniformesCrachas from './pages/UniformesCrachas';
+import MensagemMotivacional from './pages/MensagemMotivacional';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -84,6 +85,7 @@ function RouterWithInactivity() {
       <Route path={"/cadastro/documentacao-agentes"} component={DocumentacaoAgentes} />
       <Route path={"/relatorios/ativo-imobilizado"} component={AtivoImobilizado} />
       <Route path={"/relatorios/uniformes-crachas"} component={UniformesCrachas} />
+      <Route path={"/mensagem-do-dia/motivacional"} component={MensagemMotivacional} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />

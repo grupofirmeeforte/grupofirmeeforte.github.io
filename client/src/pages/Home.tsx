@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles, FolderOpen, Star, Package, Shirt } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles, FolderOpen, Star, Package, Shirt, Zap } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -188,6 +188,7 @@ export default function Home() {
       bgColor: 'from-rose-50 to-pink-50',
       subModules: [
         { title: 'Minutos de Sabedoria', description: 'Reflexões diárias de sabedoria', icon: Sparkles, color: 'bg-purple-600', path: '/mensagem-do-dia/minutos-sabedoria', subKey: 'minutos-sabedoria' },
+        { title: 'Motivacional', description: 'Mensagem de otimismo e superação do dia', icon: Zap, color: 'bg-amber-600', path: '/mensagem-do-dia/motivacional', subKey: 'motivacional' },
         { title: 'Salmos', description: 'Salmos do dia', icon: BookOpen, color: 'bg-amber-600', path: '/mensagem-do-dia/salmos', subKey: 'salmos' },
         { title: 'Versículos', description: 'Versículos motivacionais do dia', icon: BookMarked, color: 'bg-rose-600', path: '/mensagem-do-dia/versiculos', subKey: 'versiculos' },
         { title: 'Horóscopo', description: 'Horóscopo diário por signo', icon: Star, color: 'bg-indigo-600', path: '/mensagem-do-dia/horoscopo', subKey: 'horoscopo' },

@@ -1138,3 +1138,26 @@ export const uniformesCrachas = mysqlTable("uniformesCrachas", {
 });
 export type UniformeCracha = typeof uniformesCrachas.$inferSelect;
 export type InsertUniformeCracha = typeof uniformesCrachas.$inferInsert;
+
+// ── Mensagens Motivacionais ──────────────────────────────────────────────────
+export const mensagensMotivacionais = mysqlTable("mensagens_motivacionais", {
+  id: int("id").autoincrement().primaryKey(),
+  numero: int("numero").notNull(),
+  autor: varchar("autor", { length: 255 }),
+  conteudo: text("conteudo").notNull(),
+  ativo: boolean("ativo").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  numeroIdx: index("idx_mm_numero").on(table.numero),
+}));
+export type MensagemMotivacional = typeof mensagensMotivacionais.$inferSelect;
+export type InsertMensagemMotivacional = typeof mensagensMotivacionais.$inferInsert;
+
+export const motivacionalDoDiaUsuario = mysqlTable("motivacional_do_dia_usuario", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: varchar("user_id", { length: 255 }).notNull(),
+  dataDia: date("data_dia").notNull(),
+  mensagemId: int("mensagem_id").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type MotivacionalDoDiaUsuario = typeof motivacionalDoDiaUsuario.$inferSelect;

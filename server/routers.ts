@@ -18,6 +18,7 @@ import { supervisoresRouter } from "./routers/supervisores";
 import { ativoImobilizadoRouter } from "./routers/ativoImobilizado";
 import { uniformesCrachasRouter } from "./routers/uniformesCrachas";
 import { minutosSabedoriaRouter } from "./routers/minutosSabedoria";
+import { mensagensMotivacionaisRouter } from "./routers/mensagensMotivacionais";
 import { contasLojasRouter } from "./routers/contasLojas";
 import { documentosAgentesRouter } from "./routers/documentosAgentes";
 import { horoscopoRouter } from "./routers/horoscopo";
@@ -359,6 +360,7 @@ export const appRouter = router({
   ativoImobilizado: ativoImobilizadoRouter,
   uniformesCrachas: uniformesCrachasRouter,
   minutosSabedoria: minutosSabedoriaRouter,
+  mensagensMotivacionais: mensagensMotivacionaisRouter,
   contasLojas: contasLojasRouter,
   documentosAgentes: documentosAgentesRouter,
   horoscopo: horoscopoRouter,
