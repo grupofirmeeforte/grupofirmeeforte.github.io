@@ -297,19 +297,23 @@ export default function Home() {
                       {visibleSubs.length > 0 ? (
                         visibleSubs.map((sub, idx) => {
                           const SubIcon = sub.icon;
-                          // Verde, Amarelo, Azul, Branco — sequência cíclica
-                          const brasilColors = [
-                            'bg-green-600 hover:bg-green-700 text-white border-green-700',
-                            'bg-yellow-400 hover:bg-yellow-500 text-slate-900 border-yellow-500',
-                            'bg-blue-700 hover:bg-blue-800 text-white border-blue-800',
-                            'bg-white hover:bg-slate-50 text-slate-800 border-slate-300',
+                          // Verde, Amarelo, Azul, Branco — cores da bandeira do Brasil
+                          type BrasilColor = { bg: string; text: string; border: string; hover: string };
+                          const brasilColors: BrasilColor[] = [
+                            { bg: '#16a34a', text: '#ffffff', border: '#15803d', hover: '#15803d' }, // verde
+                            { bg: '#facc15', text: '#1e293b', border: '#ca8a04', hover: '#eab308' }, // amarelo
+                            { bg: '#1d4ed8', text: '#ffffff', border: '#1e40af', hover: '#1e40af' }, // azul
+                            { bg: '#ffffff', text: '#1e293b', border: '#cbd5e1', hover: '#f1f5f9' }, // branco
                           ];
-                          const colorClass = brasilColors[idx % 4];
+                          const c = brasilColors[idx % 4];
                           return (
                             <button
                               key={sub.path}
                               onClick={() => navigate(sub.path)}
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-semibold text-sm shadow-sm hover:shadow-md transition-all ${colorClass}`}
+                              style={{ backgroundColor: c.bg, color: c.text, borderColor: c.border }}
+                              onMouseEnter={e => (e.currentTarget.style.backgroundColor = c.hover)}
+                              onMouseLeave={e => (e.currentTarget.style.backgroundColor = c.bg)}
+                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-semibold text-sm shadow-sm hover:shadow-md transition-all"
                             >
                               <SubIcon className="w-3.5 h-3.5 flex-shrink-0" />
                               {sub.title}
