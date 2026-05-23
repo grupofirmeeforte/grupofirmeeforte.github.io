@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Download, Search, ArrowLeft, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2, Shield } from 'lucide-react';
+import { Download, Search, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2, Shield, Activity, Users, Clock, Filter, X, LogOut, RefreshCw } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import AuditoriaPermissoes from './auditoria-permissoes';
 import { useLocation } from 'wouter';
 import { toast } from 'sonner';
@@ -62,24 +63,55 @@ export default function AuditoriaPage() {
     v == null ? '-' : v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   // ── LOGS ──
+  const { user } = useAuth();
+  const isCeo = user && (['admin', 'CEO', 'ADM'].includes((user as any).cargo?.toUpperCase?.() ?? '') || (user as any).role === 'admin');
   const [filtroChaveJ, setFiltroChaveJ] = useState('');
+  const [filtroNome, setFiltroNome] = useState('');
   const [filtroModulo, setFiltroModulo] = useState('');
+  const [filtroAcao, setFiltroAcao] = useState('');
+  const [filtroDataInicio, setFiltroDataInicio] = useState('');
+  const [filtroDataFim, setFiltroDataFim] = useState('');
   const [page, setPage] = useState(0);
   const limit = 50;
 
-  const { data: logs, isLoading: loadingLogs } = trpc.auditoria.list.useQuery({
+  const { data: modulosDisponiveis } = trpc.auditoria.modulos.useQuery();
+  const { data: stats } = trpc.auditoria.stats.useQuery(undefined, { refetchInterval: 30000 });
+  const { data: sessoesAtivas, refetch: refetchSessoes } = trpc.auditoria.sessoesAtivas.useQuery(undefined, { refetchInterval: 15000 });
+  const desconectarSessao = trpc.auditoria.desconectarSessao.useMutation({
+    onSuccess: () => { toast.success('Sessão encerrada!'); refetchSessoes(); },
+    onError: (e) => toast.error('Erro: ' + e.message),
+  });
+
+  const queryParams = {
     chaveJ: filtroChaveJ || undefined,
+    nomeAgente: filtroNome || undefined,
     modulo: filtroModulo && filtroModulo !== 'todos' ? filtroModulo : undefined,
+    acao: filtroAcao || undefined,
+    dataInicio: filtroDataInicio || undefined,
+    dataFim: filtroDataFim || undefined,
+  };
+
+  const { data: logs, isLoading: loadingLogs } = trpc.auditoria.list.useQuery({
+    ...queryParams,
     limit,
     offset: page * limit,
   });
 
-  const { data: totalCount } = trpc.auditoria.count.useQuery({
-    chaveJ: filtroChaveJ || undefined,
-    modulo: filtroModulo && filtroModulo !== 'todos' ? filtroModulo : undefined,
-  });
+  const { data: totalCount } = trpc.auditoria.count.useQuery(queryParams);
 
   const totalPages = totalCount ? Math.ceil(totalCount / limit) : 0;
+
+  const limparFiltros = () => {
+    setFiltroChaveJ('');
+    setFiltroNome('');
+    setFiltroModulo('');
+    setFiltroAcao('');
+    setFiltroDataInicio('');
+    setFiltroDataFim('');
+    setPage(0);
+  };
+
+  const temFiltroAtivo = filtroChaveJ || filtroNome || (filtroModulo && filtroModulo !== 'todos') || filtroAcao || filtroDataInicio || filtroDataFim;
 
   // ── FERIADOS ──
   const [filtroAno, setFiltroAno] = useState<number>(new Date().getFullYear());
@@ -142,7 +174,7 @@ export default function AuditoriaPage() {
     }
   };
 
-  // ── EXPORT LOGS ──
+  // ── HELPERS LOGS ──
   const handleExportCSV = () => {
     if (!logs || logs.length === 0) return;
     const headers = ['Número Entrada', 'Nome Agente', 'ChaveJ', 'Módulo', 'Ação', 'Horário Entrada', 'Horário Saída', 'Descrição'];
@@ -157,6 +189,50 @@ export default function AuditoriaPage() {
     link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
     link.download = `auditoria_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
+  };
+
+  const moduloBadge = (modulo: string | null | undefined) => {
+    const m = modulo || '-';
+    const map: Record<string, string> = {
+      'Agentes': 'bg-blue-100 text-blue-800',
+      'Certificações': 'bg-purple-100 text-purple-800',
+      'Fornecedores': 'bg-yellow-100 text-yellow-800',
+      'Operações': 'bg-green-100 text-green-800',
+      'Financeiro': 'bg-emerald-100 text-emerald-800',
+      'Febraban': 'bg-indigo-100 text-indigo-800',
+      'Auditoria': 'bg-gray-100 text-gray-800',
+      'Login': 'bg-orange-100 text-orange-800',
+      'dashboard': 'bg-slate-100 text-slate-700',
+    };
+    return map[m] ?? 'bg-gray-100 text-gray-600';
+  };
+
+  const acaoBadge = (acao: string | null | undefined) => {
+    const a = (acao || '').toLowerCase();
+    if (a.includes('login') || a.includes('entrou')) return 'bg-green-100 text-green-800';
+    if (a.includes('logout') || a.includes('saiu')) return 'bg-red-100 text-red-800';
+    if (a.includes('edit') || a.includes('atualiz')) return 'bg-yellow-100 text-yellow-800';
+    if (a.includes('cri') || a.includes('adicion') || a.includes('insert')) return 'bg-blue-100 text-blue-800';
+    if (a.includes('delet') || a.includes('remov') || a.includes('exclu')) return 'bg-red-100 text-red-800';
+    return 'bg-gray-100 text-gray-600';
+  };
+
+  const fmtDuracao = (entrada: any, saida: any) => {
+    if (!saida) return null;
+    const diff = new Date(saida).getTime() - new Date(entrada).getTime();
+    const min = Math.floor(diff / 60000);
+    const seg = Math.floor((diff % 60000) / 1000);
+    if (min >= 60) return `${Math.floor(min/60)}h${min%60}m`;
+    if (min > 0) return `${min}m${seg}s`;
+    return `${seg}s`;
+  };
+
+  const tempoOnline = (ultimoAcesso: any) => {
+    const diff = Date.now() - new Date(ultimoAcesso).getTime();
+    const min = Math.floor(diff / 60000);
+    if (min < 1) return 'agora';
+    if (min < 60) return `há ${min}min`;
+    return `há ${Math.floor(min/60)}h${min%60}m`;
   };
 
   const tipoBadge = (tipo: string) => {
@@ -211,106 +287,231 @@ export default function AuditoriaPage() {
         </button>
       </div>
 
-      {/* ── ABA LOGS ─────────────────────────────────────────────────────── */}
+      {/* ── ABA LOGS ─────────────────────────────────────────────────────────────────── */}
       {aba === 'logs' && (
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-500">{totalCount ? `Total: ${totalCount} registros` : 'Carregando...'}</p>
-            <div className="flex gap-2">
-              <Button onClick={handleExportCSV} variant="outline" className="gap-2 text-sm">
-                <Download className="w-4 h-4" /> Exportar CSV
-              </Button>
+
+          {/* Cards de estatísticas */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-3">
+              <Activity className="w-8 h-8 text-blue-500 shrink-0" />
+              <div>
+                <div className="text-xs text-blue-600 font-medium">Hoje</div>
+                <div className="text-xl font-bold text-blue-800">{stats?.totalHoje ?? '-'}</div>
+              </div>
             </div>
-          </div>
-          {/* Paginação topo logs */}
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-500">Página {page + 1} de {Math.max(1, totalPages)}</p>
-            <div className="flex gap-1">
-              <Button onClick={() => setPage(0)} disabled={page === 0} variant="outline" size="sm"><ChevronFirst className="w-4 h-4" /></Button>
-              <Button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} variant="outline" size="sm"><ChevronLeft className="w-4 h-4" /></Button>
-              <Button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} variant="outline" size="sm"><ChevronRight className="w-4 h-4" /></Button>
-              <Button onClick={() => setPage(totalPages - 1)} disabled={page >= totalPages - 1} variant="outline" size="sm"><ChevronLast className="w-4 h-4" /></Button>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-3">
+              <Clock className="w-8 h-8 text-green-500 shrink-0" />
+              <div>
+                <div className="text-xs text-green-600 font-medium">7 dias</div>
+                <div className="text-xl font-bold text-green-800">{stats?.totalSemana ?? '-'}</div>
+              </div>
+            </div>
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 flex items-center gap-3">
+              <BarChart2 className="w-8 h-8 text-purple-500 shrink-0" />
+              <div>
+                <div className="text-xs text-purple-600 font-medium">Mês atual</div>
+                <div className="text-xl font-bold text-purple-800">{stats?.totalMes ?? '-'}</div>
+              </div>
+            </div>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 flex items-center gap-3">
+              <Users className="w-8 h-8 text-emerald-500 shrink-0" />
+              <div>
+                <div className="text-xs text-emerald-600 font-medium">Online agora</div>
+                <div className="text-xl font-bold text-emerald-800">{sessoesAtivas?.length ?? 0}</div>
+              </div>
             </div>
           </div>
 
-          <Card>
-            <CardHeader><CardTitle className="text-base">Filtros</CardTitle></CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                  <Input placeholder="Buscar por ChaveJ..." value={filtroChaveJ}
-                    onChange={(e) => { setFiltroChaveJ(e.target.value); setPage(0); }} className="pl-10" />
+          {/* Painel de sessões ativas */}
+          {sessoesAtivas && sessoesAtivas.length > 0 && (
+            <div className="bg-white border border-emerald-200 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                  <span className="font-semibold text-sm text-emerald-800">Sessões Ativas ({sessoesAtivas.length})</span>
                 </div>
-                <Select value={filtroModulo} onValueChange={(v) => { setFiltroModulo(v); setPage(0); }}>
-                  <SelectTrigger><SelectValue placeholder="Módulo" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="todos">Todos os módulos</SelectItem>
-                    <SelectItem value="Agentes">Agentes</SelectItem>
-                    <SelectItem value="Certificações">Certificações</SelectItem>
-                    <SelectItem value="Fornecedores">Fornecedores</SelectItem>
-                    <SelectItem value="Operações">Operações</SelectItem>
-                    <SelectItem value="Financeiro">Financeiro</SelectItem>
-                    <SelectItem value="Febraban">Febraban</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Button variant="ghost" size="sm" onClick={() => refetchSessoes()} className="h-7 gap-1 text-xs text-gray-500">
+                  <RefreshCw className="w-3 h-3" /> Atualizar
+                </Button>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-gray-50">
-                      <TableHead>Nº Entrada</TableHead>
-                      <TableHead>Nome Agente</TableHead>
-                      <TableHead>ChaveJ</TableHead>
-                      <TableHead>Módulo</TableHead>
-                      <TableHead>Ação</TableHead>
-                      <TableHead>Horário Entrada</TableHead>
-                      <TableHead>Horário Saída</TableHead>
-                      <TableHead>Descrição</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {loadingLogs ? (
-                      <TableRow><TableCell colSpan={8} className="text-center py-8 text-gray-400">Carregando...</TableCell></TableRow>
-                    ) : logs && logs.length > 0 ? (
-                      logs.map((log: any, idx: number) => (
-                        <TableRow key={log.id} className={idx % 2 === 0 ? 'bg-green-50/40' : ''}>
-                          <TableCell className="font-mono text-xs">{log.numeroEntrada}</TableCell>
-                          <TableCell className="font-medium">{log.nomeAgente}</TableCell>
-                          <TableCell className="text-blue-700 font-medium">{log.chaveJ}</TableCell>
-                          <TableCell>{log.modulo || '-'}</TableCell>
-                          <TableCell>{log.acao || '-'}</TableCell>
-                          <TableCell className="text-sm">{new Date(log.horarioEntrada).toLocaleString('pt-BR')}</TableCell>
-                          <TableCell className="text-sm">{log.horarioSaida ? new Date(log.horarioSaida).toLocaleString('pt-BR') : '-'}</TableCell>
-                          <TableCell className="text-sm text-gray-600 max-w-xs truncate">{log.descricao || '-'}</TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow><TableCell colSpan={8} className="text-center py-8 text-gray-400">Nenhum registro encontrado</TableCell></TableRow>
+              <div className="flex flex-wrap gap-2">
+                {sessoesAtivas.map((s: any) => (
+                  <div key={s.id} className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
+                    <span className="font-mono text-[11px] text-blue-700 font-semibold">{s.chaveJ}</span>
+                    <span className="text-[11px] text-gray-700">{s.nomeAgente}</span>
+                    {s.modulo && <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">{s.modulo}</span>}
+                    <span className="text-[10px] text-gray-400">{tempoOnline(s.ultimoAcesso)}</span>
+                    {isCeo && (
+                      <button
+                        onClick={() => desconectarSessao.mutate({ sessaoId: s.id })}
+                        className="text-red-400 hover:text-red-600 transition-colors ml-1"
+                        title="Desconectar"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                      </button>
                     )}
-                  </TableBody>
-                </Table>
+                  </div>
+                ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          )}
 
-          {/* Paginação logs */}
+          {/* Filtros avançados */}
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Filter className="w-4 h-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Filtros</span>
+                {temFiltroAtivo && <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full">ativos</span>}
+              </div>
+              {temFiltroAtivo && (
+                <Button variant="ghost" size="sm" onClick={limparFiltros} className="h-7 gap-1 text-xs text-red-500 hover:text-red-700">
+                  <X className="w-3 h-3" /> Limpar filtros
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+              <Input
+                placeholder="ChaveJ..."
+                value={filtroChaveJ}
+                onChange={e => { setFiltroChaveJ(e.target.value); setPage(0); }}
+                className="h-8 text-sm"
+              />
+              <Input
+                placeholder="Nome agente..."
+                value={filtroNome}
+                onChange={e => { setFiltroNome(e.target.value); setPage(0); }}
+                className="h-8 text-sm"
+              />
+              <Select value={filtroModulo || 'todos'} onValueChange={v => { setFiltroModulo(v === 'todos' ? '' : v); setPage(0); }}>
+                <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Módulo" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os módulos</SelectItem>
+                  {(modulosDisponiveis ?? []).map(m => (
+                    <SelectItem key={m} value={m}>{m}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                placeholder="Ação..."
+                value={filtroAcao}
+                onChange={e => { setFiltroAcao(e.target.value); setPage(0); }}
+                className="h-8 text-sm"
+              />
+              <Input
+                placeholder="De: DD/MM/AAAA"
+                value={filtroDataInicio}
+                onChange={e => { setFiltroDataInicio(e.target.value); setPage(0); }}
+                className="h-8 text-sm"
+              />
+              <Input
+                placeholder="Até: DD/MM/AAAA"
+                value={filtroDataFim}
+                onChange={e => { setFiltroDataFim(e.target.value); setPage(0); }}
+                className="h-8 text-sm"
+              />
+            </div>
+          </div>
+
+          {/* Barra de ações e paginação topo */}
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-gray-500">
+              {totalCount != null ? <><strong>{totalCount}</strong> registro{totalCount !== 1 ? 's' : ''}</> : 'Carregando...'}
+              {temFiltroAtivo && <span className="text-blue-600 ml-1">(filtrado)</span>}
+            </p>
+            <div className="flex items-center gap-2">
+              <Button onClick={handleExportCSV} variant="outline" size="sm" className="gap-1 text-xs h-8">
+                <Download className="w-3.5 h-3.5" /> CSV
+              </Button>
+              <div className="flex gap-1">
+                <Button onClick={() => setPage(0)} disabled={page === 0} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronFirst className="w-4 h-4" /></Button>
+                <Button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronLeft className="w-4 h-4" /></Button>
+                <span className="px-2 py-1 text-xs border rounded bg-white">{page + 1}/{Math.max(1, totalPages)}</span>
+                <Button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronRight className="w-4 h-4" /></Button>
+                <Button onClick={() => setPage(totalPages - 1)} disabled={page >= totalPages - 1} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronLast className="w-4 h-4" /></Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabela de logs */}
+          <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto shadow-sm">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-blue-800 text-white">
+                  <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Agente</th>
+                  <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Módulo / Ação</th>
+                  <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Horário</th>
+                  <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Duração</th>
+                  <th className="px-3 py-2 text-left font-semibold">Descrição</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loadingLogs ? (
+                  <tr><td colSpan={5} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                ) : logs && logs.length > 0 ? (
+                  logs.map((log: any, idx: number) => (
+                    <tr key={log.id} className={idx % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-blue-50/30 hover:bg-blue-100/40'}>
+                      {/* Coluna Agente */}
+                      <td className="px-3 py-1.5">
+                        <div className="font-mono text-[11px] text-blue-700 font-semibold">{log.chaveJ}</div>
+                        <div className="text-[11px] text-gray-700">{log.nomeAgente}</div>
+                        {log.ipAddress && <div className="text-[10px] text-gray-400">{log.ipAddress}</div>}
+                      </td>
+                      {/* Coluna Módulo/Ação */}
+                      <td className="px-3 py-1.5">
+                        {log.modulo && (
+                          <span className={`inline-block text-[10px] px-1.5 py-0.5 rounded font-medium mb-0.5 ${moduloBadge(log.modulo)}`}>
+                            {log.modulo}
+                          </span>
+                        )}
+                        {log.acao && (
+                          <div>
+                            <span className={`inline-block text-[10px] px-1.5 py-0.5 rounded ${acaoBadge(log.acao)}`}>
+                              {log.acao}
+                            </span>
+                          </div>
+                        )}
+                      </td>
+                      {/* Coluna Horário */}
+                      <td className="px-3 py-1.5 whitespace-nowrap">
+                        <div className="text-[11px] text-gray-800">{new Date(log.horarioEntrada).toLocaleDateString('pt-BR')}</div>
+                        <div className="text-[10px] text-gray-500">{new Date(log.horarioEntrada).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
+                      </td>
+                      {/* Coluna Duração */}
+                      <td className="px-3 py-1.5 whitespace-nowrap">
+                        {fmtDuracao(log.horarioEntrada, log.horarioSaida)
+                          ? <span className="text-[11px] text-emerald-700 font-medium">{fmtDuracao(log.horarioEntrada, log.horarioSaida)}</span>
+                          : <span className="text-[10px] text-gray-400">em andamento</span>
+                        }
+                      </td>
+                      {/* Coluna Descrição */}
+                      <td className="px-3 py-1.5 max-w-xs">
+                        <div className="text-[11px] text-gray-600 truncate" title={log.descricao || ''}>{log.descricao || '-'}</div>
+                        <div className="text-[10px] text-gray-400 font-mono">{log.numeroEntrada}</div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr><td colSpan={5} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Paginação rodapé */}
           <div className="flex justify-between items-center">
             <p className="text-sm text-gray-500">Página {page + 1} de {Math.max(1, totalPages)}</p>
             <div className="flex gap-1">
-              <Button onClick={() => setPage(0)} disabled={page === 0} variant="outline" size="sm"><ChevronFirst className="w-4 h-4" /></Button>
-              <Button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} variant="outline" size="sm"><ChevronLeft className="w-4 h-4" /></Button>
-              <Button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} variant="outline" size="sm"><ChevronRight className="w-4 h-4" /></Button>
-              <Button onClick={() => setPage(totalPages - 1)} disabled={page >= totalPages - 1} variant="outline" size="sm"><ChevronLast className="w-4 h-4" /></Button>
+              <Button onClick={() => setPage(0)} disabled={page === 0} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronFirst className="w-4 h-4" /></Button>
+              <Button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronLeft className="w-4 h-4" /></Button>
+              <Button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronRight className="w-4 h-4" /></Button>
+              <Button onClick={() => setPage(totalPages - 1)} disabled={page >= totalPages - 1} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronLast className="w-4 h-4" /></Button>
             </div>
           </div>
         </div>
       )}
+
 
       {/* ── ABA FERIADOS ─────────────────────────────────────────────────── */}
       {aba === 'feriados' && (

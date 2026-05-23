@@ -1,15 +1,19 @@
 import { z } from "zod";
-import { publicProcedure, router } from "../_core/trpc";
+import { publicProcedure, router, adminProcedure } from "../_core/trpc";
 import { getAuditLogs, createAuditLog, updateAuditLogSaida } from "../db";
 import { getDb } from "../db";
-import { auditoria, calculos, pagamentos, agentes } from "../../drizzle/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { auditoria, calculos, pagamentos, agentes, sessoes } from "../../drizzle/schema";
+import { eq, desc, sql, and, like, gte, lte, or } from "drizzle-orm";
 
 export const auditoriaRouter = router({
   list: publicProcedure
     .input(z.object({
       chaveJ: z.string().optional(),
+      nomeAgente: z.string().optional(),
       modulo: z.string().optional(),
+      acao: z.string().optional(),
+      dataInicio: z.string().optional(), // DD/MM/YYYY
+      dataFim: z.string().optional(),    // DD/MM/YYYY
       limit: z.number().default(50),
       offset: z.number().default(0),
     }))
@@ -17,16 +21,40 @@ export const auditoriaRouter = router({
       const db = await getDb();
       if (!db) return [];
 
-      let query: any = db.select().from(auditoria);
+      const conditions: any[] = [];
 
       if (input.chaveJ) {
-        query = query.where(eq(auditoria.chaveJ, input.chaveJ));
+        conditions.push(like(auditoria.chaveJ, `%${input.chaveJ}%`));
+      }
+      if (input.nomeAgente) {
+        conditions.push(like(auditoria.nomeAgente, `%${input.nomeAgente}%`));
       }
       if (input.modulo) {
-        query = query.where(eq(auditoria.modulo, input.modulo));
+        conditions.push(eq(auditoria.modulo, input.modulo));
+      }
+      if (input.acao) {
+        conditions.push(like(auditoria.acao, `%${input.acao}%`));
+      }
+      if (input.dataInicio) {
+        // Converter DD/MM/YYYY para YYYY-MM-DD
+        const [d, m, y] = input.dataInicio.split('/');
+        if (d && m && y) {
+          conditions.push(gte(auditoria.horarioEntrada, new Date(`${y}-${m}-${d}T00:00:00`)));
+        }
+      }
+      if (input.dataFim) {
+        const [d, m, y] = input.dataFim.split('/');
+        if (d && m && y) {
+          conditions.push(lte(auditoria.horarioEntrada, new Date(`${y}-${m}-${d}T23:59:59`)));
+        }
       }
 
-      return await query
+      const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+      return await db
+        .select()
+        .from(auditoria)
+        .where(where)
         .orderBy(desc(auditoria.horarioEntrada))
         .limit(input.limit)
         .offset(input.offset);
@@ -35,24 +63,120 @@ export const auditoriaRouter = router({
   count: publicProcedure
     .input(z.object({
       chaveJ: z.string().optional(),
+      nomeAgente: z.string().optional(),
       modulo: z.string().optional(),
+      acao: z.string().optional(),
+      dataInicio: z.string().optional(),
+      dataFim: z.string().optional(),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) return 0;
 
-      let query: any = db.select({ count: auditoria.id }).from(auditoria);
+      const conditions: any[] = [];
 
-      if (input.chaveJ) {
-        query = query.where(eq(auditoria.chaveJ, input.chaveJ));
+      if (input.chaveJ) conditions.push(like(auditoria.chaveJ, `%${input.chaveJ}%`));
+      if (input.nomeAgente) conditions.push(like(auditoria.nomeAgente, `%${input.nomeAgente}%`));
+      if (input.modulo) conditions.push(eq(auditoria.modulo, input.modulo));
+      if (input.acao) conditions.push(like(auditoria.acao, `%${input.acao}%`));
+      if (input.dataInicio) {
+        const [d, m, y] = input.dataInicio.split('/');
+        if (d && m && y) conditions.push(gte(auditoria.horarioEntrada, new Date(`${y}-${m}-${d}T00:00:00`)));
       }
-      if (input.modulo) {
-        query = query.where(eq(auditoria.modulo, input.modulo));
+      if (input.dataFim) {
+        const [d, m, y] = input.dataFim.split('/');
+        if (d && m && y) conditions.push(lte(auditoria.horarioEntrada, new Date(`${y}-${m}-${d}T23:59:59`)));
       }
 
-      const result = await query;
-      return result.length;
+      const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+      const result = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(auditoria)
+        .where(where);
+      return Number(result[0]?.count ?? 0);
     }),
+
+  // Estatísticas rápidas para o painel de logs
+  stats: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return { totalHoje: 0, totalSemana: 0, totalMes: 0, modulosMaisAcessados: [] };
+
+    const agora = new Date();
+    const inicioDia = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
+    const inicioSemana = new Date(agora);
+    inicioSemana.setDate(agora.getDate() - 7);
+    const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1);
+
+    const [totalHoje, totalSemana, totalMes, modulosRows] = await Promise.all([
+      db.select({ count: sql<number>`count(*)` }).from(auditoria).where(gte(auditoria.horarioEntrada, inicioDia)),
+      db.select({ count: sql<number>`count(*)` }).from(auditoria).where(gte(auditoria.horarioEntrada, inicioSemana)),
+      db.select({ count: sql<number>`count(*)` }).from(auditoria).where(gte(auditoria.horarioEntrada, inicioMes)),
+      db.select({
+        modulo: auditoria.modulo,
+        total: sql<number>`count(*)`,
+      })
+        .from(auditoria)
+        .where(gte(auditoria.horarioEntrada, inicioMes))
+        .groupBy(auditoria.modulo)
+        .orderBy(desc(sql`count(*)`))
+        .limit(5),
+    ]);
+
+    return {
+      totalHoje: Number(totalHoje[0]?.count ?? 0),
+      totalSemana: Number(totalSemana[0]?.count ?? 0),
+      totalMes: Number(totalMes[0]?.count ?? 0),
+      modulosMaisAcessados: modulosRows.map(r => ({ modulo: r.modulo ?? '-', total: Number(r.total) })),
+    };
+  }),
+
+  // Sessões ativas com dados do agente
+  sessoesAtivas: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+
+    const rows = await db
+      .select({
+        id: sessoes.id,
+        chaveJ: sessoes.chaveJ,
+        nomeAgente: sessoes.nomeAgente,
+        horarioConexao: sessoes.horarioConexao,
+        ultimoAcesso: sessoes.ultimoAcesso,
+        modulo: sessoes.modulo,
+        ipAddress: sessoes.ipAddress,
+        ativo: sessoes.ativo,
+      })
+      .from(sessoes)
+      .where(eq(sessoes.ativo, 1))
+      .orderBy(desc(sessoes.ultimoAcesso));
+
+    return rows;
+  }),
+
+  // Desconectar sessão (CEO/Admin)
+  desconectarSessao: publicProcedure
+    .input(z.object({ sessaoId: z.number() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return false;
+      await db.update(sessoes)
+        .set({ ativo: 0, motivoDesconexao: 'Desconectado pelo administrador' })
+        .where(eq(sessoes.id, input.sessaoId));
+      return true;
+    }),
+
+  // Listar módulos distintos para filtro
+  modulos: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return [];
+    const rows = await db
+      .selectDistinct({ modulo: auditoria.modulo })
+      .from(auditoria)
+      .where(sql`${auditoria.modulo} IS NOT NULL AND ${auditoria.modulo} != ''`)
+      .orderBy(auditoria.modulo);
+    return rows.map(r => r.modulo).filter(Boolean) as string[];
+  }),
 
   create: publicProcedure
     .input(z.object({
@@ -92,13 +216,11 @@ export const auditoriaRouter = router({
       const db = await getDb();
       if (!db) return [];
 
-      // Buscar cálculos (créditos / RBM)
       let calcQuery = db.select().from(calculos).$dynamic();
       if (input.mesAno) calcQuery = calcQuery.where(eq(calculos.mesRef, input.mesAno));
       if (input.chaveJ) calcQuery = calcQuery.where(eq(calculos.chaveJ, input.chaveJ));
       const calcs = await calcQuery.orderBy(desc(calculos.mesRef));
 
-      // Buscar pagamentos (despesas) agrupados por mesAno + chaveJ + tipoPagto
       let pagQuery = db
         .select({
           mesAno: pagamentos.mesAno,
@@ -113,11 +235,9 @@ export const auditoriaRouter = router({
       if (input.chaveJ) pagQuery = pagQuery.where(eq(pagamentos.chaveJ, input.chaveJ));
       const pags = await pagQuery;
 
-      // Buscar agentes para cidade
       const ags = await db.select({ chaveJ: agentes.chaveJ, cidade: agentes.cidade }).from(agentes);
       const cidadeMap = new Map(ags.map(a => [a.chaveJ, a.cidade]));
 
-      // Normalizar tipo de pagamento para coluna
       const tipoParaColuna = (tipo: string): string => {
         const t = tipo.toLowerCase().trim();
         if (t.includes('aluguel')) return 'aluguel';
@@ -132,7 +252,6 @@ export const auditoriaRouter = router({
         return 'outros';
       };
 
-      // Consolidar despesas normalizadas por mesAno|chaveJ
       const despNorm = new Map<string, Record<string, number>>();
       for (const p of pags) {
         const key = `${p.mesAno}|${p.chaveJ}`;
@@ -141,7 +260,6 @@ export const auditoriaRouter = router({
         despNorm.get(key)![col] = (despNorm.get(key)![col] || 0) + (Number(p.total) || 0);
       }
 
-      // Montar resultado final
       return calcs.map(c => {
         const key = `${c.mesRef}|${c.chaveJ}`;
         const desp = despNorm.get(key) || {};
@@ -194,7 +312,6 @@ export const auditoriaRouter = router({
       });
     }),
 
-  // Meses disponíveis para filtro
   creditoDespesasMeses: publicProcedure.query(async () => {
     const db = await getDb();
     if (!db) return [];
