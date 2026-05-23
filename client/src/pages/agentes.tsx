@@ -353,19 +353,8 @@ export default function AgentesPage() {
                            return <Badge className="bg-green-100 text-green-800 border-0 text-xs">A vencer {c.dias}d</Badge>;
                          })()}
                       </TableCell>
-                      <TableCell>
-                        <span
-                          className={`px-2 py-1 rounded text-xs font-semibold ${
-                            agente.situacao === "Ativo" || agente.situacao?.startsWith("Ativo")
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {agente.situacao}
-                        </span>
-                      </TableCell>
+
                       <TableCell>{agente.supervisor}</TableCell>
-                      <TableCell>{agente.cidade}</TableCell>
                       <TableCell>{agente.uf}</TableCell>
                       <TableCell>{agente.cpfAgente}</TableCell>
                       <TableCell>{agente.dataNascimento ? formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '') : '-'}</TableCell>
