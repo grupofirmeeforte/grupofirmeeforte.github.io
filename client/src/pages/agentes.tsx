@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit2, Trash2, Search, ExternalLink, GitMerge } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, ExternalLink, GitMerge, Copy, Check } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useLocation } from "wouter";
 
@@ -38,7 +38,14 @@ export default function AgentesPage() {
   const [cidade, setCidade] = useState<string>("");
   const [page, setPage] = useState(0);
   const [showDuplicatas, setShowDuplicatas] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const limit = 50;
+
+  const copyToClipboard = (text: string, key: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(key);
+    setTimeout(() => setCopiedId(null), 1500);
+  };
 
   const { data: agentes, isLoading } = trpc.agentes.list.useQuery({
     search,
@@ -305,11 +312,25 @@ export default function AgentesPage() {
                     } hover:from-blue-200 hover:to-blue-100 transition-colors`}>
                       {/* Coluna compacta: ChaveJ + Situação + Nome + Empresa·Cidade */}
                       <TableCell className="min-w-[260px]">
-                        {/* Linha 1: ChaveJ + Senha + badge Situação */}
-                        <div className="flex items-center gap-2 mb-0.5">
+                        {/* Linha 1: ChaveJ + botão copiar + Senha + botão copiar + badge Situação */}
+                        <div className="flex items-center gap-1 mb-0.5 flex-wrap">
                           <span className="font-bold text-blue-700 text-sm">{agente.chaveJ}</span>
-                          <span className="text-xs text-gray-400 font-mono">{'*'.repeat(6)}</span>
-                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${
+                          <button
+                            title="Copiar Chave J"
+                            onClick={() => copyToClipboard(agente.chaveJ || '', `chave-${agente.id}`)}
+                            className="text-gray-400 hover:text-blue-600 transition-colors p-0.5 rounded"
+                          >
+                            {copiedId === `chave-${agente.id}` ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                          <span className="text-xs text-gray-400 font-mono ml-1">{'*'.repeat(6)}</span>
+                          <button
+                            title="Copiar Senha"
+                            onClick={() => copyToClipboard(agente.senha || '', `senha-${agente.id}`)}
+                            className="text-gray-400 hover:text-blue-600 transition-colors p-0.5 rounded"
+                          >
+                            {copiedId === `senha-${agente.id}` ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
+                          </button>
+                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ml-1 ${
                             agente.situacao === 'Ativo'
                               ? 'bg-green-100 text-green-800 border-green-300'
                               : agente.situacao === 'Inativo'
