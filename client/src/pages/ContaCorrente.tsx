@@ -513,16 +513,9 @@ export default function ContaCorrente() {
                     className="cursor-pointer"
                   />
                 </th>
-                <th className="px-2 py-2 text-left">Empresa</th>
-                <th className="px-2 py-2 text-left">Mês/Ano</th>
-                <th className="px-2 py-2 text-left">ChaveJ</th>
                 <th className="px-2 py-2 text-left">Agente</th>
-                <th className="px-2 py-2 text-left">Agência</th>
                 <th className="px-2 py-2 text-left">Conta</th>
-                <th className="px-2 py-2 text-left">Data</th>
-                <th className="px-2 py-2 text-right">RBM</th>
-                <th className="px-2 py-2 text-right">Comissão</th>
-                <th className="px-2 py-2 text-left">Supervisor</th>
+                <th className="px-2 py-2 text-right">Valores</th>
                 <th className="px-2 py-2 text-center">Ações</th>
               </tr>
             </thead>
@@ -549,24 +542,32 @@ export default function ContaCorrente() {
                         className="cursor-pointer"
                       />
                     </td>
-                    <td className="px-2 py-1.5 font-medium">{r.empresa || "-"}</td>
-                    <td className="px-2 py-1.5">{r.mesAno || "-"}</td>
-                    <td className="px-2 py-1.5 font-mono text-blue-700">{r.chaveJ || "-"}</td>
-                    <td className="px-2 py-1.5">{r.agente || "-"}</td>
-                    <td className="px-2 py-1.5">{r.agencia || "-"}</td>
-                    <td className="px-2 py-1.5">{r.contaCorrente || "-"}</td>
+                    {/* Coluna Agente */}
                     <td className="px-2 py-1.5">
-                      {r.dataOperacao
-                        ? (r.dataOperacao instanceof Date
-                          ? r.dataOperacao.toLocaleDateString("pt-BR")
-                          : String(r.dataOperacao).split("T")[0])
-                        : "-"}
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="font-mono text-[11px] text-blue-700 font-semibold">{r.chaveJ || "-"}</span>
+                        <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{r.empresa || ""}</span>
+                        <span className="text-[9px] text-gray-400">{r.mesAno || ""}</span>
+                      </div>
+                      <div className="text-[11px] text-gray-800 font-medium">{r.agente || "-"}</div>
+                      {r.supervisor && <div className="text-[10px] text-gray-400">Sup: {r.supervisor}</div>}
                     </td>
-                    <td className="px-2 py-1.5 text-right font-mono">{fmtMoeda(r.rbm)}</td>
-                    <td className="px-2 py-1.5 text-right font-mono font-semibold text-green-700">
-                      {r.comissao ? fmtMoeda(r.comissao) : "-"}
+                    {/* Coluna Conta */}
+                    <td className="px-2 py-1.5">
+                      <div className="text-[11px] text-gray-700">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
+                      <div className="text-[10px] text-gray-400">
+                        {r.dataOperacao
+                          ? (r.dataOperacao instanceof Date
+                            ? r.dataOperacao.toLocaleDateString("pt-BR")
+                            : String(r.dataOperacao).split("T")[0])
+                          : "-"}
+                      </div>
                     </td>
-                    <td className="px-2 py-1.5">{r.supervisor || "-"}</td>
+                    {/* Coluna Valores */}
+                    <td className="px-2 py-1.5 text-right whitespace-nowrap">
+                      <div className="font-bold text-green-700 text-[12px]">{r.comissao ? fmtMoeda(r.comissao) : "-"}</div>
+                      <div className="text-[10px] text-gray-400">RBM: {fmtMoeda(r.rbm)}</div>
+                    </td>
                     <td className="px-2 py-1.5 text-center" onClick={e => e.stopPropagation()}>
                       <div className="flex items-center justify-center gap-1">
                         <button

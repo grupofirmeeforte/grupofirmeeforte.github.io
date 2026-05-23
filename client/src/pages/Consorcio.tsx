@@ -403,16 +403,16 @@ export default function Consorcio() {
                   title="Selecionar todos"
                 />
               </th>
-              {["Empresa","Mês/Ano","Proposta","Data","Segmento","Valor Bem","Parc. Lib.","% Com. 1","RBM","% Com. 2","Comissão","ChaveJ","Agente","Ações"].map(h => (
+              {["Agente","Operação","Valores","Comissão","Ações"].map(h => (
                 <th key={h} className="px-2 py-2 text-left font-semibold whitespace-nowrap border-r border-slate-700 last:border-0">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={15} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+              <tr><td colSpan={6} className="text-center py-8 text-gray-400">Carregando...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={15} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
+              <tr><td colSpan={6} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
             ) : rows.map((row, i) => (
               <tr key={row.id} className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50"} ${selectedIds.has(row.id) ? "ring-1 ring-inset ring-blue-400" : ""}`}>
                 <td className="px-2 py-1.5 border-r border-gray-200 text-center">
@@ -423,23 +423,36 @@ export default function Consorcio() {
                     className="cursor-pointer"
                   />
                 </td>
-                <td className="px-2 py-1.5 border-r border-gray-200 font-medium">{row.empresa ?? "-"}</td>
-                <td className="px-2 py-1.5 border-r border-gray-200">{row.mesAno ?? "-"}</td>
-                <td className="px-2 py-1.5 border-r border-gray-200 font-mono">{row.proposta ?? "-"}</td>
-                <td className="px-2 py-1.5 border-r border-gray-200 whitespace-nowrap">{row.data ?? "-"}</td>
+                {/* Coluna Agente */}
                 <td className="px-2 py-1.5 border-r border-gray-200">
-                  <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${row.segmento === "IMOVEL" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
-                    {row.segmento ?? "-"}
-                  </span>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className="font-mono text-[11px] text-blue-700 font-semibold">{row.chaveJ ?? "-"}</span>
+                    <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{row.empresa ?? ""}</span>
+                    <span className="text-[9px] text-gray-400">{row.mesAno ?? ""}</span>
+                  </div>
+                  <div className="text-[11px] text-gray-800 font-medium whitespace-nowrap">{row.nomeAgente ?? "-"}</div>
                 </td>
-                <td className="px-2 py-1.5 border-r border-gray-200 text-right">{fmtMoeda(row.valorBem)}</td>
-                <td className="px-2 py-1.5 border-r border-gray-200 text-center">{row.parcLiberada ?? "-"}</td>
-                <td className="px-2 py-1.5 border-r border-gray-200 text-right">{fmtPct(row.pctComissao1)}</td>
-                <td className="px-2 py-1.5 border-r border-gray-200 text-right font-medium text-blue-700">{fmtMoeda(row.rbm)}</td>
-                <td className="px-2 py-1.5 border-r border-gray-200 text-right">{fmtPct(row.pctComissao2)}</td>
-                <td className="px-2 py-1.5 border-r border-gray-200 text-right font-medium text-green-700">{fmtMoeda(row.comissao)}</td>
-                <td className="px-2 py-1.5 border-r border-gray-200 font-mono text-xs">{row.chaveJ ?? "-"}</td>
-                <td className="px-2 py-1.5 border-r border-gray-200 max-w-[160px] truncate">{row.nomeAgente ?? "-"}</td>
+                {/* Coluna Operação */}
+                <td className="px-2 py-1.5 border-r border-gray-200">
+                  <div className="font-mono text-[11px] text-gray-700 font-medium">{row.proposta ?? "-"}</div>
+                  <div className="text-[10px] text-gray-500 whitespace-nowrap">{row.data ?? ""}</div>
+                  {row.segmento && (
+                    <span className={`text-[9px] px-1 py-0.5 rounded font-medium ${row.segmento === "IMOVEL" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
+                      {row.segmento}
+                    </span>
+                  )}
+                </td>
+                {/* Coluna Valores */}
+                <td className="px-2 py-1.5 border-r border-gray-200 text-right whitespace-nowrap">
+                  <div className="font-bold text-blue-800 text-[12px]">{fmtMoeda(row.valorBem)}</div>
+                  <div className="text-[10px] text-gray-400">RBM: {fmtMoeda(row.rbm)}</div>
+                  {row.parcLiberada && <div className="text-[10px] text-gray-400">Parc: {row.parcLiberada}</div>}
+                </td>
+                {/* Coluna Comissão */}
+                <td className="px-2 py-1.5 border-r border-gray-200 text-right whitespace-nowrap">
+                  <div className="font-bold text-green-700 text-[12px]">{fmtMoeda(row.comissao)}</div>
+                  <div className="text-[10px] text-gray-400">{fmtPct(row.pctComissao1)} · {fmtPct(row.pctComissao2)}</div>
+                </td>
                 <td className="px-2 py-1.5 whitespace-nowrap">
                   <div className="flex gap-1">
                     <button
