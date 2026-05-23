@@ -429,4 +429,76 @@ export const agentesRouter = router({
     }
     return map;
   }),
+
+  // Listar agentes com suas permissões (para gestão em massa)
+  listComPermissoes: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    const result = await db
+      .select({
+        id: agentes.id,
+        nomeAgente: agentes.nomeAgente,
+        chaveJ: agentes.chaveJ,
+        empresa: agentes.empresa,
+        cargo: agentes.cargo,
+        situacao: agentes.situacao,
+        permissoes: agentes.permissoes,
+        permissoesModulos: agentes.permissoesModulos,
+      })
+      .from(agentes)
+      .orderBy(asc(agentes.empresa), asc(agentes.nomeAgente));
+    return result;
+  }),
+
+  // Aplicar template de permissões em massa por cargo
+  aplicarTemplatePermissoes: protectedProcedure
+    .input(z.object({
+      cargo: z.string(), // cargo alvo (ex: 'Promotor')
+      permissoes: z.string(), // nível geral (ex: 'leitor')
+      permissoesModulos: z.string(), // JSON string com o template de módulos
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      // Buscar todos os agentes com esse cargo
+      const alvos = await db
+        .select({ id: agentes.id })
+        .from(agentes)
+        .where(eq(agentes.cargo, input.cargo));
+      if (alvos.length === 0) return { atualizados: 0 };
+      // Atualizar permissões de todos
+      for (const a of alvos) {
+        await db.update(agentes)
+          .set({ permissoes: input.permissoes, permissoesModulos: input.permissoesModulos })
+          .where(eq(agentes.id, a.id));
+      }
+      return { atualizados: alvos.length };
+    }),
+
+  // Atualizar permissões de um agente individual (inline)
+  atualizarPermissoes: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      permissoes: z.string(),
+      permissoesModulos: z.string(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      await db.update(agentes)
+        .set({ permissoes: input.permissoes, permissoesModulos: input.permissoesModulos })
+        .where(eq(agentes.id, input.id));
+      return { success: true };
+    }),
+
+  // Listar cargos únicos (para o seletor de template)
+  getCargos: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    const result = await db
+      .selectDistinct({ cargo: agentes.cargo })
+      .from(agentes)
+      .where(isNotNull(agentes.cargo));
+    return result.map(r => r.cargo).filter(Boolean);
+  }),
 });

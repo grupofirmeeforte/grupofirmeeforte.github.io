@@ -13,7 +13,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Download, Search, ArrowLeft, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
+import { Download, Search, ArrowLeft, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2, Shield } from 'lucide-react';
+import AuditoriaPermissoes from './auditoria-permissoes';
 import { useLocation } from 'wouter';
 import { toast } from 'sonner';
 import PageHeader from "@/components/PageHeader";
@@ -34,8 +35,8 @@ export default function AuditoriaPage() {
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const abaParam = searchParams.get('aba');
-  const [aba, setAba] = useState<'logs' | 'feriados' | 'credito-despesas'>(
-    abaParam === 'feriados' ? 'feriados' : abaParam === 'credito-despesas' ? 'credito-despesas' : 'logs'
+  const [aba, setAba] = useState<'logs' | 'feriados' | 'credito-despesas' | 'permissoes'>(
+    abaParam === 'feriados' ? 'feriados' : abaParam === 'credito-despesas' ? 'credito-despesas' : abaParam === 'permissoes' ? 'permissoes' : 'logs'
   );
 
   // Atualiza aba quando o parâmetro de URL muda
@@ -44,6 +45,7 @@ export default function AuditoriaPage() {
     const p = params.get('aba');
     if (p === 'feriados') setAba('feriados');
     else if (p === 'credito-despesas') setAba('credito-despesas');
+    else if (p === 'permissoes') setAba('permissoes');
     else setAba('logs');
   }, [window.location.search]);
 
@@ -200,6 +202,12 @@ export default function AuditoriaPage() {
           className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'credito-despesas' ? 'bg-white border border-b-white border-gray-200 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
         >
           <BarChart2 className="w-4 h-4" /> Crédito x Despesas
+        </button>
+        <button
+          onClick={() => setAba('permissoes')}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'permissoes' ? 'bg-white border border-b-white border-gray-200 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
+        >
+          <Shield className="w-4 h-4" /> Permissões
         </button>
       </div>
 
@@ -596,6 +604,13 @@ export default function AuditoriaPage() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* ── ABA PERMISSÕES ──────────────────────────────────────────────── */}
+      {aba === 'permissoes' && (
+        <div className="mt-4">
+          <AuditoriaPermissoes />
         </div>
       )}
     </div>
