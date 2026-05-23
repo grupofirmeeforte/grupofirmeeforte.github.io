@@ -307,6 +307,7 @@ export default function AgentesPage() {
                     } hover:from-blue-200 hover:to-blue-100 transition-colors`}>
                       {/* Coluna compacta: ChaveJ + Situação + Nome + Empresa·Cidade */}
                       <TableCell className="min-w-[260px]">
+                        {/* Linha 1: ChaveJ + badge Situação */}
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className="font-bold text-blue-700 text-sm">{agente.chaveJ}</span>
                           <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${
@@ -317,9 +318,14 @@ export default function AgentesPage() {
                               : 'bg-gray-100 text-gray-600 border-gray-300'
                           }`}>{agente.situacao || '-'}</span>
                         </div>
-                        <div className="font-medium text-sm text-gray-900 leading-tight">{agente.nomeAgente}</div>
-                        <div className="text-xs text-gray-500 mt-0.5">{agente.empresa}{agente.cidade ? ` · ${agente.cidade}` : ''}{agente.uf ? `/${agente.uf}` : ''}</div>
-                        <div className="text-xs text-gray-400 mt-0.5 font-mono">Senha: {'*'.repeat(6)}</div>
+                        {/* Linha 2: Senha */}
+                        <div className="text-xs text-gray-400 font-mono">{'*'.repeat(6)}</div>
+                        {/* Linha 3: Nome */}
+                        <div className="font-medium text-sm text-gray-900 leading-tight mt-0.5">{agente.nomeAgente}</div>
+                        {/* Linha 4: Empresa */}
+                        <div className="text-xs text-gray-500 mt-0.5">{agente.empresa || '-'}</div>
+                        {/* Linha 5: Cidade/UF */}
+                        <div className="text-xs text-gray-400">{agente.cidade ? `${agente.cidade}${agente.uf ? `/${agente.uf}` : ''}` : (agente.uf || '')}</div>
                       </TableCell>
                       <TableCell className="font-medium text-sm">{agente.numCadastro}</TableCell>
                       <TableCell>{agente.dataAdmissao ? formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '') : '-'}</TableCell>
