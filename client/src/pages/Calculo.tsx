@@ -133,13 +133,6 @@ export default function Calculo() {
 
   // Colunas na ordem EXATA da planilha Calculo-C2
   const colunas = [
-    { label: "TipoPagamento",      key: "tipoPagamento",    tipo: "texto" },
-    { label: "Empresa",            key: "empresa",          tipo: "texto" },
-    { label: "Situação",           key: "situacao",         tipo: "texto" },
-    { label: "Mês Ref",            key: "mesRef",           tipo: "mesRef" },
-    { label: "Chave J",            key: "chaveJ",           tipo: "texto" },
-    { label: "Nome Agente",        key: "nomeAgente",       tipo: "texto" },
-    { label: "Cidade",             key: "cidade",           tipo: "texto" },
     { label: "Percentual",         key: "percentual",       tipo: "perc" },
     { label: "Comissão Total",     key: "comissaoTotal",    tipo: "moeda" },
     { label: "RBM Total",          key: "rbmTotal",         tipo: "moeda" },
@@ -168,7 +161,6 @@ export default function Calculo() {
     const v = r[col.key];
     if (col.tipo === "moeda") return fmtMoeda(v);
     if (col.tipo === "perc")  return fmtPerc(v);
-    if (col.tipo === "mesRef") return fmtMesRef(v);
     return fmtTexto(v);
   };
 
@@ -693,6 +685,8 @@ export default function Calculo() {
                     title="Selecionar todos"
                   />
                 </th>
+                {/* Coluna compacta Agente */}
+                <th className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[220px]">Agente</th>
                 {colunas.map((col) => (
                   <th
                     key={col.key}
@@ -724,6 +718,23 @@ export default function Calculo() {
                       onChange={() => toggleSelecionado(r.id)}
                       className="w-3 h-3 cursor-pointer accent-purple-600"
                     />
+                  </td>
+                  {/* Célula compacta Agente */}
+                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[220px] align-top">
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <span className="font-bold text-purple-700 text-xs">{r.chaveJ || '-'}</span>
+                      {r.situacao && (
+                        <span className={`text-[9px] font-semibold px-1 py-0.5 rounded-full border ${
+                          r.situacao === 'Ativo' ? 'bg-green-100 text-green-800 border-green-300'
+                          : r.situacao === 'Inativo' ? 'bg-red-100 text-red-700 border-red-300'
+                          : 'bg-gray-100 text-gray-600 border-gray-300'
+                        }`}>{r.situacao}</span>
+                      )}
+                      {r.mesRef && <span className="text-[9px] text-purple-500 font-mono">{fmtMesRef(r.mesRef)}</span>}
+                    </div>
+                    <div className="text-xs font-medium text-slate-800 leading-tight mt-0.5">{r.nomeAgente || '-'}</div>
+                    <div className="text-[10px] text-slate-500">{r.empresa || ''}{r.cidade ? ` · ${r.cidade}` : ''}</div>
+                    {r.tipoPagamento && <div className="text-[9px] text-slate-400 mt-0.5">{r.tipoPagamento}</div>}
                   </td>
                   {colunas.map((col) => (
                     <td
@@ -816,6 +827,8 @@ export default function Calculo() {
             <tfoot>
               <tr style={{ background: "linear-gradient(90deg, #7e22ce, #be185d)" }} className="font-bold text-white">
                 {/* Célula vazia para coluna de checkbox */}
+                <td className="px-1.5 py-1.5" />
+                {/* Célula vazia para coluna compacta Agente */}
                 <td className="px-1.5 py-1.5" />
                 {colunas.map((col, i) => (
                   <td
