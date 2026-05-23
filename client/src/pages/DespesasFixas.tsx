@@ -304,26 +304,15 @@ export default function DespesasFixasPage() {
               <th className="px-1.5 py-1.5 text-center w-6">
                 <input type="checkbox" checked={todosSelecionados} ref={el => { if (el) el.indeterminate = algunsSelecionados; }} onChange={toggleTodos} className="w-3 h-3 cursor-pointer accent-purple-400" />
               </th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Mês Ano</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Tipo Pagto</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Cidade/UF</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Empresa</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Chave</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Nome</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Banco</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Ag.</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Conta</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">CPF/CNPJ</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Tp.Conta</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Pix</th>
-              <th className="px-1.5 py-1.5 text-right whitespace-nowrap">Valor</th>
-              <th className="px-1.5 py-1.5 text-left whitespace-nowrap">Dt.Vencer</th>
-              <th className="px-1.5 py-1.5 text-center whitespace-nowrap">Ações</th>
+              <th className="px-2 py-1.5 text-left whitespace-nowrap">Beneficiário</th>
+              <th className="px-2 py-1.5 text-left whitespace-nowrap">Dados Bancários</th>
+              <th className="px-2 py-1.5 text-right whitespace-nowrap">Pagamento</th>
+              <th className="px-2 py-1.5 text-center whitespace-nowrap">Ações</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
-              <tr><td colSpan={16} className="text-center py-10 text-gray-500">Nenhum registro encontrado.</td></tr>
+              <tr><td colSpan={5} className="text-center py-10 text-gray-500">Nenhum registro encontrado.</td></tr>
             ) : rows.map((row, i) => {
               const sel = selecionados.has(row.id);
               return (
@@ -331,20 +320,30 @@ export default function DespesasFixasPage() {
                   <td className="px-1.5 py-1 text-center">
                     <input type="checkbox" checked={sel} onChange={() => toggleSelecionado(row.id)} className="w-3 h-3 cursor-pointer accent-purple-400" />
                   </td>
-                  <td className="px-1.5 py-1 whitespace-nowrap">{row.mesAno || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap">{row.tipoPagto || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap max-w-[90px] truncate" title={row.cidadeUF ?? ""}>{row.cidadeUF || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap">{row.empresa || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap font-mono text-[10px]">{row.chaveResp || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap max-w-[140px] truncate" title={row.nome ?? ""}>{row.nome || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap max-w-[80px] truncate" title={row.banco ?? ""}>{row.banco || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap">{row.agencia || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap">{row.conta || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap font-mono text-[10px]">{row.cpfCnpj || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap">{row.tipoConta || "-"}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap max-w-[90px] truncate" title={row.pix ?? ""}>{row.pix || "-"}</td>
-                  <td className="px-1.5 py-1 text-right whitespace-nowrap font-medium text-green-400">{formatCurrency(row.valor)}</td>
-                  <td className="px-1.5 py-1 whitespace-nowrap text-[10px]">{row.dataVencer || "-"}</td>
+                  {/* Coluna Beneficiário */}
+                  <td className="px-2 py-1.5 whitespace-nowrap">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      {row.chaveResp && <span className="font-mono text-[10px] text-purple-300 font-semibold">{row.chaveResp}</span>}
+                      {row.tipoPagto && <span className="text-[9px] px-1 py-0.5 rounded bg-purple-900/50 text-purple-300 border border-purple-700">{row.tipoPagto}</span>}
+                      {row.mesAno && <span className="text-[9px] text-gray-500">{row.mesAno}</span>}
+                    </div>
+                    <div className="text-[11px] text-white font-medium truncate max-w-[200px]" title={row.nome ?? ""}>{row.nome || "-"}</div>
+                    <div className="text-[10px] text-gray-400">{row.empresa || ""}{row.cidadeUF ? ` · ${row.cidadeUF}` : ""}</div>
+                  </td>
+                  {/* Coluna Dados Bancários */}
+                  <td className="px-2 py-1.5 whitespace-nowrap text-[10px]">
+                    <div className="text-gray-300">
+                      {row.banco || "-"}{row.agencia ? ` · Ag ${row.agencia}` : ""}{row.conta ? ` · Cc ${row.conta}` : ""}
+                      {row.tipoConta && <span className="ml-1 text-gray-500">({row.tipoConta})</span>}
+                    </div>
+                    {row.cpfCnpj && <div className="text-gray-400 font-mono">{row.cpfCnpj}</div>}
+                    {row.pix && <div className="text-blue-400 truncate max-w-[180px]" title={row.pix}>PIX: {row.pix}</div>}
+                  </td>
+                  {/* Coluna Pagamento */}
+                  <td className="px-2 py-1.5 text-right whitespace-nowrap">
+                    <div className="font-bold text-green-400 text-sm">{formatCurrency(row.valor)}</div>
+                    <div className="text-[10px] text-gray-400">Vence: {row.dataVencer || "-"}</div>
+                  </td>
                   <td className="px-1.5 py-1 text-center whitespace-nowrap">
                     <div className="flex gap-1 justify-center">
                       <button onClick={() => abrirEditar(row as DespesaFixa)}
@@ -364,9 +363,9 @@ export default function DespesasFixasPage() {
           {rows.length > 0 && (
             <tfoot>
               <tr className="bg-gray-800 font-semibold border-t-2 border-purple-600">
-                <td colSpan={13} className="px-1.5 py-1.5 text-right text-[10px] text-gray-400">Total:</td>
-                <td className="px-1.5 py-1.5 text-right text-green-400 text-[11px]">{totalValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                <td colSpan={2}></td>
+                <td colSpan={2} className="px-2 py-1.5 text-right text-[10px] text-gray-400">Total:</td>
+                <td className="px-2 py-1.5 text-right text-green-400 font-bold">{totalValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td></td>
               </tr>
             </tfoot>
           )}
