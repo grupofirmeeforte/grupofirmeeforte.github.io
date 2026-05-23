@@ -279,12 +279,10 @@ export default function AgentesPage() {
                 <TableRow>
                   <TableHead className="min-w-[260px]">Agente</TableHead>
                   <TableHead>Número</TableHead>
-                  <TableHead>Senha</TableHead>
                   <TableHead>Data Admissão</TableHead>
                   <TableHead>Cargo / Área / Vínculo</TableHead>
                   <TableHead>Certificações</TableHead>
                   <TableHead>Supervisor</TableHead>
-                  <TableHead>UF</TableHead>
                   <TableHead>CPF</TableHead>
                   <TableHead>Data Nascimento</TableHead>
                   <TableHead>Email</TableHead>
@@ -320,10 +318,10 @@ export default function AgentesPage() {
                           }`}>{agente.situacao || '-'}</span>
                         </div>
                         <div className="font-medium text-sm text-gray-900 leading-tight">{agente.nomeAgente}</div>
-                        <div className="text-xs text-gray-500 mt-0.5">{agente.empresa}{agente.cidade ? ` · ${agente.cidade}` : ''}</div>
+                        <div className="text-xs text-gray-500 mt-0.5">{agente.empresa}{agente.cidade ? ` · ${agente.cidade}` : ''}{agente.uf ? `/${agente.uf}` : ''}</div>
+                        <div className="text-xs text-gray-400 mt-0.5 font-mono">Senha: {'*'.repeat(6)}</div>
                       </TableCell>
                       <TableCell className="font-medium text-sm">{agente.numCadastro}</TableCell>
-                      <TableCell>{'*'.repeat(6)}</TableCell>
                       <TableCell>{agente.dataAdmissao ? formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '') : '-'}</TableCell>
                       {/* Cargo / Área / Vínculo compacto */}
                       <TableCell className="min-w-[140px]">
@@ -353,7 +351,6 @@ export default function AgentesPage() {
                       </TableCell>
 
                       <TableCell>{agente.supervisor}</TableCell>
-                      <TableCell>{agente.uf}</TableCell>
                       <TableCell>{agente.cpfAgente}</TableCell>
                       <TableCell>{agente.dataNascimento ? formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '') : '-'}</TableCell>
                       <TableCell>{agente.email}</TableCell>
