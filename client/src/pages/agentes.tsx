@@ -305,9 +305,10 @@ export default function AgentesPage() {
                     } hover:from-blue-200 hover:to-blue-100 transition-colors`}>
                       {/* Coluna compacta: ChaveJ + Situação + Nome + Empresa·Cidade */}
                       <TableCell className="min-w-[260px]">
-                        {/* Linha 1: ChaveJ + badge Situação */}
+                        {/* Linha 1: ChaveJ + Senha + badge Situação */}
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className="font-bold text-blue-700 text-sm">{agente.chaveJ}</span>
+                          <span className="text-xs text-gray-400 font-mono">{'*'.repeat(6)}</span>
                           <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${
                             agente.situacao === 'Ativo'
                               ? 'bg-green-100 text-green-800 border-green-300'
@@ -316,8 +317,6 @@ export default function AgentesPage() {
                               : 'bg-gray-100 text-gray-600 border-gray-300'
                           }`}>{agente.situacao || '-'}</span>
                         </div>
-                        {/* Linha 2: Senha */}
-                        <div className="text-xs text-gray-400 font-mono">{'*'.repeat(6)}</div>
                         {/* Linha 3: Nome + Data Nascimento */}
                         <div className="font-medium text-sm text-gray-900 leading-tight mt-0.5">
                           {agente.nomeAgente}{agente.dataNascimento ? <span className="font-normal text-gray-400 text-xs ml-1">· {formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '')}</span> : ''}
