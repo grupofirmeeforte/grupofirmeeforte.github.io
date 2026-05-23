@@ -267,32 +267,10 @@ export default function Certificacoes() {
           <Table>
             <TableHeader>
               <TableRow className="bg-blue-700 hover:bg-blue-700">
-                <TableHead className="text-white font-semibold">Empresa</TableHead>
-                <TableHead className="text-white font-semibold">ChaveJ</TableHead>
-                <TableHead className="text-white font-semibold">Nome Agente</TableHead>
-                <TableHead className="text-white font-semibold">CPF</TableHead>
-                <TableHead className="text-white font-semibold">Situação</TableHead>
-                <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação CONSIG / LGPD</TableHead>
-                <TableHead className="text-white font-semibold text-center" colSpan={5}>Certificação PLDFT</TableHead>
+                <TableHead className="text-white font-semibold">Agente</TableHead>
+                <TableHead className="text-white font-semibold text-center">CONSIG / LGPD</TableHead>
+                <TableHead className="text-white font-semibold text-center">PLDFT</TableHead>
                 <TableHead className="text-white font-semibold">Ações</TableHead>
-              </TableRow>
-              <TableRow className="bg-blue-600 hover:bg-blue-600">
-                <TableHead className="text-white text-xs"></TableHead>
-                <TableHead className="text-white text-xs"></TableHead>
-                <TableHead className="text-white text-xs"></TableHead>
-                <TableHead className="text-white text-xs"></TableHead>
-                <TableHead className="text-white text-xs"></TableHead>
-                <TableHead className="text-white text-xs">Data Certif</TableHead>
-                <TableHead className="text-white text-xs">Vencto</TableHead>
-                <TableHead className="text-white text-xs">Dias Faltando</TableHead>
-                <TableHead className="text-white text-xs">Situação</TableHead>
-                <TableHead className="text-white text-xs">Nr. Certif</TableHead>
-                <TableHead className="text-white text-xs">Data Certif</TableHead>
-                <TableHead className="text-white text-xs">Vencto</TableHead>
-                <TableHead className="text-white text-xs">Dias Faltando</TableHead>
-                <TableHead className="text-white text-xs">Situação</TableHead>
-                <TableHead className="text-white text-xs">Nr. Certif</TableHead>
-                <TableHead className="text-white text-xs"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -308,23 +286,58 @@ export default function Certificacoes() {
                 </TableRow>
               ) : registros.map((c, idx) => (
                 <TableRow key={c.id != null ? c.id : `sint-${idx}`} className={idx % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}>
-                  <TableCell>{(c as any).empresa || '-'}</TableCell>
-                  <TableCell className="font-mono text-sm">{c.chaveJ || '-'}</TableCell>
-                  <TableCell>{c.nomeAgente || '-'}</TableCell>
-                  <TableCell className="font-mono text-sm">{c.cpf || '-'}</TableCell>
-                  <TableCell>{c.situacao || '-'}</TableCell>
-                  {/* CONSIG */}
-                  <TableCell>{fmtDate(c.dataCertif)}</TableCell>
-                  <TableCell>{fmtDate(c.ventoCertif)}</TableCell>
-                  <TableCell className="text-center">{c.diasFaltando ?? '-'}</TableCell>
-                  <TableCell className={situacaoColor(c.situacaoCertif)}>{c.situacaoCertif || '-'}</TableCell>
-                  <TableCell className="font-mono text-xs">{c.nrCertificadoConsig || '-'}</TableCell>
-                  {/* LGPD */}
-                  <TableCell>{fmtDate(c.dataCertif2)}</TableCell>
-                  <TableCell>{fmtDate(c.ventoCertif3)}</TableCell>
-                  <TableCell className="text-center">{c.diasFaltando2 ?? '-'}</TableCell>
-                  <TableCell className={situacaoColor(c.situacaoCertif3)}>{c.situacaoCertif3 || '-'}</TableCell>
-                  <TableCell className="font-mono text-xs">{c.nrCertificadoPldft || '-'}</TableCell>
+                  {/* Coluna Agente compacta */}
+                  <TableCell className="min-w-[200px]">
+                    <div className="flex items-center gap-1">
+                      <span className="font-mono text-sm font-semibold text-blue-700">{c.chaveJ || '-'}</span>
+                      {c.situacao && (
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                          c.situacao.startsWith('Ativo') ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                        }`}>{c.situacao}</span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-800 mt-0.5">{c.nomeAgente || '-'}</div>
+                    <div className="text-[11px] text-gray-500 mt-0.5">
+                      {(c as any).empresa && <span>{(c as any).empresa}</span>}
+                      {c.cpf && <span className="ml-1 font-mono">· {c.cpf}</span>}
+                    </div>
+                  </TableCell>
+                  {/* Coluna CONSIG/LGPD compacta */}
+                  <TableCell className="min-w-[160px]">
+                    {(c.dataCertif || c.ventoCertif || c.situacaoCertif) ? (
+                      <div className="space-y-0.5">
+                        <div className={`text-xs font-semibold ${situacaoColor(c.situacaoCertif)}`}>{c.situacaoCertif || '-'}</div>
+                        <div className="text-[11px] text-gray-600">
+                          {c.dataCertif && <span>Certif: {fmtDate(c.dataCertif)}</span>}
+                          {c.ventoCertif && <span className="ml-1">· Venc: {fmtDate(c.ventoCertif)}</span>}
+                        </div>
+                        {c.diasFaltando != null && (
+                          <div className="text-[11px] text-gray-500">{c.diasFaltando}d restantes</div>
+                        )}
+                        {c.nrCertificadoConsig && (
+                          <div className="text-[10px] font-mono text-gray-400">Nr: {c.nrCertificadoConsig}</div>
+                        )}
+                      </div>
+                    ) : <span className="text-xs text-slate-400">-</span>}
+                  </TableCell>
+                  {/* Coluna PLDFT compacta */}
+                  <TableCell className="min-w-[160px]">
+                    {(c.dataCertif2 || c.ventoCertif3 || c.situacaoCertif3) ? (
+                      <div className="space-y-0.5">
+                        <div className={`text-xs font-semibold ${situacaoColor(c.situacaoCertif3)}`}>{c.situacaoCertif3 || '-'}</div>
+                        <div className="text-[11px] text-gray-600">
+                          {c.dataCertif2 && <span>Certif: {fmtDate(c.dataCertif2)}</span>}
+                          {c.ventoCertif3 && <span className="ml-1">· Venc: {fmtDate(c.ventoCertif3)}</span>}
+                        </div>
+                        {c.diasFaltando2 != null && (
+                          <div className="text-[11px] text-gray-500">{c.diasFaltando2}d restantes</div>
+                        )}
+                        {c.nrCertificadoPldft && (
+                          <div className="text-[10px] font-mono text-gray-400">Nr: {c.nrCertificadoPldft}</div>
+                        )}
+                      </div>
+                    ) : <span className="text-xs text-slate-400">-</span>}
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       {c.cpf && (
