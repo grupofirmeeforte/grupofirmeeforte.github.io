@@ -287,9 +287,7 @@ export default function AgentesPage() {
                   <TableHead className="min-w-[260px]">Agente</TableHead>
                   <TableHead className="min-w-[200px]">Função / Certificações</TableHead>
                   <TableHead>Supervisor</TableHead>
-                  <TableHead>CPF</TableHead>
-
-                  <TableHead>Celular</TableHead>
+                  <TableHead>CPF / Celular</TableHead>
                   <TableHead>Dados Bancários</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -377,9 +375,14 @@ export default function AgentesPage() {
                       </TableCell>
 
                       <TableCell>{agente.supervisor}</TableCell>
-                      <TableCell>{agente.cpfAgente}</TableCell>
-
-                      <TableCell>{agente.celular}</TableCell>
+                      <TableCell className="min-w-[150px]">
+                        {agente.cpfAgente
+                          ? <div className="text-sm font-mono text-gray-800">{agente.cpfAgente}</div>
+                          : <span className="text-xs text-slate-400">-</span>}
+                        {agente.celular && (
+                          <div className="text-xs text-gray-500 mt-0.5">{agente.celular}</div>
+                        )}
+                      </TableCell>
                       {/* Dados bancários compactos */}
                       <TableCell className="min-w-[180px]">
                         {(agente.banco || agente.agencia || agente.conta) ? (
