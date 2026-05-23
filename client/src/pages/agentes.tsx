@@ -283,8 +283,7 @@ export default function AgentesPage() {
                   <TableHead>Certificações</TableHead>
                   <TableHead>Supervisor</TableHead>
                   <TableHead>CPF</TableHead>
-                  <TableHead>Data Nascimento</TableHead>
-                  <TableHead>Email</TableHead>
+
                   <TableHead>Celular</TableHead>
                   <TableHead>Dados Bancários</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
@@ -319,10 +318,12 @@ export default function AgentesPage() {
                         </div>
                         {/* Linha 2: Senha */}
                         <div className="text-xs text-gray-400 font-mono">{'*'.repeat(6)}</div>
-                        {/* Linha 3: Nome */}
-                        <div className="font-medium text-sm text-gray-900 leading-tight mt-0.5">{agente.nomeAgente}</div>
-                        {/* Linha 4: Empresa */}
-                        <div className="text-xs text-gray-500 mt-0.5">{agente.empresa || '-'}</div>
+                        {/* Linha 3: Nome + Data Nascimento */}
+                        <div className="font-medium text-sm text-gray-900 leading-tight mt-0.5">
+                          {agente.nomeAgente}{agente.dataNascimento ? <span className="font-normal text-gray-400 text-xs ml-1">· {formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '')}</span> : ''}
+                        </div>
+                        {/* Linha 4: Empresa + Email */}
+                        <div className="text-xs text-gray-500 mt-0.5">{agente.empresa || '-'}{agente.email ? <span className="text-blue-500 ml-1">{agente.email}</span> : ''}</div>
                         {/* Linha 5: Cidade/UF */}
                         <div className="text-xs text-gray-400">{agente.cidade ? `${agente.cidade}${agente.uf ? `/${agente.uf}` : ''}` : (agente.uf || '')}</div>
                       </TableCell>
@@ -356,8 +357,7 @@ export default function AgentesPage() {
 
                       <TableCell>{agente.supervisor}</TableCell>
                       <TableCell>{agente.cpfAgente}</TableCell>
-                      <TableCell>{agente.dataNascimento ? formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '') : '-'}</TableCell>
-                      <TableCell>{agente.email}</TableCell>
+
                       <TableCell>{agente.celular}</TableCell>
                       {/* Dados bancários compactos */}
                       <TableCell className="min-w-[180px]">
