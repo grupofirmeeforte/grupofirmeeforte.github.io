@@ -131,22 +131,6 @@ export default function Calculo() {
     });
   };
 
-  // Colunas na ordem EXATA da planilha Calculo-C2
-  const colunas = [
-
-    { label: "Ajuda de Custo",     key: "ajudaCusto",       tipo: "moeda" },
-    { label: "Créditos/Débitos",   key: "creditosDebitos",  tipo: "moeda" },
-    { label: "Adiantamento",       key: "adiantamento",     tipo: "moeda" },
-    { label: "Reajuste",           key: "reajuste",         tipo: "moeda" },
-
-  ] as const;
-
-  const renderVal = (r: any, col: typeof colunas[number]) => {
-    const v = r[col.key];
-    if (col.tipo === "moeda") return fmtMoeda(v);
-    return fmtTexto(v);
-  };
-
   // Totais das colunas monetárias
   const soma = (key: string) =>
     (registros as any[]).reduce((acc, r) => acc + (parseFloat(String(r[key])) || 0), 0);
@@ -676,14 +660,9 @@ export default function Calculo() {
                 <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">Comissões</th>
                 {/* Coluna compacta Pagamento */}
                 <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">Pagamento</th>
-                {colunas.map((col) => (
-                  <th
-                    key={col.key}
-                    className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 last:border-r-0"
-                  >
-                    {col.label}
-                  </th>
-                ))}
+                {/* Coluna compacta Ajustes */}
+                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[150px]">Ajustes</th>
+
                 <th className="px-1.5 py-1.5 text-center border-l border-white/20 w-8"></th>
               </tr>
             </thead>
@@ -782,43 +761,41 @@ export default function Calculo() {
                       )}
                     </div>
                   </td>
-                  {colunas.map((col) => (
-                    <td
-                      key={col.key}
-                      className={`px-1.5 py-1 whitespace-nowrap border-b border-slate-100 ${col.tipo === "moeda" ? "text-right" : ""}`}
-                    >
-                      {col.key === "creditosDebitos" ? (
-                        editandoCreditoDebito === r.id ? (
-                          <input
-                            ref={creditoDebitoInputRef}
-                            type="number"
-                            step="0.01"
-                            value={valorCreditoDebito}
-                            onChange={(e) => setValorCreditoDebito(e.target.value)}
-                            onBlur={() => salvarCreditoDebito(r.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") salvarCreditoDebito(r.id);
-                              if (e.key === "Escape") setEditandoCreditoDebito(null);
-                            }}
-                            placeholder="0.00"
-                            className="w-24 border border-pink-400 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-pink-500 bg-white text-right"
-                          />
-                        ) : (
-                          <span
-                            onClick={() => iniciarEdicaoCreditoDebito(r)}
-                            className="cursor-pointer hover:bg-pink-100 rounded px-1 py-0.5 min-w-[5rem] inline-block text-right border border-transparent hover:border-pink-300"
-                            title="Clique para editar Créditos/Débitos"
-                          >
-                            {r.creditosDebitos && parseFloat(String(r.creditosDebitos)) !== 0
-                              ? fmtMoeda(r.creditosDebitos)
-                              : <span className="text-slate-300 italic">0,00</span>}
-                          </span>
-                        )
-                      ) : (
-                        renderVal(r, col)
-                      )}
-                    </td>
-                  ))}
+                  {/* Célula compacta Ajustes */}
+                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[150px] align-top text-right">
+                    {/* Créditos/Débitos editável */}
+                    <div className="text-[9px] text-slate-400 mb-0.5">Créd/Déb</div>
+                    {editandoCreditoDebito === r.id ? (
+                      <input
+                        ref={creditoDebitoInputRef}
+                        type="number"
+                        step="0.01"
+                        value={valorCreditoDebito}
+                        onChange={(e) => setValorCreditoDebito(e.target.value)}
+                        onBlur={() => salvarCreditoDebito(r.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") salvarCreditoDebito(r.id);
+                          if (e.key === "Escape") setEditandoCreditoDebito(null);
+                        }}
+                        placeholder="0.00"
+                        className="w-24 border border-pink-400 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-pink-500 bg-white text-right"
+                      />
+                    ) : (
+                      <span
+                        onClick={() => iniciarEdicaoCreditoDebito(r)}
+                        className="cursor-pointer hover:bg-pink-100 rounded px-1 py-0.5 min-w-[5rem] inline-block text-right border border-transparent hover:border-pink-300 text-xs font-medium text-slate-700"
+                        title="Clique para editar Créditos/Débitos"
+                      >
+                        {r.creditosDebitos && parseFloat(String(r.creditosDebitos)) !== 0
+                          ? fmtMoeda(r.creditosDebitos)
+                          : <span className="text-slate-300 italic text-[10px]">0,00</span>}
+                      </span>
+                    )}
+                    {r.ajudaCusto && parseFloat(String(r.ajudaCusto)) !== 0 && <div className="text-[10px] text-slate-500">Aj.Custo: {fmtMoeda(r.ajudaCusto)}</div>}
+                    {r.adiantamento && parseFloat(String(r.adiantamento)) !== 0 && <div className="text-[10px] text-slate-500">Adiant: {fmtMoeda(r.adiantamento)}</div>}
+                    {r.reajuste && parseFloat(String(r.reajuste)) !== 0 && <div className="text-[10px] text-slate-500">Reajuste: {fmtMoeda(r.reajuste)}</div>}
+                  </td>
+
                   {/* Botões de ação: editar + deletar */}
                   <td className="px-1.5 py-1 text-center border-b border-slate-100 border-l border-l-slate-200">
                     <div className="flex items-center gap-1 justify-center">
@@ -857,18 +834,8 @@ export default function Calculo() {
                 <td className="px-1.5 py-1.5 text-right font-bold text-white text-xs">{fmtMoeda((registros as any[]).reduce((a: number, r: any) => a + (parseFloat(String(r.comissaoTotal)) || 0), 0))}</td>
                 {/* Célula Vr. Líquido Total no tfoot */}
                 <td className="px-1.5 py-1.5 text-right font-bold text-white text-xs">{fmtMoeda((registros as any[]).reduce((a: number, r: any) => a + (parseFloat(String(r.vrLiquidoC2)) || 0), 0))}</td>
-                {colunas.map((col, i) => (
-                  <td
-                    key={col.key}
-                    className={`px-1.5 py-1.5 whitespace-nowrap ${col.tipo === "moeda" ? "text-right" : ""}`}
-                  >
-                    {i === 0
-                      ? "TOTAL"
-                      : col.tipo === "moeda"
-                      ? fmtMoeda(soma(col.key))
-                      : ""}
-                  </td>
-                ))}
+                {/* Célula Ajustes (Créd/Déb) no tfoot */}
+                <td className="px-1.5 py-1.5 text-right font-bold text-white text-xs">{fmtMoeda((registros as any[]).reduce((a: number, r: any) => a + (parseFloat(String(r.creditosDebitos)) || 0), 0))}</td>
               </tr>
             </tfoot>
           </table>
