@@ -277,20 +277,16 @@ export default function AgentesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="min-w-[260px]">Agente</TableHead>
                   <TableHead>Número</TableHead>
-                  <TableHead>Empresa</TableHead>
-                  <TableHead>ChaveJ</TableHead>
                   <TableHead>Senha</TableHead>
-                  <TableHead>Nome</TableHead>
                   <TableHead>Data Admissão</TableHead>
                   <TableHead>Cargo</TableHead>
                   <TableHead>Área</TableHead>
                   <TableHead>Vínculo</TableHead>
                   <TableHead>Certif. CONSIG / LGPD</TableHead>
                   <TableHead>Certif. PLDFT</TableHead>
-                  <TableHead>Situação</TableHead>
                   <TableHead>Supervisor</TableHead>
-                  <TableHead>Cidade</TableHead>
                   <TableHead>UF</TableHead>
                   <TableHead>CPF</TableHead>
                   <TableHead>Data Nascimento</TableHead>
@@ -317,15 +313,23 @@ export default function AgentesPage() {
                         ? 'bg-gradient-to-r from-blue-50 to-transparent' 
                         : 'bg-gradient-to-r from-blue-100 to-transparent'
                     } hover:from-blue-200 hover:to-blue-100 transition-colors`}>
-                      <TableCell className="font-medium text-sm">
-                        {agente.numCadastro}
+                      {/* Coluna compacta: ChaveJ + Situação + Nome + Empresa·Cidade */}
+                      <TableCell className="min-w-[260px]">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="font-bold text-blue-700 text-sm">{agente.chaveJ}</span>
+                          <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${
+                            agente.situacao === 'Ativo'
+                              ? 'bg-green-100 text-green-800 border-green-300'
+                              : agente.situacao === 'Inativo'
+                              ? 'bg-red-100 text-red-700 border-red-300'
+                              : 'bg-gray-100 text-gray-600 border-gray-300'
+                          }`}>{agente.situacao || '-'}</span>
+                        </div>
+                        <div className="font-medium text-sm text-gray-900 leading-tight">{agente.nomeAgente}</div>
+                        <div className="text-xs text-gray-500 mt-0.5">{agente.empresa}{agente.cidade ? ` · ${agente.cidade}` : ''}</div>
                       </TableCell>
-                      <TableCell>{agente.empresa}</TableCell>
-                      <TableCell>{agente.chaveJ}</TableCell>
+                      <TableCell className="font-medium text-sm">{agente.numCadastro}</TableCell>
                       <TableCell>{'*'.repeat(6)}</TableCell>
-                      <TableCell className="font-medium">
-                        {agente.nomeAgente}
-                      </TableCell>
                       <TableCell>{agente.dataAdmissao ? formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '') : '-'}</TableCell>
                       <TableCell>{agente.cargo}</TableCell>
                       <TableCell>{agente.area}</TableCell>
