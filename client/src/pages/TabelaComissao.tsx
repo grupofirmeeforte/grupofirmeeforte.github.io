@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
@@ -145,6 +146,15 @@ export default function TabelaComissao() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [savingCell, setSavingCell] = useState<string | null>(null);
   const NIVEIS = ['Ativo01','Ativo02','Ativo03','Ativo04','Ativo05','Ativo06','Ativo07','Ativo08','Ativo09','Ativo10'];
+  const { user } = useAuth();
+  const isAdminOuCeo = (user as any)?.cargo === 'CEO' || (user as any)?.cargo === 'SUPORTE' || (user as any)?.role === 'admin';
+  const situacaoAgente: string | null = (user as any)?.situacao ?? null;
+  const SITUACAO_TO_ATIVO: Record<string, string> = {
+    'Ativo': 'ativo01', 'Ativo_2': 'ativo02', 'Ativo_3': 'ativo03',
+    'Ativo_4': 'ativo04', 'Ativo_5': 'ativo05', 'Ativo_6': 'ativo06',
+    'Ativo_7': 'ativo07', 'Ativo_8': 'ativo08', 'Ativo_9': 'ativo09', 'Ativo_10': 'ativo10',
+  };
+  const ativoAgente: string | null = situacaoAgente ? (SITUACAO_TO_ATIVO[situacaoAgente] ?? null) : null;
   const [valoresAtivos, setValoresAtivos] = useState<Record<string, string>>(
     NIVEIS.reduce((acc, n) => ({ ...acc, [n]: '', [`${n}De`]: '', [`${n}Ate`]: '' }), {})
   );
@@ -460,200 +470,119 @@ export default function TabelaComissao() {
             <table className="w-full text-sm">
               <thead>
                 <tr style={{background: 'linear-gradient(90deg, #002776 0%, #003d99 40%, #0055cc 70%, #1a6ed8 100%)'}} className="text-white">
-                  <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Empresa</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Código</th>
                   <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Convênio</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Tx Juros De</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Tx Juros Até</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Valor Mín.</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Meses De</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Meses Até</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 01</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 02</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 03</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 04</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 05</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 06</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 07</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 08</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.16)'}}>Ativo 09</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.16)'}}>Ativo 10</th>
-                  <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Ações</th>
+                  <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Faixas</th>
+                  {isAdminOuCeo ? (
+                    <>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 01</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 02</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 03</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 04</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 05</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 06</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 07</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 08</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.16)'}}>Ativo 09</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.16)'}}>Ativo 10</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Ações</th>
+                    </>
+                  ) : ativoAgente ? (
+                    <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Minha Comissão</th>
+                  ) : null}
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
-                  <tr>
-                    <td colSpan={19} className="text-center py-8 text-gray-500">Carregando...</td>
-                  </tr>
+                  <tr><td colSpan={isAdminOuCeo ? 13 : 3} className="text-center py-8 text-gray-500">Carregando...</td></tr>
                 ) : filteredRows.length === 0 ? (
-                  <tr>
-                    <td colSpan={19} className="text-center py-8 text-gray-500">Nenhum registro encontrado</td>
-                  </tr>
+                  <tr><td colSpan={isAdminOuCeo ? 13 : 3} className="text-center py-8 text-gray-500">Nenhum registro encontrado</td></tr>
                 ) : (
                   filteredRows.map((row) => {
                     const convColor = getConvenioColor(row.convenio);
                     return (
                       <tr key={row.id} className={`${convColor.row} transition-colors`}>
-                      <td className="px-3 py-1.5 font-medium text-gray-900 whitespace-nowrap">
-                        <EditableCell
-                          value={row.empresa}
-                          onSave={(v) => handleCellSave(row.id, 'empresa', v)}
-                          isSaving={savingCell === `${row.id}-empresa`}
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
-                        <EditableCell
-                          value={(row as any).codigo}
-                          onSave={(v) => handleCellSave(row.id, 'codigo' as any, v)}
-                          isSaving={savingCell === `${row.id}-codigo`}
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 whitespace-nowrap max-w-[200px]">
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold truncate max-w-[180px] ${convColor.badge}`}>
-                          {row.convenio || '-'}
-                        </span>
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
-                        <EditableCell
-                          value={row.txJurosDe}
-                          onSave={(v) => handleCellSave(row.id, 'txJurosDe', v)}
-                          isSaving={savingCell === `${row.id}-txJurosDe`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
-                        <EditableCell
-                          value={row.txJurosAte}
-                          onSave={(v) => handleCellSave(row.id, 'txJurosAte', v)}
-                          isSaving={savingCell === `${row.id}-txJurosAte`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
-                        <EditableCell
-                          value={row.valorMinimo}
-                          onSave={(v) => handleCellSave(row.id, 'valorMinimo', v)}
-                          isSaving={savingCell === `${row.id}-valorMinimo`}
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-gray-700 whitespace-nowrap">
-                        <EditableCell
-                          value={row.mesesDe}
-                          onSave={(v) => handleCellSave(row.id, 'mesesDe', v)}
-                          isSaving={savingCell === `${row.id}-mesesDe`}
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={row.mesesAte}
-                          onSave={(v) => handleCellSave(row.id, 'mesesAte', v)}
-                          isSaving={savingCell === `${row.id}-mesesAte`}
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={row.ativo01}
-                          onSave={(v) => handleCellSave(row.id, 'ativo01', v)}
-                          isSaving={savingCell === `${row.id}-ativo01`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={row.ativo02}
-                          onSave={(v) => handleCellSave(row.id, 'ativo02', v)}
-                          isSaving={savingCell === `${row.id}-ativo02`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={row.ativo03}
-                          onSave={(v) => handleCellSave(row.id, 'ativo03', v)}
-                          isSaving={savingCell === `${row.id}-ativo03`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={row.ativo04}
-                          onSave={(v) => handleCellSave(row.id, 'ativo04', v)}
-                          isSaving={savingCell === `${row.id}-ativo04`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={row.ativo05}
-                          onSave={(v) => handleCellSave(row.id, 'ativo05', v)}
-                          isSaving={savingCell === `${row.id}-ativo05`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={row.ativo06}
-                          onSave={(v) => handleCellSave(row.id, 'ativo06', v)}
-                          isSaving={savingCell === `${row.id}-ativo06`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={row.ativo07}
-                          onSave={(v) => handleCellSave(row.id, 'ativo07', v)}
-                          isSaving={savingCell === `${row.id}-ativo07`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-800 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={row.ativo08}
-                          onSave={(v) => handleCellSave(row.id, 'ativo08', v)}
-                          isSaving={savingCell === `${row.id}-ativo08`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={(row as any).ativo09}
-                          onSave={(v) => handleCellSave(row.id, 'ativo09' as any, v)}
-                          isSaving={savingCell === `${row.id}-ativo09`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
-                        <EditableCell
-                          value={(row as any).ativo10}
-                          onSave={(v) => handleCellSave(row.id, 'ativo10' as any, v)}
-                          isSaving={savingCell === `${row.id}-ativo10`}
-                          format="percent"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-center whitespace-nowrap">
-                        <div className="flex items-center justify-center gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-7 w-7 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50"
-                            onClick={() => openEditar(row as TabelaRow)}
-                            title="Editar tudo"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => setDeleteId(row.id)}
-                            title="Excluir"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
+                        {/* Coluna Convênio: Empresa · Código + badge */}
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          <div className="flex items-center gap-1 text-xs mb-0.5">
+                            {isAdminOuCeo ? (
+                              <EditableCell value={row.empresa} onSave={(v) => handleCellSave(row.id, 'empresa', v)} isSaving={savingCell === `${row.id}-empresa`} />
+                            ) : (
+                              <span className="font-medium text-gray-800">{row.empresa || '-'}</span>
+                            )}
+                            {(row as any).codigo && <span className="text-gray-400">· {(row as any).codigo}</span>}
+                          </div>
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${convColor.badge}`}>
+                            {row.convenio || '-'}
+                          </span>
+                        </td>
+                        {/* Coluna Faixas: Juros, Valor Mín, Prazo */}
+                        <td className="px-3 py-2 whitespace-nowrap text-xs">
+                          <div className="text-gray-700 flex items-center gap-1">
+                            <span className="text-gray-400">Juros:</span>
+                            {isAdminOuCeo ? (
+                              <span className="inline-flex items-center gap-1">
+                                <EditableCell value={row.txJurosDe} onSave={(v) => handleCellSave(row.id, 'txJurosDe', v)} isSaving={savingCell === `${row.id}-txJurosDe`} format="percent" />
+                                <span className="text-gray-400">→</span>
+                                <EditableCell value={row.txJurosAte} onSave={(v) => handleCellSave(row.id, 'txJurosAte', v)} isSaving={savingCell === `${row.id}-txJurosAte`} format="percent" />
+                              </span>
+                            ) : (
+                              <span>{pct(row.txJurosDe)} → {pct(row.txJurosAte)}</span>
+                            )}
+                          </div>
+                          <div className="text-gray-500 flex items-center gap-1">
+                            <span className="text-gray-400">Mín:</span>
+                            {isAdminOuCeo ? (
+                              <EditableCell value={row.valorMinimo} onSave={(v) => handleCellSave(row.id, 'valorMinimo', v)} isSaving={savingCell === `${row.id}-valorMinimo`} />
+                            ) : (
+                              <span>{row.valorMinimo || '-'}</span>
+                            )}
+                          </div>
+                          <div className="text-gray-500 flex items-center gap-1">
+                            <span className="text-gray-400">Prazo:</span>
+                            {isAdminOuCeo ? (
+                              <span className="inline-flex items-center gap-1">
+                                <EditableCell value={row.mesesDe} onSave={(v) => handleCellSave(row.id, 'mesesDe', v)} isSaving={savingCell === `${row.id}-mesesDe`} />
+                                <span className="text-gray-400">→</span>
+                                <EditableCell value={row.mesesAte} onSave={(v) => handleCellSave(row.id, 'mesesAte', v)} isSaving={savingCell === `${row.id}-mesesAte`} />
+                              </span>
+                            ) : (
+                              <span>{row.mesesDe || '-'} → {row.mesesAte || '-'} meses</span>
+                            )}
+                          </div>
+                        </td>
+                        {/* Ativos: admin vê todos editáveis, agente vê só o dele */}
+                        {isAdminOuCeo ? (
+                          <>{
+                            (['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'] as (keyof TabelaRow)[]).map((key) => (
+                              <td key={String(key)} className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
+                                <EditableCell
+                                  value={(row as any)[key]}
+                                  onSave={(v) => handleCellSave(row.id, key, v)}
+                                  isSaving={savingCell === `${row.id}-${String(key)}`}
+                                  format="percent"
+                                />
+                              </td>
+                            ))
+                          }</>
+                        ) : ativoAgente ? (
+                          <td className="px-3 py-1.5 text-center text-blue-700 font-bold whitespace-nowrap text-base">
+                            {pct((row as any)[ativoAgente])}
+                          </td>
+                        ) : null}
+                        {/* Ações: só admin */}
+                        {isAdminOuCeo && (
+                          <td className="px-3 py-1.5 text-center whitespace-nowrap">
+                            <div className="flex items-center justify-center gap-1">
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50" onClick={() => openEditar(row as TabelaRow)} title="Editar tudo">
+                                <Pencil className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => setDeleteId(row.id)} title="Excluir">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
                     );
                   })
                 )}

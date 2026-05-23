@@ -1,0 +1,9 @@
+{
+  "query": "DELETE FROM agentes WHERE chaveJ LIKE 'KEY177%' AND nomeAgente = 'Unique Agent Name';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute DELETE FROM agentes WHERE chaveJ LIKE 'KEY177%' AND nomeAgente = 'Unique Agent Name';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 265
+}
