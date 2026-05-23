@@ -289,10 +289,7 @@ export default function AgentesPage() {
                   <TableHead>Data Nascimento</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Celular</TableHead>
-                  <TableHead>Banco</TableHead>
-                  <TableHead>Agencia</TableHead>
-                  <TableHead>Conta</TableHead>
-                  <TableHead>PIX</TableHead>
+                  <TableHead>Dados Bancários</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -361,10 +358,17 @@ export default function AgentesPage() {
                       <TableCell>{agente.dataNascimento ? formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '') : '-'}</TableCell>
                       <TableCell>{agente.email}</TableCell>
                       <TableCell>{agente.celular}</TableCell>
-                      <TableCell>{agente.banco}</TableCell>
-                      <TableCell>{agente.agencia}</TableCell>
-                      <TableCell>{agente.conta}</TableCell>
-                      <TableCell>{agente.pix}</TableCell>
+                      {/* Dados bancários compactos */}
+                      <TableCell className="min-w-[180px]">
+                        {(agente.banco || agente.agencia || agente.conta) ? (
+                          <div className="font-medium text-sm text-gray-900">
+                            {agente.banco}{agente.agencia ? ` · Ag ${agente.agencia}` : ''}{agente.conta ? ` · Cc ${agente.conta}` : ''}
+                          </div>
+                        ) : <span className="text-xs text-slate-400">-</span>}
+                        {agente.pix && (
+                          <div className="text-xs text-blue-600 mt-0.5">PIX: {agente.pix}</div>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right space-x-1">
                         {agente.cpfAgente && (
                           <Button
