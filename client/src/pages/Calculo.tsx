@@ -133,13 +133,7 @@ export default function Calculo() {
 
   // Colunas na ordem EXATA da planilha Calculo-C2
   const colunas = [
-    { label: "Percentual",         key: "percentual",       tipo: "perc" },
-    { label: "Comissão Total",     key: "comissaoTotal",    tipo: "moeda" },
-    { label: "Comissão Consig",    key: "comissaoConsig",   tipo: "moeda" },
-    { label: "Comissão Consórcio", key: "comissaoConsorcio",tipo: "moeda" },
-    { label: "ComissãoOurocap",    key: "comissaoOurocap",  tipo: "moeda" },
-    { label: "Comissão C/C",       key: "comissaoCc",       tipo: "moeda" },
-    { label: "Comissão Seguro",    key: "comissaoSeguros",  tipo: "moeda" },
+
     { label: "Ajuda de Custo",     key: "ajudaCusto",       tipo: "moeda" },
     { label: "Créditos/Débitos",   key: "creditosDebitos",  tipo: "moeda" },
     { label: "Adiantamento",       key: "adiantamento",     tipo: "moeda" },
@@ -154,7 +148,6 @@ export default function Calculo() {
   const renderVal = (r: any, col: typeof colunas[number]) => {
     const v = r[col.key];
     if (col.tipo === "moeda") return fmtMoeda(v);
-    if (col.tipo === "perc")  return fmtPerc(v);
     return fmtTexto(v);
   };
 
@@ -683,6 +676,8 @@ export default function Calculo() {
                 <th className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[220px]">Agente</th>
                 {/* Coluna compacta RBM */}
                 <th className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">RBM</th>
+                {/* Coluna compacta Comissões */}
+                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">Comissões</th>
                 {colunas.map((col) => (
                   <th
                     key={col.key}
@@ -742,6 +737,17 @@ export default function Calculo() {
                     {r.rbmConsorcioC2 && parseFloat(String(r.rbmConsorcioC2)) !== 0 && <div className="text-[10px] text-slate-500">Cons: {fmtMoeda(r.rbmConsorcioC2)}</div>}
                     {r.rbmOurocap && parseFloat(String(r.rbmOurocap)) !== 0 && <div className="text-[10px] text-slate-500">Ouro: {fmtMoeda(r.rbmOurocap)}</div>}
                     {r.rbmSeguros && parseFloat(String(r.rbmSeguros)) !== 0 && <div className="text-[10px] text-slate-500">Seg: {fmtMoeda(r.rbmSeguros)}</div>}
+                  </td>
+                  {/* Célula compacta Comissões */}
+                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[160px] align-top text-right">
+                    {/* Comissão Total em destaque */}
+                    <div className="font-bold text-pink-700 text-xs">{r.comissaoTotal ? fmtMoeda(r.comissaoTotal) : '-'}</div>
+                    {r.percentual && parseFloat(String(r.percentual)) !== 0 && <div className="text-[10px] text-slate-400">{fmtPerc(r.percentual)}</div>}
+                    {r.comissaoConsig && parseFloat(String(r.comissaoConsig)) !== 0 && <div className="text-[10px] text-slate-500">Consig: {fmtMoeda(r.comissaoConsig)}</div>}
+                    {r.comissaoConsorcio && parseFloat(String(r.comissaoConsorcio)) !== 0 && <div className="text-[10px] text-slate-500">Consórc: {fmtMoeda(r.comissaoConsorcio)}</div>}
+                    {r.comissaoOurocap && parseFloat(String(r.comissaoOurocap)) !== 0 && <div className="text-[10px] text-slate-500">Ouro: {fmtMoeda(r.comissaoOurocap)}</div>}
+                    {r.comissaoCc && parseFloat(String(r.comissaoCc)) !== 0 && <div className="text-[10px] text-slate-500">C/C: {fmtMoeda(r.comissaoCc)}</div>}
+                    {r.comissaoSeguros && parseFloat(String(r.comissaoSeguros)) !== 0 && <div className="text-[10px] text-slate-500">Seg: {fmtMoeda(r.comissaoSeguros)}</div>}
                   </td>
                   {colunas.map((col) => (
                     <td
@@ -839,6 +845,8 @@ export default function Calculo() {
                 <td className="px-1.5 py-1.5" />
                 {/* Célula RBM Total no tfoot */}
                 <td className="px-1.5 py-1.5 text-right font-bold text-white text-xs">{fmtMoeda((registros as any[]).reduce((a: number, r: any) => a + (parseFloat(String(r.rbmTotal)) || 0), 0))}</td>
+                {/* Célula Comissão Total no tfoot */}
+                <td className="px-1.5 py-1.5 text-right font-bold text-white text-xs">{fmtMoeda((registros as any[]).reduce((a: number, r: any) => a + (parseFloat(String(r.comissaoTotal)) || 0), 0))}</td>
                 {colunas.map((col, i) => (
                   <td
                     key={col.key}
