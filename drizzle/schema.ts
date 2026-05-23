@@ -1224,3 +1224,27 @@ export const bbdental = mysqlTable("bbdental", {
 }));
 export type BBDental = typeof bbdental.$inferSelect;
 export type InsertBBDental = typeof bbdental.$inferInsert;
+
+/**
+ * Tabela de Credenciais WebAuthn (Biometria)
+ * Armazena chaves públicas de autenticação biométrica (digital/face) por dispositivo
+ */
+export const webauthnCredentials = mysqlTable("webauthn_credentials", {
+  id: int("id").autoincrement().primaryKey(),
+  agenteId: int("agenteId").notNull(),
+  chaveJ: varchar("chaveJ", { length: 50 }).notNull(),
+  credentialId: varchar("credentialId", { length: 512 }).notNull().unique(),
+  credentialPublicKey: text("credentialPublicKey").notNull(),
+  counter: int("counter").default(0).notNull(),
+  deviceType: varchar("deviceType", { length: 32 }).default("singleDevice"),
+  backedUp: tinyint("backedUp").default(0),
+  transports: varchar("transports", { length: 255 }),
+  deviceName: varchar("deviceName", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  lastUsedAt: timestamp("lastUsedAt"),
+}, (table) => ({
+  agenteIdIdx: index("idx_webauthn_agenteId").on(table.agenteId),
+  chaveJIdx: index("idx_webauthn_chaveJ").on(table.chaveJ),
+}));
+export type WebAuthnCredential = typeof webauthnCredentials.$inferSelect;
+export type InsertWebAuthnCredential = typeof webauthnCredentials.$inferInsert;
