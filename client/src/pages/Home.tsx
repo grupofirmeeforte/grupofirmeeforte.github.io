@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles, FolderOpen, Star, Package, Shirt, Zap, LayoutDashboard } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles, FolderOpen, Star, Package, Shirt, Zap, LayoutDashboard, Shield } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -223,6 +223,21 @@ export default function Home() {
       subModules: [
         { title: 'Ativo Imobilizado', description: 'Controle de bens patrimoniais', icon: Package, color: 'bg-amber-600', path: '/relatorios/ativo-imobilizado', subKey: 'ativo-imobilizado' },
         { title: 'Uniformes e Crachás', description: 'Controle de entrega por agente', icon: Shirt, color: 'bg-indigo-600', path: '/relatorios/uniformes-crachas', subKey: 'uniformes-crachas' },
+      ],
+    },
+    {
+      type: 'group',
+      key: 'auditoria',
+      title: 'Auditoria',
+      description: 'Logs de acesso, feriados e permissões',
+      icon: Shield,
+      color: 'bg-slate-700',
+      borderColor: 'border-slate-200',
+      bgColor: 'from-slate-50 to-gray-50',
+      subModules: [
+        { title: 'Logs de Acesso', description: 'Histórico de entradas e saídas no sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria', subKey: 'logs' },
+        { title: 'Feriados', description: 'Calendário de feriados nacionais, estaduais e municipais', icon: BarChart2, color: 'bg-slate-500', path: '/auditoria?aba=feriados', subKey: 'feriados' },
+        { title: 'Permissões', description: 'Controle de acesso por módulo e cargo', icon: Shield, color: 'bg-slate-800', path: '/auditoria?aba=permissoes', subKey: 'logs' },
       ],
     },
   ];
