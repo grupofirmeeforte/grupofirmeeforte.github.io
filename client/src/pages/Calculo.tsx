@@ -138,11 +138,7 @@ export default function Calculo() {
     { label: "Créditos/Débitos",   key: "creditosDebitos",  tipo: "moeda" },
     { label: "Adiantamento",       key: "adiantamento",     tipo: "moeda" },
     { label: "Reajuste",           key: "reajuste",         tipo: "moeda" },
-    { label: "Qtde Contas",        key: "qtdeContas",       tipo: "texto" },
-    { label: "Vr. Liquido",        key: "vrLiquidoC2",      tipo: "moeda" },
-    { label: "SRCC",               key: "srccC2",           tipo: "moeda" },
-    { label: "VrLiquido-Srcc",     key: "vrLiquidoSrcc",    tipo: "moeda" },
-    { label: "Dt Pagto",           key: "dtPagto",          tipo: "texto" },
+
   ] as const;
 
   const renderVal = (r: any, col: typeof colunas[number]) => {
@@ -678,6 +674,8 @@ export default function Calculo() {
                 <th className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">RBM</th>
                 {/* Coluna compacta Comissões */}
                 <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">Comissões</th>
+                {/* Coluna compacta Pagamento */}
+                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">Pagamento</th>
                 {colunas.map((col) => (
                   <th
                     key={col.key}
@@ -749,37 +747,47 @@ export default function Calculo() {
                     {r.comissaoCc && parseFloat(String(r.comissaoCc)) !== 0 && <div className="text-[10px] text-slate-500">C/C: {fmtMoeda(r.comissaoCc)}</div>}
                     {r.comissaoSeguros && parseFloat(String(r.comissaoSeguros)) !== 0 && <div className="text-[10px] text-slate-500">Seg: {fmtMoeda(r.comissaoSeguros)}</div>}
                   </td>
+                  {/* Célula compacta Pagamento */}
+                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[160px] align-top text-right">
+                    {/* Vr. Líquido em destaque */}
+                    <div className="font-bold text-emerald-700 text-xs">{r.vrLiquidoC2 ? fmtMoeda(r.vrLiquidoC2) : '-'}</div>
+                    {r.vrLiquidoSrcc && parseFloat(String(r.vrLiquidoSrcc)) !== 0 && <div className="text-[10px] text-slate-500">-SRCC: {fmtMoeda(r.vrLiquidoSrcc)}</div>}
+                    {r.srccC2 && parseFloat(String(r.srccC2)) !== 0 && <div className="text-[10px] text-slate-400">SRCC: {fmtMoeda(r.srccC2)}</div>}
+                    {r.qtdeContas && String(r.qtdeContas) !== '0' && <div className="text-[10px] text-slate-400">Contas: {r.qtdeContas}</div>}
+                    {/* Dt Pagto editável */}
+                    <div className="mt-0.5">
+                      {editandoDtPagto === r.id ? (
+                        <input
+                          ref={dtPagtoInputRef}
+                          type="text"
+                          value={valorDtPagto}
+                          onChange={(e) => setValorDtPagto(e.target.value)}
+                          onBlur={() => salvarDtPagto(r.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") salvarDtPagto(r.id);
+                            if (e.key === "Escape") setEditandoDtPagto(null);
+                          }}
+                          placeholder="DD/MM/AAAA"
+                          maxLength={10}
+                          className="w-28 border border-purple-400 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500 bg-white"
+                        />
+                      ) : (
+                        <span
+                          onClick={() => iniciarEdicaoDt(r)}
+                          className="cursor-pointer hover:bg-purple-100 rounded px-1 py-0.5 min-w-[6rem] inline-block text-blue-600 font-medium border border-transparent hover:border-purple-300 text-[10px]"
+                          title={selecionados.size > 1 && selecionados.has(r.id) ? `Clique para editar e aplicar em ${selecionados.size} linhas selecionadas` : "Clique para editar"}
+                        >
+                          {r.dtPagto || <span className="text-slate-300 italic">DD/MM/AAAA</span>}
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   {colunas.map((col) => (
                     <td
                       key={col.key}
                       className={`px-1.5 py-1 whitespace-nowrap border-b border-slate-100 ${col.tipo === "moeda" ? "text-right" : ""}`}
                     >
-                      {col.key === "dtPagto" ? (
-                        editandoDtPagto === r.id ? (
-                          <input
-                            ref={dtPagtoInputRef}
-                            type="text"
-                            value={valorDtPagto}
-                            onChange={(e) => setValorDtPagto(e.target.value)}
-                            onBlur={() => salvarDtPagto(r.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") salvarDtPagto(r.id);
-                              if (e.key === "Escape") setEditandoDtPagto(null);
-                            }}
-                            placeholder="DD/MM/AAAA"
-                            maxLength={10}
-                            className="w-28 border border-purple-400 rounded px-1.5 py-0.5 text-xs focus:outline-none focus:ring-1 focus:ring-purple-500 bg-white"
-                          />
-                        ) : (
-                          <span
-                            onClick={() => iniciarEdicaoDt(r)}
-                            className="cursor-pointer hover:bg-purple-100 rounded px-1 py-0.5 min-w-[6rem] inline-block text-slate-700 border border-transparent hover:border-purple-300"
-                            title={selecionados.size > 1 && selecionados.has(r.id) ? `Clique para editar e aplicar em ${selecionados.size} linhas selecionadas` : "Clique para editar"}
-                          >
-                            {r.dtPagto || <span className="text-slate-300 italic">DD/MM/AAAA</span>}
-                          </span>
-                        )
-                      ) : col.key === "creditosDebitos" ? (
+                      {col.key === "creditosDebitos" ? (
                         editandoCreditoDebito === r.id ? (
                           <input
                             ref={creditoDebitoInputRef}
@@ -847,6 +855,8 @@ export default function Calculo() {
                 <td className="px-1.5 py-1.5 text-right font-bold text-white text-xs">{fmtMoeda((registros as any[]).reduce((a: number, r: any) => a + (parseFloat(String(r.rbmTotal)) || 0), 0))}</td>
                 {/* Célula Comissão Total no tfoot */}
                 <td className="px-1.5 py-1.5 text-right font-bold text-white text-xs">{fmtMoeda((registros as any[]).reduce((a: number, r: any) => a + (parseFloat(String(r.comissaoTotal)) || 0), 0))}</td>
+                {/* Célula Vr. Líquido Total no tfoot */}
+                <td className="px-1.5 py-1.5 text-right font-bold text-white text-xs">{fmtMoeda((registros as any[]).reduce((a: number, r: any) => a + (parseFloat(String(r.vrLiquidoC2)) || 0), 0))}</td>
                 {colunas.map((col, i) => (
                   <td
                     key={col.key}
