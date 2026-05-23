@@ -258,24 +258,45 @@ export default function Ourocap() {
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-blue-800 text-white">
-                {COLUNAS_OUROCAP.map(c => (
-                  <th key={c.field} className="px-3 py-2 text-left font-semibold whitespace-nowrap">{c.label}</th>
-                ))}
+                <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Agente</th>
+                <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Produto / Cliente</th>
+                <th className="px-3 py-2 text-right font-semibold whitespace-nowrap">Valores</th>
                 <th className="px-3 py-2 text-center font-semibold">Ações</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan={COLUNAS_OUROCAP.length + 1} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                <tr><td colSpan={4} className="text-center py-8 text-gray-400">Carregando...</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td colSpan={COLUNAS_OUROCAP.length + 1} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
+                <tr><td colSpan={4} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
               ) : rows.map((row, i) => (
                 <tr key={row.id} className={i % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}>
-                  {COLUNAS_OUROCAP.map(c => (
-                    <td key={c.field} className="px-3 py-1.5 whitespace-nowrap">
-                      {c.moeda ? fmtMoeda((row as any)[c.field]) : (c.field === "dtVenda" || c.field === "dtDebito") ? toDate((row as any)[c.field]) : ((row as any)[c.field] ?? "-")}
-                    </td>
-                  ))}
+                  {/* Coluna Agente */}
+                  <td className="px-3 py-1.5">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="font-mono text-[11px] text-blue-700 font-semibold">{(row as any).chaveJ ?? "-"}</span>
+                      <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{(row as any).empresa ?? ""}</span>
+                      <span className="text-[9px] text-gray-400">{(row as any).mesAno ?? ""}</span>
+                    </div>
+                    <div className="text-[11px] text-gray-800 font-medium">{(row as any).nomeAgente ?? "-"}</div>
+                    {(row as any).supervisor && <div className="text-[10px] text-gray-400">Sup: {(row as any).supervisor}</div>}
+                  </td>
+                  {/* Coluna Produto / Cliente */}
+                  <td className="px-3 py-1.5">
+                    <div className="text-[11px] text-gray-700 font-medium">{(row as any).codProduto ?? "-"}</div>
+                    <div className="text-[10px] text-gray-500 font-mono">{(row as any).proposta ?? ""}</div>
+                    {(row as any).cpfCliente && <div className="text-[10px] text-gray-400">CPF: {(row as any).cpfCliente}</div>}
+                    <div className="text-[10px] text-gray-400">
+                      {(row as any).dtVenda ? `Venda: ${toDate((row as any).dtVenda)}` : ""}
+                      {(row as any).dtDebito ? ` · Déb: ${toDate((row as any).dtDebito)}` : ""}
+                    </div>
+                  </td>
+                  {/* Coluna Valores */}
+                  <td className="px-3 py-1.5 text-right whitespace-nowrap">
+                    <div className="font-bold text-green-700 text-[12px]">{fmtMoeda((row as any).comissao)}</div>
+                    <div className="text-[10px] text-gray-400">Prod: {fmtMoeda((row as any).vrProduto)}</div>
+                    <div className="text-[10px] text-gray-400">RBM: {fmtMoeda((row as any).rbm)}</div>
+                  </td>
                   <td className="px-3 py-1.5 text-center">
                     <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 h-6 w-6 p-0" onClick={() => setDeleteId(row.id)}>
                       <Trash2 className="w-3.5 h-3.5" />
