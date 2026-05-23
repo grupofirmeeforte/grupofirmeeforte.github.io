@@ -402,129 +402,110 @@ export default function PagamentosPage() {
         <table className="w-full text-xs border-collapse">
           <thead>
             <tr className="bg-gray-800 text-gray-300 uppercase text-xs">
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Origem</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Mês Ano</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Tipo Pagto</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Cidade/UF</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Empresa</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Chave J</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Cadastro</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Nome Favorecido</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Banco</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Agência</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Conta</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">CPF/CNPJ</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Tipo Conta</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Pix</th>
+              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Beneficiário</th>
+              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Dados Bancários</th>
               <th className="px-2 py-2 text-right border-b border-gray-700 whitespace-nowrap">Valor</th>
-              <th className="px-2 py-2 text-center border-b border-gray-700 whitespace-nowrap">Pago</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Dt. Pagto</th>
-              <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Dt. Vencer</th>
+              <th className="px-2 py-2 text-center border-b border-gray-700 whitespace-nowrap">Situação / Datas</th>
               <th className="px-2 py-2 text-center border-b border-gray-700 whitespace-nowrap">Ações</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={19} className="text-center py-12 text-gray-500">
+                <td colSpan={5} className="text-center py-12 text-gray-500">
                   Nenhum registro encontrado. Clique em "+ Novo Lançamento" para começar.
                 </td>
               </tr>
             ) : rows.map((row, i) => (
               <tr key={`${row._fonte}-${row.id}`}
                 className={`border-b border-gray-800 hover:bg-gray-800/50 transition-colors ${rowBgClass(row) || (i % 2 === 0 ? "bg-gray-900/60" : "bg-gray-900/30")}`}>
+                {/* Coluna Beneficiário */}
                 <td className="px-2 py-1.5 whitespace-nowrap">
-                  {row._fonte === 'despesa_fixa'
-                    ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-purple-900/60 text-purple-300 border border-purple-700">Desp. Fixa</span>
-                    : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-blue-900/60 text-blue-300 border border-blue-700">Pagamento</span>
-                  }
+                  <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                    {row._fonte === 'despesa_fixa'
+                      ? <span className="text-[9px] px-1 py-0.5 rounded bg-purple-900/60 text-purple-300 border border-purple-700">Desp. Fixa</span>
+                      : <span className="text-[9px] px-1 py-0.5 rounded bg-blue-900/60 text-blue-300 border border-blue-700">Pagamento</span>
+                    }
+                    {row.chaveJ && <span className="font-mono text-[10px] text-purple-300 font-semibold">{row.chaveJ}</span>}
+                    {row.tipoPagto && <span className="text-[9px] px-1 py-0.5 rounded bg-gray-700 text-gray-300">{row.tipoPagto}</span>}
+                    {row.mesAno && <span className="text-[9px] text-gray-500">{row.mesAno}</span>}
+                  </div>
+                  <div className="text-[11px] text-white font-medium truncate max-w-[200px]" title={row.nomeFavorecido ?? ""}>{row.nomeFavorecido || "-"}</div>
+                  <div className="text-[10px] text-gray-400">{row.empresa || ""}{row.cidadeUF ? ` · ${row.cidadeUF}` : ""}</div>
                 </td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.mesAno || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.tipoPagto || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.cidadeUF || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.empresa || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap font-mono">{row.chaveJ || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.cadastro || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap max-w-[160px] truncate" title={row.nomeFavorecido ?? ""}>{row.nomeFavorecido || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.banco || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.agencia || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.conta || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap font-mono">{row.cpfCnpj || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap">{row.tipoConta || "-"}</td>
-                <td className="px-2 py-1.5 whitespace-nowrap max-w-[180px]">
-                  {row.pix ? (
-                    <span className="flex items-center gap-1 group">
-                      <span className="truncate max-w-[155px] block" title={row.pix}>{row.pix.replace(/^\+55/, '')}</span>
-                      <button
-                        onClick={() => { navigator.clipboard.writeText(row.pix!); toast.success("Copiado!"); }}
-                        className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-gray-600 text-gray-400 hover:text-white flex-shrink-0"
-                        title="Copiar"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-                          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-                        </svg>
+                {/* Coluna Dados Bancários */}
+                <td className="px-2 py-1.5 whitespace-nowrap text-[10px]">
+                  <div className="text-gray-300">
+                    {row.banco || "-"}{row.agencia ? ` · Ag ${row.agencia}` : ""}{row.conta ? ` · Cc ${row.conta}` : ""}
+                    {row.tipoConta && <span className="ml-1 text-gray-500">({row.tipoConta})</span>}
+                  </div>
+                  {row.cpfCnpj && <div className="text-gray-400 font-mono">{row.cpfCnpj}</div>}
+                  {row.pix && (
+                    <div className="flex items-center gap-1 group text-blue-400">
+                      <span className="truncate max-w-[160px]" title={row.pix}>PIX: {row.pix.replace(/^\+55/, '')}</span>
+                      <button onClick={() => { navigator.clipboard.writeText(row.pix!); toast.success("Copiado!"); }}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded hover:bg-gray-600 flex-shrink-0" title="Copiar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                       </button>
-                    </span>
-                  ) : "-"}
-                </td>
-                <td className="px-2 py-1.5 text-right whitespace-nowrap font-medium text-green-400">{formatCurrency(row.valor)}</td>
-                <td className="px-2 py-1.5 text-center">
-                  {row.dataPagto
-                    ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-green-900/60 text-green-300 border border-green-700">Pago</span>
-                    : isAtrasado(row.dataVencer)
-                      ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-700 text-white border border-red-500">Atrasado</span>
-                      : isHoje(row.dataVencer)
-                        ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-yellow-600 text-white border border-yellow-400">Hoje</span>
-                        : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-900/60 text-red-300 border border-red-700">Não</span>
-                  }
-                </td>
-                <td className="px-2 py-1.5 whitespace-nowrap">
-                  {editandoDtPagto === row.id ? (
-                    <input ref={dtPagtoRef} type="text" value={valorDtPagto}
-                      onChange={(e) => {
-                        const v = maskData(e.target.value);
-                        setValorDtPagto(v);
-                      }}
-                      onBlur={() => row._fonte === 'pagamento' ? salvarDtPagto(row.id) : salvarDtPagtoDesp(row.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          // Salva a data atual
-                          if (row._fonte === 'pagamento') salvarDtPagto(row.id);
-                          else salvarDtPagtoDesp(row.id);
-                          // Avança para a próxima linha não paga
-                          const currentIdx = dtPagtoRowIndexRef.current;
-                          if (currentIdx >= 0) {
-                            const nextRow = rows.slice(currentIdx + 1).find(r => !r.dataPagto && !r.pago);
-                            if (nextRow) {
-                              const nextIdx = rows.findIndex(r => r.id === nextRow.id && r._fonte === nextRow._fonte);
-                              setTimeout(() => iniciarEdicaoDtPagto(nextRow, nextIdx), 100);
-                            }
-                          }
-                        }
-                        if (e.key === "Escape") setEditandoDtPagto(null);
-                      }}
-                      placeholder="DD/MM/AAAA" maxLength={10}
-                      className="w-28 border border-blue-500 rounded px-1.5 py-0.5 text-xs focus:outline-none bg-gray-800 text-white" />
-                  ) : (
-                    <span onClick={() => iniciarEdicaoDtPagto(row, i)}
-                      className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[6rem] inline-block border border-transparent hover:border-blue-600"
-                      title="Clique para editar">
-                      {row.dataPagto || <span className="text-gray-500 italic text-xs">DD/MM/AAAA</span>}
-                    </span>
+                    </div>
                   )}
                 </td>
-                <td className="px-2 py-1.5 whitespace-nowrap">
-                  {row.dataVencer
-                    ? (
-                      !row.pago && !row.dataPagto && isAtrasado(row.dataVencer)
-                        ? <span className="font-bold text-red-400">⚠ {row.dataVencer}</span>
+                {/* Coluna Valor */}
+                <td className="px-2 py-1.5 text-right whitespace-nowrap">
+                  <div className="font-bold text-green-400 text-sm">{formatCurrency(row.valor)}</div>
+                </td>
+                {/* Coluna Situação / Datas */}
+                <td className="px-2 py-1.5 text-center whitespace-nowrap">
+                  <div className="mb-1">
+                    {row.dataPagto
+                      ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-green-900/60 text-green-300 border border-green-700">Pago</span>
+                      : isAtrasado(row.dataVencer)
+                        ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-700 text-white border border-red-500">Atrasado</span>
+                        : isHoje(row.dataVencer)
+                          ? <span className="px-2 py-0.5 rounded text-xs font-semibold bg-yellow-600 text-white border border-yellow-400">Hoje</span>
+                          : <span className="px-2 py-0.5 rounded text-xs font-semibold bg-red-900/60 text-red-300 border border-red-700">Não pago</span>
+                    }
+                  </div>
+                  <div className="text-[10px] text-gray-400">
+                    {editandoDtPagto === row.id ? (
+                      <input ref={dtPagtoRef} type="text" value={valorDtPagto}
+                        onChange={(e) => { const v = maskData(e.target.value); setValorDtPagto(v); }}
+                        onBlur={() => row._fonte === 'pagamento' ? salvarDtPagto(row.id) : salvarDtPagtoDesp(row.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            if (row._fonte === 'pagamento') salvarDtPagto(row.id);
+                            else salvarDtPagtoDesp(row.id);
+                            const currentIdx = dtPagtoRowIndexRef.current;
+                            if (currentIdx >= 0) {
+                              const nextRow = rows.slice(currentIdx + 1).find(r => !r.dataPagto && !r.pago);
+                              if (nextRow) {
+                                const nextIdx = rows.findIndex(r => r.id === nextRow.id && r._fonte === nextRow._fonte);
+                                setTimeout(() => iniciarEdicaoDtPagto(nextRow, nextIdx), 100);
+                              }
+                            }
+                          }
+                          if (e.key === "Escape") setEditandoDtPagto(null);
+                        }}
+                        placeholder="DD/MM/AAAA" maxLength={10}
+                        className="w-28 border border-blue-500 rounded px-1.5 py-0.5 text-xs focus:outline-none bg-gray-800 text-white" />
+                    ) : (
+                      <span onClick={() => iniciarEdicaoDtPagto(row, i)}
+                        className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[6rem] inline-block border border-transparent hover:border-blue-600"
+                        title="Clique para editar data de pagamento">
+                        Pagto: {row.dataPagto || <span className="text-gray-500 italic">DD/MM/AAAA</span>}
+                      </span>
+                    )}
+                  </div>
+                  {row.dataVencer && (
+                    <div className="text-[10px] mt-0.5">
+                      {!row.pago && !row.dataPagto && isAtrasado(row.dataVencer)
+                        ? <span className="font-bold text-red-400">⚠ Vence: {row.dataVencer}</span>
                         : !row.pago && !row.dataPagto && isHoje(row.dataVencer)
-                          ? <span className="font-bold text-yellow-300">🔔 {row.dataVencer}</span>
-                          : <span>{row.dataVencer}</span>
-                    )
-                    : <span className="text-gray-500">-</span>
-                  }
+                          ? <span className="font-bold text-yellow-300">🔔 Vence: {row.dataVencer}</span>
+                          : <span className="text-gray-500">Vence: {row.dataVencer}</span>
+                      }
+                    </div>
+                  )}
                 </td>
                 <td className="px-2 py-1.5 text-center whitespace-nowrap">
                   <div className="flex gap-1 justify-center">
