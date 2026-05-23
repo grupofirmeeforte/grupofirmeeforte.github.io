@@ -567,32 +567,36 @@ function MinhaTabela() {
           ) : tabela.length === 0 ? (
             <div className="flex items-center justify-center py-20 text-gray-400">Nenhum registro encontrado para sua empresa.</div>
           ) : (
-            <div className="overflow-x-auto">
-              <Table>
+            <div className="overflow-x-auto w-full">
+              <Table className="min-w-full">
                 <TableHeader>
                   <TableRow className="bg-gray-800">
-                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3">Convênio</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3">Tx Juros De</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3">Tx Juros Até</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3">Valor Mín.</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3">Meses De</TableHead>
-                    <TableHead className="text-white font-semibold text-xs uppercase text-blue-300 py-2 px-3">Meses Até</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3 min-w-[140px]">Convênio</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3 text-center min-w-[130px]">Tx Juros (De → Até)</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3 text-center min-w-[110px]">Meses (De → Até)</TableHead>
+                    <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3 text-center min-w-[90px]">Valor Mín.</TableHead>
                     {colunaExibida && (
-                      <TableHead className="text-amber-300 font-bold text-xs uppercase bg-amber-900 py-2 px-3">{labelAtivo(colunaExibida)}</TableHead>
+                      <TableHead className="text-amber-300 font-bold text-xs uppercase bg-amber-900 py-2 px-3 text-center min-w-[80px]">{labelAtivo(colunaExibida)}</TableHead>
                     )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {tabela.map((row: any) => (
                     <TableRow key={row.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium text-xs py-1 px-3">{row.convenio ?? '—'}</TableCell>
-                      <TableCell className="text-xs py-1 px-3">{row.txJurosDe ? fmtPct(row.txJurosDe) : '—'}</TableCell>
-                      <TableCell className="text-xs py-1 px-3">{row.txJurosAte === 'acima' ? 'acima' : (row.txJurosAte ? fmtPct(row.txJurosAte) : '—')}</TableCell>
-                      <TableCell className="text-xs py-1 px-3">{row.valorMinimo ?? '—'}</TableCell>
-                      <TableCell className="text-xs py-1 px-3">{row.mesesDe ?? '—'}</TableCell>
-                      <TableCell className="text-blue-700 font-semibold text-xs py-1 px-3">{row.mesesAte ?? '—'}</TableCell>
+                      <TableCell className="font-medium text-xs py-1 px-3 whitespace-nowrap">{row.convenio ?? '—'}</TableCell>
+                      <TableCell className="text-xs py-1 px-3 text-center whitespace-nowrap">
+                        <span className="text-gray-500">{row.txJurosDe ? fmtPct(row.txJurosDe) : '—'}</span>
+                        <span className="text-gray-400 mx-1">→</span>
+                        <span className="font-semibold text-gray-800">{row.txJurosAte === 'acima' ? 'acima' : (row.txJurosAte ? fmtPct(row.txJurosAte) : '—')}</span>
+                      </TableCell>
+                      <TableCell className="text-xs py-1 px-3 text-center whitespace-nowrap">
+                        <span className="text-gray-500">{row.mesesDe ?? '—'}</span>
+                        <span className="text-gray-400 mx-1">→</span>
+                        <span className="font-semibold text-blue-700">{row.mesesAte ?? '—'}</span>
+                      </TableCell>
+                      <TableCell className="text-xs py-1 px-3 text-center whitespace-nowrap">{row.valorMinimo ?? '—'}</TableCell>
                       {colunaExibida && (
-                        <TableCell className="font-bold text-amber-700 bg-amber-50 text-xs py-1 px-3">
+                        <TableCell className="font-bold text-amber-700 bg-amber-50 text-xs py-1 px-3 text-center whitespace-nowrap">
                           {fmtPct(row[colunaExibida])}
                         </TableCell>
                       )}
