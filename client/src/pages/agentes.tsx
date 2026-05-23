@@ -281,11 +281,8 @@ export default function AgentesPage() {
                   <TableHead>Número</TableHead>
                   <TableHead>Senha</TableHead>
                   <TableHead>Data Admissão</TableHead>
-                  <TableHead>Cargo</TableHead>
-                  <TableHead>Área</TableHead>
-                  <TableHead>Vínculo</TableHead>
-                  <TableHead>Certif. CONSIG / LGPD</TableHead>
-                  <TableHead>Certif. PLDFT</TableHead>
+                  <TableHead>Cargo / Área / Vínculo</TableHead>
+                  <TableHead>Certificações</TableHead>
                   <TableHead>Supervisor</TableHead>
                   <TableHead>UF</TableHead>
                   <TableHead>CPF</TableHead>
@@ -331,31 +328,31 @@ export default function AgentesPage() {
                       <TableCell className="font-medium text-sm">{agente.numCadastro}</TableCell>
                       <TableCell>{'*'.repeat(6)}</TableCell>
                       <TableCell>{agente.dataAdmissao ? formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '') : '-'}</TableCell>
-                      <TableCell>{agente.cargo}</TableCell>
-                      <TableCell>{agente.area}</TableCell>
-                      <TableCell>{agente.vinculo}</TableCell>
-                      {/* Certif. CONSIG */}
-                      <TableCell>
-                        {(() => {
-                          const key = agente.chaveJ?.trim().toUpperCase();
-                          const c = key && statusCerts ? statusCerts[key]?.consig : undefined;
-                          if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-400">-</span>;
-                          if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">{(c.dias ?? 0) === 0 ? 'Vencido hoje' : `Vencido há ${Math.abs(c.dias ?? 0)}d`}</Badge>;
-                           if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">Vence em {c.dias}d</Badge>;
-                           return <Badge className="bg-green-100 text-green-800 border-0 text-xs">A vencer {c.dias}d</Badge>;
-                         })()}
+                      {/* Cargo / Área / Vínculo compacto */}
+                      <TableCell className="min-w-[140px]">
+                        <div className="font-medium text-sm text-gray-900">{agente.cargo || '-'}</div>
+                        <div className="text-xs text-gray-500">{agente.area}{agente.vinculo ? ` · ${agente.vinculo}` : ''}</div>
                       </TableCell>
-                      {/* Certif. PLDFT */}
-                      <TableCell>
-
-                        {(() => {
-                          const key = agente.chaveJ?.trim().toUpperCase();
-                          const c = key && statusCerts ? statusCerts[key]?.lgpd : undefined;
-                          if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-400">-</span>;
-                          if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">{(c.dias ?? 0) === 0 ? 'Vencido hoje' : `Vencido há ${Math.abs(c.dias ?? 0)}d`}</Badge>;
-                           if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">Vence em {c.dias}d</Badge>;
-                           return <Badge className="bg-green-100 text-green-800 border-0 text-xs">A vencer {c.dias}d</Badge>;
-                         })()}
+                      {/* Certificações compactas */}
+                      <TableCell className="min-w-[130px]">
+                        <div className="flex flex-col gap-1">
+                          {(() => {
+                            const key = agente.chaveJ?.trim().toUpperCase();
+                            const c = key && statusCerts ? statusCerts[key]?.consig : undefined;
+                            if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-400">CONSIG: -</span>;
+                            if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">CONSIG: {(c.dias ?? 0) === 0 ? 'Vencido' : `Venc. há ${Math.abs(c.dias ?? 0)}d`}</Badge>;
+                            if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">CONSIG: {c.dias}d</Badge>;
+                            return <Badge className="bg-green-100 text-green-800 border-0 text-xs">CONSIG: {c.dias}d</Badge>;
+                          })()}
+                          {(() => {
+                            const key = agente.chaveJ?.trim().toUpperCase();
+                            const c = key && statusCerts ? statusCerts[key]?.lgpd : undefined;
+                            if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-400">PLDFT: -</span>;
+                            if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">PLDFT: {(c.dias ?? 0) === 0 ? 'Vencido' : `Venc. há ${Math.abs(c.dias ?? 0)}d`}</Badge>;
+                            if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">PLDFT: {c.dias}d</Badge>;
+                            return <Badge className="bg-green-100 text-green-800 border-0 text-xs">PLDFT: {c.dias}d</Badge>;
+                          })()}
+                        </div>
                       </TableCell>
 
                       <TableCell>{agente.supervisor}</TableCell>
