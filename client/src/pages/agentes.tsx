@@ -285,9 +285,7 @@ export default function AgentesPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="min-w-[260px]">Agente</TableHead>
-                  <TableHead>Data Admissão</TableHead>
-                  <TableHead>Cargo / Área / Vínculo</TableHead>
-                  <TableHead>Certificações</TableHead>
+                  <TableHead className="min-w-[200px]">Função / Certificações</TableHead>
                   <TableHead>Supervisor</TableHead>
                   <TableHead>CPF</TableHead>
 
@@ -347,15 +345,18 @@ export default function AgentesPage() {
                         {/* Linha 5: Cidade/UF */}
                         <div className="text-xs text-gray-400">{agente.cidade ? `${agente.cidade}${agente.uf ? `/${agente.uf}` : ''}` : (agente.uf || '')}</div>
                       </TableCell>
-                      <TableCell>{agente.dataAdmissao ? formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '') : '-'}</TableCell>
-                      {/* Cargo / Área / Vínculo compacto */}
-                      <TableCell className="min-w-[140px]">
-                        <div className="font-medium text-sm text-gray-900">{agente.cargo || '-'}</div>
-                        <div className="text-xs text-gray-500">{agente.area}{agente.vinculo ? ` · ${agente.vinculo}` : ''}</div>
-                      </TableCell>
-                      {/* Certificações compactas */}
-                      <TableCell className="min-w-[130px]">
-                        <div className="flex flex-col gap-1">
+                      {/* Função / Certificações unificadas */}
+                      <TableCell className="min-w-[200px]">
+                        {/* Admissão */}
+                        {agente.dataAdmissao && (
+                          <div className="text-xs text-gray-400 mb-0.5">Adm: {formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '')}</div>
+                        )}
+                        {/* Cargo · Área · Vínculo */}
+                        <div className="font-medium text-sm text-gray-900">
+                          {agente.cargo || '-'}{agente.area ? ` · ${agente.area}` : ''}{agente.vinculo ? ` · ${agente.vinculo}` : ''}
+                        </div>
+                        {/* Certificações */}
+                        <div className="flex gap-1 mt-1 flex-wrap">
                           {(() => {
                             const key = agente.chaveJ?.trim().toUpperCase();
                             const c = key && statusCerts ? statusCerts[key]?.consig : undefined;
