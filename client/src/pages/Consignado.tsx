@@ -711,7 +711,7 @@ export default function Consignado() {
         {isLoading ? (
           <div className="text-center py-12 text-gray-400">Carregando...</div>
         ) : (
-          <table className="w-full text-xs border-collapse min-w-[2200px]">
+          <table className="w-full text-xs border-collapse min-w-[900px]">
             <thead>
               <tr className="bg-gradient-to-r from-blue-800 to-blue-600 text-white">
                 {modoSelecao && (
@@ -724,33 +724,18 @@ export default function Consignado() {
                     />
                   </th>
                 )}
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Empresa</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Mês</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">ChaveJ</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Nome Agente</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Convênio</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Nr. Operação</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Vr. Bruto</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Vr. Líquido</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">RBM</th>
-                <th className="px-2 py-2 text-center font-semibold whitespace-nowrap">Parcela</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Prefixo BB</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Dt. Contratação</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Produto</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Descrição Produto</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Juros</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Restrição SRCC</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Perc. Pago</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Total Comissão</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Tabela</th>
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Supervisor</th>
+                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Agente</th>
+                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Operação</th>
+                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Valores</th>
+                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap">Produto / Condições</th>
+                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap">Comissão</th>
                 <th className="px-2 py-2 text-center font-semibold whitespace-nowrap">Ações</th>
               </tr>
             </thead>
             <tbody>
               {registrosFiltrados.length === 0 && (
                 <tr>
-                  <td colSpan={24} className="text-center py-10 text-gray-400">
+                  <td colSpan={6} className="text-center py-10 text-gray-400">
                     <p className="font-medium">Nenhum registro encontrado</p>
                     <p className="text-xs mt-1">Importe uma planilha ou cadastre manualmente</p>
                   </td>
@@ -775,31 +760,48 @@ export default function Consignado() {
                       />
                     </td>
                   )}
-                  <td className="px-2 py-1.5 border-b border-gray-100 font-medium text-blue-900">{strVal(r.empresa)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{mesNumParaStr(r.mes)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 font-mono">{strVal(r.chaveJ)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 whitespace-nowrap">{strVal(r.nomeAgente)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.convenio)}</td>
-                  <td className={`px-2 py-1.5 border-b border-gray-100 font-mono ${
-                    r.isDuplicate ? 'bg-red-100 text-red-900 font-bold' : ''
-                  }`}>
-                    {strVal(r.nrOperacao)}
-                    {r.isDuplicate && <span className="ml-1 text-red-600">⚠️</span>}
+                  {/* Coluna Agente */}
+                  <td className="px-2 py-1.5 border-b border-gray-100">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="font-mono text-[11px] text-blue-700 font-semibold">{strVal(r.chaveJ)}</span>
+                      <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{strVal(r.empresa)}</span>
+                      <span className="text-[9px] text-gray-400">{mesNumParaStr(r.mes)}</span>
+                    </div>
+                    <div className="text-[11px] text-gray-800 font-medium whitespace-nowrap">{strVal(r.nomeAgente)}</div>
+                    {r.supervisor && <div className="text-[10px] text-gray-400">Sup: {r.supervisor}</div>}
                   </td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{moeda(r.valorBruto)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right font-semibold text-blue-800">{moeda(r.valorLiquido)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{moeda(r.rbm)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-center">{r.parcela ?? '-'}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.prefixoBB)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.dtContratacao)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.produto)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 max-w-32 truncate" title={r.descricaoProduto || ''}>{strVal(r.descricaoProduto)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pctJuros(r.juros)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.restricaoSRCC)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right">{pct(r.percPago)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right font-semibold text-green-700">{moeda(r.totalComissao)}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{r.tabela && r.tabela !== 'NULL' && r.tabela !== '0' ? r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1') : '-'}</td>
-                  <td className="px-2 py-1.5 border-b border-gray-100">{strVal(r.supervisor)}</td>
+                  {/* Coluna Operação */}
+                  <td className="px-2 py-1.5 border-b border-gray-100">
+                    <div className="text-[11px] text-gray-700 font-medium">{strVal(r.convenio)}</div>
+                    <div className={`font-mono text-[10px] ${r.isDuplicate ? 'text-red-700 font-bold' : 'text-gray-500'}`}>
+                      {strVal(r.nrOperacao)}{r.isDuplicate && <span className="ml-1">⚠️</span>}
+                    </div>
+                    {r.dtContratacao && <div className="text-[10px] text-gray-400">{strVal(r.dtContratacao)}</div>}
+                  </td>
+                  {/* Coluna Valores */}
+                  <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
+                    <div className="font-bold text-blue-800 text-[12px]">{moeda(r.valorLiquido)}</div>
+                    <div className="text-[10px] text-gray-400">Bruto: {moeda(r.valorBruto)}</div>
+                    <div className="text-[10px] text-gray-400">RBM: {moeda(r.rbm)}</div>
+                    {r.parcela != null && <div className="text-[10px] text-gray-400">Parcela: {r.parcela}</div>}
+                  </td>
+                  {/* Coluna Produto / Condições */}
+                  <td className="px-2 py-1.5 border-b border-gray-100">
+                    <div className="text-[11px] text-gray-700 font-medium">{strVal(r.produto)}</div>
+                    {r.descricaoProduto && <div className="text-[10px] text-gray-500 max-w-[160px] truncate" title={r.descricaoProduto}>{r.descricaoProduto}</div>}
+                    <div className="text-[10px] text-gray-400">
+                      {r.juros ? `Juros: ${pctJuros(r.juros)}` : ''}{r.prefixoBB ? ` · BB: ${r.prefixoBB}` : ''}
+                    </div>
+                    {r.restricaoSRCC && <div className="text-[10px] text-orange-600">SRCC: {r.restricaoSRCC}</div>}
+                  </td>
+                  {/* Coluna Comissão */}
+                  <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
+                    <div className="font-bold text-green-700 text-[12px]">{moeda(r.totalComissao)}</div>
+                    <div className="text-[10px] text-gray-400">{pct(r.percPago)} pago</div>
+                    {r.tabela && r.tabela !== 'NULL' && r.tabela !== '0' && (
+                      <div className="text-[10px] text-gray-500">{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
+                    )}
+                  </td>
                   <td className="px-2 py-1.5 border-b border-gray-100">
                     <div className="flex gap-1 justify-center">
                       <button onClick={() => openEditar(r)} className="p-1 rounded hover:bg-blue-100 text-blue-600" title="Editar">
