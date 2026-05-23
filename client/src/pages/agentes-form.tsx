@@ -118,6 +118,7 @@ export default function AgentesFormPage() {
     supervisor: "",
     email: "",
     favorecido: "",
+    favProprio: false as boolean,
     banco: "",
     agencia: "",
     conta: "",
@@ -220,6 +221,7 @@ export default function AgentesFormPage() {
       
       // Apenas incluir campos que têm valor (não vazios)
       Object.entries(formData).forEach(([key, value]) => {
+        if (key === 'favProprio') { normalizedData[key] = value; return; }
         if (value && value !== '') {
           // Para datas, manter apenas YYYY-MM-DD sem conversão de fuso
           if (key === 'dataNascimento' || key === 'dataAdmissao') {
@@ -277,6 +279,7 @@ export default function AgentesFormPage() {
         supervisor: agente.supervisor || "",
         email: agente.email || "",
         favorecido: agente.favorecido || "",
+        favProprio: (agente as any).favProprio ?? false,
         banco: agente.banco || "",
         agencia: agente.agencia || "",
         conta: agente.conta || "",
@@ -611,14 +614,38 @@ export default function AgentesFormPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="favorecido">Favorecido</Label>
-                <Input
-                  id="favorecido"
-                  name="favorecido"
-                  value={formData.favorecido}
-                  onChange={handleInputChange}
-                />
+              {/* Favorecido: checkbox próprio + campo condicional */}
+              <div className="col-span-1 md:col-span-3">
+                <Label className="text-sm font-medium text-gray-700">Favorecido</Label>
+                <div className="mt-2 flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50">
+                  <input
+                    type="checkbox"
+                    id="favProprio"
+                    checked={formData.favProprio}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      favProprio: e.target.checked,
+                      favorecido: e.target.checked ? prev.nomeAgente : prev.favorecido,
+                    }))}
+                    className="w-4 h-4 accent-blue-600 cursor-pointer"
+                  />
+                  <label htmlFor="favProprio" className="text-sm text-gray-700 cursor-pointer select-none">
+                    Favorecido é o próprio agente
+                  </label>
+                </div>
+                {!formData.favProprio && (
+                  <div className="mt-2">
+                    <Label htmlFor="favorecido" className="text-xs text-gray-500">Nome do Favorecido (diferente do agente)</Label>
+                    <Input
+                      id="favorecido"
+                      name="favorecido"
+                      placeholder="Nome completo do favorecido"
+                      value={formData.favorecido}
+                      onChange={handleInputChange}
+                      className="mt-1"
+                    />
+                  </div>
+                )}
               </div>
               <div>
                 <Label htmlFor="banco">Banco</Label>

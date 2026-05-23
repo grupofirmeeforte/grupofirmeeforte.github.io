@@ -387,6 +387,16 @@ export default function AgentesPage() {
                             {agente.banco}{agente.agencia ? ` · Ag ${agente.agencia}` : ''}{agente.conta ? ` · Cc ${agente.conta}` : ''}
                           </div>
                         ) : <span className="text-xs text-slate-400">-</span>}
+                        {/* Favorecido */}
+                        {((agente as any).favProprio || agente.favorecido) && (
+                          <div className="text-[10px] text-slate-600 mt-0.5 flex items-center gap-1">
+                            <span className="font-medium">Fav:</span>
+                            {(agente as any).favProprio
+                              ? <span className="text-emerald-700">{agente.nomeAgente} <span className="text-[9px] bg-emerald-100 text-emerald-700 rounded px-1">próprio</span></span>
+                              : <span>{agente.favorecido}</span>
+                            }
+                          </div>
+                        )}
                         {agente.pix && (
                           <div className="text-xs text-blue-600 mt-0.5">PIX: {agente.pix}</div>
                         )}

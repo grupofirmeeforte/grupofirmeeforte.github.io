@@ -66,6 +66,7 @@ export const agentes = mysqlTable('agentes', {
   supervisor: varchar("supervisor", { length: 255 }),
   email: varchar("email", { length: 255 }),
   favorecido: varchar("favorecido", { length: 255 }),
+  favProprio: boolean("favProprio").default(false),
   banco: varchar("banco", { length: 100 }),
   agencia: varchar("agencia", { length: 50 }),
   conta: varchar("conta", { length: 50 }),

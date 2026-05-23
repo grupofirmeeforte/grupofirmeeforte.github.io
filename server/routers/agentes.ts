@@ -22,6 +22,7 @@ const agenteSchema = z.object({
   supervisor: z.string().optional(),
   email: z.string().email().optional(),
   favorecido: z.string().optional(),
+  favProprio: z.boolean().optional(),
   banco: z.string().optional(),
   agencia: z.string().optional(),
   conta: z.string().optional(),
