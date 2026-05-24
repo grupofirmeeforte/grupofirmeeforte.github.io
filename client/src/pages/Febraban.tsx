@@ -125,7 +125,12 @@ const PERIODOS: {value: Periodo; label: string}[] = [
 function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros: any }) {
   const [periodoChaveJ, setPeriodoChaveJ] = useState<Periodo>('trimestre');
   const [periodoTipo, setPeriodoTipo] = useState<Periodo>('trimestre');
-  const empresaFiltro = empresa !== '__all__' ? empresa : undefined;
+  const [empresaSel, setEmpresaSel] = useState<string>('__all__');
+  const { data: filtrosData } = trpc.febraban.filtros.useQuery();
+  const empresasDisponiveis = filtrosData?.empresas ?? [];
+  // usa empresa do filtro da aba Produção se definida, senão usa seletor próprio
+  const empresaEfetiva = empresa !== '__all__' ? empresa : empresaSel;
+  const empresaFiltro = empresaEfetiva !== '__all__' ? empresaEfetiva : undefined;
 
   const { data: dadosChaveJ, isLoading: loadChaveJ } = trpc.febraban.graficoPorPeriodo.useQuery({ periodo: periodoChaveJ, empresa: empresaFiltro });
   const { data: dadosTipo, isLoading: loadTipo } = trpc.febraban.graficoPorTipo.useQuery({ periodo: periodoTipo, empresa: empresaFiltro });
@@ -148,6 +153,22 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
 
   return (
     <div className="space-y-6">
+      {/* Filtro de empresa — só aparece quando o filtro da aba Produção não está ativo */}
+      {empresa === '__all__' && (
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-sm font-semibold text-gray-600">Filtrar por empresa:</span>
+          <div className="flex gap-2 flex-wrap">
+            <Button size="sm" variant={empresaSel === '__all__' ? 'default' : 'outline'}
+              className={`text-xs h-7 px-3 ${empresaSel === '__all__' ? 'bg-gray-800 text-white' : ''}`}
+              onClick={() => setEmpresaSel('__all__')}>Todas</Button>
+            {empresasDisponiveis.map(emp => (
+              <Button key={emp} size="sm" variant={empresaSel === emp ? 'default' : 'outline'}
+                className={`text-xs h-7 px-3 ${empresaSel === emp ? 'bg-blue-700 text-white' : ''}`}
+                onClick={() => setEmpresaSel(emp)}>{emp}</Button>
+            ))}
+          </div>
+        </div>
+      )}
       {/* Gráfico 1: Por ChaveJ */}
       <Card>
         <CardHeader className="pb-3 border-b">
