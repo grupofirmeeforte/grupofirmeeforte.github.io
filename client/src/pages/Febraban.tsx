@@ -177,7 +177,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
                 {top10.map((s, i) => (
                   <div key={s.name} className="rounded-lg border p-2 text-center" style={{ borderColor: CORES[i%CORES.length]+'44', background: CORES[i%CORES.length]+'0d' }}>
                     <p className="text-[10px] font-bold uppercase tracking-wide truncate" style={{ color: CORES[i%CORES.length] }}>{s.name}</p>
-                    <p className="text-sm font-bold text-gray-800 mt-0.5">{fmtK(s.total)}</p>
+                    <p className="text-sm font-bold text-gray-800 mt-0.5">{fmtFull(s.total)}</p>
                   </div>
                 ))}
               </div>
@@ -227,17 +227,17 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
               <div className="grid grid-cols-3 gap-3 mb-4">
                 <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center">
                   <p className="text-[10px] font-bold uppercase tracking-wide text-blue-600">Financ. Novo</p>
-                  <p className="text-lg font-bold text-blue-800">{fmtK(totalNovo)}</p>
+                  <p className="text-lg font-bold text-blue-800">{fmtFull(totalNovo)}</p>
                   <p className="text-xs text-blue-500">{totalGeral>0?((totalNovo/totalGeral)*100).toFixed(1):0}%</p>
                 </div>
                 <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 text-center">
                   <p className="text-[10px] font-bold uppercase tracking-wide text-orange-600">Troco/Refin</p>
-                  <p className="text-lg font-bold text-orange-800">{fmtK(totalRefin)}</p>
+                  <p className="text-lg font-bold text-orange-800">{fmtFull(totalRefin)}</p>
                   <p className="text-xs text-orange-500">{totalGeral>0?((totalRefin/totalGeral)*100).toFixed(1):0}%</p>
                 </div>
                 <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-center">
                   <p className="text-[10px] font-bold uppercase tracking-wide text-red-600">Cancelados</p>
-                  <p className="text-lg font-bold text-red-800">{fmtK(totalCancelado)}</p>
+                  <p className="text-lg font-bold text-red-800">{fmtFull(totalCancelado)}</p>
                   <p className="text-xs text-red-500">{totalGeral>0?((totalCancelado/totalGeral)*100).toFixed(1):0}%</p>
                 </div>
               </div>
