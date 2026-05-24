@@ -154,7 +154,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
           <div className="flex items-center justify-between flex-wrap gap-3">
             <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-blue-600" />
-              Produção por ChaveJ — Valor Líquido (Contratadas 2026)
+              Produção por ChaveJ — Valor Líquido (Contratadas)
             </CardTitle>
             <div className="flex gap-1">
               {PERIODOS.map(p => (

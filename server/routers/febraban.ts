@@ -879,13 +879,11 @@ export const febrabanRouter = {
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) return { series: [], labels: [], agentes: [] };
-      // Filtrar apenas 2026: mesano termina em '26' (ex: 126, 226, ..., 1226)
       const rows = await db
         .select({ mesano: febraban.mesano, operador: febraban.operador, troco: febraban.troco })
         .from(febraban)
         .where(and(
           eq(febraban.situacao, 'Contratada'),
-          sql`mesano % 100 = 26`,
           input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`
         ));
       const parseMesano = (m: number) => { const s = String(m); return { mes: parseInt(s.slice(0, s.length - 2)), ano: parseInt('20' + s.slice(-2)) }; };
@@ -919,7 +917,7 @@ export const febrabanRouter = {
       const rows = await db
         .select({ mesano: febraban.mesano, situacao: febraban.situacao, troco: febraban.troco, financiado: febraban.financiado })
         .from(febraban)
-        .where(and(sql`mesano >= 126`, input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`));
+        .where(input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`);
       const parseMesano = (m: number) => { const s = String(m); return { mes: parseInt(s.slice(0, s.length - 2)), ano: parseInt('20' + s.slice(-2)) }; };
       const getLabel = (m: number) => { const { mes, ano } = parseMesano(m); if (input.periodo === 'bimestre') return `${Math.ceil(mes / 2)}º Bim/${ano}`; if (input.periodo === 'trimestre') return `${Math.ceil(mes / 3)}º Tri/${ano}`; if (input.periodo === 'semestre') return `${mes <= 6 ? 1 : 2}º Sem/${ano}`; return String(ano); };
       const getOrder = (m: number) => { const { mes, ano } = parseMesano(m); if (input.periodo === 'bimestre') return ano * 100 + Math.ceil(mes / 2); if (input.periodo === 'trimestre') return ano * 100 + Math.ceil(mes / 3); if (input.periodo === 'semestre') return ano * 100 + (mes <= 6 ? 1 : 2); return ano; };
