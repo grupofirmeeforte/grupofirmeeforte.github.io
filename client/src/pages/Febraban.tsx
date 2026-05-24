@@ -276,6 +276,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
 
 export default function FebrabanPage() {
   const [, navigate] = useLocation();
+  const abaInicial = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('aba') === 'graficos' ? 'graficos' : 'producao';
   const [search, setSearch] = useState("");
   const [empresa, setEmpresa] = useState("__all__");
   const [mesano, setMesano] = useState<number | undefined>();
@@ -852,7 +853,7 @@ export default function FebrabanPage() {
       </div>
 
       {/* Abas: Produção / Gráficos */}
-      <Tabs defaultValue="producao" className="w-full">
+      <Tabs defaultValue={abaInicial} className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="producao" className="gap-2"><Search className="w-3.5 h-3.5" />Produção</TabsTrigger>
           <TabsTrigger value="graficos" className="gap-2"><BarChart2 className="w-3.5 h-3.5" />Gráficos</TabsTrigger>
