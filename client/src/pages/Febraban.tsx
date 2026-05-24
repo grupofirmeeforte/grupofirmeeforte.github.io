@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,12 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Upload, Edit2, Trash2, ArrowLeft, Download, BarChart2 } from "lucide-react";
+import { Search, Upload, Edit2, Trash2, ArrowLeft, Download, BarChart2, TrendingUp, PieChart } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartTooltip,
+  Legend, ResponsiveContainer, LineChart, Line,
+} from "recharts";
 import * as XLSX from "xlsx";
 import { formatMesAno } from "@/lib/mesano";
 import PageHeader from "@/components/PageHeader";
@@ -85,6 +90,189 @@ type FebRow = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+// ─── Paleta de cores para agentes ───────────────────────────────────────────
+const CORES = ["#2563eb","#16a34a","#dc2626","#d97706","#7c3aed","#0891b2","#be185d","#65a30d","#ea580c","#0d9488"];
+const fmtK = (v: number) => { if (Math.abs(v)>=1_000_000) return `R$ ${(v/1_000_000).toFixed(1)}M`; if (Math.abs(v)>=1_000) return `R$ ${(v/1_000).toFixed(0)}k`; return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:0,maximumFractionDigits:0}); };
+const fmtFull = (v: number) => v.toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2});
+
+function GrafTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-xs max-w-[220px]">
+      <p className="font-bold text-gray-700 mb-2">{label}</p>
+      {payload.map((p: any, i: number) => (
+        <div key={i} className="flex items-center justify-between gap-3 mb-1">
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full inline-block" style={{ background: p.fill || p.color }} />
+            <span className="text-gray-600 truncate max-w-[110px]">{p.name}</span>
+          </span>
+          <span className="font-semibold text-gray-800">{fmtK(p.value)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+type Periodo = 'bimestre'|'trimestre'|'semestre'|'ano';
+const PERIODOS: {value: Periodo; label: string}[] = [
+  {value:'bimestre',label:'Bimestre'},
+  {value:'trimestre',label:'Trimestre'},
+  {value:'semestre',label:'Semestre'},
+  {value:'ano',label:'Ano'},
+];
+
+function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros: any }) {
+  const [periodoChaveJ, setPeriodoChaveJ] = useState<Periodo>('trimestre');
+  const [periodoTipo, setPeriodoTipo] = useState<Periodo>('trimestre');
+  const empresaFiltro = empresa !== '__all__' ? empresa : undefined;
+
+  const { data: dadosChaveJ, isLoading: loadChaveJ } = trpc.febraban.graficoPorPeriodo.useQuery({ periodo: periodoChaveJ, empresa: empresaFiltro });
+  const { data: dadosTipo, isLoading: loadTipo } = trpc.febraban.graficoPorTipo.useQuery({ periodo: periodoTipo, empresa: empresaFiltro });
+
+  const seriesChaveJ = dadosChaveJ?.series ?? [];
+  const labelsChaveJ = dadosChaveJ?.labels ?? [];
+  const top10 = useMemo(() => seriesChaveJ.slice(0, 10), [seriesChaveJ]);
+  const chartDataChaveJ = useMemo(() =>
+    labelsChaveJ.map((label, i) => {
+      const obj: Record<string, any> = { label };
+      top10.forEach(s => { obj[s.name] = s.data[i] ?? 0; });
+      return obj;
+    }), [labelsChaveJ, top10]);
+
+  const chartDataTipo = dadosTipo?.data ?? [];
+  const totalNovo = chartDataTipo.reduce((s, r) => s + r.novo, 0);
+  const totalRefin = chartDataTipo.reduce((s, r) => s + r.refin, 0);
+  const totalCancelado = chartDataTipo.reduce((s, r) => s + r.cancelado, 0);
+  const totalGeral = totalNovo + totalRefin + totalCancelado;
+
+  return (
+    <div className="space-y-6">
+      {/* Gráfico 1: Por ChaveJ */}
+      <Card>
+        <CardHeader className="pb-3 border-b">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-blue-600" />
+              Produção por ChaveJ — Valor Líquido (Contratadas 2026)
+            </CardTitle>
+            <div className="flex gap-1">
+              {PERIODOS.map(p => (
+                <Button key={p.value} size="sm"
+                  variant={periodoChaveJ === p.value ? 'default' : 'outline'}
+                  className={`text-xs h-7 px-3 ${periodoChaveJ === p.value ? 'bg-blue-600 text-white' : ''}`}
+                  onClick={() => setPeriodoChaveJ(p.value)}>{p.label}</Button>
+              ))}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-4">
+          {loadChaveJ ? (
+            <div className="flex items-center justify-center py-16 text-gray-400">Carregando...</div>
+          ) : !labelsChaveJ.length ? (
+            <div className="flex items-center justify-center py-16 text-gray-400">Nenhum dado disponível para 2026.</div>
+          ) : (
+            <div>
+              <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                {top10.map((s, i) => (
+                  <div key={s.name} className="rounded-lg border p-2 text-center" style={{ borderColor: CORES[i%CORES.length]+'44', background: CORES[i%CORES.length]+'0d' }}>
+                    <p className="text-[10px] font-bold uppercase tracking-wide truncate" style={{ color: CORES[i%CORES.length] }}>{s.name}</p>
+                    <p className="text-sm font-bold text-gray-800 mt-0.5">{fmtK(s.total)}</p>
+                  </div>
+                ))}
+              </div>
+              <ResponsiveContainer width="100%" height={320}>
+                <BarChart data={chartDataChaveJ} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+                  <YAxis tickFormatter={fmtK} tick={{ fontSize: 10 }} width={72} />
+                  <RechartTooltip content={<GrafTooltip />} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  {top10.map((s, i) => (
+                    <Bar key={s.name} dataKey={s.name} stackId="a" fill={CORES[i%CORES.length]}
+                      radius={i === top10.length-1 ? [4,4,0,0] : [0,0,0,0]} />
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Gráfico 2: Por Tipo */}
+      <Card>
+        <CardHeader className="pb-3 border-b">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
+              <PieChart className="w-4 h-4 text-orange-600" />
+              Por Tipo — Financ. Novo / Troco-Refin / Cancelados
+            </CardTitle>
+            <div className="flex gap-1">
+              {PERIODOS.map(p => (
+                <Button key={p.value} size="sm"
+                  variant={periodoTipo === p.value ? 'default' : 'outline'}
+                  className={`text-xs h-7 px-3 ${periodoTipo === p.value ? 'bg-orange-600 text-white' : ''}`}
+                  onClick={() => setPeriodoTipo(p.value)}>{p.label}</Button>
+              ))}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-4">
+          {loadTipo ? (
+            <div className="flex items-center justify-center py-16 text-gray-400">Carregando...</div>
+          ) : !chartDataTipo.length ? (
+            <div className="flex items-center justify-center py-16 text-gray-400">Nenhum dado disponível.</div>
+          ) : (
+            <div>
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-blue-600">Financ. Novo</p>
+                  <p className="text-lg font-bold text-blue-800">{fmtK(totalNovo)}</p>
+                  <p className="text-xs text-blue-500">{totalGeral>0?((totalNovo/totalGeral)*100).toFixed(1):0}%</p>
+                </div>
+                <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-orange-600">Troco/Refin</p>
+                  <p className="text-lg font-bold text-orange-800">{fmtK(totalRefin)}</p>
+                  <p className="text-xs text-orange-500">{totalGeral>0?((totalRefin/totalGeral)*100).toFixed(1):0}%</p>
+                </div>
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-red-600">Cancelados</p>
+                  <p className="text-lg font-bold text-red-800">{fmtK(totalCancelado)}</p>
+                  <p className="text-xs text-red-500">{totalGeral>0?((totalCancelado/totalGeral)*100).toFixed(1):0}%</p>
+                </div>
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartDataTipo} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="periodo" tick={{ fontSize: 11 }} />
+                  <YAxis tickFormatter={fmtK} tick={{ fontSize: 10 }} width={72} />
+                  <RechartTooltip content={<GrafTooltip />} />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  <Bar dataKey="novo" name="Financ. Novo" stackId="a" fill="#2563eb" />
+                  <Bar dataKey="refin" name="Troco/Refin" stackId="a" fill="#f97316" />
+                  <Bar dataKey="cancelado" name="Cancelados" stackId="a" fill="#ef4444" radius={[4,4,0,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-4">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Evolução do Volume Total Contratado</p>
+                <ResponsiveContainer width="100%" height={160}>
+                  <LineChart data={chartDataTipo} margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="periodo" tick={{ fontSize: 11 }} />
+                    <YAxis tickFormatter={fmtK} tick={{ fontSize: 10 }} width={72} />
+                    <RechartTooltip formatter={(v: any) => [fmtFull(v), 'Total']} labelStyle={{ fontWeight: 'bold' }} />
+                    <Line type="monotone" dataKey={(d) => d.novo + d.refin} name="Total Contratado"
+                      stroke="#16a34a" strokeWidth={2} dot={{ r: 4, fill: '#16a34a' }} activeDot={{ r: 6 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 export default function FebrabanPage() {
   const [, navigate] = useLocation();
@@ -623,13 +811,7 @@ export default function FebrabanPage() {
             <BarChart2 className="w-4 h-4" />
             Acomp. Diário
           </Button>
-          <Button
-            className="gap-2 bg-blue-700 text-white hover:bg-blue-800"
-            onClick={() => navigate("/febraban/graficos")}
-          >
-            <BarChart2 className="w-4 h-4" />
-            Gráficos de Produção
-          </Button>
+
           <Button
             variant="outline"
             className="gap-2 border-green-500 text-green-700 hover:bg-green-50"
@@ -669,6 +851,14 @@ export default function FebrabanPage() {
         </div>
       </div>
 
+      {/* Abas: Produção / Gráficos */}
+      <Tabs defaultValue="producao" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="producao" className="gap-2"><Search className="w-3.5 h-3.5" />Produção</TabsTrigger>
+          <TabsTrigger value="graficos" className="gap-2"><BarChart2 className="w-3.5 h-3.5" />Gráficos</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="producao">
       {/* Filtros */}
       <Card>
         <CardHeader className="pb-2">
@@ -869,6 +1059,15 @@ export default function FebrabanPage() {
           )}
         </CardContent>
       </Card>
+
+        </TabsContent>
+
+        {/* ABA GRÁFICOS */}
+        <TabsContent value="graficos">
+          <GraficosProducaoInline empresa={empresa} filtros={filtros} />
+        </TabsContent>
+
+      </Tabs>
 
       {/* Painel de Importação — sem Dialog shadcn para evitar bloqueio do file picker */}
       {importModal && (

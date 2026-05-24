@@ -879,12 +879,13 @@ export const febrabanRouter = {
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) return { series: [], labels: [], agentes: [] };
+      // Filtrar apenas 2026: mesano termina em '26' (ex: 126, 226, ..., 1226)
       const rows = await db
         .select({ mesano: febraban.mesano, operador: febraban.operador, troco: febraban.troco })
         .from(febraban)
         .where(and(
           eq(febraban.situacao, 'Contratada'),
-          sql`mesano >= 126`,
+          sql`mesano % 100 = 26`,
           input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`
         ));
       const parseMesano = (m: number) => { const s = String(m); return { mes: parseInt(s.slice(0, s.length - 2)), ano: parseInt('20' + s.slice(-2)) }; };
