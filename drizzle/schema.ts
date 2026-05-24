@@ -648,6 +648,9 @@ export const auditoria = mysqlTable("auditoria", {
   valorNovo: text("valorNovo"),
   ipAddress: varchar("ipAddress", { length: 50 }),
   userAgent: text("userAgent"),
+  latitude: varchar("latitude", { length: 30 }),
+  longitude: varchar("longitude", { length: 30 }),
+  geoEndereco: varchar("geoEndereco", { length: 500 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({

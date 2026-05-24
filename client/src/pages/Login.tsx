@@ -61,6 +61,12 @@ export default function Login() {
   const [welcomeData, setWelcomeData] = useState<{ nome: string; isAniversario: boolean } | null>(null);
   const [, setLocation] = useLocation();
 
+  // Geolocalização
+  const CHAVES_ISENTAS_GEO = ['J1234567', 'JBMF1234'];
+  const isIsentoGeo = CHAVES_ISENTAS_GEO.includes(chaveJ.trim().toUpperCase());
+  const [geoStatus, setGeoStatus] = useState<'idle' | 'requesting' | 'granted' | 'denied' | 'unavailable'>('idle');
+  const [geoCoords, setGeoCoords] = useState<{ latitude: string; longitude: string } | null>(null);
+
   // CAPTCHA
   const [operacao, setOperacao] = useState(() => gerarOperacao());
   const [respostaMath, setRespostaMath] = useState('');
@@ -128,7 +134,42 @@ export default function Login() {
     setMathError(false);
     document.cookie = 'app_session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     document.cookie = 'sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    loginMutation.mutate({ chaveJ, senha });
+
+    // Se isento de geo, faz login direto
+    if (isIsentoGeo) {
+      loginMutation.mutate({ chaveJ, senha });
+      return;
+    }
+
+    // Verificar se geo já foi capturada
+    if (geoCoords) {
+      loginMutation.mutate({ chaveJ, senha, latitude: geoCoords.latitude, longitude: geoCoords.longitude });
+      return;
+    }
+
+    // Solicitar geolocalização antes do login
+    if (!navigator.geolocation) {
+      setGeoStatus('unavailable');
+      setError('Geolocalização não suportada neste navegador. Acesso bloqueado.');
+      return;
+    }
+    setGeoStatus('requesting');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const coords = {
+          latitude: String(pos.coords.latitude),
+          longitude: String(pos.coords.longitude),
+        };
+        setGeoCoords(coords);
+        setGeoStatus('granted');
+        loginMutation.mutate({ chaveJ, senha, latitude: coords.latitude, longitude: coords.longitude });
+      },
+      () => {
+        setGeoStatus('denied');
+        setError('Geolocalização negada. Permita o acesso à localização para entrar no sistema.');
+      },
+      { timeout: 10000, maximumAge: 60000 }
+    );
   };
 
   // ── Cadastrar biometria (após login normal) ──────────────────────────────
@@ -413,6 +454,20 @@ export default function Login() {
               {mathError && <p className="text-xs text-red-600 mt-1">Resposta incorreta. Tente a nova operação.</p>}
             </div>
 
+            {/* Indicador de geolocalização */}
+            {!isIsentoGeo && geoStatus === 'requesting' && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                <span className="animate-spin text-blue-600">&#8635;</span>
+                <p className="text-sm text-blue-700">Aguardando permissão de localização...</p>
+              </div>
+            )}
+            {!isIsentoGeo && geoStatus === 'granted' && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-200">
+                <span className="text-green-600">&#10003;</span>
+                <p className="text-sm text-green-700">Localização capturada com sucesso.</p>
+              </div>
+            )}
+
             {error && (
               <div className={`flex items-start gap-3 p-3 rounded-lg ${isBlocked ? 'bg-red-50 border border-red-200' : 'bg-yellow-50 border border-yellow-200'}`}>
                 <AlertCircle className={`w-5 h-5 mt-0.5 shrink-0 ${isBlocked ? 'text-red-600' : 'text-yellow-600'}`} />
@@ -422,13 +477,13 @@ export default function Login() {
 
             <Button
               type="submit"
-              disabled={isBlocked || loginMutation.isPending}
+              disabled={isBlocked || loginMutation.isPending || geoStatus === 'requesting'}
               className="w-full text-white font-semibold py-2 rounded-lg transition-colors"
               style={{ backgroundColor: '#002776' }}
             >
               {isBlocked ? (
                 <span className="flex items-center gap-2"><Lock className="w-4 h-4" />Sistema Bloqueado</span>
-              ) : loginMutation.isPending ? 'Entrando...' : 'Entrar'}
+              ) : geoStatus === 'requesting' ? 'Aguardando localização...' : loginMutation.isPending ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
 

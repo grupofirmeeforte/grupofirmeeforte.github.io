@@ -87,6 +87,9 @@ export const appRouter = router({
       .input(z.object({
         chaveJ: z.string().min(1, "ChaveJ é obrigatório"),
         senha: z.string().min(1, "Senha é obrigatória"),
+        latitude: z.string().optional(),
+        longitude: z.string().optional(),
+        geoEndereco: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         // Verificar se está bloqueado
@@ -133,6 +136,9 @@ export const appRouter = router({
           loginMethod: "custom",
         });
         
+        // Lista de ChaveJs isentas de geolocalização
+        const CHAVES_ISENTAS_GEO = ['J1234567', 'JBMF1234'];
+        const isentoGeo = CHAVES_ISENTAS_GEO.includes(agente.chaveJ?.toUpperCase?.() ?? '');
         // Criar registro de auditoria
         await createAuditLog({
           agenteId: agente.id,
@@ -144,6 +150,9 @@ export const appRouter = router({
           descricao: `Agente ${agente.nomeAgente} fez login no sistema`,
           ipAddress: (ctx.req as any).ip || (ctx.req.headers as any)['x-forwarded-for'] || 'unknown',
           userAgent: (ctx.req.headers as any)['user-agent'] || 'unknown',
+          latitude: isentoGeo ? null : (input.latitude ?? null),
+          longitude: isentoGeo ? null : (input.longitude ?? null),
+          geoEndereco: isentoGeo ? null : (input.geoEndereco ?? null),
         });
         
         // Criar token de sessão customizado
@@ -278,7 +287,7 @@ export const appRouter = router({
         }
 
         // Verificar se o agente tem acesso irrestrito (sem bloqueio de horário)
-        const AGENTES_ACESSO_IRRESTRITO = ['Sidnei Honorato Ultramare'];
+        const AGENTES_ACESSO_IRRESTRITO = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
         const acessoIrrestrito = AGENTES_ACESSO_IRRESTRITO.some(
           nome => agente.nomeAgente?.toLowerCase().trim() === nome.toLowerCase().trim()
         );
@@ -315,6 +324,7 @@ export const appRouter = router({
           numeroEntrada,
           isAniversario,
           acessoIrrestrito,
+          isentoGeo,
           agente: {
             id: agente.id,
             chaveJ: agente.chaveJ,
