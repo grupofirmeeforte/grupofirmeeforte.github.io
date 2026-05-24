@@ -6,7 +6,8 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key, Calendar, TrendingUp, Construction, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key, Calendar, TrendingUp, Construction, CheckCircle2, Clock, AlertTriangle, Search, Filter } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import PageHeader from "@/components/PageHeader";
 
@@ -71,9 +72,49 @@ function PainelIdentificacao({ chaveJ, nomeAgente, mesRef }: {
   );
 }
 
+// ─── PAINEL DE FILTROS PARA ADMIN/SUPORTE ────────────────────────────────────
+function PainelFiltros({ filtroChaveJ, setFiltroChaveJ, filtroNome, setFiltroNome, filtroMes, setFiltroMes, onBuscar }: {
+  filtroChaveJ: string; setFiltroChaveJ: (v: string) => void;
+  filtroNome: string; setFiltroNome: (v: string) => void;
+  filtroMes: string; setFiltroMes: (v: string) => void;
+  onBuscar: () => void;
+}) {
+  return (
+    <div className="mb-5 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+      <div className="flex items-center gap-2 mb-3">
+        <Filter className="w-4 h-4 text-indigo-600" />
+        <span className="text-sm font-semibold text-indigo-700">Filtrar por agente</span>
+      </div>
+      <div className="flex flex-wrap gap-3 items-end">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-indigo-600 font-medium">ChaveJ</label>
+          <Input value={filtroChaveJ} onChange={e => setFiltroChaveJ(e.target.value)} placeholder="Ex: J1234567" className="w-36 h-8 text-sm" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-indigo-600 font-medium">Nome do Agente</label>
+          <Input value={filtroNome} onChange={e => setFiltroNome(e.target.value)} placeholder="Ex: JOAO SILVA" className="w-48 h-8 text-sm" />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-indigo-600 font-medium">Mês (MM/AAAA)</label>
+          <Input value={filtroMes} onChange={e => setFiltroMes(e.target.value)} placeholder="Ex: 04/2026" className="w-32 h-8 text-sm" />
+        </div>
+        <Button size="sm" onClick={onBuscar} className="h-8 gap-1 bg-indigo-600 hover:bg-indigo-700">
+          <Search className="w-3 h-3" /> Buscar
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 // ─── EXTRATO CONSIGNADO ───────────────────────────────────────────────────────
 function ExtratoConsignado() {
-  const { data, isLoading } = trpc.extratoConsignado.listar.useQuery({});
+  const [filtroChaveJ, setFiltroChaveJ] = useState('');
+  const [filtroNome, setFiltroNome] = useState('');
+  const [filtroMes, setFiltroMes] = useState('');
+  const [queryInput, setQueryInput] = useState<{ chaveJ?: string; nomeAgente?: string; mesAno?: string }>({});
+
+  const { data, isLoading } = trpc.extratoConsignado.listar.useQuery(queryInput);
+  const isAdminOuSuporte = (data as any)?.isAdminOuSuporte ?? false;
 
   const chaveJ = data?.chaveJ ?? '';
   const mesRef = data?.mesRef ?? '';
@@ -103,6 +144,14 @@ function ExtratoConsignado() {
   return (
     <div>
       <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+      {isAdminOuSuporte && (
+        <PainelFiltros
+          filtroChaveJ={filtroChaveJ} setFiltroChaveJ={setFiltroChaveJ}
+          filtroNome={filtroNome} setFiltroNome={setFiltroNome}
+          filtroMes={filtroMes} setFiltroMes={setFiltroMes}
+          onBuscar={() => setQueryInput({ chaveJ: filtroChaveJ || undefined, nomeAgente: filtroNome || undefined, mesAno: filtroMes || undefined })}
+        />
+      )}
 
       {isLoading ? (
         <div className="text-center py-16 text-gray-400">Carregando...</div>
@@ -315,7 +364,12 @@ function PerspectivadeGanho() {
 
 // ─── EXTRATO C/C ────────────────────────────────────────────────────────────
 function ExtratoCC() {
-  const { data, isLoading } = trpc.extratoCC.listar.useQuery({});
+  const [filtroChaveJ, setFiltroChaveJ] = useState('');
+  const [filtroNome, setFiltroNome] = useState('');
+  const [filtroMes, setFiltroMes] = useState('');
+  const [queryInput, setQueryInput] = useState<{ chaveJ?: string; nomeAgente?: string; mesAno?: string }>({});
+  const { data, isLoading } = trpc.extratoCC.listar.useQuery(queryInput);
+  const isAdminOuSuporte = (data as any)?.isAdminOuSuporte ?? false;
   const rows = data?.rows ?? [];
   const mesRef = data?.mesRef ?? '';
   const chaveJ = data?.chaveJ ?? '';
@@ -326,6 +380,14 @@ function ExtratoCC() {
   return (
     <div>
       <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+      {isAdminOuSuporte && (
+        <PainelFiltros
+          filtroChaveJ={filtroChaveJ} setFiltroChaveJ={setFiltroChaveJ}
+          filtroNome={filtroNome} setFiltroNome={setFiltroNome}
+          filtroMes={filtroMes} setFiltroMes={setFiltroMes}
+          onBuscar={() => setQueryInput({ chaveJ: filtroChaveJ || undefined, nomeAgente: filtroNome || undefined, mesAno: filtroMes || undefined })}
+        />
+      )}
       {isLoading ? (
         <div className="text-center py-16 text-gray-400">Carregando...</div>
       ) : rows.length === 0 ? (
@@ -372,7 +434,12 @@ function ExtratoCC() {
 
 // ─── EXTRATO CONSÓRCIO ───────────────────────────────────────────────────────
 function ExtratoConsorcio() {
-  const { data, isLoading } = trpc.extratoConsorcio.listar.useQuery({});
+  const [filtroChaveJ, setFiltroChaveJ] = useState('');
+  const [filtroNome, setFiltroNome] = useState('');
+  const [filtroMes, setFiltroMes] = useState('');
+  const [queryInput, setQueryInput] = useState<{ chaveJ?: string; nomeAgente?: string; mesAno?: string }>({});
+  const { data, isLoading } = trpc.extratoConsorcio.listar.useQuery(queryInput);
+  const isAdminOuSuporte = (data as any)?.isAdminOuSuporte ?? false;
   const rows = data?.rows ?? [];
   const mesRef = data?.mesRef ?? '';
   const chaveJ = data?.chaveJ ?? '';
@@ -384,6 +451,14 @@ function ExtratoConsorcio() {
   return (
     <div>
       <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+      {isAdminOuSuporte && (
+        <PainelFiltros
+          filtroChaveJ={filtroChaveJ} setFiltroChaveJ={setFiltroChaveJ}
+          filtroNome={filtroNome} setFiltroNome={setFiltroNome}
+          filtroMes={filtroMes} setFiltroMes={setFiltroMes}
+          onBuscar={() => setQueryInput({ chaveJ: filtroChaveJ || undefined, nomeAgente: filtroNome || undefined, mesAno: filtroMes || undefined })}
+        />
+      )}
       {isLoading ? (
         <div className="text-center py-16 text-gray-400">Carregando...</div>
       ) : rows.length === 0 ? (
@@ -434,7 +509,12 @@ function ExtratoConsorcio() {
 
 // ─── EXTRATO OUROCAP ─────────────────────────────────────────────────────────
 function ExtratoOurocap() {
-  const { data, isLoading } = trpc.extratoOurocap.listar.useQuery({});
+  const [filtroChaveJ, setFiltroChaveJ] = useState('');
+  const [filtroNome, setFiltroNome] = useState('');
+  const [filtroMes, setFiltroMes] = useState('');
+  const [queryInput, setQueryInput] = useState<{ chaveJ?: string; nomeAgente?: string; mesAno?: string }>({});
+  const { data, isLoading } = trpc.extratoOurocap.listar.useQuery(queryInput);
+  const isAdminOuSuporte = (data as any)?.isAdminOuSuporte ?? false;
   const rows = data?.rows ?? [];
   const mesRef = data?.mesRef ?? '';
   const chaveJ = data?.chaveJ ?? '';
@@ -446,6 +526,14 @@ function ExtratoOurocap() {
   return (
     <div>
       <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+      {isAdminOuSuporte && (
+        <PainelFiltros
+          filtroChaveJ={filtroChaveJ} setFiltroChaveJ={setFiltroChaveJ}
+          filtroNome={filtroNome} setFiltroNome={setFiltroNome}
+          filtroMes={filtroMes} setFiltroMes={setFiltroMes}
+          onBuscar={() => setQueryInput({ chaveJ: filtroChaveJ || undefined, nomeAgente: filtroNome || undefined, mesAno: filtroMes || undefined })}
+        />
+      )}
       {isLoading ? (
         <div className="text-center py-16 text-gray-400">Carregando...</div>
       ) : rows.length === 0 ? (
@@ -486,6 +574,150 @@ function ExtratoOurocap() {
                 <p className="text-xs text-gray-400">Total Comissão</p>
                 <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
               </div>
+            </div>
+          </div>
+        </CardContent></Card>
+      )}
+    </div>
+  );
+}
+
+// ─── EXTRATO SEGUROS ─────────────────────────────────────────────────────────
+function ExtratoSeguros() {
+  const [filtroChaveJ, setFiltroChaveJ] = useState('');
+  const [filtroNome, setFiltroNome] = useState('');
+  const [filtroMes, setFiltroMes] = useState('');
+  const [queryInput, setQueryInput] = useState<{ chaveJ?: string; nomeAgente?: string; mesAno?: string }>({});
+  const { data, isLoading } = trpc.extratoSeguros.listar.useQuery(queryInput);
+  const isAdminOuSuporte = (data as any)?.isAdminOuSuporte ?? false;
+  const rows = data?.rows ?? [];
+  const mesRef = data?.mesRef ?? '';
+  const chaveJ = data?.chaveJ ?? '';
+  const { data: agenteData } = trpc.agentes.getByChaveJ.useQuery({ chaveJ }, { enabled: !!chaveJ });
+  const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
+  const totalComissao = useMemo(() => (rows as any[]).reduce((acc: number, r: any) => acc + parseFloat(String(r.comissaoAgente ?? 0)), 0), [rows]);
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (
+    <div>
+      <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+      {isAdminOuSuporte && (
+        <PainelFiltros
+          filtroChaveJ={filtroChaveJ} setFiltroChaveJ={setFiltroChaveJ}
+          filtroNome={filtroNome} setFiltroNome={setFiltroNome}
+          filtroMes={filtroMes} setFiltroMes={setFiltroMes}
+          onBuscar={() => setQueryInput({ chaveJ: filtroChaveJ || undefined, nomeAgente: filtroNome || undefined, mesAno: filtroMes || undefined })}
+        />
+      )}
+      {isLoading ? (
+        <div className="text-center py-16 text-gray-400">Carregando...</div>
+      ) : rows.length === 0 ? (
+        <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
+          <Shield className="w-12 h-12 text-gray-300" />
+          <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+        </CardContent></Card>
+      ) : (
+        <Card><CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-semibold text-gray-700">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Contrato</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Banco</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-right">Valor Empréstimo</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(rows as any[]).map((row: any) => (
+                  <TableRow key={row.id} className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-700">{row.nrContrato || '—'}</TableCell>
+                    <TableCell className="text-gray-700 text-sm">{row.banco || '—'}</TableCell>
+                    <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.vrEmprestimo ?? 0)))}</TableCell>
+                    <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissaoAgente ?? 0)))}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-500">{rows.length} registro(s)</span>
+            <div className="text-right">
+              <p className="text-xs text-gray-400">Total Comissão</p>
+              <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
+            </div>
+          </div>
+        </CardContent></Card>
+      )}
+    </div>
+  );
+}
+
+// ─── EXTRATO BB DENTAL ───────────────────────────────────────────────────────
+function ExtratoBBDental() {
+  const [filtroChaveJ, setFiltroChaveJ] = useState('');
+  const [filtroNome, setFiltroNome] = useState('');
+  const [filtroMes, setFiltroMes] = useState('');
+  const [queryInput, setQueryInput] = useState<{ chaveJ?: string; nomeAgente?: string; mesAno?: string }>({});
+  const { data, isLoading } = trpc.extratoBBDental.listar.useQuery(queryInput);
+  const isAdminOuSuporte = (data as any)?.isAdminOuSuporte ?? false;
+  const rows = data?.rows ?? [];
+  const mesRef = data?.mesRef ?? '';
+  const chaveJ = data?.chaveJ ?? '';
+  const { data: agenteData } = trpc.agentes.getByChaveJ.useQuery({ chaveJ }, { enabled: !!chaveJ });
+  const nomeAgente = (agenteData as any)?.nomeAgente ?? '';
+  const totalComissao = useMemo(() => (rows as any[]).reduce((acc: number, r: any) => acc + parseFloat(String(r.comissao ?? 0)), 0), [rows]);
+  const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return (
+    <div>
+      <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesRef} />
+      {isAdminOuSuporte && (
+        <PainelFiltros
+          filtroChaveJ={filtroChaveJ} setFiltroChaveJ={setFiltroChaveJ}
+          filtroNome={filtroNome} setFiltroNome={setFiltroNome}
+          filtroMes={filtroMes} setFiltroMes={setFiltroMes}
+          onBuscar={() => setQueryInput({ chaveJ: filtroChaveJ || undefined, nomeAgente: filtroNome || undefined, mesAno: filtroMes || undefined })}
+        />
+      )}
+      {isLoading ? (
+        <div className="text-center py-16 text-gray-400">Carregando...</div>
+      ) : rows.length === 0 ? (
+        <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
+          <Smile className="w-12 h-12 text-gray-300" />
+          <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+        </CardContent></Card>
+      ) : (
+        <Card><CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-semibold text-gray-700">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-right">Valor Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(rows as any[]).map((row: any) => (
+                  <TableRow key={row.id} className="hover:bg-gray-50">
+                    <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-700">{row.proposta || '—'}</TableCell>
+                    <TableCell className="text-gray-700 text-sm">{row.produto || '—'}</TableCell>
+                    <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.vrProduto ?? 0)))}</TableCell>
+                    <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-500">{rows.length} registro(s)</span>
+            <div className="text-right">
+              <p className="text-xs text-gray-400">Total Comissão</p>
+              <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
             </div>
           </div>
         </CardContent></Card>
@@ -676,9 +908,10 @@ export default function ExtratosPage() {
         {aba === 'cc'          && <ExtratoCC />}
         {aba === 'consorcio'   && <ExtratoConsorcio />}
         {aba === 'ourocap'     && <ExtratoOurocap />}
+        {aba === 'seguros'     && <ExtratoSeguros />}
+        {aba === 'bbdental'    && <ExtratoBBDental />}
         {aba === 'perspectiva' && <PerspectivadeGanho />}
         {aba === 'minha-tabela' && <MinhaTabela />}
-        {aba !== 'consignado' && aba !== 'cc' && aba !== 'consorcio' && aba !== 'ourocap' && aba !== 'perspectiva' && aba !== 'minha-tabela' && <ConteudoAbaPlaceholder aba={aba} />}
       </div>
     </div>
   );

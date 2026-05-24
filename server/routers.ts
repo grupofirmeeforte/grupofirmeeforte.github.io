@@ -1499,11 +1499,12 @@ export const appRouter = router({
 
   // ─── EXTRATO CONSIGNADO ────────────────────────────────────────────────────
   // Helper interno: extrai chaveJ do agente logado via openId (formato: agente_<id>)
-  extratoConsignado: router({
+    extratoConsignado: router({
     // Lista operações do mês anterior para a ChaveJ do usuário logado
     listar: protectedProcedure
       .input(z.object({
         chaveJ: z.string().optional(),
+        nomeAgente: z.string().optional(),
         mesAno: z.string().optional(), // formato MM/AAAA
       }))
       .query(async ({ input, ctx }) => {
@@ -1511,8 +1512,7 @@ export const appRouter = router({
         const dbConn = await getDb();
         if (!dbConn) throw new Error('Database connection not available');
         const db = dbConn;
-        const { and, eq, like } = await import('drizzle-orm');
-
+        const { and, eq, like, or, sql } = await import('drizzle-orm');
         // Determinar mês de referência: mês anterior ao atual
         const agora = new Date();
         const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
@@ -1523,19 +1523,25 @@ export const appRouter = router({
         const mesFormatado = `${mm}/${aaaa}`; // para exibição
         const anoShort = aaaa ? aaaa.slice(2) : String(anoRef).slice(2); // ex: '26'
         const mesBanco = `${parseInt(mm, 10)}${anoShort}`; // ex: '426' para 04/2026
-
-        // ChaveJ: busca pelo openId do usuário logado (formato: agente_<id>)
+        // Verificar se é admin/suporte (pode filtrar por qualquer agente)
+        let isAdminOuSuporte = false;
         let chaveJLogado: string | null = null;
         if (ctx.user?.openId?.startsWith('agente_')) {
           const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
           const { agentes: agentesTable } = await import('../drizzle/schema');
-          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ, permissoes: agentesTable.permissoes, cargo: agentesTable.cargo }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
           chaveJLogado = agenteRow?.chaveJ ?? null;
+          isAdminOuSuporte = agenteRow?.permissoes === 'admin' || ['CEO','Admin','ADM','Suporte','Gerente'].includes(agenteRow?.cargo ?? '');
+        } else if (ctx.user) {
+          // Owner do projeto
+          isAdminOuSuporte = true;
         }
-        const chaveJ = input.chaveJ ?? chaveJLogado;
-
-        const conditions = [];
+        // Se admin/suporte: usa filtro do input; senão: força a ChaveJ do logado
+        const chaveJ = isAdminOuSuporte ? (input.chaveJ ?? null) : chaveJLogado;
+        const conditions: any[] = [];
         if (chaveJ) conditions.push(like(consignados.chaveJ, `%${chaveJ}%`));
+        else if (!isAdminOuSuporte && chaveJLogado) conditions.push(like(consignados.chaveJ, `%${chaveJLogado}%`));
+        if (input.nomeAgente && isAdminOuSuporte) conditions.push(like(consignados.nomeAgente, `%${input.nomeAgente}%`));
         if (mesBanco) conditions.push(eq(consignados.mes, mesBanco));
 
         const rows = await db
@@ -1561,6 +1567,7 @@ export const appRouter = router({
           rows,
           mesRef: mesFormatado,
           chaveJ: chaveJ ?? '',
+          isAdminOuSuporte,
         };
       }),
   }),
@@ -1654,10 +1661,11 @@ export const appRouter = router({
       };
     }),
   }),
-  extratoCC: router({
+    extratoCC: router({
     listar: protectedProcedure
       .input(z.object({
         chaveJ: z.string().optional(),
+        nomeAgente: z.string().optional(),
         mesAno: z.string().optional(),
       }))
       .query(async ({ input, ctx }) => {
@@ -1670,30 +1678,30 @@ export const appRouter = router({
         const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
         const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
         const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+        let isAdminOuSuporte = false;
         let chaveJLogado: string | null = null;
         if (ctx.user?.openId?.startsWith('agente_')) {
           const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
           const { agentes: agentesTable } = await import('../drizzle/schema');
-          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ, permissoes: agentesTable.permissoes, cargo: agentesTable.cargo }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
           chaveJLogado = agenteRow?.chaveJ ?? null;
-        }
-        const chaveJ = input.chaveJ ?? chaveJLogado;
+          isAdminOuSuporte = agenteRow?.permissoes === 'admin' || ['CEO','Admin','ADM','Suporte','Gerente'].includes(agenteRow?.cargo ?? '');
+        } else if (ctx.user) { isAdminOuSuporte = true; }
+        const chaveJ = isAdminOuSuporte ? (input.chaveJ ?? null) : chaveJLogado;
         const conditions: any[] = [];
         if (chaveJ) conditions.push(like(extratoContas.chaveJ, `%${chaveJ}%`));
+        else if (!isAdminOuSuporte && chaveJLogado) conditions.push(like(extratoContas.chaveJ, `%${chaveJLogado}%`));
+        if (input.nomeAgente && isAdminOuSuporte) conditions.push(like(extratoContas.nome, `%${input.nomeAgente}%`));
         if (mesRef) conditions.push(eq(extratoContas.mesAno, mesRef));
-        const rows = await db
-          .select()
-          .from(extratoContas)
-          .where(conditions.length ? and(...conditions) : undefined)
-          .orderBy(extratoContas.nome);
-        return { rows, mesRef, chaveJ: chaveJ ?? '' };
+        const rows = await db.select().from(extratoContas).where(conditions.length ? and(...conditions) : undefined).orderBy(extratoContas.nome);
+        return { rows, mesRef, chaveJ: chaveJ ?? '', isAdminOuSuporte };
       }),
   }),
-
   extratoConsorcio: router({
     listar: protectedProcedure
       .input(z.object({
         chaveJ: z.string().optional(),
+        nomeAgente: z.string().optional(),
         mesAno: z.string().optional(),
       }))
       .query(async ({ input, ctx }) => {
@@ -1701,35 +1709,37 @@ export const appRouter = router({
         const dbConn = await getDb();
         if (!dbConn) throw new Error('Database connection not available');
         const db = dbConn;
-        const { and, eq, like } = await import('drizzle-orm');
+        const { and, eq, like, gt } = await import('drizzle-orm');
         const agora = new Date();
         const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
         const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
         const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+        let isAdminOuSuporte = false;
         let chaveJLogado: string | null = null;
         if (ctx.user?.openId?.startsWith('agente_')) {
           const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
           const { agentes: agentesTable } = await import('../drizzle/schema');
-          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ, permissoes: agentesTable.permissoes, cargo: agentesTable.cargo }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
           chaveJLogado = agenteRow?.chaveJ ?? null;
-        }
-        const chaveJ = input.chaveJ ?? chaveJLogado;
+          isAdminOuSuporte = agenteRow?.permissoes === 'admin' || ['CEO','Admin','ADM','Suporte','Gerente'].includes(agenteRow?.cargo ?? '');
+        } else if (ctx.user) { isAdminOuSuporte = true; }
+        const chaveJ = isAdminOuSuporte ? (input.chaveJ ?? null) : chaveJLogado;
         const conditions: any[] = [];
         if (chaveJ) conditions.push(like(extratoConsorcios.chaveJ, `%${chaveJ}%`));
+        else if (!isAdminOuSuporte && chaveJLogado) conditions.push(like(extratoConsorcios.chaveJ, `%${chaveJLogado}%`));
+        if (input.nomeAgente && isAdminOuSuporte) conditions.push(like(extratoConsorcios.nome, `%${input.nomeAgente}%`));
         if (mesRef) conditions.push(eq(extratoConsorcios.mesAno, mesRef));
-        const rows = await db
-          .select()
-          .from(extratoConsorcios)
-          .where(conditions.length ? and(...conditions) : undefined)
-          .orderBy(extratoConsorcios.nome);
-        return { rows, mesRef, chaveJ: chaveJ ?? '' };
+        // Somente operações que geram comissão (comissao > 0)
+        conditions.push(gt(extratoConsorcios.comissao, '0'));
+        const rows = await db.select().from(extratoConsorcios).where(conditions.length ? and(...conditions) : undefined).orderBy(extratoConsorcios.nome);
+        return { rows, mesRef, chaveJ: chaveJ ?? '', isAdminOuSuporte };
       }),
   }),
-
   extratoOurocap: router({
     listar: protectedProcedure
       .input(z.object({
         chaveJ: z.string().optional(),
+        nomeAgente: z.string().optional(),
         mesAno: z.string().optional(),
       }))
       .query(async ({ input, ctx }) => {
@@ -1742,23 +1752,115 @@ export const appRouter = router({
         const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
         const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
         const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+        let isAdminOuSuporte = false;
         let chaveJLogado: string | null = null;
         if (ctx.user?.openId?.startsWith('agente_')) {
           const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
           const { agentes: agentesTable } = await import('../drizzle/schema');
-          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ, permissoes: agentesTable.permissoes, cargo: agentesTable.cargo }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
           chaveJLogado = agenteRow?.chaveJ ?? null;
-        }
-        const chaveJ = input.chaveJ ?? chaveJLogado;
+          isAdminOuSuporte = agenteRow?.permissoes === 'admin' || ['CEO','Admin','ADM','Suporte','Gerente'].includes(agenteRow?.cargo ?? '');
+        } else if (ctx.user) { isAdminOuSuporte = true; }
+        const chaveJ = isAdminOuSuporte ? (input.chaveJ ?? null) : chaveJLogado;
         const conditions: any[] = [];
         if (chaveJ) conditions.push(like(extratoOurocap.chaveJ, `%${chaveJ}%`));
+        else if (!isAdminOuSuporte && chaveJLogado) conditions.push(like(extratoOurocap.chaveJ, `%${chaveJLogado}%`));
+        if (input.nomeAgente && isAdminOuSuporte) conditions.push(like(extratoOurocap.nome, `%${input.nomeAgente}%`));
         if (mesRef) conditions.push(eq(extratoOurocap.mesAno, mesRef));
-        const rows = await db
-          .select()
-          .from(extratoOurocap)
-          .where(conditions.length ? and(...conditions) : undefined)
-          .orderBy(extratoOurocap.nome);
-        return { rows, mesRef, chaveJ: chaveJ ?? '' };
+        const rows = await db.select().from(extratoOurocap).where(conditions.length ? and(...conditions) : undefined).orderBy(extratoOurocap.nome);
+        return { rows, mesRef, chaveJ: chaveJ ?? '', isAdminOuSuporte };
+      }),
+  }),
+
+  extratoSeguros: router({
+    listar: protectedProcedure
+      .input(z.object({
+        chaveJ: z.string().optional(),
+        nomeAgente: z.string().optional(),
+        mesAno: z.string().optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const { seguros: segurosTable } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new Error('Database connection not available');
+        const db = dbConn;
+        const { and, eq, like, gt } = await import('drizzle-orm');
+        const agora = new Date();
+        const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
+        const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
+        const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+        let isAdminOuSuporte = false;
+        let chaveJLogado: string | null = null;
+        if (ctx.user?.openId?.startsWith('agente_')) {
+          const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+          const { agentes: agentesTable } = await import('../drizzle/schema');
+          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ, permissoes: agentesTable.permissoes, cargo: agentesTable.cargo }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+          chaveJLogado = agenteRow?.chaveJ ?? null;
+          isAdminOuSuporte = agenteRow?.permissoes === 'admin' || ['CEO','Admin','ADM','Suporte','Gerente'].includes(agenteRow?.cargo ?? '');
+        } else if (ctx.user) { isAdminOuSuporte = true; }
+        const chaveJ = isAdminOuSuporte ? (input.chaveJ ?? null) : chaveJLogado;
+        const conditions: any[] = [];
+        if (chaveJ) conditions.push(like(segurosTable.chaveJ, `%${chaveJ}%`));
+        else if (!isAdminOuSuporte && chaveJLogado) conditions.push(like(segurosTable.chaveJ, `%${chaveJLogado}%`));
+        if (input.nomeAgente && isAdminOuSuporte) conditions.push(like(segurosTable.nomeAgente, `%${input.nomeAgente}%`));
+        if (mesRef) conditions.push(eq(segurosTable.mesAno, mesRef));
+        // Somente registros com comissão > 0
+        conditions.push(gt(segurosTable.comissaoAgente, '0'));
+        const rows = await db.select().from(segurosTable).where(conditions.length ? and(...conditions) : undefined).orderBy(segurosTable.nomeAgente);
+        return { rows, mesRef, chaveJ: chaveJ ?? '', isAdminOuSuporte };
+      }),
+  }),
+
+  extratoBBDental: router({
+    listar: protectedProcedure
+      .input(z.object({
+        chaveJ: z.string().optional(),
+        nomeAgente: z.string().optional(),
+        mesAno: z.string().optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const { bbdental: bbdentalTable } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new Error('Database connection not available');
+        const db = dbConn;
+        const { and, eq, like, gt } = await import('drizzle-orm');
+        const agora = new Date();
+        const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
+        const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
+        const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+        let isAdminOuSuporte = false;
+        let chaveJLogado: string | null = null;
+        if (ctx.user?.openId?.startsWith('agente_')) {
+          const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+          const { agentes: agentesTable } = await import('../drizzle/schema');
+          const [agenteRow] = await db.select({ chaveJ: agentesTable.chaveJ, permissoes: agentesTable.permissoes, cargo: agentesTable.cargo }).from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+          chaveJLogado = agenteRow?.chaveJ ?? null;
+          isAdminOuSuporte = agenteRow?.permissoes === 'admin' || ['CEO','Admin','ADM','Suporte','Gerente'].includes(agenteRow?.cargo ?? '');
+        } else if (ctx.user) { isAdminOuSuporte = true; }
+        const chaveJ = isAdminOuSuporte ? (input.chaveJ ?? null) : chaveJLogado;
+        const conditions: any[] = [];
+        if (chaveJ) conditions.push(like(bbdentalTable.chaveJ, `%${chaveJ}%`));
+        else if (!isAdminOuSuporte && chaveJLogado) conditions.push(like(bbdentalTable.chaveJ, `%${chaveJLogado}%`));
+        if (input.nomeAgente && isAdminOuSuporte) conditions.push(like(bbdentalTable.nomeAgente, `%${input.nomeAgente}%`));
+        if (mesRef) conditions.push(eq(bbdentalTable.mesAno, mesRef));
+        // Somente registros com comissão > 0 (sem RBM)
+        conditions.push(gt(bbdentalTable.comissao, '0'));
+        // Selecionar campos sem RBM
+        const rows = await db.select({
+          id: bbdentalTable.id,
+          empresa: bbdentalTable.empresa,
+          mesAno: bbdentalTable.mesAno,
+          chaveJ: bbdentalTable.chaveJ,
+          nomeAgente: bbdentalTable.nomeAgente,
+          proposta: bbdentalTable.proposta,
+          cpfCliente: bbdentalTable.cpfCliente,
+          dtVenda: bbdentalTable.dtVenda,
+          produto: bbdentalTable.produto,
+          vrProduto: bbdentalTable.vrProduto,
+          comissao: bbdentalTable.comissao,
+          supervisor: bbdentalTable.supervisor,
+        }).from(bbdentalTable).where(conditions.length ? and(...conditions) : undefined).orderBy(bbdentalTable.nomeAgente);
+        return { rows, mesRef, chaveJ: chaveJ ?? '', isAdminOuSuporte };
       }),
   }),
 });
