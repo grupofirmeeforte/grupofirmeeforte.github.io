@@ -869,6 +869,78 @@ export const febrabanRouter = {
       return { agentes: agentesResult, dias, totalPorDia, diasUteisTotal, feriadosNome };
     }),
 
+  // ─── GRÁFICOS DE PRODUÇÃO BB ─────────────────────────────────────────────
+  // Gráfico por período e por ChaveJ (valor líquido - troco - Contratadas)
+  graficoPorPeriodo: protectedProcedure
+    .input(z.object({
+      periodo: z.enum(['bimestre', 'trimestre', 'semestre', 'ano']),
+      empresa: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { series: [], labels: [], agentes: [] };
+      const rows = await db
+        .select({ mesano: febraban.mesano, operador: febraban.operador, troco: febraban.troco })
+        .from(febraban)
+        .where(and(
+          eq(febraban.situacao, 'Contratada'),
+          sql`mesano >= 126`,
+          input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`
+        ));
+      const parseMesano = (m: number) => { const s = String(m); return { mes: parseInt(s.slice(0, s.length - 2)), ano: parseInt('20' + s.slice(-2)) }; };
+      const getLabel = (m: number) => { const { mes, ano } = parseMesano(m); if (input.periodo === 'bimestre') return `${Math.ceil(mes / 2)}º Bim/${ano}`; if (input.periodo === 'trimestre') return `${Math.ceil(mes / 3)}º Tri/${ano}`; if (input.periodo === 'semestre') return `${mes <= 6 ? 1 : 2}º Sem/${ano}`; return String(ano); };
+      const getOrder = (m: number) => { const { mes, ano } = parseMesano(m); if (input.periodo === 'bimestre') return ano * 100 + Math.ceil(mes / 2); if (input.periodo === 'trimestre') return ano * 100 + Math.ceil(mes / 3); if (input.periodo === 'semestre') return ano * 100 + (mes <= 6 ? 1 : 2); return ano; };
+      const mapaAgente: Record<string, Record<string, number>> = {};
+      const periodosOrder: Record<string, number> = {};
+      for (const row of rows) {
+        if (!row.mesano || !row.operador) continue;
+        const label = getLabel(row.mesano);
+        periodosOrder[label] = getOrder(row.mesano);
+        const ag = row.operador.trim();
+        if (!mapaAgente[ag]) mapaAgente[ag] = {};
+        mapaAgente[ag][label] = (mapaAgente[ag][label] ?? 0) + (parseFloat(String(row.troco ?? '0')) || 0);
+      }
+      const labels = Object.keys(periodosOrder).sort((a, b) => periodosOrder[a] - periodosOrder[b]);
+      const agentes = Object.keys(mapaAgente).sort((a, b) => Object.values(mapaAgente[b]).reduce((s, v) => s + v, 0) - Object.values(mapaAgente[a]).reduce((s, v) => s + v, 0));
+      const series = agentes.map(ag => ({ name: ag, data: labels.map(l => Math.round((mapaAgente[ag][l] ?? 0) * 100) / 100), total: Math.round(Object.values(mapaAgente[ag]).reduce((s, v) => s + v, 0) * 100) / 100 }));
+      return { series, labels, agentes };
+    }),
+
+  // Gráfico geral por tipo de operação (Financ. Novo / Troco-Refin / Cancelado)
+  graficoPorTipo: protectedProcedure
+    .input(z.object({
+      periodo: z.enum(['bimestre', 'trimestre', 'semestre', 'ano']),
+      empresa: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { data: [], labels: [] };
+      const rows = await db
+        .select({ mesano: febraban.mesano, situacao: febraban.situacao, troco: febraban.troco, financiado: febraban.financiado })
+        .from(febraban)
+        .where(and(sql`mesano >= 126`, input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`));
+      const parseMesano = (m: number) => { const s = String(m); return { mes: parseInt(s.slice(0, s.length - 2)), ano: parseInt('20' + s.slice(-2)) }; };
+      const getLabel = (m: number) => { const { mes, ano } = parseMesano(m); if (input.periodo === 'bimestre') return `${Math.ceil(mes / 2)}º Bim/${ano}`; if (input.periodo === 'trimestre') return `${Math.ceil(mes / 3)}º Tri/${ano}`; if (input.periodo === 'semestre') return `${mes <= 6 ? 1 : 2}º Sem/${ano}`; return String(ano); };
+      const getOrder = (m: number) => { const { mes, ano } = parseMesano(m); if (input.periodo === 'bimestre') return ano * 100 + Math.ceil(mes / 2); if (input.periodo === 'trimestre') return ano * 100 + Math.ceil(mes / 3); if (input.periodo === 'semestre') return ano * 100 + (mes <= 6 ? 1 : 2); return ano; };
+      const mapa: Record<string, { novo: number; refin: number; cancelado: number }> = {};
+      const periodosOrder: Record<string, number> = {};
+      for (const row of rows) {
+        if (!row.mesano) continue;
+        const label = getLabel(row.mesano);
+        periodosOrder[label] = getOrder(row.mesano);
+        if (!mapa[label]) mapa[label] = { novo: 0, refin: 0, cancelado: 0 };
+        const t = Math.round((parseFloat(String(row.troco ?? '0').replace(',', '.')) || 0) * 100);
+        const f = Math.round((parseFloat(String(row.financiado ?? '0').replace(',', '.')) || 0) * 100);
+        const val = parseFloat(String(row.troco ?? '0')) || 0;
+        if (row.situacao && row.situacao.toLowerCase().includes('cancel')) mapa[label].cancelado += val;
+        else if (t === f) mapa[label].novo += val;
+        else mapa[label].refin += val;
+      }
+      const labels = Object.keys(mapa).sort((a, b) => (periodosOrder[a] ?? 0) - (periodosOrder[b] ?? 0));
+      const data = labels.map(label => ({ periodo: label, novo: Math.round(mapa[label].novo * 100) / 100, refin: Math.round(mapa[label].refin * 100) / 100, cancelado: Math.round(mapa[label].cancelado * 100) / 100 }));
+      return { data, labels };
+    }),
+
   // Retorna valores únicos para filtros
   filtros: protectedProcedure.query(async () => {
     const db = await getDb();

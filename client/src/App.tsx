@@ -23,6 +23,7 @@ import DespesasFixasPage from './pages/DespesasFixas';
 import ContasLojasPage from './pages/ContasLojas';
 import CRMPage from './pages/CRM';
 import AcompanhamentoDiario from './pages/AcompanhamentoDiario';
+import GraficoProducaoBBPage from './pages/GraficoProducaoBB';
 import Consorcio from './pages/Consorcio';
 import OurocapPage from './pages/Ourocap';
 import SegurosPage from './pages/Seguros';
@@ -76,6 +77,7 @@ function RouterWithInactivity() {
       <Route path={"/certificacoes"} component={Certificacoes} />
       <Route path={"/febraban"} component={FebrabanPage} />
       <Route path={"/febraban/acompanhamento-diario"} component={AcompanhamentoDiario} />
+      <Route path={"/febraban/graficos"} component={GraficoProducaoBBPage} />
       <Route path={"/pagamentos"} component={PagamentosPage} />
       <Route path={"/fornecedores"} component={DespesasFixasPage} />
       <Route path={"/contas-lojas"} component={ContasLojasPage} />

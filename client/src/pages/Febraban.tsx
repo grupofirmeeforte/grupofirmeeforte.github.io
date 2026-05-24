@@ -624,6 +624,13 @@ export default function FebrabanPage() {
             Acomp. Diário
           </Button>
           <Button
+            className="gap-2 bg-blue-700 text-white hover:bg-blue-800"
+            onClick={() => navigate("/febraban/graficos")}
+          >
+            <BarChart2 className="w-4 h-4" />
+            Gráficos de Produção
+          </Button>
+          <Button
             variant="outline"
             className="gap-2 border-green-500 text-green-700 hover:bg-green-50"
             onClick={handleExportarNaoPagos}
