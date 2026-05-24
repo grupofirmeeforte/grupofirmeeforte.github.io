@@ -6,7 +6,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key, Calendar, TrendingUp } from 'lucide-react';
+import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key, Calendar, TrendingUp, Construction, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import PageHeader from "@/components/PageHeader";
 
@@ -217,6 +217,16 @@ function PerspectivadeGanho() {
   return (
     <div>
       <PainelIdentificacao chaveJ={chaveJReal} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
+
+      {/* ─── BANNER EM CONSTRUÇÃO ─────────────────────────────────── */}
+      <div className="mb-6 flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 py-10">
+        <div className="w-16 h-16 rounded-full bg-amber-500 flex items-center justify-center shadow-md">
+          <Construction className="w-9 h-9 text-white" />
+        </div>
+        <h3 className="text-2xl font-bold text-amber-700 tracking-wide">Em Construção</h3>
+        <p className="text-sm text-amber-500">Este módulo estará disponível em breve.</p>
+      </div>
+
       {/* ─── TABELA DETALHADA──────────────────────────────────────── */}
       <Card>
         <CardContent className="p-0">

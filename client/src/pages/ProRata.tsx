@@ -313,11 +313,13 @@ export default function ProRataPage() {
   // Enquanto autenticação carrega, exibir spinner
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <PageHeader />
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto mb-3"></div>
-          <p className="text-gray-500">Verificando acesso...</p>
+      <div className="min-h-screen bg-gray-50">
+        <PageHeader />
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto mb-3"></div>
+            <p className="text-gray-500">Verificando acesso...</p>
+          </div>
         </div>
       </div>
     );
@@ -327,16 +329,8 @@ export default function ProRataPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Cabeçalho */}
-      <div className="bg-white border-b px-6 py-3 flex items-center gap-3">
-        <div>
-          <h1 className="text-lg font-bold text-gray-800">Pró Rata</h1>
-          <p className="text-xs text-gray-500">Operações com controle de parcelas pagas e a receber</p>
-        </div>
-        <div className="ml-auto">
-          
-        </div>
-      </div>
+      {/* Cabeçalho padrão com logo e botão Voltar */}
+      <PageHeader />
 
       {/* Abas */}
       <div className="bg-white border-b px-6">
