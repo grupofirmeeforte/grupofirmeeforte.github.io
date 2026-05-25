@@ -29,7 +29,7 @@ function isWeekend(ano: number, mes: number, dia: number) {
   return dow === 0 || dow === 6;
 }
 
-type Empresa = "BMF" | "FLEX";
+type Empresa = "BMF" | "FLEX" | "TODAS";
 
 function hasAcompanhamentoAccess(user: any): boolean {
   if (!user) return false;
@@ -159,15 +159,17 @@ export default function AcompanhamentoDiario() {
               ))}
             </div>
 
-            {/* Abas BMF / FLEX */}
+            {/* Abas BMF / FLEX / TODAS */}
             <div className="flex gap-2">
-              {(["BMF","FLEX"] as Empresa[]).map(e => (
+              {(["BMF","FLEX","TODAS"] as Empresa[]).map(e => (
                 <button key={e} onClick={() => setEmpresa(e)}
                   className={`px-5 py-2 rounded-lg font-bold text-sm transition-all ${
                     empresa === e
                       ? e === "BMF"
                         ? "bg-blue-600 text-white shadow-lg"
-                        : "bg-green-600 text-white shadow-lg"
+                        : e === "FLEX"
+                        ? "bg-green-600 text-white shadow-lg"
+                        : "bg-purple-600 text-white shadow-lg"
                       : "bg-gray-800 text-gray-400 hover:bg-gray-700"
                   }`}>
                   {e}
@@ -208,7 +210,7 @@ export default function AcompanhamentoDiario() {
 
       {!isLoading && agentes.length === 0 && (
         <div className="flex items-center justify-center py-20 text-gray-500">
-          Nenhum dado encontrado para {MESES[mes-1]}/{ano} — {empresa}
+          Nenhum dado encontrado para {MESES[mes-1]}/{ano} — {empresa === 'TODAS' ? 'BMF + FLEX' : empresa}
         </div>
       )}
 

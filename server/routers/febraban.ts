@@ -734,7 +734,7 @@ export const febrabanRouter = {
   // Acompanhamento Diário: produção por agente por dia no mês selecionado
   acompanhamentoDiario: protectedProcedure
     .input(z.object({
-      empresa: z.enum(['BMF', 'FLEX']),
+      empresa: z.enum(['BMF', 'FLEX', 'TODAS']),
       mes: z.number().min(1).max(12),
       ano: z.number().min(2025),
     }))
@@ -747,12 +747,15 @@ export const febrabanRouter = {
       // Calcular mesano no formato usado na Febraban (ex: 526 para maio/2026)
       const anoSuffix = String(input.ano).slice(-2);
       const mesano = Number(`${input.mes}${anoSuffix}`);
+      const isTodas = input.empresa === 'TODAS';
 
       // Buscar operadores únicos da Febraban para este mesano e empresa
       const operadoresFebraban = await db
         .selectDistinct({ operador: febraban.operador })
         .from(febraban)
-        .where(sql`empresa = ${input.empresa} AND mesano = ${mesano} AND operador IS NOT NULL AND operador != ''`)
+        .where(isTodas
+          ? sql`mesano = ${mesano} AND operador IS NOT NULL AND operador != ''`
+          : sql`empresa = ${input.empresa} AND mesano = ${mesano} AND operador IS NOT NULL AND operador != ''`)
         .orderBy(asc(febraban.operador));
 
       const operadorList = operadoresFebraban.map(r => r.operador).filter(Boolean) as string[];
@@ -762,7 +765,7 @@ export const febrabanRouter = {
       const agentesInfo = await db
         .select({ chaveJ: agentesTable.chaveJ, nomeAgente: agentesTable.nomeAgente, situacao: agentesTable.situacao })
         .from(agentesTable)
-        .where(sql`empresa = ${input.empresa} AND chaveJ IN (${sql.raw(operadorList.map(o => `'${o.replace(/'/g, "''")}'`).join(','))})`);
+        .where(sql`chaveJ IN (${sql.raw(operadorList.map(o => `'${o.replace(/'/g, "''")}'`).join(','))})`);
 
       const agentesMap = new Map(agentesInfo.map(a => [a.chaveJ?.toUpperCase(), a]));
 
@@ -779,7 +782,9 @@ export const febrabanRouter = {
           troco: febraban.troco,
         })
         .from(febraban)
-        .where(sql`empresa = ${input.empresa} AND mesano = ${mesano} AND situacao = 'Contratada' AND operador IS NOT NULL`);
+        .where(isTodas
+          ? sql`mesano = ${mesano} AND situacao = 'Contratada' AND operador IS NOT NULL`
+          : sql`empresa = ${input.empresa} AND mesano = ${mesano} AND situacao = 'Contratada' AND operador IS NOT NULL`);
 
       // Montar mapa: operador -> dia -> soma troco
       const prodMap = new Map<string, Map<number, number>>();
