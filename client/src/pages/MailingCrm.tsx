@@ -169,6 +169,30 @@ export default function MailingCrm() {
     onError: (e) => toast.error("Erro ao importar: " + e.message),
   });
 
+  // Limpeza em lote
+  const [confirmLimpeza, setConfirmLimpeza] = useState<'falecidos' | 'acima78' | null>(null);
+  const { data: contagem } = trpc.mailingCrm.contarParaLimpeza.useQuery(undefined, { staleTime: 30_000 });
+  const removerFalecidos = trpc.mailingCrm.removerFalecidos.useMutation({
+    onSuccess: () => {
+      utils.mailingCrm.list.invalidate();
+      utils.mailingCrm.count.invalidate();
+      utils.mailingCrm.contarParaLimpeza.invalidate();
+      setConfirmLimpeza(null);
+      toast.success('Falecidos removidos com sucesso!');
+    },
+    onError: (e) => toast.error('Erro: ' + e.message),
+  });
+  const removerAcima78 = trpc.mailingCrm.removerAcima78.useMutation({
+    onSuccess: (r) => {
+      utils.mailingCrm.list.invalidate();
+      utils.mailingCrm.count.invalidate();
+      utils.mailingCrm.contarParaLimpeza.invalidate();
+      setConfirmLimpeza(null);
+      toast.success(`${r.removidos} registros com mais de 78 anos removidos!`);
+    },
+    onError: (e) => toast.error('Erro: ' + e.message),
+  });
+
   const totalPages = Math.ceil(total / PER_PAGE);
 
   // Exportar Excel
@@ -270,6 +294,20 @@ export default function MailingCrm() {
           <input ref={fileRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImport} />
           <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5 border-green-500 text-green-600 hover:bg-green-50">
             <Download className="w-3.5 h-3.5" /> Exportar Excel
+          </Button>
+          <Button
+            variant="outline" size="sm"
+            onClick={() => setConfirmLimpeza('falecidos')}
+            className="gap-1.5 border-red-400 text-red-600 hover:bg-red-50"
+          >
+            🪦 Remover Falecidos {contagem?.falecidos ? `(${contagem.falecidos})` : ''}
+          </Button>
+          <Button
+            variant="outline" size="sm"
+            onClick={() => setConfirmLimpeza('acima78')}
+            className="gap-1.5 border-orange-400 text-orange-600 hover:bg-orange-50"
+          >
+            👴 Remover +78 anos {contagem?.acima78 ? `(${contagem.acima78})` : ''}
           </Button>
           <Button size="sm" onClick={openNew} className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5">
             + Novo Registro
@@ -378,20 +416,27 @@ export default function MailingCrm() {
                     )}
                   </td>
 
-                  {/* Coluna 2: Telefones */}
+                  {/* Coluna 2: Telefones — oculto se NÃO PERTUBE */}
                   <td className="px-3 py-2.5 min-w-[180px]">
-                    {tels.length > 0 ? (
-                      <div className="space-y-0.5">
-                        {tels.slice(0, 4).map((t, idx) => (
-                          <div key={idx} className="text-[11px] text-green-700 font-mono font-medium">{t}</div>
-                        ))}
-                        {tels.length > 4 && (
-                          <div className="text-[10px] text-gray-400">+{tels.length - 4} mais</div>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-[11px] text-gray-300">—</span>
-                    )}
+                    {(() => {
+                      const np = (r.naoPerturbe ?? '').toLowerCase().trim();
+                      const bloqueado = np !== '' && np !== 'sem restrição' && np !== 'sem restricao';
+                      if (bloqueado) {
+                        return <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-100 text-red-600 font-medium">🚫 NÃO PERTUBE</span>;
+                      }
+                      return tels.length > 0 ? (
+                        <div className="space-y-0.5">
+                          {tels.slice(0, 4).map((t, idx) => (
+                            <div key={idx} className="text-[11px] text-green-700 font-mono font-medium">{t}</div>
+                          ))}
+                          {tels.length > 4 && (
+                            <div className="text-[10px] text-gray-400">+{tels.length - 4} mais</div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-[11px] text-gray-300">—</span>
+                      );
+                    })()}
                   </td>
 
                   {/* Coluna 3: Localização */}
@@ -480,6 +525,36 @@ export default function MailingCrm() {
           </div>
         </div>
       )}
+
+      {/* Confirm Limpeza em Lote */}
+      <Dialog open={confirmLimpeza !== null} onOpenChange={o => !o && setConfirmLimpeza(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {confirmLimpeza === 'falecidos' ? '🪦 Remover Falecidos' : '👴 Remover maiores de 78 anos'}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-gray-600">
+            {confirmLimpeza === 'falecidos'
+              ? `Isso irá excluir permanentemente ${contagem?.falecidos ?? 0} registro(s) identificados como falecidos (campo NÃO PERTUBE contém indicação de óbito). Esta ação não pode ser desfeita.`
+              : `Isso irá excluir permanentemente ${contagem?.acima78 ?? 0} registro(s) com mais de 78 anos calculados pela data de nascimento. Esta ação não pode ser desfeita.`
+            }
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmLimpeza(null)}>Cancelar</Button>
+            <Button
+              variant="destructive"
+              disabled={removerFalecidos.isPending || removerAcima78.isPending}
+              onClick={() => {
+                if (confirmLimpeza === 'falecidos') removerFalecidos.mutate();
+                else removerAcima78.mutate();
+              }}
+            >
+              {(removerFalecidos.isPending || removerAcima78.isPending) ? 'Removendo...' : 'Confirmar e Remover'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Confirm Delete */}
       <Dialog open={confirmDel !== null} onOpenChange={o => !o && setConfirmDel(null)}>

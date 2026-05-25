@@ -186,6 +186,79 @@ export const mailingCrmRouter = router({
     return { inseridos };
   }),
 
+  // Contar quantos registros seriam removidos por cada critério (preview antes de confirmar)
+  contarParaLimpeza: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return { falecidos: 0, acima78: 0 };
+
+    // Falecidos: campo naoPerturbe contém FALECIDO, OBITO, ÓBITO, FALEC
+    const [falecidos, todos] = await Promise.all([
+      db.select({ id: crm.id, naoPerturbe: crm.naoPerturbe })
+        .from(crm)
+        .where(sql`LOWER(COALESCE(naoPerturbe,'')) REGEXP 'falec|obito|óbito|obit'`),
+      db.select({ id: crm.id, dtaNasc: crm.dtaNasc }).from(crm),
+    ]);
+
+    // Acima de 78 anos: calcular pela dtaNasc
+    const hoje = new Date();
+    const acima78 = todos.filter(r => {
+      if (!r.dtaNasc) return false;
+      const s = String(r.dtaNasc);
+      let dia: number, mes: number, ano: number;
+      const m1 = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+      if (m1) { dia = +m1[1]; mes = +m1[2]; ano = m1[3].length === 2 ? 2000 + +m1[3] : +m1[3]; }
+      else { const m2 = s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if (!m2) return false; ano = +m2[1]; mes = +m2[2]; dia = +m2[3]; }
+      const nasc = new Date(ano, mes - 1, dia);
+      let idade = hoje.getFullYear() - nasc.getFullYear();
+      if (hoje.getMonth() < nasc.getMonth() || (hoje.getMonth() === nasc.getMonth() && hoje.getDate() < nasc.getDate())) idade--;
+      return idade > 78;
+    });
+
+    return { falecidos: falecidos.length, acima78: acima78.length };
+  }),
+
+  // Remover falecidos definitivamente
+  removerFalecidos: protectedProcedure.mutation(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+    await db.delete(crm).where(sql`LOWER(COALESCE(naoPerturbe,'')) REGEXP 'falec|obito|óbito|obit'`);
+    return { ok: true };
+  }),
+
+  // Remover maiores de 78 anos definitivamente
+  removerAcima78: protectedProcedure.mutation(async () => {
+    const db = await getDb();
+    if (!db) throw new Error("Database not available");
+
+    // Buscar todos e filtrar em JS (datas em formato variado)
+    const todos = await db.select({ id: crm.id, dtaNasc: crm.dtaNasc }).from(crm);
+    const hoje = new Date();
+    const idsRemover: number[] = [];
+
+    for (const r of todos) {
+      if (!r.dtaNasc) continue;
+      const s = String(r.dtaNasc);
+      let dia: number, mes: number, ano: number;
+      const m1 = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+      if (m1) { dia = +m1[1]; mes = +m1[2]; ano = m1[3].length === 2 ? 2000 + +m1[3] : +m1[3]; }
+      else { const m2 = s.match(/^(\d{4})-(\d{2})-(\d{2})$/); if (!m2) continue; ano = +m2[1]; mes = +m2[2]; dia = +m2[3]; }
+      const nasc = new Date(ano, mes - 1, dia);
+      let idade = hoje.getFullYear() - nasc.getFullYear();
+      if (hoje.getMonth() < nasc.getMonth() || (hoje.getMonth() === nasc.getMonth() && hoje.getDate() < nasc.getDate())) idade--;
+      if (idade > 78) idsRemover.push(r.id);
+    }
+
+    if (idsRemover.length > 0) {
+      // Deletar em lotes de 500 para evitar query muito longa
+      for (let i = 0; i < idsRemover.length; i += 500) {
+        const lote = idsRemover.slice(i, i + 500);
+        await db.delete(crm).where(sql`id IN (${sql.join(lote.map(id => sql`${id}`), sql`, `)})`);
+      }
+    }
+
+    return { removidos: idsRemover.length };
+  }),
+
   // Valores únicos para filtros
   filtros: protectedProcedure.query(async () => {
     const db = await getDb();
