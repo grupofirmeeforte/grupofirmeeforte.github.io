@@ -505,8 +505,10 @@ function ExtratoConsorcio() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50">
-                  <TableHead className="font-semibold text-gray-700">Nº Operação</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-center">Parcela</TableHead>
+                  {isAdminOuSuporte && <TableHead className="font-semibold text-gray-700">Agente</TableHead>}
+                  <TableHead className="font-semibold text-gray-700">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Empresa</TableHead>
+                  <TableHead className="font-semibold text-gray-700 text-center">Parc. Liberada</TableHead>
                   <TableHead className="font-semibold text-gray-700">Segmento</TableHead>
                   <TableHead className="font-semibold text-gray-700 text-right">Valor Bem</TableHead>
                   <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
@@ -515,9 +517,11 @@ function ExtratoConsorcio() {
               <TableBody>
                 {(rows as any[]).map((row: any) => (
                   <TableRow key={row.id} className="hover:bg-gray-50">
-                    <TableCell className="font-mono text-sm text-gray-700">{row.nrOperacao || '—'}</TableCell>
+                    {isAdminOuSuporte && <TableCell className="text-sm font-medium text-gray-800">{row.nomeAgente || '—'}</TableCell>}
+                    <TableCell className="font-mono text-sm text-gray-700">{row.proposta || '—'}</TableCell>
+                    <TableCell className="text-sm text-gray-600">{row.empresa || '—'}</TableCell>
                     <TableCell className="text-center">
-                      <Badge variant="outline" className="text-xs">{row.parcelas ?? '—'}</Badge>
+                      <Badge variant="outline" className="text-xs">{row.parcLiberada ?? '—'}</Badge>
                     </TableCell>
                     <TableCell className="text-gray-700 text-sm">{row.segmento || '—'}</TableCell>
                     <TableCell className="text-right text-blue-700 font-semibold">{fmtNum(row.valorBem)}</TableCell>

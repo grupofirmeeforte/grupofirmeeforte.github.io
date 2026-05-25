@@ -1715,15 +1715,15 @@ export const appRouter = router({
         mesAno: z.string().optional(),
       }))
       .query(async ({ input, ctx }) => {
-        const { extratoConsorcios } = await import('../drizzle/schema');
+        const { consorcios: consorciosTable } = await import('../drizzle/schema');
         const dbConn = await getDb();
         if (!dbConn) throw new Error('Database connection not available');
         const db = dbConn;
         const { and, eq, like, gt } = await import('drizzle-orm');
         const agora = new Date();
-        const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
-        const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
-        const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
+        const mesAtual = agora.getMonth() + 1;
+        const anoRef = agora.getFullYear();
+        const mesRef = input.mesAno ?? `${String(mesAtual).padStart(2, '0')}/${anoRef}`;
         let isAdminOuSuporte = false;
         let chaveJLogado: string | null = null;
         if (ctx.user?.openId?.startsWith('agente_')) {
@@ -1735,13 +1735,13 @@ export const appRouter = router({
         } else if (ctx.user) { isAdminOuSuporte = true; }
         const chaveJ = isAdminOuSuporte ? (input.chaveJ ?? null) : chaveJLogado;
         const conditions: any[] = [];
-        if (chaveJ) conditions.push(like(extratoConsorcios.chaveJ, `%${chaveJ}%`));
-        else if (!isAdminOuSuporte && chaveJLogado) conditions.push(like(extratoConsorcios.chaveJ, `%${chaveJLogado}%`));
-        if (input.nomeAgente && isAdminOuSuporte) conditions.push(like(extratoConsorcios.nome, `%${input.nomeAgente}%`));
-        if (mesRef) conditions.push(eq(extratoConsorcios.mesAno, mesRef));
+        if (chaveJ) conditions.push(like(consorciosTable.chaveJ, `%${chaveJ}%`));
+        else if (!isAdminOuSuporte && chaveJLogado) conditions.push(like(consorciosTable.chaveJ, `%${chaveJLogado}%`));
+        if (input.nomeAgente && isAdminOuSuporte) conditions.push(like(consorciosTable.nomeAgente, `%${input.nomeAgente}%`));
+        if (mesRef) conditions.push(eq(consorciosTable.mesAno, mesRef));
         // Somente operações que geram comissão (comissao > 0)
-        conditions.push(gt(extratoConsorcios.comissao, '0'));
-        const rows = await db.select().from(extratoConsorcios).where(conditions.length ? and(...conditions) : undefined).orderBy(extratoConsorcios.nome);
+        conditions.push(gt(consorciosTable.comissao, '0'));
+        const rows = await db.select().from(consorciosTable).where(conditions.length ? and(...conditions) : undefined).orderBy(consorciosTable.nomeAgente);
         return { rows, mesRef, chaveJ: chaveJ ?? '', isAdminOuSuporte };
       }),
   }),
