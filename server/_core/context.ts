@@ -36,32 +36,20 @@ export async function createContext(
   try {
     user = await sdk.authenticateRequest(opts.req);
 
-    // Se usuário está autenticado, validar se a sessão ainda está ativa
-    if (user) {
-      const openId = user.openId;
-      const db = await getDb();
-      if (db) {
-        let sessaoAtiva = false;
-        if (openId.startsWith('agente_')) {
-          // Login via ChaveJ customizado — verificar pelo agenteId (mais confiável que sessionId cookie)
-          const agenteId = parseInt(openId.replace('agente_', ''), 10);
-          const result = await db.select().from(sessoes)
-            .where(and(eq(sessoes.agenteId, agenteId), eq(sessoes.ativo, 1)))
-            .limit(1);
-          sessaoAtiva = result.length > 0;
-        } else if (user.name) {
-          // Login OAuth puro: verificar pelo nome do agente
+    // Para agentes customizados (login com ChaveJ), o JWT já é suficiente para autenticação.
+    // Não verificar sessão ativa para evitar problemas com múltiplos dispositivos.
+    if (user && !user.openId?.startsWith('agente_')) {
+      // Apenas para login OAuth puro: verificar sessão pelo nome
+      if (user.name) {
+        const db = await getDb();
+        if (db) {
           const result = await db.select().from(sessoes)
             .where(and(eq(sessoes.nomeAgente, user.name), eq(sessoes.ativo, 1)))
             .limit(1);
-          sessaoAtiva = result.length > 0;
-        } else {
-          // Sem como verificar: permitir acesso
-          sessaoAtiva = true;
-        }
-        if (!sessaoAtiva) {
-          user = null;
-          clearSessionCookies(opts.res);
+          if (result.length === 0) {
+            user = null;
+            clearSessionCookies(opts.res);
+          }
         }
       }
     }
