@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Download, Search, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2, Shield, Activity, Users, Clock, Filter, X, LogOut, RefreshCw, Wallet, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { Download, Search, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2, Shield, Activity, Users, Clock, Filter, X, LogOut, RefreshCw, Wallet, Lock, Eye, EyeOff, AlertTriangle, DatabaseBackup, Mail, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import AuditoriaPermissoes from './auditoria-permissoes';
 import { useLocation } from 'wouter';
@@ -36,8 +36,8 @@ export default function AuditoriaPage() {
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const abaParam = searchParams.get('aba');
-  const [aba, setAba] = useState<'logs' | 'feriados' | 'credito-despesas' | 'permissoes' | 'despesas-internas'>(
-    abaParam === 'feriados' ? 'feriados' : abaParam === 'credito-despesas' ? 'credito-despesas' : abaParam === 'permissoes' ? 'permissoes' : abaParam === 'despesas-internas' ? 'despesas-internas' : 'logs'
+  const [aba, setAba] = useState<'logs' | 'feriados' | 'credito-despesas' | 'permissoes' | 'despesas-internas' | 'backup'>(
+    abaParam === 'feriados' ? 'feriados' : abaParam === 'credito-despesas' ? 'credito-despesas' : abaParam === 'permissoes' ? 'permissoes' : abaParam === 'despesas-internas' ? 'despesas-internas' : abaParam === 'backup' ? 'backup' : 'logs'
   );
 
   // Atualiza aba quando o parâmetro de URL muda
@@ -48,6 +48,7 @@ export default function AuditoriaPage() {
     else if (p === 'credito-despesas') setAba('credito-despesas');
     else if (p === 'permissoes') setAba('permissoes');
     else if (p === 'despesas-internas') setAba('despesas-internas');
+    else if (p === 'backup') setAba('backup');
     else setAba('logs');
   }, [window.location.search]);
 
@@ -288,6 +289,8 @@ export default function AuditoriaPage() {
         </button>
         {/* Aba Despesas Internas — só aparece para Sidnei e Thiago */}
         <DespesasInternasAbaBtn aba={aba} setAba={setAba} />
+        {/* Aba Backup — só aparece para admin/CEO */}
+        <BackupAbaBtn aba={aba} setAba={setAba} />
       </div>
 
       {/* ── ABA LOGS ─────────────────────────────────────────────────────────────────── */}
@@ -820,6 +823,8 @@ export default function AuditoriaPage() {
 
       {/* ── ABA DESPESAS INTERNAS ──────────────────────────────────────── */}
       {aba === 'despesas-internas' && <DespesasInternasAba />}
+      {/* ── ABA BACKUP ─────────────────────────────────────────────────────────────── */}
+      {aba === 'backup' && <BackupAba />}
     </div>
   );
 }
@@ -1154,6 +1159,163 @@ function DespesasInternasAba() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+// ─── BOTÃO DA ABA BACKUP (só aparece para admin/CEO) ─────────────────────────
+function BackupAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => void }) {
+  const { user } = useAuth();
+  const cargo = ((user as any)?.cargo ?? '').toUpperCase();
+  const permissoes = (user as any)?.permissoes ?? '';
+  const role = (user as any)?.role ?? '';
+  const temAcesso = role === 'admin' || ['CEO', 'ADM', 'ADMIN'].includes(cargo) || permissoes === 'admin';
+  if (!temAcesso) return null;
+  return (
+    <button
+      onClick={() => setAba('backup')}
+      className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
+        aba === 'backup' ? 'bg-white border border-b-white border-gray-200 text-emerald-700' : 'text-gray-500 hover:text-gray-700'
+      }`}
+    >
+      <DatabaseBackup className="w-4 h-4" /> Backup
+    </button>
+  );
+}
+
+// ─── ABA BACKUP ───────────────────────────────────────────────────────────────
+function BackupAba() {
+  const gerarMutation = trpc.backup.gerar.useMutation();
+  const emailMutation = trpc.backup.enviarEmail.useMutation();
+  const [ultimoBackup, setUltimoBackup] = useState<{ tabelas: number; tamanhoKB: number; dataHora: string } | null>(null);
+  const [emailEnviado, setEmailEnviado] = useState(false);
+
+  const handleDownload = async () => {
+    try {
+      const result = await gerarMutation.mutateAsync();
+      const dataHora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+      setUltimoBackup({ tabelas: result.tabelas, tamanhoKB: result.tamanhoKB, dataHora });
+
+      // Converter base64 para blob e fazer download
+      const byteChars = atob(result.base64);
+      const byteNums = new Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) byteNums[i] = byteChars.charCodeAt(i);
+      const byteArray = new Uint8Array(byteNums);
+      const blob = new Blob([byteArray], { type: 'application/zip' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `backup-gff-${dataHora.replace(/[/:]/g, '-').replace(/ /g, '_')}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(`Backup gerado com sucesso! ${result.tabelas} tabelas, ${result.tamanhoKB} KB`);
+    } catch (e: any) {
+      toast.error('Erro ao gerar backup: ' + (e?.message ?? 'Erro desconhecido'));
+    }
+  };
+
+  const handleEmail = async () => {
+    try {
+      const result = await emailMutation.mutateAsync();
+      setEmailEnviado(true);
+      toast.success(`Backup enviado para ${result.email}`);
+    } catch (e: any) {
+      toast.error('Erro ao enviar e-mail: ' + (e?.message ?? 'Erro desconhecido'));
+    }
+  };
+
+  return (
+    <div className="space-y-6 mt-4">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <div className="flex items-center gap-3 mb-4">
+          <DatabaseBackup className="w-7 h-7 text-emerald-600" />
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">Backup do Sistema</h2>
+            <p className="text-sm text-gray-500">Exportação completa de todas as tabelas do banco de dados</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* Card Download */}
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <Download className="w-5 h-5 text-emerald-700" />
+              <h3 className="font-semibold text-emerald-800">Download Manual</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Gera um arquivo ZIP com todas as tabelas em formato Excel (.xlsx). Faça o download agora e guarde em local seguro.
+            </p>
+            <div className="text-xs text-gray-500 mb-4 space-y-1">
+              <p>• Agentes • Febraban • Consignados • Contas Correntes</p>
+              <p>• Consórcios • OuroCap • Seguros • BB Dental</p>
+              <p>• Despesas Fixas • Despesas Internas • Certificações</p>
+              <p>• Feriados • Pagamentos • Auditoria</p>
+            </div>
+            <Button
+              onClick={handleDownload}
+              disabled={gerarMutation.isPending}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+            >
+              {gerarMutation.isPending ? (
+                <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Gerando backup...</>
+              ) : (
+                <><Download className="w-4 h-4 mr-2" /> Baixar Backup Agora</>
+              )}
+            </Button>
+          </div>
+
+          {/* Card E-mail */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+            <div className="flex items-center gap-2 mb-2">
+              <Mail className="w-5 h-5 text-blue-700" />
+              <h3 className="font-semibold text-blue-800">Enviar por E-mail</h3>
+            </div>
+            <p className="text-sm text-gray-600 mb-2">
+              Envia o backup completo para o e-mail cadastrado do sistema.
+            </p>
+            <div className="bg-white border border-blue-200 rounded-lg px-3 py-2 mb-4 text-sm font-mono text-blue-800">
+              ultramare@gmail.com
+            </div>
+            <p className="text-xs text-gray-500 mb-4">
+              O arquivo ZIP será enviado como anexo. Certifique-se de que as configurações de SMTP estão ativas no sistema.
+            </p>
+            <Button
+              onClick={handleEmail}
+              disabled={emailMutation.isPending}
+              variant="outline"
+              className="w-full border-blue-400 text-blue-700 hover:bg-blue-50 font-semibold"
+            >
+              {emailMutation.isPending ? (
+                <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Enviando...</>
+              ) : emailEnviado ? (
+                <><CheckCircle2 className="w-4 h-4 mr-2 text-green-600" /> E-mail Enviado!</>
+              ) : (
+                <><Mail className="w-4 h-4 mr-2" /> Enviar por E-mail</>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Último backup */}
+        {ultimoBackup && (
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
+            <div className="text-sm">
+              <span className="font-semibold text-gray-700">Último backup gerado:</span>{' '}
+              <span className="text-gray-600">{ultimoBackup.dataHora}</span>
+              <span className="text-gray-400 ml-2">• {ultimoBackup.tabelas} tabelas • {ultimoBackup.tamanhoKB} KB</span>
+            </div>
+          </div>
+        )}
+
+        {/* Aviso */}
+        <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3 flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5 shrink-0" />
+          <p className="text-xs text-yellow-800">
+            <strong>Recomendação:</strong> Faça backup pelo menos uma vez por semana e guarde os arquivos em local seguro (Google Drive, HD externo, etc.). O banco de dados do sistema não possui recuperação automática em caso de perda acidental de dados.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
