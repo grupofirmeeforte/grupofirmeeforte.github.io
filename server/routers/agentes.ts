@@ -491,6 +491,21 @@ export const agentesRouter = router({
       return { success: true };
     }),
 
+  // Autocomplete: buscar agentes por nome parcial (retorna nome + chaveJ)
+  autocomplete: protectedProcedure
+    .input(z.object({ query: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+      const result = await db
+        .select({ nomeAgente: agentes.nomeAgente, chaveJ: agentes.chaveJ })
+        .from(agentes)
+        .where(like(agentes.nomeAgente, `%${input.query}%`))
+        .orderBy(asc(agentes.nomeAgente))
+        .limit(10);
+      return result;
+    }),
+
   // Listar cargos únicos (para o seletor de template)
   getCargos: protectedProcedure.query(async () => {
     const db = await getDb();

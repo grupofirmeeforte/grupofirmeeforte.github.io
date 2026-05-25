@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -79,6 +79,16 @@ function PainelFiltros({ filtroChaveJ, setFiltroChaveJ, filtroNome, setFiltroNom
   filtroMes: string; setFiltroMes: (v: string) => void;
   onBuscar: () => void;
 }) {
+  const [showSugestoes, setShowSugestoes] = React.useState(false);
+  const { data: sugestoes } = trpc.agentes.autocomplete.useQuery(
+    { query: filtroNome },
+    { enabled: filtroNome.length >= 2 }
+  );
+  const handleSelecionarAgente = (nome: string, chaveJ: string) => {
+    setFiltroNome(nome);
+    setFiltroChaveJ(chaveJ ?? '');
+    setShowSugestoes(false);
+  };
   return (
     <div className="mb-5 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
       <div className="flex items-center gap-2 mb-3">
@@ -90,9 +100,32 @@ function PainelFiltros({ filtroChaveJ, setFiltroChaveJ, filtroNome, setFiltroNom
           <label className="text-xs text-indigo-600 font-medium">ChaveJ</label>
           <Input value={filtroChaveJ} onChange={e => setFiltroChaveJ(e.target.value)} placeholder="Ex: J1234567" className="w-36 h-8 text-sm" />
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 relative">
           <label className="text-xs text-indigo-600 font-medium">Nome do Agente</label>
-          <Input value={filtroNome} onChange={e => setFiltroNome(e.target.value)} placeholder="Ex: JOAO SILVA" className="w-48 h-8 text-sm" />
+          <Input
+            value={filtroNome}
+            onChange={e => { setFiltroNome(e.target.value); setShowSugestoes(true); }}
+            onFocus={() => setShowSugestoes(true)}
+            onBlur={() => setTimeout(() => setShowSugestoes(false), 150)}
+            placeholder="Digite o nome..."
+            className="w-56 h-8 text-sm"
+            autoComplete="off"
+          />
+          {showSugestoes && sugestoes && sugestoes.length > 0 && (
+            <div className="absolute top-full left-0 z-50 mt-1 w-72 bg-white border border-indigo-200 rounded-lg shadow-lg max-h-52 overflow-y-auto">
+              {sugestoes.map((s, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onMouseDown={() => handleSelecionarAgente(s.nomeAgente ?? '', s.chaveJ ?? '')}
+                  className="w-full text-left px-3 py-2 hover:bg-indigo-50 text-sm border-b last:border-b-0"
+                >
+                  <span className="font-medium text-gray-800">{s.nomeAgente}</span>
+                  <span className="ml-2 text-xs text-indigo-500 font-mono">{s.chaveJ}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <label className="text-xs text-indigo-600 font-medium">Mês (MM/AAAA)</label>
