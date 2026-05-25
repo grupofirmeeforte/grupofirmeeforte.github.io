@@ -68,14 +68,11 @@ function fones(row: Row): string[] {
 }
 
 // Mapeamento Excel → campos
+// Colunas removidas: MCI_EMPREGADOR_CADASTRO, NR_CVN_13_SALARIO, NR_CVN_CONSIG, NR_CVN_SALARIO,
+// SUPER, MCI, CD_IDFR_BNFC, DT_PRIMEIRO_PAGTO, MAIOR_LIMITE_DE_CREDITO_NOVO, Cod_COBAN, CAMPANHA, AGENTE
 const EXCEL_MAP: Record<string, keyof Row> = {
   "SEXO": "sexo",
-  "MCI_EMPREGADOR_CADASTRO": "mciEmpregador",
-  "NR_CVN_13_SALARIO": "nrCvn13Salario",
-  "NR_CVN_CONSIG": "nrCvnConsig",
-  "NR_CVN_SALARIO": "nrCvnSalario",
   "SG_UF": "sgUf",
-  "SUPER": "super",
   "CIDADE": "cidade",
   "NÃO_PERTUBE": "naoPerturbe",
   "DT INCLUSÃO": "dtInclusao",
@@ -94,13 +91,6 @@ const EXCEL_MAP: Record<string, keyof Row> = {
   "DDD_08": "ddd08", "TEL_08": "tel08",
   "DDD_09": "ddd09", "TEL_09": "tel09",
   "DDD_10": "ddd10", "TEL_10": "tel10",
-  "MCI": "mci",
-  "CD_IDFR_BNFC": "cdIdfr",
-  "DT_PRIMEIRO_PAGTO": "dtPrimeiroPagto",
-  "MAIOR_LIMITE_DE_CREDITO_NOVO": "maiorLimiteCredito",
-  "Cod_COBAN": "codCoban",
-  "CAMPANHA": "campanha",
-  "AGENTE": "agente",
   "DATA": "dataContato",
   "RESULTADO": "resultado",
   "DATA Inserido": "dataInserido",
@@ -220,28 +210,24 @@ export default function MailingCrm() {
       "DTA_NASC": r.dtaNasc ?? "",
       "CPF": r.cpf ?? "",
       "CIDADE": r.cidade ?? "",
-      "UF": r.sgUf ?? "",
-      "SUPER": r.super ?? "",
+      "SG_UF": r.sgUf ?? "",
       "NR_C/C": r.nrCc ?? "",
-      "NÃO PERTURBE": r.naoPerturbe ?? "",
+      "NÃO_PERTUBE": r.naoPerturbe ?? "",
       "DT INCLUSÃO": r.dtInclusao ?? "",
       "PRF_DEPE": r.prfDepe ?? "",
-      "NR_CVN_CONSIG": r.nrCvnConsig ?? "",
-      "NR_CVN_SALARIO": r.nrCvnSalario ?? "",
-      "NR_CVN_13_SALARIO": r.nrCvn13Salario ?? "",
-      "CD_IDFR_BNFC": r.cdIdfr ?? "",
-      "DT_PRIMEIRO_PAGTO": r.dtPrimeiroPagto ?? "",
-      "MAIOR_LIMITE_CREDITO": r.maiorLimiteCredito ?? "",
-      "CAMPANHA": r.campanha ?? "",
-      "AGENTE": r.agente ?? "",
-      "DATA CONTATO": r.dataContato ?? "",
+      "DATA": r.dataContato ?? "",
       "RESULTADO": r.resultado ?? "",
-      "DATA INSERIDO": r.dataInserido ?? "",
+      "DATA Inserido": r.dataInserido ?? "",
       "DDD_01": r.ddd01 ?? "", "TEL_01": r.tel01 ?? "",
       "DDD_02": r.ddd02 ?? "", "TEL_02": r.tel02 ?? "",
       "DDD_03": r.ddd03 ?? "", "TEL_03": r.tel03 ?? "",
       "DDD_04": r.ddd04 ?? "", "TEL_04": r.tel04 ?? "",
       "DDD_05": r.ddd05 ?? "", "TEL_05": r.tel05 ?? "",
+      "DDD_06": r.ddd06 ?? "", "TEL_06": r.tel06 ?? "",
+      "DDD_07": r.ddd07 ?? "", "TEL_07": r.tel07 ?? "",
+      "DDD_08": r.ddd08 ?? "", "TEL_08": r.tel08 ?? "",
+      "DDD_09": r.ddd09 ?? "", "TEL_09": r.tel09 ?? "",
+      "DDD_10": r.ddd10 ?? "", "TEL_10": r.tel10 ?? "",
       "OBSERVAÇÃO": r.observacao ?? "",
     })));
     const wb = XLSX.utils.book_new();
@@ -391,10 +377,9 @@ export default function MailingCrm() {
           <thead>
             <tr className="bg-blue-50 border-b border-blue-100 text-xs text-blue-700 uppercase tracking-wide">
               <th className="px-3 py-2.5 text-left font-semibold">Cliente</th>
-              <th className="px-3 py-2.5 text-left font-semibold">Contato / Telefones</th>
-              <th className="px-3 py-2.5 text-left font-semibold">Localização</th>
-              <th className="px-3 py-2.5 text-left font-semibold">Dados Bancários</th>
-              <th className="px-3 py-2.5 text-left font-semibold">Campanha / Agente</th>
+              <th className="px-3 py-2.5 text-left font-semibold">Telefones</th>
+              <th className="px-3 py-2.5 text-left font-semibold">Localização / C/C</th>
+              <th className="px-3 py-2.5 text-left font-semibold">Datas</th>
               <th className="px-3 py-2.5 text-left font-semibold">Resultado</th>
               <th className="px-3 py-2.5 text-center font-semibold w-16">Ações</th>
             </tr>
@@ -466,35 +451,14 @@ export default function MailingCrm() {
                       {r.cidade && <span className="text-[12px] text-gray-700 font-medium">{r.cidade}</span>}
                       {r.sgUf && <span className="text-[10px] px-1 py-0.5 rounded bg-gray-100 text-gray-600 font-bold">{r.sgUf}</span>}
                     </div>
-                    {r.super && <div className="text-[10px] text-gray-400 mt-0.5">Super: {r.super}</div>}
                     {r.dtInclusao && <div className="text-[10px] text-gray-400">Incl: {r.dtInclusao}</div>}
                     {r.prfDepe && <div className="text-[10px] text-gray-400">Prf: {r.prfDepe}</div>}
+                    {r.nrCc && <div className="text-[10px] text-gray-500 font-mono">C/C: {r.nrCc}</div>}
                   </td>
 
-                  {/* Coluna 4: Dados Bancários */}
-                  <td className="px-3 py-2.5 min-w-[160px]">
-                    {r.nrCc && <div className="text-[11px] text-gray-700 font-mono">C/C: {r.nrCc}</div>}
-                    {r.cdIdfr && <div className="text-[10px] text-gray-500">IDFR: {r.cdIdfr}</div>}
-                    {r.dtPrimeiroPagto && <div className="text-[10px] text-gray-500">1º Pagto: {r.dtPrimeiroPagto}</div>}
-                    {r.maiorLimiteCredito && (
-                      <div className="text-[11px] text-blue-700 font-semibold mt-0.5">
-                        Limite: {r.maiorLimiteCredito}
-                      </div>
-                    )}
-                    {r.nrCvnConsig && <div className="text-[10px] text-gray-400">CVN Consig: {r.nrCvnConsig}</div>}
-                    {r.nrCvnSalario && <div className="text-[10px] text-gray-400">CVN Sal: {r.nrCvnSalario}</div>}
-                    {r.nrCvn13Salario && <div className="text-[10px] text-gray-400">CVN 13: {r.nrCvn13Salario}</div>}
-                  </td>
-
-                  {/* Coluna 5: Campanha / Agente */}
+                  {/* Coluna 4: Contato / Datas */}
                   <td className="px-3 py-2.5 min-w-[140px]">
-                    {r.campanha && (
-                      <div className="text-[10px] px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 font-medium inline-block mb-1">
-                        {r.campanha}
-                      </div>
-                    )}
-                    {r.agente && <div className="text-[12px] text-gray-700 font-medium">{r.agente}</div>}
-                    {r.dataContato && <div className="text-[10px] text-gray-400 mt-0.5">Contato: {r.dataContato}</div>}
+                    {r.dataContato && <div className="text-[11px] text-gray-700">Contato: {r.dataContato}</div>}
                     {r.dataInserido && <div className="text-[10px] text-gray-400">Inserido: {r.dataInserido}</div>}
                   </td>
 
@@ -628,19 +592,10 @@ export default function MailingCrm() {
             {fld("cpf", "CPF", 2)}
             {fld("cidade", "Cidade", 2)}
             {fld("sgUf", "UF", 1)}
-            {fld("super", "Super", 1)}
-            {fld("nrCc", "NR C/C", 2)}
+            {fld("nrCc", "NR C/C", 1)}
             {fld("naoPerturbe", "Não Perturbe", 2)}
             {fld("dtInclusao", "Dt. Inclusão", 2)}
             {fld("prfDepe", "Prf Depe", 2)}
-            {fld("cdIdfr", "CD IDFR BNFC", 2)}
-            {fld("dtPrimeiroPagto", "1º Pagto", 2)}
-            {fld("maiorLimiteCredito", "Maior Limite Crédito", 2)}
-            {fld("nrCvnConsig", "CVN Consig", 2)}
-            {fld("nrCvnSalario", "CVN Salário", 2)}
-            {fld("nrCvn13Salario", "CVN 13 Salário", 2)}
-            {fld("campanha", "Campanha", 2)}
-            {fld("agente", "Agente", 2)}
             {fld("dataContato", "Data Contato", 2)}
             {fld("resultado", "Resultado", 2)}
             {fld("dataInserido", "Data Inserido", 2)}
