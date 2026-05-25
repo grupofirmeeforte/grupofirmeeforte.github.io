@@ -67,7 +67,7 @@ export default function AcompanhamentoDiario() {
     { empresa, mes, ano }
   );
 
-  const agentes = data?.agentes ?? [];
+  const agentes = [...(data?.agentes ?? [])].sort((a, b) => b.total - a.total);
   const dias = data?.dias ?? [];
   const totalPorDia: Record<number, number> = (data?.totalPorDia ?? {}) as Record<number, number>;
   const diasUteisTotal = data?.diasUteisTotal ?? 0;
