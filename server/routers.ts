@@ -1876,10 +1876,14 @@ export const appRouter = router({
         if (!dbConn) return { temAcesso: false };
         const db = dbConn;
         const { eq } = await import('drizzle-orm');
-        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente })
+        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente, chaveJ: agentesTable.chaveJ })
           .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
-        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
-        const temAcesso = AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim());
+        // Verificar por ChaveJ (mais confiável) OU por nome
+        const CHAVES_AUTORIZADAS = ['J1234568', 'J1234569', 'J9624265', 'JG701582'];
+        const NOMES_AUTORIZADOS = ['sidnei honorato ultramare', 'thiago viana ultramare'];
+        const temAcesso = 
+          CHAVES_AUTORIZADAS.includes(agente?.chaveJ ?? '') ||
+          NOMES_AUTORIZADOS.includes(agente?.nomeAgente?.toLowerCase().trim() ?? '');
         return { temAcesso };
       }),
 
@@ -1896,8 +1900,9 @@ export const appRouter = router({
         const { eq } = await import('drizzle-orm');
         const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente, senha: agentesTable.senha })
           .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
-        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
-        const temAcesso = AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim());
+        const CHAVES_AUTORIZADAS = ['J1234568', 'J1234569', 'J9624265', 'JG701582'];
+        const NOMES_AUTORIZADOS = ['sidnei honorato ultramare', 'thiago viana ultramare'];
+        const temAcesso = CHAVES_AUTORIZADAS.includes((agente as any)?.chaveJ ?? '') || NOMES_AUTORIZADOS.includes(agente?.nomeAgente?.toLowerCase().trim() ?? '');
         if (!temAcesso) throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
         // A segunda senha CEO é a mesma senha do agente
         if (agente.senha !== input.senha) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Senha CEO incorreta' });
@@ -1915,10 +1920,11 @@ export const appRouter = router({
         if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco indisponível' });
         const db = dbConn;
         const { eq, and, desc } = await import('drizzle-orm');
-        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente })
+        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente, chaveJ: agentesTable.chaveJ })
           .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
-        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
-        if (!AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim()))
+        const CHAVES_AUTORIZADAS = ['J1234568', 'J1234569', 'J9624265', 'JG701582'];
+        const NOMES_AUTORIZADOS = ['sidnei honorato ultramare', 'thiago viana ultramare'];
+        if (!CHAVES_AUTORIZADAS.includes(agente?.chaveJ ?? '') && !NOMES_AUTORIZADOS.includes(agente?.nomeAgente?.toLowerCase().trim() ?? ''))
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
         const conditions: any[] = [];
         if (input.mesAno) conditions.push(eq(despesasTable.mesAno, input.mesAno));
@@ -1948,8 +1954,9 @@ export const appRouter = router({
         const { eq } = await import('drizzle-orm');
         const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente, chaveJ: agentesTable.chaveJ })
           .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
-        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
-        if (!AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim()))
+        const CHAVES_AUTORIZADAS = ['J1234568', 'J1234569', 'J9624265', 'JG701582'];
+        const NOMES_AUTORIZADOS = ['sidnei honorato ultramare', 'thiago viana ultramare'];
+        if (!CHAVES_AUTORIZADAS.includes(agente?.chaveJ ?? '') && !NOMES_AUTORIZADOS.includes(agente?.nomeAgente?.toLowerCase().trim() ?? ''))
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
         await db.insert(despesasTable).values({
           mesAno: input.mesAno,
@@ -1983,10 +1990,11 @@ export const appRouter = router({
         if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco indisponível' });
         const db = dbConn;
         const { eq } = await import('drizzle-orm');
-        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente })
+        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente, chaveJ: agentesTable.chaveJ })
           .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
-        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
-        if (!AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim()))
+        const CHAVES_AUTORIZADAS = ['J1234568', 'J1234569', 'J9624265', 'JG701582'];
+        const NOMES_AUTORIZADOS = ['sidnei honorato ultramare', 'thiago viana ultramare'];
+        if (!CHAVES_AUTORIZADAS.includes(agente?.chaveJ ?? '') && !NOMES_AUTORIZADOS.includes(agente?.nomeAgente?.toLowerCase().trim() ?? ''))
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
         await db.update(despesasTable).set({
           mesAno: input.mesAno,
@@ -2010,10 +2018,11 @@ export const appRouter = router({
         if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco indisponível' });
         const db = dbConn;
         const { eq } = await import('drizzle-orm');
-        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente })
+        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente, chaveJ: agentesTable.chaveJ })
           .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
-        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
-        if (!AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim()))
+        const CHAVES_AUTORIZADAS = ['J1234568', 'J1234569', 'J9624265', 'JG701582'];
+        const NOMES_AUTORIZADOS = ['sidnei honorato ultramare', 'thiago viana ultramare'];
+        if (!CHAVES_AUTORIZADAS.includes(agente?.chaveJ ?? '') && !NOMES_AUTORIZADOS.includes(agente?.nomeAgente?.toLowerCase().trim() ?? ''))
           throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
         await db.delete(despesasTable).where(eq(despesasTable.id, input.id));
         return { ok: true };
