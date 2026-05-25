@@ -3,9 +3,8 @@ import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { TRPCError } from "@trpc/server";
 import * as XLSX from "xlsx";
-import archiver from "archiver";
+import JSZip from "jszip";
 import nodemailer from "nodemailer";
-import { PassThrough } from "stream";
 
 const BACKUP_EMAIL = "ultramare@gmail.com";
 
@@ -24,7 +23,6 @@ function isAuthorized(user: any): boolean {
 async function gerarBuffersExcel(db: any): Promise<Record<string, Buffer>> {
   const buffers: Record<string, Buffer> = {};
 
-  // Helper para converter rows em buffer Excel
   function toBuffer(rows: any[], sheetName: string): Buffer {
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
@@ -38,100 +36,46 @@ async function gerarBuffersExcel(db: any): Promise<Record<string, Buffer>> {
     certificacoes, feriados, pagamentos, auditoria,
   } = await import("../../drizzle/schema");
 
-  // Agentes
-  const rowsAgentes = await db.select().from(agentes);
-  buffers["agentes.xlsx"] = toBuffer(rowsAgentes, "Agentes");
-
-  // Febraban
-  const rowsFebraban = await db.select().from(febraban);
-  buffers["febraban.xlsx"] = toBuffer(rowsFebraban, "Febraban");
-
-  // Consignados
-  const rowsConsignados = await db.select().from(consignados);
-  buffers["consignados.xlsx"] = toBuffer(rowsConsignados, "Consignados");
-
-  // Contas Correntes
-  const rowsCC = await db.select().from(contasCorrentes);
-  buffers["contasCorrentes.xlsx"] = toBuffer(rowsCC, "ContasCorrentes");
-
-  // Consórcios
-  const rowsConsorcios = await db.select().from(consorcios);
-  buffers["consorcios.xlsx"] = toBuffer(rowsConsorcios, "Consorcios");
-
-  // OuroCap
-  const rowsOurocap = await db.select().from(ourocap);
-  buffers["ourocap.xlsx"] = toBuffer(rowsOurocap, "OuroCap");
-
-  // Seguros
-  const rowsSeguros = await db.select().from(seguros);
-  buffers["seguros.xlsx"] = toBuffer(rowsSeguros, "Seguros");
-
-  // BB Dental
-  const rowsBBDental = await db.select().from(bbdental);
-  buffers["bbdental.xlsx"] = toBuffer(rowsBBDental, "BBDental");
-
-  // Despesas Fixas
-  const rowsDespFixas = await db.select().from(despesasFixas);
-  buffers["despesasFixas.xlsx"] = toBuffer(rowsDespFixas, "DespesasFixas");
-
-  // Despesas Internas
-  const rowsDespInternas = await db.select().from(despesasInternas);
-  buffers["despesasInternas.xlsx"] = toBuffer(rowsDespInternas, "DespesasInternas");
-
-  // Certificações
-  const rowsCertif = await db.select().from(certificacoes);
-  buffers["certificacoes.xlsx"] = toBuffer(rowsCertif, "Certificacoes");
-
-  // Feriados
-  const rowsFeriados = await db.select().from(feriados);
-  buffers["feriados.xlsx"] = toBuffer(rowsFeriados, "Feriados");
-
-  // Pagamentos
-  const rowsPagamentos = await db.select().from(pagamentos);
-  buffers["pagamentos.xlsx"] = toBuffer(rowsPagamentos, "Pagamentos");
-
-  // Auditoria (últimos 10.000 registros)
-  const rowsAuditoria = await db.select().from(auditoria).limit(10000);
-  buffers["auditoria.xlsx"] = toBuffer(rowsAuditoria, "Auditoria");
+  buffers["agentes.xlsx"] = toBuffer(await db.select().from(agentes), "Agentes");
+  buffers["febraban.xlsx"] = toBuffer(await db.select().from(febraban), "Febraban");
+  buffers["consignados.xlsx"] = toBuffer(await db.select().from(consignados), "Consignados");
+  buffers["contasCorrentes.xlsx"] = toBuffer(await db.select().from(contasCorrentes), "ContasCorrentes");
+  buffers["consorcios.xlsx"] = toBuffer(await db.select().from(consorcios), "Consorcios");
+  buffers["ourocap.xlsx"] = toBuffer(await db.select().from(ourocap), "OuroCap");
+  buffers["seguros.xlsx"] = toBuffer(await db.select().from(seguros), "Seguros");
+  buffers["bbdental.xlsx"] = toBuffer(await db.select().from(bbdental), "BBDental");
+  buffers["despesasFixas.xlsx"] = toBuffer(await db.select().from(despesasFixas), "DespesasFixas");
+  buffers["despesasInternas.xlsx"] = toBuffer(await db.select().from(despesasInternas), "DespesasInternas");
+  buffers["certificacoes.xlsx"] = toBuffer(await db.select().from(certificacoes), "Certificacoes");
+  buffers["feriados.xlsx"] = toBuffer(await db.select().from(feriados), "Feriados");
+  buffers["pagamentos.xlsx"] = toBuffer(await db.select().from(pagamentos), "Pagamentos");
+  buffers["auditoria.xlsx"] = toBuffer(await db.select().from(auditoria).limit(10000), "Auditoria");
 
   return buffers;
 }
 
 async function gerarZip(buffers: Record<string, Buffer>): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    const passThrough = new PassThrough();
-    passThrough.on("data", (chunk) => chunks.push(chunk));
-    passThrough.on("end", () => resolve(Buffer.concat(chunks)));
-    passThrough.on("error", reject);
-
-    const archive = archiver("zip", { zlib: { level: 6 } });
-    archive.on("error", reject);
-    archive.pipe(passThrough);
-
-    for (const [name, buf] of Object.entries(buffers)) {
-      archive.append(buf, { name });
-    }
-    archive.finalize();
-  });
+  const zip = new JSZip();
+  for (const [name, buf] of Object.entries(buffers)) {
+    zip.file(name, buf);
+  }
+  const result = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE", compressionOptions: { level: 6 } });
+  return result;
 }
 
 async function enviarEmailBackup(zipBuffer: Buffer, dataHora: string): Promise<void> {
-  // Usa SMTP do Gmail via variável de ambiente ou fallback para ethereal
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
 
-  let transporter: any;
-  if (smtpUser && smtpPass) {
-    transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: { user: smtpUser, pass: smtpPass },
-    });
-  } else {
-    // Sem SMTP configurado: apenas loga
+  if (!smtpUser || !smtpPass) {
     console.log("[BACKUP] SMTP não configurado. Backup gerado mas não enviado por e-mail.");
     return;
   }
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: smtpUser, pass: smtpPass },
+  });
 
   await transporter.sendMail({
     from: `"Sistema GFF Backup" <${smtpUser}>`,
@@ -140,7 +84,7 @@ async function enviarEmailBackup(zipBuffer: Buffer, dataHora: string): Promise<v
     text: `Backup automático do sistema gerado em ${dataHora}.\n\nArquivo ZIP em anexo com todas as tabelas do banco de dados.`,
     attachments: [
       {
-        filename: `backup-gff-${dataHora.replace(/[/:]/g, "-")}.zip`,
+        filename: `backup-gff-${dataHora.replace(/[/:]/g, "-").replace(/ /g, "_")}.zip`,
         content: zipBuffer,
         contentType: "application/zip",
       },
@@ -182,7 +126,7 @@ export const backupRouter = router({
       return { base64, tabelas, tamanhoKB };
     }),
 
-  // Enviar backup por e-mail (manual ou automático)
+  // Enviar backup por e-mail
   enviarEmail: protectedProcedure
     .mutation(async ({ ctx }) => {
       if (!isAuthorized(ctx.user)) {
