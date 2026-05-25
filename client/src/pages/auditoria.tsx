@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Download, Search, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2, Shield, Activity, Users, Clock, Filter, X, LogOut, RefreshCw } from 'lucide-react';
+import { Download, Search, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2, Shield, Activity, Users, Clock, Filter, X, LogOut, RefreshCw, Wallet, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import AuditoriaPermissoes from './auditoria-permissoes';
 import { useLocation } from 'wouter';
@@ -36,8 +36,8 @@ export default function AuditoriaPage() {
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const abaParam = searchParams.get('aba');
-  const [aba, setAba] = useState<'logs' | 'feriados' | 'credito-despesas' | 'permissoes'>(
-    abaParam === 'feriados' ? 'feriados' : abaParam === 'credito-despesas' ? 'credito-despesas' : abaParam === 'permissoes' ? 'permissoes' : 'logs'
+  const [aba, setAba] = useState<'logs' | 'feriados' | 'credito-despesas' | 'permissoes' | 'despesas-internas'>(
+    abaParam === 'feriados' ? 'feriados' : abaParam === 'credito-despesas' ? 'credito-despesas' : abaParam === 'permissoes' ? 'permissoes' : abaParam === 'despesas-internas' ? 'despesas-internas' : 'logs'
   );
 
   // Atualiza aba quando o parâmetro de URL muda
@@ -47,6 +47,7 @@ export default function AuditoriaPage() {
     if (p === 'feriados') setAba('feriados');
     else if (p === 'credito-despesas') setAba('credito-despesas');
     else if (p === 'permissoes') setAba('permissoes');
+    else if (p === 'despesas-internas') setAba('despesas-internas');
     else setAba('logs');
   }, [window.location.search]);
 
@@ -285,6 +286,8 @@ export default function AuditoriaPage() {
         >
           <Shield className="w-4 h-4" /> Permissões
         </button>
+        {/* Aba Despesas Internas — só aparece para Sidnei e Thiago */}
+        <DespesasInternasAbaBtn aba={aba} setAba={setAba} />
       </div>
 
       {/* ── ABA LOGS ─────────────────────────────────────────────────────────────────── */}
@@ -814,6 +817,331 @@ export default function AuditoriaPage() {
           <AuditoriaPermissoes />
         </div>
       )}
+
+      {/* ── ABA DESPESAS INTERNAS ──────────────────────────────────────── */}
+      {aba === 'despesas-internas' && <DespesasInternasAba />}
+    </div>
+  );
+}
+
+// ─── BOTÃO DA ABA DESPESAS INTERNAS (só renderiza se tiver acesso) ────────────
+function DespesasInternasAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => void }) {
+  const { data } = trpc.despesasInternas.verificarAcesso.useQuery();
+  if (!data?.temAcesso) return null;
+  return (
+    <button
+      onClick={() => setAba('despesas-internas')}
+      className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
+        aba === 'despesas-internas' ? 'bg-white border border-b-white border-gray-200 text-red-700' : 'text-gray-500 hover:text-gray-700'
+      }`}
+    >
+      <Wallet className="w-4 h-4" /> Despesas Internas
+    </button>
+  );
+}
+
+// ─── ABA DESPESAS INTERNAS ────────────────────────────────────────────────────
+const CATEGORIAS_DESPESAS = [
+  'Pro-labore',
+  'Cartão de Crédito',
+  'Veículos',
+  'Imóvel',
+  'Colégio',
+  'Seguros',
+  'Outros',
+];
+
+type DespesaInterna = {
+  id: number;
+  mesAno: string;
+  categoria: string;
+  descricao: string | null;
+  valor: string;
+  dataLancamento: string | null;
+  lancadoPor: string | null;
+  observacao: string | null;
+  createdAt: Date;
+};
+
+function DespesasInternasAba() {
+  const utils = trpc.useUtils();
+  // Controle de acesso
+  const { data: acesso } = trpc.despesasInternas.verificarAcesso.useQuery();
+  // Segunda senha CEO
+  const [senhaDesbloqueada, setSenhaDesbloqueada] = useState(false);
+  const [senhaInput, setSenhaInput] = useState('');
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [erroSenha, setErroSenha] = useState('');
+  const validarSenha = trpc.despesasInternas.validarSenhaCeo.useMutation({
+    onSuccess: () => { setSenhaDesbloqueada(true); setErroSenha(''); toast.success('Acesso liberado!'); },
+    onError: (e) => setErroSenha(e.message),
+  });
+  // Filtro de mês
+  const [filtroMes, setFiltroMes] = useState('');
+  const { data: despesas, isLoading } = trpc.despesasInternas.listar.useQuery(
+    { mesAno: filtroMes || undefined },
+    { enabled: senhaDesbloqueada }
+  );
+  // Modal novo/editar
+  const [modalAberto, setModalAberto] = useState(false);
+  const [editando, setEditando] = useState<DespesaInterna | null>(null);
+  const [form, setForm] = useState({ mesAno: '', categoria: '', descricao: '', valor: '', dataLancamento: '', observacao: '' });
+  const criarMutation = trpc.despesasInternas.criar.useMutation({
+    onSuccess: () => { utils.despesasInternas.listar.invalidate(); setModalAberto(false); toast.success('Despesa lançada!'); },
+    onError: (e) => toast.error('Erro: ' + e.message),
+  });
+  const editarMutation = trpc.despesasInternas.editar.useMutation({
+    onSuccess: () => { utils.despesasInternas.listar.invalidate(); setModalAberto(false); toast.success('Despesa atualizada!'); },
+    onError: (e) => toast.error('Erro: ' + e.message),
+  });
+  const excluirMutation = trpc.despesasInternas.excluir.useMutation({
+    onSuccess: () => { utils.despesasInternas.listar.invalidate(); toast.success('Despesa excluída!'); },
+    onError: (e) => toast.error('Erro: ' + e.message),
+  });
+  const fmt = (v: string | number) => {
+    const n = typeof v === 'string' ? parseFloat(v) : v;
+    return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
+  };
+  const totalMes = (despesas ?? []).reduce((acc: number, d: DespesaInterna) => acc + parseFloat(d.valor ?? '0'), 0);
+  const abrirNovo = () => {
+    const agora = new Date();
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    setEditando(null);
+    setForm({ mesAno: `${mes}/${agora.getFullYear()}`, categoria: '', descricao: '', valor: '', dataLancamento: '', observacao: '' });
+    setModalAberto(true);
+  };
+  const abrirEditar = (d: DespesaInterna) => {
+    setEditando(d);
+    setForm({ mesAno: d.mesAno, categoria: d.categoria, descricao: d.descricao ?? '', valor: d.valor, dataLancamento: d.dataLancamento ?? '', observacao: d.observacao ?? '' });
+    setModalAberto(true);
+  };
+  const salvar = () => {
+    const payload = {
+      mesAno: form.mesAno,
+      categoria: form.categoria,
+      descricao: form.descricao || undefined,
+      valor: parseFloat(form.valor.replace(',', '.')),
+      dataLancamento: form.dataLancamento || undefined,
+      observacao: form.observacao || undefined,
+    };
+    if (editando) editarMutation.mutate({ id: editando.id, ...payload });
+    else criarMutation.mutate(payload);
+  };
+
+  if (!acesso?.temAcesso) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-4">
+        <AlertTriangle className="w-16 h-16 text-red-400" />
+        <p className="text-red-600 font-semibold text-lg">Acesso Restrito</p>
+        <p className="text-gray-500">Esta seção é exclusiva para a diretoria.</p>
+      </div>
+    );
+  }
+
+  if (!senhaDesbloqueada) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-6">
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 w-full max-w-sm flex flex-col items-center gap-5">
+          <div className="bg-red-100 rounded-full p-4">
+            <Lock className="w-10 h-10 text-red-600" />
+          </div>
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-gray-900">Área Restrita</h2>
+            <p className="text-gray-500 text-sm mt-1">Informe a senha CEO para acessar as Despesas Internas</p>
+          </div>
+          <div className="w-full space-y-2">
+            <Label className="text-sm font-medium">Senha CEO</Label>
+            <div className="relative">
+              <Input
+                type={mostrarSenha ? 'text' : 'password'}
+                placeholder="Digite a senha CEO"
+                value={senhaInput}
+                onChange={e => setSenhaInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && validarSenha.mutate({ senha: senhaInput })}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setMostrarSenha(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {mostrarSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            {erroSenha && <p className="text-red-500 text-xs">{erroSenha}</p>}
+          </div>
+          <Button
+            onClick={() => validarSenha.mutate({ senha: senhaInput })}
+            disabled={!senhaInput || validarSenha.isPending}
+            className="w-full bg-red-700 hover:bg-red-800 text-white"
+          >
+            {validarSenha.isPending ? 'Verificando...' : 'Desbloquear'}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 mt-4">
+      {/* Cabeçalho */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="bg-red-100 rounded-lg p-2">
+            <Wallet className="w-6 h-6 text-red-700" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">Despesas Internas</h2>
+            <p className="text-xs text-gray-500">Acesso restrito — Diretoria</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-gray-600">Filtrar por Mês</label>
+            <Input
+              placeholder="MM/AAAA"
+              value={filtroMes}
+              onChange={e => setFiltroMes(e.target.value)}
+              className="w-36 text-sm"
+            />
+          </div>
+          <Button onClick={abrirNovo} className="gap-2 bg-red-700 hover:bg-red-800 text-white mt-4">
+            <Plus className="w-4 h-4" /> Nova Despesa
+          </Button>
+        </div>
+      </div>
+
+      {/* Resumo */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {CATEGORIAS_DESPESAS.slice(0, 4).map(cat => {
+          const total = (despesas ?? []).filter((d: DespesaInterna) => d.categoria === cat).reduce((acc: number, d: DespesaInterna) => acc + parseFloat(d.valor ?? '0'), 0);
+          return (
+            <div key={cat} className="bg-red-50 border border-red-100 rounded-lg p-3">
+              <p className="text-xs text-red-600 font-medium truncate">{cat}</p>
+              <p className="text-lg font-bold text-red-800">{fmt(total)}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Tabela */}
+      {isLoading ? (
+        <div className="text-center py-12 text-gray-400">Carregando...</div>
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-red-700 text-white">
+                    <TableHead className="text-white font-semibold">Mês/Ano</TableHead>
+                    <TableHead className="text-white font-semibold">Categoria</TableHead>
+                    <TableHead className="text-white font-semibold">Descrição</TableHead>
+                    <TableHead className="text-white font-semibold">Data</TableHead>
+                    <TableHead className="text-white font-semibold">Lançado por</TableHead>
+                    <TableHead className="text-white font-semibold text-right">Valor</TableHead>
+                    <TableHead className="text-white font-semibold">Obs.</TableHead>
+                    <TableHead className="text-white font-semibold text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(despesas ?? []).length === 0 ? (
+                    <TableRow><TableCell colSpan={8} className="text-center py-10 text-gray-400">Nenhuma despesa lançada</TableCell></TableRow>
+                  ) : (
+                    (despesas ?? []).map((d: DespesaInterna) => (
+                      <TableRow key={d.id} className="hover:bg-red-50">
+                        <TableCell className="font-mono font-semibold">{d.mesAno}</TableCell>
+                        <TableCell>
+                          <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">{d.categoria}</span>
+                        </TableCell>
+                        <TableCell className="text-sm text-gray-700 max-w-[180px] truncate">{d.descricao ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-600">{d.dataLancamento ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-600">{d.lancadoPor ?? '—'}</TableCell>
+                        <TableCell className="text-right font-bold text-red-700">{fmt(d.valor)}</TableCell>
+                        <TableCell className="text-sm text-gray-500 max-w-[120px] truncate">{d.observacao ?? '—'}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex gap-1 justify-end">
+                            <Button size="sm" variant="ghost" onClick={() => abrirEditar(d)} className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50">
+                              <Pencil className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => excluirMutation.mutate({ id: d.id })} className="h-7 w-7 p-0 text-red-500 hover:bg-red-50">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+            <div className="border-t bg-red-50 px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-gray-500">{(despesas ?? []).length} registro(s)</span>
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Total do Período</p>
+                <p className="font-bold text-red-700 text-lg">{fmt(totalMes)}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Modal Novo/Editar */}
+      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-red-700" />
+              {editando ? 'Editar Despesa Interna' : 'Nova Despesa Interna'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label>Mês/Ano</Label>
+                <Input placeholder="MM/AAAA" value={form.mesAno} onChange={e => setForm(f => ({ ...f, mesAno: e.target.value }))} />
+              </div>
+              <div className="space-y-1">
+                <Label>Data Lançamento</Label>
+                <Input placeholder="DD/MM/AAAA" value={form.dataLancamento} onChange={e => setForm(f => ({ ...f, dataLancamento: e.target.value }))} />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <Label>Categoria</Label>
+              <Select value={form.categoria} onValueChange={v => setForm(f => ({ ...f, categoria: v }))}>
+                <SelectTrigger><SelectValue placeholder="Selecione a categoria" /></SelectTrigger>
+                <SelectContent>
+                  {CATEGORIAS_DESPESAS.map(cat => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label>Descrição</Label>
+              <Input placeholder="Descrição da despesa" value={form.descricao} onChange={e => setForm(f => ({ ...f, descricao: e.target.value }))} />
+            </div>
+            <div className="space-y-1">
+              <Label>Valor (R$)</Label>
+              <Input placeholder="0,00" value={form.valor} onChange={e => setForm(f => ({ ...f, valor: e.target.value }))} />
+            </div>
+            <div className="space-y-1">
+              <Label>Observação</Label>
+              <Input placeholder="Observação adicional" value={form.observacao} onChange={e => setForm(f => ({ ...f, observacao: e.target.value }))} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setModalAberto(false)}>Cancelar</Button>
+            <Button
+              onClick={salvar}
+              disabled={!form.mesAno || !form.categoria || !form.valor || criarMutation.isPending || editarMutation.isPending}
+              className="bg-red-700 hover:bg-red-800 text-white"
+            >
+              {criarMutation.isPending || editarMutation.isPending ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1863,5 +1863,161 @@ export const appRouter = router({
         return { rows, mesRef, chaveJ: chaveJ ?? '', isAdminOuSuporte };
       }),
   }),
+
+  // ─── DESPESAS INTERNAS (somente Sidnei e Thiago Ultramare) ─────────────────
+  despesasInternas: router({
+    // Verifica se o agente logado tem acesso (Sidnei ou Thiago Ultramare)
+    verificarAcesso: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user?.openId?.startsWith('agente_')) return { temAcesso: false };
+        const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+        const { agentes: agentesTable } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) return { temAcesso: false };
+        const db = dbConn;
+        const { eq } = await import('drizzle-orm');
+        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente })
+          .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
+        const temAcesso = AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim());
+        return { temAcesso };
+      }),
+
+    // Valida a segunda senha CEO
+    validarSenhaCeo: protectedProcedure
+      .input(z.object({ senha: z.string().min(1) }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user?.openId?.startsWith('agente_')) throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
+        const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+        const { agentes: agentesTable } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco indisponível' });
+        const db = dbConn;
+        const { eq } = await import('drizzle-orm');
+        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente, senha: agentesTable.senha })
+          .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
+        const temAcesso = AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim());
+        if (!temAcesso) throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
+        // A segunda senha CEO é a mesma senha do agente
+        if (agente.senha !== input.senha) throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Senha CEO incorreta' });
+        return { ok: true };
+      }),
+
+    // Listar despesas
+    listar: protectedProcedure
+      .input(z.object({ mesAno: z.string().optional() }))
+      .query(async ({ input, ctx }) => {
+        if (!ctx.user?.openId?.startsWith('agente_')) throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
+        const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+        const { agentes: agentesTable, despesasInternas: despesasTable } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco indisponível' });
+        const db = dbConn;
+        const { eq, and, desc } = await import('drizzle-orm');
+        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente })
+          .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
+        if (!AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim()))
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
+        const conditions: any[] = [];
+        if (input.mesAno) conditions.push(eq(despesasTable.mesAno, input.mesAno));
+        const rows = await db.select().from(despesasTable)
+          .where(conditions.length ? and(...conditions) : undefined)
+          .orderBy(desc(despesasTable.createdAt));
+        return rows;
+      }),
+
+    // Criar nova despesa
+    criar: protectedProcedure
+      .input(z.object({
+        mesAno: z.string().min(1),
+        categoria: z.string().min(1),
+        descricao: z.string().optional(),
+        valor: z.number().positive(),
+        dataLancamento: z.string().optional(),
+        observacao: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user?.openId?.startsWith('agente_')) throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
+        const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+        const { agentes: agentesTable, despesasInternas: despesasTable } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco indisponível' });
+        const db = dbConn;
+        const { eq } = await import('drizzle-orm');
+        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente, chaveJ: agentesTable.chaveJ })
+          .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
+        if (!AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim()))
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
+        await db.insert(despesasTable).values({
+          mesAno: input.mesAno,
+          categoria: input.categoria,
+          descricao: input.descricao ?? null,
+          valor: String(input.valor),
+          dataLancamento: input.dataLancamento ?? null,
+          lancadoPor: agente.nomeAgente ?? null,
+          chaveJLancador: agente.chaveJ ?? null,
+          observacao: input.observacao ?? null,
+        });
+        return { ok: true };
+      }),
+
+    // Editar despesa
+    editar: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        mesAno: z.string().min(1),
+        categoria: z.string().min(1),
+        descricao: z.string().optional(),
+        valor: z.number().positive(),
+        dataLancamento: z.string().optional(),
+        observacao: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user?.openId?.startsWith('agente_')) throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
+        const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+        const { agentes: agentesTable, despesasInternas: despesasTable } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco indisponível' });
+        const db = dbConn;
+        const { eq } = await import('drizzle-orm');
+        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente })
+          .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
+        if (!AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim()))
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
+        await db.update(despesasTable).set({
+          mesAno: input.mesAno,
+          categoria: input.categoria,
+          descricao: input.descricao ?? null,
+          valor: String(input.valor),
+          dataLancamento: input.dataLancamento ?? null,
+          observacao: input.observacao ?? null,
+        }).where(eq(despesasTable.id, input.id));
+        return { ok: true };
+      }),
+
+    // Excluir despesa
+    excluir: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user?.openId?.startsWith('agente_')) throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
+        const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+        const { agentes: agentesTable, despesasInternas: despesasTable } = await import('../drizzle/schema');
+        const dbConn = await getDb();
+        if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco indisponível' });
+        const db = dbConn;
+        const { eq } = await import('drizzle-orm');
+        const [agente] = await db.select({ nomeAgente: agentesTable.nomeAgente })
+          .from(agentesTable).where(eq(agentesTable.id, agenteId)).limit(1);
+        const AUTORIZADOS = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
+        if (!AUTORIZADOS.some(n => agente?.nomeAgente?.toLowerCase().trim() === n.toLowerCase().trim()))
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
+        await db.delete(despesasTable).where(eq(despesasTable.id, input.id));
+        return { ok: true };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;;

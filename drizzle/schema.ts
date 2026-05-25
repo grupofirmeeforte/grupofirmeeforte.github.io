@@ -1251,3 +1251,23 @@ export const webauthnCredentials = mysqlTable("webauthn_credentials", {
 }));
 export type WebAuthnCredential = typeof webauthnCredentials.$inferSelect;
 export type InsertWebAuthnCredential = typeof webauthnCredentials.$inferInsert;
+
+// ─── DESPESAS INTERNAS (acesso restrito: Sidnei e Thiago Ultramare) ───────────
+export const despesasInternas = mysqlTable("despesas_internas", {
+  id: int("id").autoincrement().primaryKey(),
+  mesAno: varchar("mesAno", { length: 7 }).notNull(),           // MM/AAAA
+  categoria: varchar("categoria", { length: 100 }).notNull(),   // Pro-labore, Cartão de Crédito, etc.
+  descricao: text("descricao"),                                  // Descrição livre
+  valor: decimal("valor", { precision: 15, scale: 2 }).notNull(),
+  dataLancamento: varchar("dataLancamento", { length: 10 }),    // DD/MM/AAAA
+  lancadoPor: varchar("lancadoPor", { length: 100 }),           // Nome do responsável
+  chaveJLancador: varchar("chaveJLancador", { length: 50 }),    // ChaveJ de quem lançou
+  observacao: text("observacao"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesAnoIdx: index("idx_despesas_internas_mesAno").on(table.mesAno),
+  categoriaIdx: index("idx_despesas_internas_categoria").on(table.categoria),
+}));
+export type DespesaInterna = typeof despesasInternas.$inferSelect;
+export type InsertDespesaInterna = typeof despesasInternas.$inferInsert;
