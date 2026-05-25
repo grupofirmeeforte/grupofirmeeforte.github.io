@@ -96,7 +96,7 @@ export const agentesRouter = router({
         .select()
         .from(agentes)
         .where(whereClause)
-        .orderBy(asc(agentes.empresa), asc(agentes.nomeAgente))
+        .orderBy(asc(agentes.nomeAgente))
         .limit(input.limit)
         .offset(input.offset);
 
@@ -446,7 +446,7 @@ export const agentesRouter = router({
         permissoesModulos: agentes.permissoesModulos,
       })
       .from(agentes)
-      .orderBy(asc(agentes.empresa), asc(agentes.nomeAgente));
+      .orderBy(asc(agentes.nomeAgente));
     return result;
   }),
 
