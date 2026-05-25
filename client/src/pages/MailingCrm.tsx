@@ -243,8 +243,20 @@ export default function MailingCrm() {
     reader.onload = (ev) => {
       const wb = XLSX.read(ev.target?.result, { type: "binary" });
       const ws = wb.Sheets[wb.SheetNames[0]];
-      const raw: Record<string, any>[] = XLSX.utils.sheet_to_json(ws, { defval: "" });
-      const mapped = raw.map(r => {
+      // Lê com header:1 para pegar a linha 1 como cabeçalho
+      // Pula linhas que são claramente de descrição/exemplo (sem CPF ou nome real)
+      const raw: Record<string, any>[] = XLSX.utils.sheet_to_json(ws, { defval: "", raw: false });
+      const SKIP_PATTERNS = [
+        /^ex:/i, /^dd\/mm\/aaaa$/i, /^m ou f$/i, /^nome completo$/i,
+        /^número da conta$/i, /^sigla/i, /^ex:/i,
+      ];
+      const isDescRow = (r: Record<string, any>) => {
+        const nome = String(r["NOME"] ?? "").trim();
+        const cpf = String(r["CPF"] ?? "").trim();
+        // Pula se nome ou CPF parecerem texto de instrução
+        return SKIP_PATTERNS.some(p => p.test(nome) || p.test(cpf)) || (!nome && !cpf);
+      };
+      const mapped = raw.filter(r => !isDescRow(r)).map(r => {
         const obj: Partial<Row> = {};
         for (const [col, field] of Object.entries(EXCEL_MAP)) {
           const val = r[col];
