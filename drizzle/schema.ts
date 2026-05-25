@@ -1271,3 +1271,64 @@ export const despesasInternas = mysqlTable("despesas_internas", {
 }));
 export type DespesaInterna = typeof despesasInternas.$inferSelect;
 export type InsertDespesaInterna = typeof despesasInternas.$inferInsert;
+
+// ─── CRM — Gestão de Leads / Clientes ─────────────────────────────────────────
+export const crm = mysqlTable("crm", {
+  id: int("id").autoincrement().primaryKey(),
+  sexo: varchar("sexo", { length: 1 }),                          // M / F
+  mciEmpregador: varchar("mciEmpregador", { length: 50 }),       // MCI_EMPREGADOR_CADASTRO
+  nrCvn13Salario: varchar("nrCvn13Salario", { length: 20 }),     // NR_CVN_13_SALARIO
+  nrCvnConsig: varchar("nrCvnConsig", { length: 20 }),           // NR_CVN_CONSIG
+  nrCvnSalario: varchar("nrCvnSalario", { length: 20 }),         // NR_CVN_SALARIO
+  sgUf: varchar("sgUf", { length: 2 }),                          // SG_UF
+  super: varchar("super", { length: 20 }),                       // SUPER
+  cidade: varchar("cidade", { length: 100 }),                    // CIDADE
+  naoPerturbe: varchar("naoPerturbe", { length: 50 }),           // NÃO_PERTUBE
+  dtInclusao: varchar("dtInclusao", { length: 20 }),             // DT INCLUSÃO
+  prfDepe: varchar("prfDepe", { length: 20 }),                   // PRF_DEPE
+  nrCc: varchar("nrCc", { length: 30 }),                         // NR_C/C
+  nome: varchar("nome", { length: 200 }),                        // NOME
+  dtaNasc: varchar("dtaNasc", { length: 20 }),                   // DTA_NASC
+  cpf: varchar("cpf", { length: 20 }),                           // CPF
+  ddd01: varchar("ddd01", { length: 5 }),
+  tel01: varchar("tel01", { length: 20 }),
+  ddd02: varchar("ddd02", { length: 5 }),
+  tel02: varchar("tel02", { length: 20 }),
+  ddd03: varchar("ddd03", { length: 5 }),
+  tel03: varchar("tel03", { length: 20 }),
+  ddd04: varchar("ddd04", { length: 5 }),
+  tel04: varchar("tel04", { length: 20 }),
+  ddd05: varchar("ddd05", { length: 5 }),
+  tel05: varchar("tel05", { length: 20 }),
+  ddd06: varchar("ddd06", { length: 5 }),
+  tel06: varchar("tel06", { length: 20 }),
+  ddd07: varchar("ddd07", { length: 5 }),
+  tel07: varchar("tel07", { length: 20 }),
+  ddd08: varchar("ddd08", { length: 5 }),
+  tel08: varchar("tel08", { length: 20 }),
+  ddd09: varchar("ddd09", { length: 5 }),
+  tel09: varchar("tel09", { length: 20 }),
+  ddd10: varchar("ddd10", { length: 5 }),
+  tel10: varchar("tel10", { length: 20 }),
+  mci: varchar("mci", { length: 30 }),                           // MCI
+  cdIdfr: varchar("cdIdfr", { length: 30 }),                     // CD_IDFR_BNFC
+  dtPrimeiroPagto: varchar("dtPrimeiroPagto", { length: 20 }),   // DT_PRIMEIRO_PAGTO
+  maiorLimiteCredito: varchar("maiorLimiteCredito", { length: 30 }), // MAIOR_LIMITE_DE_CREDITO_NOVO
+  codCoban: varchar("codCoban", { length: 20 }),                 // Cod_COBAN
+  campanha: varchar("campanha", { length: 100 }),                // CAMPANHA
+  agente: varchar("agente", { length: 100 }),                    // AGENTE
+  dataContato: varchar("dataContato", { length: 20 }),           // DATA
+  resultado: varchar("resultado", { length: 200 }),              // RESULTADO
+  dataInserido: varchar("dataInserido", { length: 20 }),         // DATA Inserido
+  observacao: text("observacao"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  nomeIdx: index("idx_crm_nome").on(table.nome),
+  cpfIdx: index("idx_crm_cpf").on(table.cpf),
+  agenteIdx: index("idx_crm_agente").on(table.agente),
+  cidadeIdx: index("idx_crm_cidade").on(table.cidade),
+  sgUfIdx: index("idx_crm_sgUf").on(table.sgUf),
+}));
+export type Crm = typeof crm.$inferSelect;
+export type InsertCrm = typeof crm.$inferInsert;

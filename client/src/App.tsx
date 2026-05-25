@@ -38,6 +38,7 @@ import PainelAgente from "@/pages/PainelAgente";
 import UniformesCrachas from './pages/UniformesCrachas';
 import MensagemMotivacional from './pages/MensagemMotivacional';
 import MensagemDoDiaHub from './pages/MensagemDoDiaHub';
+import MailingCrmPage from './pages/MailingCrm';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -82,6 +83,7 @@ function RouterWithInactivity() {
       <Route path={"/fornecedores"} component={DespesasFixasPage} />
       <Route path={"/contas-lojas"} component={ContasLojasPage} />
       <Route path={"/crm"} component={CRMPage} />
+      <Route path={"/mailing-crm"} component={MailingCrmPage} />
       <Route path={"/extratos"} component={ExtratosPage} />
       <Route path={"/pro-rata"} component={ProRataPage} />
       <Route path={"/producao/consorcio"} component={Consorcio} />

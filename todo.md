@@ -621,3 +621,10 @@
 - [x] Corrigir PageHeader em ProRata.tsx (remover onBack window.history.back)
 - [x] Corrigir PageHeader em AcompanhamentoDiario.tsx (remover onBack window.history.back)
 - [x] Adicionar PageHeader em DocumentacaoAgentes.tsx (remover botão Voltar antigo)
+
+## MÓDULO CRM
+- [ ] CRM: criar tabela crm no banco com todos os campos (sexo, mci_empregador, nr_cvn_13_salario, nr_cvn_consig, nr_cvn_salario, sg_uf, super, cidade, nao_perturbe, dt_inclusao, prf_depe, nr_cc, nome, dta_nasc, cpf, ddd/tel 1-10, mci, cd_idfr_bnfc, dt_primeiro_pagto, maior_limite_credito, cod_coban, campanha, agente, data, resultado, data_inserido)
+- [ ] CRM: backend tRPC procedures (list com filtros/paginação, create, update, delete, exportExcel)
+- [ ] CRM: página frontend com tabela horizontal scrollável, filtros (nome, CPF, agente, resultado, cidade, UF), paginação
+- [ ] CRM: botão exportar Excel com todos os campos
+- [ ] CRM: adicionar rota /crm no App.tsx e link no menu lateral

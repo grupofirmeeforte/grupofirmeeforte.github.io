@@ -209,6 +209,7 @@ export default function Home() {
         { title: 'Atendimentos', description: 'Histórico de contatos', icon: Phone, color: 'bg-indigo-600', path: '/crm?aba=atendimentos', subKey: 'atendimentos' },
         { title: 'Tarefas / Follow-up', description: 'Lembretes e tarefas', icon: CheckSquare, color: 'bg-violet-600', path: '/crm?aba=tarefas', subKey: 'tarefas' },
         { title: 'Relatórios CRM', description: 'Funil e produtividade', icon: BarChart2, color: 'bg-teal-600', path: '/crm?aba=relatorios', subKey: 'relatorios' },
+        { title: 'Mailing / Leads', description: 'Gestão de mailing e leads do banco', icon: Users, color: 'bg-cyan-600', path: '/mailing-crm', subKey: 'mailing-crm' },
       ],
     },
 
