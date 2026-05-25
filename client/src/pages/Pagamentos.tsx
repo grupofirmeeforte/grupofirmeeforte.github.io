@@ -24,6 +24,48 @@ function maskMesAno(value: string): string {
   if (digits.length <= 2) return digits;
   return digits.slice(0, 2) + '/' + digits.slice(2);
 }
+// Extrai valor e vencimento de código de barras de boleto bancário
+function parseBoleto(codigo: string): { valor?: string; dataVencer?: string } {
+  const digits = codigo.replace(/\D/g, '');
+  // Linha digitável (47 ou 48 dígitos) ou código de barras (44 dígitos)
+  if (digits.length === 44) {
+    // Código de barras: posição 19-22 = fator vencimento, 23-32 = valor (centavos)
+    const fatorVenc = parseInt(digits.slice(19, 23));
+    const valorCents = parseInt(digits.slice(23, 33));
+    const valor = valorCents > 0 ? (valorCents / 100).toFixed(2).replace('.', ',') : undefined;
+    // Fator 0 = sem vencimento; base = 07/10/1997
+    let dataVencer: string | undefined;
+    if (fatorVenc > 0) {
+      const base = new Date(1997, 9, 7); // 07/10/1997
+      base.setDate(base.getDate() + fatorVenc);
+      const d = String(base.getDate()).padStart(2, '0');
+      const m = String(base.getMonth() + 1).padStart(2, '0');
+      const y = base.getFullYear();
+      dataVencer = `${d}/${m}/${y}`;
+    }
+    return { valor, dataVencer };
+  }
+  if (digits.length === 47 || digits.length === 48) {
+    // Linha digitável: campo 10 (posição 9-18 no código de barras)
+    // Reordena para código de barras: banco(3)+moeda(1)+venc(4)+valor(10)+campo livre(25)
+    // Posição valor na linha digitável: dígitos 37-46 (0-indexed)
+    const valorCents = parseInt(digits.slice(37, 47));
+    const valor = valorCents > 0 ? (valorCents / 100).toFixed(2).replace('.', ',') : undefined;
+    const fatorVenc = parseInt(digits.slice(33, 37));
+    let dataVencer: string | undefined;
+    if (fatorVenc > 0) {
+      const base = new Date(1997, 9, 7);
+      base.setDate(base.getDate() + fatorVenc);
+      const d = String(base.getDate()).padStart(2, '0');
+      const m = String(base.getMonth() + 1).padStart(2, '0');
+      const y = base.getFullYear();
+      dataVencer = `${d}/${m}/${y}`;
+    }
+    return { valor, dataVencer };
+  }
+  return {};
+}
+
 function maskData(value: string): string {
   const digits = value.replace(/\D/g, '').slice(0, 8);
   if (digits.length <= 2) return digits;
@@ -653,7 +695,20 @@ export default function PagamentosPage() {
             </div>
             <div>
               <Label className="text-xs text-gray-400">{((form as any).tipoChave ?? 'pix') === 'boleto' ? 'Código de Barras' : 'Pix'}</Label>
-              <Input value={form.pix} onChange={e => setForm(f => ({ ...f, pix: e.target.value }))}
+              <Input value={form.pix} onChange={e => {
+                const val = e.target.value;
+                if (((form as any).tipoChave ?? 'pix') === 'boleto') {
+                  const parsed = parseBoleto(val);
+                  setForm(f => ({
+                    ...f,
+                    pix: val,
+                    ...(parsed.valor ? { valor: parsed.valor } : {}),
+                    ...(parsed.dataVencer ? { dataVencer: parsed.dataVencer } : {}),
+                  }));
+                } else {
+                  setForm(f => ({ ...f, pix: val }));
+                }
+              }}
                 placeholder={((form as any).tipoChave ?? 'pix') === 'boleto' ? 'Código de barras do boleto...' : ''}
                 className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
             </div>
