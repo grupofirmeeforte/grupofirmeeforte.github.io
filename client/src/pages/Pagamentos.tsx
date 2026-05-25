@@ -24,19 +24,44 @@ function maskMesAno(value: string): string {
   if (digits.length <= 2) return digits;
   return digits.slice(0, 2) + '/' + digits.slice(2);
 }
-// Extrai valor e vencimento de código de barras de boleto bancário
+// Extrai valor e vencimento de código de barras de boleto bancário ou convênio/tributo
 function parseBoleto(codigo: string): { valor?: string; dataVencer?: string } {
   const digits = codigo.replace(/\D/g, '');
-  // Linha digitável (47 ou 48 dígitos) ou código de barras (44 dígitos)
-  if (digits.length === 44) {
-    // Código de barras: posição 19-22 = fator vencimento, 23-32 = valor (centavos)
+
+  // ── BOLETO CONVÊINIO/TRIBUTO (começa com 8) ─────────────────────────────────
+  if (digits[0] === '8' && digits.length === 48) {
+    // Linha digitável convênio: 4 blocos de 12 dígitos
+    // Vencimento: últimos 4 do bloco2 (pos 7-10) + primeiros 4 do bloco3 (pos 25-28) = AAAAMMDD
+    const b2 = digits.slice(13, 24);
+    const b3 = digits.slice(25, 37);
+    const vencRaw = b2.slice(7, 11) + b3.slice(0, 4);
+    let dataVencer: string | undefined;
+    if (/^\d{8}$/.test(vencRaw) && vencRaw !== '00000000') {
+      const ano = vencRaw.slice(0, 4);
+      const mes = vencRaw.slice(4, 6);
+      const dia = vencRaw.slice(6, 8);
+      const mesN = parseInt(mes);
+      const diaN = parseInt(dia);
+      if (mesN >= 1 && mesN <= 12 && diaN >= 1 && diaN <= 31) {
+        dataVencer = `${dia}/${mes}/${ano}`;
+      }
+    }
+    // Valor: bloco1 pos 3-12 (10 dígitos sem dv), dividido por 100
+    // Se todos zeros = sem valor fixo (preencher manualmente)
+    const valorRaw = digits.slice(3, 12);
+    const valorCents = parseInt(valorRaw);
+    const valor = valorCents > 0 ? (valorCents / 100).toFixed(2).replace('.', ',') : undefined;
+    return { valor, dataVencer };
+  }
+
+  // ── BOLETO BANCÁRIO CÓDIGO DE BARRAS (44 dígitos, não começa com 8) ───────────
+  if (digits.length === 44 && digits[0] !== '8') {
     const fatorVenc = parseInt(digits.slice(19, 23));
     const valorCents = parseInt(digits.slice(23, 33));
     const valor = valorCents > 0 ? (valorCents / 100).toFixed(2).replace('.', ',') : undefined;
-    // Fator 0 = sem vencimento; base = 07/10/1997
     let dataVencer: string | undefined;
     if (fatorVenc > 0) {
-      const base = new Date(1997, 9, 7); // 07/10/1997
+      const base = new Date(1997, 9, 7);
       base.setDate(base.getDate() + fatorVenc);
       const d = String(base.getDate()).padStart(2, '0');
       const m = String(base.getMonth() + 1).padStart(2, '0');
@@ -45,10 +70,10 @@ function parseBoleto(codigo: string): { valor?: string; dataVencer?: string } {
     }
     return { valor, dataVencer };
   }
-  if (digits.length === 47 || digits.length === 48) {
-    // Linha digitável: campo 10 (posição 9-18 no código de barras)
-    // Reordena para código de barras: banco(3)+moeda(1)+venc(4)+valor(10)+campo livre(25)
-    // Posição valor na linha digitável: dígitos 37-46 (0-indexed)
+
+  // ── BOLETO BANCÁRIO LINHA DIGITÁVEL (47 dígitos, não começa com 8) ────────────
+  if ((digits.length === 47 || digits.length === 48) && digits[0] !== '8') {
+    // Posição valor: dígitos 37-46; fator vencimento: 33-36
     const valorCents = parseInt(digits.slice(37, 47));
     const valor = valorCents > 0 ? (valorCents / 100).toFixed(2).replace('.', ',') : undefined;
     const fatorVenc = parseInt(digits.slice(33, 37));
@@ -63,6 +88,7 @@ function parseBoleto(codigo: string): { valor?: string; dataVencer?: string } {
     }
     return { valor, dataVencer };
   }
+
   return {};
 }
 
