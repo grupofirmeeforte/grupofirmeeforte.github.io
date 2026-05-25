@@ -768,8 +768,10 @@ function MinhaTabela() {
   const nivelAtivo = data?.nivelAtivo ?? null;
   const tabela = (data?.tabela ?? []) as any[];
   const totalLiquido = data?.totalLiquidoSemSRCC ?? 0;
+  const metas = (data?.metas ?? {}) as Record<string, number>;
+  const metasDe = (data?.metasDe ?? {}) as Record<string, number>;
+  const metasAte = (data?.metasAte ?? {}) as Record<string, number>;
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  // Formata decimal (ex: 0.0195) como percentual legível no formato XX,XX% (2 casas decimais)
   const fmtPct = (v: string | null | undefined) => {
     if (!v) return '—';
     const normalized = String(v).replace(',', '.');
@@ -778,30 +780,82 @@ function MinhaTabela() {
     const pctVal = n > 1 ? n : n * 100;
     return pctVal.toFixed(2).replace('.', ',') + '%';
   };
-  // Colunas de ativo que têm pelo menos um valor preenchido na tabela
   const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
   const colunasComValor = ativoKeys.filter(k => tabela.some(r => r[k] != null && r[k] !== ''));
-  // Exibe apenas a coluna do nível ativo atingido; se não atingiu nenhum, não exibe coluna de ativo
   const colunaExibida = nivelAtivo && colunasComValor.includes(nivelAtivo) ? nivelAtivo : null;
   const labelAtivo = (k: string) => `Ativo ${parseInt(k.replace('ativo', ''), 10).toString().padStart(2, '0')}`;
+  // Níveis que têm faixa configurada (De ou Ate preenchido)
+  const niveisConfigurados = ativoKeys.filter(k => (metasDe[k] ?? 0) > 0 || (metasAte[k] ?? 0) > 0 || (metas[k] ?? 0) > 0).slice(0, 4);
+  // Índice do nível atual
+  const idxAtual = nivelAtivo ? niveisConfigurados.indexOf(nivelAtivo) : -1;
+  // Próximo nível
+  const proximoNivel = idxAtual >= 0 && idxAtual < niveisConfigurados.length - 1 ? niveisConfigurados[idxAtual + 1] : null;
+  const metaProximo = proximoNivel ? (metasDe[proximoNivel] ?? metas[proximoNivel] ?? 0) : 0;
+  const faltaProximo = metaProximo > 0 ? Math.max(0, metaProximo - totalLiquido) : 0;
   return (
     <div>
       <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
-      <div className="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-6">
+
+      {/* Card de Produção + Nível Atingido */}
+      <div className="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-wrap items-center gap-6">
         <div>
           <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">Produção Líq. sem SRCC ({mesAtualStr})</p>
           <p className="text-xl font-bold text-blue-800">{fmt(totalLiquido)}</p>
         </div>
-        {nivelAtivo && (
+        {nivelAtivo ? (
           <div>
             <p className="text-xs text-green-600 font-semibold uppercase tracking-wide">Nível atingido</p>
             <p className="text-xl font-bold text-green-700">{labelAtivo(nivelAtivo)}</p>
           </div>
-        )}
-        {!nivelAtivo && !isLoading && (
+        ) : (
           <p className="text-sm text-gray-400">Nenhuma faixa de meta atingida ainda neste mês.</p>
         )}
+        {proximoNivel && faltaProximo > 0 && (
+          <div className="ml-auto text-right">
+            <p className="text-xs text-orange-500 font-semibold uppercase tracking-wide">Falta para {labelAtivo(proximoNivel)}</p>
+            <p className="text-lg font-bold text-orange-600">{fmt(faltaProximo)}</p>
+          </div>
+        )}
       </div>
+
+      {/* Régua de Níveis */}
+      {niveisConfigurados.length > 0 && (
+        <div className="mb-4">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Faixas de Nível — Produza mais para ganhar mais!</p>
+          <div className="grid gap-2" style={{gridTemplateColumns: `repeat(${niveisConfigurados.length}, 1fr)`}}>
+            {niveisConfigurados.map((k, idx) => {
+              const isAtual = k === nivelAtivo;
+              const isAlcancado = idxAtual >= 0 && idx <= idxAtual;
+              const de = metasDe[k] ?? 0;
+              const ate = metasAte[k] ?? 0;
+              return (
+                <div
+                  key={k}
+                  className={`rounded-lg border-2 px-3 py-2.5 text-center transition-all ${
+                    isAtual
+                      ? 'border-green-500 bg-green-50 shadow-md'
+                      : isAlcancado
+                      ? 'border-blue-300 bg-blue-50'
+                      : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  <div className={`text-xs font-bold uppercase mb-1 ${
+                    isAtual ? 'text-green-700' : isAlcancado ? 'text-blue-600' : 'text-gray-400'
+                  }`}>
+                    {isAtual ? '✓ ' : ''}{labelAtivo(k)}
+                  </div>
+                  <div className={`text-[11px] font-medium ${
+                    isAtual ? 'text-green-800' : isAlcancado ? 'text-blue-700' : 'text-gray-500'
+                  }`}>
+                    {de > 0 ? fmt(de) : '—'}
+                    {ate > 0 ? <><br/><span className="text-[10px] text-gray-400">até</span><br/>{fmt(ate)}</> : ''}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
       <Card>
         <CardContent className="p-0">
           {isLoading ? (

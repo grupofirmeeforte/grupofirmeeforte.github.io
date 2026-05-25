@@ -1617,10 +1617,17 @@ export const appRouter = router({
       // Buscar valores de meta dos ativos
       const [valRow] = await db.select().from(valCalc).where(eq(valCalc.id, 1)).limit(1);
       const metas: Record<string, number> = {};
+      const metasDe: Record<string, number> = {};
+      const metasAte: Record<string, number> = {};
       if (valRow) {
         for (let i = 1; i <= 10; i++) {
-          const key = `ativo${String(i).padStart(2, '0')}` as keyof typeof valRow;
-          metas[key] = parseFloat(String(valRow[key] ?? '0')) || 0;
+          const pad = String(i).padStart(2, '0');
+          const key = `ativo${pad}` as keyof typeof valRow;
+          const keyDe = `ativo${pad}De` as keyof typeof valRow;
+          const keyAte = `ativo${pad}Ate` as keyof typeof valRow;
+          metas[`ativo${pad}`] = parseFloat(String(valRow[key] ?? '0')) || 0;
+          metasDe[`ativo${pad}`] = parseFloat(String(valRow[keyDe] ?? '0')) || 0;
+          metasAte[`ativo${pad}`] = parseFloat(String(valRow[keyAte] ?? '0')) || 0;
         }
       }
       // Determinar nível ativo:
@@ -1655,6 +1662,8 @@ export const appRouter = router({
         totalLiquidoSemSRCC,
         nivelAtivo,
         metas,
+        metasDe,
+        metasAte,
         tabela,
         mesRef,
         chaveJ: chaveJLogado ?? '',
