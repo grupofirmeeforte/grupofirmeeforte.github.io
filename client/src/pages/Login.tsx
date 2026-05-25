@@ -75,6 +75,8 @@ export default function Login() {
   // Biometria
   const { supported: webAuthnSupported, platformAvailable } = useWebAuthnSupport();
   const [bioChaveJ, setBioChaveJ] = useState('');
+  // Sincronizar bioChaveJ com chaveJ do formulário principal automaticamente
+  useEffect(() => { if (chaveJ.trim().length >= 4) setBioChaveJ(chaveJ.trim().toUpperCase()); }, [chaveJ]);
   const [bioStatus, setBioStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [bioMessage, setBioMessage] = useState('');
   const [showBioSection, setShowBioSection] = useState(false);
@@ -318,17 +320,23 @@ export default function Login() {
                   <p className="text-xs text-blue-700 font-medium">
                     Use a biometria do seu dispositivo para entrar rapidamente.
                   </p>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Sua ChaveJ</label>
-                    <Input
-                      type="text"
-                      placeholder="Digite sua ChaveJ"
-                      value={bioChaveJ}
-                      onChange={(e) => { setBioChaveJ(e.target.value); setBioStatus('idle'); setBioMessage(''); }}
-                      className="w-full text-sm"
-                      autoComplete="off"
-                    />
-                  </div>
+                  {bioChaveJ ? (
+                    <div className="text-xs text-blue-700 bg-blue-100 rounded-lg px-3 py-2 font-medium">
+                      ChaveJ: <span className="font-bold">{bioChaveJ}</span>
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Sua ChaveJ</label>
+                      <Input
+                        type="text"
+                        placeholder="Digite sua ChaveJ"
+                        value={bioChaveJ}
+                        onChange={(e) => { setBioChaveJ(e.target.value.toUpperCase()); setBioStatus('idle'); setBioMessage(''); }}
+                        className="w-full text-sm"
+                        autoComplete="off"
+                      />
+                    </div>
+                  )}
 
                   {/* Mensagem de status */}
                   {bioMessage && (
