@@ -766,9 +766,10 @@ export const febrabanRouter = {
 
       const agentesMap = new Map(agentesInfo.map(a => [a.chaveJ?.toUpperCase(), a]));
 
-      // Calcular dias do mês
+      // Calcular dias do mês (apenas dias úteis: seg-sex, sem sábado e domingo)
       const daysInMonth = new Date(input.ano, input.mes, 0).getDate();
-      const dias: number[] = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+      const dias: number[] = Array.from({ length: daysInMonth }, (_, i) => i + 1)
+        .filter(d => { const dow = new Date(input.ano, input.mes - 1, d).getDay(); return dow !== 0 && dow !== 6; });
 
       // Buscar produção por operador e dia (apenas Contratadas)
       const producaoRows = await db
