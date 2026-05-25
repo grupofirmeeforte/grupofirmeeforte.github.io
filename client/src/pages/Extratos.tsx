@@ -799,7 +799,7 @@ function MinhaTabela() {
       {/* Card de Produção + Nível Atingido */}
       <div className="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-wrap items-center gap-6">
         <div>
-          <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">Produção Líq. sem SRCC ({mesAtualStr})</p>
+          <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">Produção Líquida ({mesAtualStr})</p>
           <p className="text-xl font-bold text-blue-800">{fmt(totalLiquido)}</p>
         </div>
         {nivelAtivo ? (
