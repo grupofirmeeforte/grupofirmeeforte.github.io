@@ -149,12 +149,16 @@ export default function TabelaComissao() {
   const { user } = useAuth();
   const isAdminOuCeo = (user as any)?.cargo === 'CEO' || (user as any)?.cargo === 'SUPORTE' || (user as any)?.role === 'admin';
   const situacaoAgente: string | null = (user as any)?.situacao ?? null;
+  // Mapeamento correto: Ativo → ativo01, Ativo01 → ativo01, Ativo02 → ativo02, ...
   const SITUACAO_TO_ATIVO: Record<string, string> = {
-    'Ativo': 'ativo01', 'Ativo_2': 'ativo02', 'Ativo_3': 'ativo03',
-    'Ativo_4': 'ativo04', 'Ativo_5': 'ativo05', 'Ativo_6': 'ativo06',
-    'Ativo_7': 'ativo07', 'Ativo_8': 'ativo08', 'Ativo_9': 'ativo09', 'Ativo_10': 'ativo10',
+    'Ativo':   'ativo01',
+    'Ativo01': 'ativo01', 'Ativo02': 'ativo02', 'Ativo03': 'ativo03',
+    'Ativo04': 'ativo04', 'Ativo05': 'ativo05', 'Ativo06': 'ativo06',
+    'Ativo07': 'ativo07', 'Ativo08': 'ativo08', 'Ativo09': 'ativo09', 'Ativo10': 'ativo10',
   };
-  const ativoAgente: string | null = situacaoAgente ? (SITUACAO_TO_ATIVO[situacaoAgente] ?? null) : null;
+  // Agente é considerado "ativo" se sua situação começa com 'Ativo'
+  const isAgenteAtivo: boolean = situacaoAgente != null && situacaoAgente.startsWith('Ativo');
+  const ativoAgente: string | null = isAgenteAtivo ? (SITUACAO_TO_ATIVO[situacaoAgente!] ?? 'ativo01') : null;
   const [valoresAtivos, setValoresAtivos] = useState<Record<string, string>>(
     NIVEIS.reduce((acc, n) => ({ ...acc, [n]: '', [`${n}De`]: '', [`${n}Ate`]: '' }), {})
   );
@@ -356,8 +360,8 @@ export default function TabelaComissao() {
         </div>
       </div>
 
-      {/* Valores para Cálculo por Nível - Editáveis Inline */}
-      <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b">
+      {/* Valores para Cálculo por Nível - Editáveis Inline — só para admin/CEO */}
+      {isAdminOuCeo && <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b">
         <div className="mb-3">
           <div className="flex justify-between items-center mb-2">
             <label className="text-sm font-semibold text-blue-900 block">Valores para Cálculo por Nível:</label>
@@ -406,7 +410,7 @@ export default function TabelaComissao() {
             })}
           </div>
         </div>
-      </div>
+      </div>}
 
       {/* Filtros */}
       <div className="px-6 py-4 bg-white border-b">
@@ -458,10 +462,12 @@ export default function TabelaComissao() {
         </div>
       </div>
 
-      {/* Info */}
-      <div className="px-6 py-2 bg-blue-50 border-b text-xs text-blue-700">
-        💡 Clique em qualquer célula para editar. Pressione Enter para salvar ou Escape para cancelar.
-      </div>
+      {/* Info — só para admin */}
+      {isAdminOuCeo && (
+        <div className="px-6 py-2 bg-blue-50 border-b text-xs text-blue-700">
+          💡 Clique em qualquer célula para editar. Pressione Enter para salvar ou Escape para cancelar.
+        </div>
+      )}
 
       {/* Tabela */}
       <div className="px-6 py-4">
@@ -487,15 +493,18 @@ export default function TabelaComissao() {
                       <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Ações</th>
                     </>
                   ) : ativoAgente ? (
-                    <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Minha Comissão</th>
+                    <>
+                      <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Empresa</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Minha Comissão ({situacaoAgente})</th>
+                    </>
                   ) : null}
                 </tr>
               </thead>
               <tbody>
                 {isLoading ? (
-                  <tr><td colSpan={isAdminOuCeo ? 13 : 3} className="text-center py-8 text-gray-500">Carregando...</td></tr>
+                  <tr><td colSpan={isAdminOuCeo ? 13 : ativoAgente ? 4 : 2} className="text-center py-8 text-gray-500">Carregando...</td></tr>
                 ) : filteredRows.length === 0 ? (
-                  <tr><td colSpan={isAdminOuCeo ? 13 : 3} className="text-center py-8 text-gray-500">Nenhum registro encontrado</td></tr>
+                  <tr><td colSpan={isAdminOuCeo ? 13 : ativoAgente ? 4 : 2} className="text-center py-8 text-gray-500">Nenhum registro encontrado</td></tr>
                 ) : (
                   filteredRows.map((row) => {
                     const convColor = getConvenioColor(row.convenio);
@@ -565,9 +574,14 @@ export default function TabelaComissao() {
                             ))
                           }</>
                         ) : ativoAgente ? (
-                          <td className="px-3 py-1.5 text-center text-blue-700 font-bold whitespace-nowrap text-base">
-                            {pct((row as any)[ativoAgente])}
-                          </td>
+                          <>
+                            <td className="px-3 py-2 font-semibold text-gray-800 whitespace-nowrap">
+                              {row.empresa || '-'}
+                            </td>
+                            <td className="px-3 py-1.5 text-center font-bold whitespace-nowrap text-base" style={{color: (row as any)[ativoAgente] ? '#1d4ed8' : '#9ca3af'}}>
+                              {(row as any)[ativoAgente] ? pct((row as any)[ativoAgente]) : '—'}
+                            </td>
+                          </>
                         ) : null}
                         {/* Ações: só admin */}
                         {isAdminOuCeo && (
