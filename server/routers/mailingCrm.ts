@@ -259,6 +259,98 @@ export const mailingCrmRouter = router({
     return { removidos: idsRemover.length };
   }),
 
+  // Contar CPFs duplicados
+  contarDuplicados: protectedProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return { duplicados: 0, registrosAfetados: 0 };
+    const todos = await db.select({ id: crm.id, cpf: crm.cpf }).from(crm).where(sql`cpf IS NOT NULL AND cpf != ''`);
+    const porCpf = new Map<string, number[]>();
+    for (const r of todos) {
+      const c = String(r.cpf ?? '').replace(/\D/g, '');
+      if (!c) continue;
+      if (!porCpf.has(c)) porCpf.set(c, []);
+      porCpf.get(c)!.push(r.id);
+    }
+    let duplicados = 0, registrosAfetados = 0;
+    for (const ids of Array.from(porCpf.values())) {
+      if (ids.length > 1) { duplicados++; registrosAfetados += ids.length - 1; }
+    }
+    return { duplicados, registrosAfetados };
+  }),
+
+  // Deduplicar CPFs: manter o mais antigo (menor id), copiar telefones únicos dos duplicados e excluir os extras
+  deduplicarCpf: protectedProcedure.mutation(async () => {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
+    // Buscar todos os campos relevantes
+    const todos = await db.select({
+      id: crm.id, cpf: crm.cpf,
+      ddd01: crm.ddd01, tel01: crm.tel01,
+      ddd02: crm.ddd02, tel02: crm.tel02,
+      ddd03: crm.ddd03, tel03: crm.tel03,
+      ddd04: crm.ddd04, tel04: crm.tel04,
+      ddd05: crm.ddd05, tel05: crm.tel05,
+      ddd06: crm.ddd06, tel06: crm.tel06,
+      ddd07: crm.ddd07, tel07: crm.tel07,
+      ddd08: crm.ddd08, tel08: crm.tel08,
+      ddd09: crm.ddd09, tel09: crm.tel09,
+      ddd10: crm.ddd10, tel10: crm.tel10,
+    }).from(crm).where(sql`cpf IS NOT NULL AND cpf != ''`).orderBy(crm.id);
+
+    // Agrupar por CPF normalizado
+    const porCpf = new Map<string, typeof todos>();
+    for (const r of todos) {
+      const c = String(r.cpf ?? '').replace(/\D/g, '');
+      if (!c) continue;
+      if (!porCpf.has(c)) porCpf.set(c, []);
+      porCpf.get(c)!.push(r);
+    }
+
+    let removidos = 0;
+    const slots = ['01','02','03','04','05','06','07','08','09','10'] as const;
+
+    for (const grupo of Array.from(porCpf.values())) {
+      if (grupo.length <= 1) continue;
+
+      // Manter o primeiro (menor id), coletar telefones de todos
+      const principal = grupo[0];
+      const duplicatas = grupo.slice(1);
+
+      // Coletar todos os pares DDD+TEL únicos de todos os registros
+      const telSet = new Set<string>();
+      const todosOsTels: { ddd: string; tel: string }[] = [];
+
+      for (const reg of grupo) {
+        for (const s of slots) {
+          const ddd = String((reg as any)[`ddd${s}`] ?? '').trim();
+          const tel = String((reg as any)[`tel${s}`] ?? '').trim();
+          if (!tel || tel === '0') continue;
+          const chave = `${ddd}|${tel}`;
+          if (!telSet.has(chave)) { telSet.add(chave); todosOsTels.push({ ddd, tel }); }
+        }
+      }
+
+      // Montar update com até 10 telefones mesclados
+      const update: Record<string, string | null> = {};
+      for (let i = 0; i < slots.length; i++) {
+        const s = slots[i];
+        update[`ddd${s}`] = todosOsTels[i]?.ddd || null;
+        update[`tel${s}`] = todosOsTels[i]?.tel || null;
+      }
+
+      // Atualizar o principal com os telefones mesclados
+      await db.update(crm).set(update).where(eq(crm.id, principal.id));
+
+      // Excluir os duplicados
+      const idsRemover = duplicatas.map((d: { id: number }) => d.id);
+      await db.delete(crm).where(sql`id IN (${sql.join(idsRemover.map((id: number) => sql`${id}`), sql`, `)})`);
+      removidos += idsRemover.length;
+    }
+
+    return { removidos };
+  }),
+
   // Valores únicos para filtros
   filtros: protectedProcedure.query(async () => {
     const db = await getDb();

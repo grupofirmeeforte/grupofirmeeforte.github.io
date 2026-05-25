@@ -193,6 +193,20 @@ export default function MailingCrm() {
     onError: (e) => toast.error('Erro: ' + e.message),
   });
 
+  // Deduplicar CPF
+  const [confirmDedup, setConfirmDedup] = useState(false);
+  const { data: contagemDup } = trpc.mailingCrm.contarDuplicados.useQuery(undefined, { staleTime: 30_000 });
+  const deduplicarCpf = trpc.mailingCrm.deduplicarCpf.useMutation({
+    onSuccess: (r) => {
+      utils.mailingCrm.list.invalidate();
+      utils.mailingCrm.count.invalidate();
+      utils.mailingCrm.contarDuplicados.invalidate();
+      setConfirmDedup(false);
+      toast.success(`${r.removidos} duplicata(s) removida(s) — telefones mesclados no registro principal!`);
+    },
+    onError: (e) => toast.error('Erro: ' + e.message),
+  });
+
   const totalPages = Math.ceil(total / PER_PAGE);
 
   // Exportar Excel
@@ -308,6 +322,13 @@ export default function MailingCrm() {
             className="gap-1.5 border-orange-400 text-orange-600 hover:bg-orange-50"
           >
             👴 Remover +78 anos {contagem?.acima78 ? `(${contagem.acima78})` : ''}
+          </Button>
+          <Button
+            variant="outline" size="sm"
+            onClick={() => setConfirmDedup(true)}
+            className="gap-1.5 border-purple-400 text-purple-600 hover:bg-purple-50"
+          >
+            🔄 Deduplicar CPF {contagemDup?.registrosAfetados ? `(${contagemDup.registrosAfetados})` : ''}
           </Button>
           <Button size="sm" onClick={openNew} className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5">
             + Novo Registro
@@ -525,6 +546,30 @@ export default function MailingCrm() {
           </div>
         </div>
       )}
+
+      {/* Confirm Deduplicar CPF */}
+      <Dialog open={confirmDedup} onOpenChange={o => !o && setConfirmDedup(false)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>🔄 Deduplicar CPFs</DialogTitle></DialogHeader>
+          <p className="text-sm text-gray-600">
+            Foram encontrados <strong>{contagemDup?.duplicados ?? 0} CPF(s)</strong> com registros duplicados
+            ({contagemDup?.registrosAfetados ?? 0} registro(s) serão removidos).
+            <br /><br />
+            O sistema irá <strong>mesclar os telefones únicos</strong> de todos os duplicados no registro mais antigo
+            e depois excluir as cópias. Esta ação não pode ser desfeita.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmDedup(false)}>Cancelar</Button>
+            <Button
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              disabled={deduplicarCpf.isPending || (contagemDup?.registrosAfetados ?? 0) === 0}
+              onClick={() => deduplicarCpf.mutate()}
+            >
+              {deduplicarCpf.isPending ? 'Processando...' : 'Confirmar e Deduplicar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Confirm Limpeza em Lote */}
       <Dialog open={confirmLimpeza !== null} onOpenChange={o => !o && setConfirmLimpeza(null)}>
