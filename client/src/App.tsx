@@ -39,6 +39,7 @@ import UniformesCrachas from './pages/UniformesCrachas';
 import MensagemMotivacional from './pages/MensagemMotivacional';
 import MensagemDoDiaHub from './pages/MensagemDoDiaHub';
 import MailingCrmPage from './pages/MailingCrm';
+import RelatorioChaveJ from './pages/RelatorioChaveJ';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -84,6 +85,7 @@ function RouterWithInactivity() {
       <Route path={"/contas-lojas"} component={ContasLojasPage} />
       <Route path={"/crm"} component={CRMPage} />
       <Route path={"/mailing-crm"} component={MailingCrmPage} />
+      <Route path={"/febraban/relatorio-chavej"} component={RelatorioChaveJ} />
       <Route path={"/extratos"} component={ExtratosPage} />
       <Route path={"/pro-rata"} component={ProRataPage} />
       <Route path={"/producao/consorcio"} component={Consorcio} />

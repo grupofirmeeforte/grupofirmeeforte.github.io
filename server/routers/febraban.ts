@@ -947,6 +947,144 @@ export const febrabanRouter = {
     }),
 
   // Retorna valores únicos para filtros
+  // Relatório por Chave J: Trimestre/Semestre/Ano Valores e Operações, por Tipo OP
+  relatorioChaveJ: protectedProcedure
+    .input(z.object({
+      ano: z.number().optional(), // ano de referência; se omitido usa o mais recente
+      empresa: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { rows: [], ano: null };
+
+      // Determinar o ano de referência
+      let anoRef = input.ano;
+      if (!anoRef) {
+        const latest = await db
+          .select({ v: febraban.mesano })
+          .from(febraban)
+          .where(sql`mesano IS NOT NULL${input.empresa ? sql` AND empresa = ${input.empresa}` : sql``}`)
+          .orderBy(sql`CONCAT('20', RIGHT(LPAD(CAST(mesano AS CHAR),6,'0'),2), LPAD(FLOOR(mesano / 100),2,'0')) DESC`)
+          .limit(1);
+        if (latest[0]?.v) {
+          const s = String(latest[0].v);
+          anoRef = parseInt('20' + s.slice(-2));
+        }
+      }
+      if (!anoRef) return { rows: [], ano: null };
+
+      const anoSuffix = String(anoRef).slice(-2); // '26' para 2026
+
+      // Buscar todos os registros do ano de referência
+      const allRows = await db
+        .select({
+          mesano: febraban.mesano,
+          operador: febraban.operador,
+          situacao: febraban.situacao,
+          troco: febraban.troco,
+          financiado: febraban.financiado,
+          empresa: febraban.empresa,
+        })
+        .from(febraban)
+        .where(sql`RIGHT(LPAD(CAST(mesano AS CHAR), 6, '0'), 2) = ${anoSuffix}${input.empresa ? sql` AND empresa = ${input.empresa}` : sql``}`);
+
+      // Classificar tipo de operação
+      const getTipo = (row: { situacao?: string | null; troco?: any; financiado?: any }): 'NOVO' | 'REFIN' | 'CANC' => {
+        if (row.situacao && row.situacao.toLowerCase().includes('cancel')) return 'CANC';
+        const t = Math.round((parseFloat(String(row.troco ?? '0').replace(',', '.')) || 0) * 100);
+        const f = Math.round((parseFloat(String(row.financiado ?? '0').replace(',', '.')) || 0) * 100);
+        if (t === f) return 'NOVO';
+        return 'REFIN';
+      };
+
+      // Extrair mês de mesano (ex: 126 → mes=1, 1226 → mes=12)
+      const getMes = (mesano: number): number => {
+        const s = String(mesano);
+        return parseInt(s.slice(0, s.length - 2));
+      };
+
+      // Trimestre do mês (1-4)
+      const getTri = (mes: number): number => Math.ceil(mes / 3);
+      // Semestre do mês (1-2)
+      const getSem = (mes: number): number => mes <= 6 ? 1 : 2;
+
+      // Acumular por operador + tipo
+      type Acc = { valor: number; qtd: number };
+      type AgenteTipo = {
+        tri1: Acc; tri2: Acc; tri3: Acc; tri4: Acc;
+        sem1: Acc; sem2: Acc;
+        ano: Acc;
+      };
+      const mapa: Record<string, Record<'NOVO'|'REFIN'|'CANC', AgenteTipo>> = {};
+
+      const emptyAcc = (): Acc => ({ valor: 0, qtd: 0 });
+      const emptyTipo = (): AgenteTipo => ({
+        tri1: emptyAcc(), tri2: emptyAcc(), tri3: emptyAcc(), tri4: emptyAcc(),
+        sem1: emptyAcc(), sem2: emptyAcc(),
+        ano: emptyAcc(),
+      });
+
+      for (const row of allRows) {
+        if (!row.mesano || !row.operador) continue;
+        const op = row.operador.trim();
+        const tipo = getTipo(row);
+        const mes = getMes(row.mesano);
+        const tri = getTri(mes);
+        const sem = getSem(mes);
+        const val = parseFloat(String(row.troco ?? '0').replace(',', '.')) || 0;
+
+        if (!mapa[op]) mapa[op] = { NOVO: emptyTipo(), REFIN: emptyTipo(), CANC: emptyTipo() };
+        const t = mapa[op][tipo];
+
+        // Trimestre
+        if (tri === 1) { t.tri1.valor += val; t.tri1.qtd++; }
+        else if (tri === 2) { t.tri2.valor += val; t.tri2.qtd++; }
+        else if (tri === 3) { t.tri3.valor += val; t.tri3.qtd++; }
+        else if (tri === 4) { t.tri4.valor += val; t.tri4.qtd++; }
+
+        // Semestre
+        if (sem === 1) { t.sem1.valor += val; t.sem1.qtd++; }
+        else { t.sem2.valor += val; t.sem2.qtd++; }
+
+        // Ano
+        t.ano.valor += val; t.ano.qtd++;
+      }
+
+      // Montar resultado ordenado por operador
+      const resultado: Array<{
+        chaveJ: string;
+        tipo: 'NOVO' | 'REFIN' | 'CANC';
+        tri1v: number; tri2v: number; tri3v: number; tri4v: number;
+        sem1v: number; sem2v: number; anov: number;
+        tri1q: number; tri2q: number; tri3q: number; tri4q: number;
+        sem1q: number; sem2q: number; anoq: number;
+      }> = [];
+
+      const round2 = (n: number) => Math.round(n * 100) / 100;
+
+      for (const [chaveJ, tipos] of Object.entries(mapa).sort(([a], [b]) => a.localeCompare(b))) {
+        for (const tipo of ['NOVO', 'REFIN', 'CANC'] as const) {
+          const t = tipos[tipo];
+          // Só inclui se tiver algum dado
+          if (t.ano.qtd === 0) continue;
+          resultado.push({
+            chaveJ,
+            tipo,
+            tri1v: round2(t.tri1.valor), tri2v: round2(t.tri2.valor),
+            tri3v: round2(t.tri3.valor), tri4v: round2(t.tri4.valor),
+            sem1v: round2(t.sem1.valor), sem2v: round2(t.sem2.valor),
+            anov: round2(t.ano.valor),
+            tri1q: t.tri1.qtd, tri2q: t.tri2.qtd,
+            tri3q: t.tri3.qtd, tri4q: t.tri4.qtd,
+            sem1q: t.sem1.qtd, sem2q: t.sem2.qtd,
+            anoq: t.ano.qtd,
+          });
+        }
+      }
+
+      return { rows: resultado, ano: anoRef };
+    }),
+
   filtros: protectedProcedure.query(async () => {
     const db = await getDb();
     if (!db) return { empresas: [], mesanos: [], situacoes: [], operadores: [] };

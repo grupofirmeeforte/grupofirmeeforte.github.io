@@ -168,6 +168,7 @@ export default function Home() {
         { title: 'Produção BB', description: 'Relatório de produção Febraban', icon: ShieldCheck, color: 'bg-violet-500', path: '/febraban', subKey: 'producao-bb' },
         { title: 'Acompanhamento Diário', description: 'Produção diária por agente (BMF e FLEX)', icon: ShieldCheck, color: 'bg-violet-700', path: '/febraban/acompanhamento-diario', subKey: 'acompanhamento-diario' },
         { title: 'Gráficos de Produção', description: 'Gráficos por ChaveJ e por tipo de operação', icon: BarChart2, color: 'bg-violet-900', path: '/febraban?aba=graficos', subKey: 'graficos-producao' },
+        { title: 'Relatório por Chave J', description: 'Trimestre, Semestre e Ano — Valores e Operações por Chave J', icon: BarChart2, color: 'bg-indigo-700', path: '/febraban/relatorio-chavej', subKey: 'relatorio-chavej' },
       ],
     },
 
