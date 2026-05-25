@@ -826,8 +826,14 @@ export default function AuditoriaPage() {
 
 // ─── BOTÃO DA ABA DESPESAS INTERNAS (só renderiza se tiver acesso) ────────────
 function DespesasInternasAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => void }) {
-  const { data } = trpc.despesasInternas.verificarAcesso.useQuery();
-  if (!data?.temAcesso) return null;
+  const { user } = useAuth();
+  const CHAVES_AUTORIZADAS = ['J1234568', 'J1234569', 'J9624265', 'JG701582'];
+  const chaveJ = (user as any)?.chaveJ ?? '';
+  const nome = (user as any)?.nomeAgente?.toLowerCase?.() ?? '';
+  const temAcesso = CHAVES_AUTORIZADAS.includes(chaveJ) ||
+    nome.includes('sidnei honorato ultramare') ||
+    nome.includes('thiago viana ultramare');
+  if (!temAcesso) return null;
   return (
     <button
       onClick={() => setAba('despesas-internas')}
@@ -865,8 +871,14 @@ type DespesaInterna = {
 
 function DespesasInternasAba() {
   const utils = trpc.useUtils();
-  // Controle de acesso
-  const { data: acesso } = trpc.despesasInternas.verificarAcesso.useQuery();
+  const { user } = useAuth();
+  // Controle de acesso via frontend (chaveJ ou nome)
+  const CHAVES_AUTORIZADAS = ['J1234568', 'J1234569', 'J9624265', 'JG701582'];
+  const chaveJUser = (user as any)?.chaveJ ?? '';
+  const nomeUser = (user as any)?.nomeAgente?.toLowerCase?.() ?? '';
+  const acesso = { temAcesso: CHAVES_AUTORIZADAS.includes(chaveJUser) ||
+    nomeUser.includes('sidnei honorato ultramare') ||
+    nomeUser.includes('thiago viana ultramare') };
   // Segunda senha CEO
   const [senhaDesbloqueada, setSenhaDesbloqueada] = useState(false);
   const [senhaInput, setSenhaInput] = useState('');
