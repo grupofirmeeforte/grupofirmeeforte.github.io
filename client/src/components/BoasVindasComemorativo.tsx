@@ -2,10 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { X, Send, Sparkles, Star, Heart, MessageSquare, CheckCircle2 } from "lucide-react";
+import { X, Send, Sparkles, Star, Heart, MessageSquare, CheckCircle2, Crown, Shield, UserCheck, Headphones } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
+
+const DESTINATARIOS_OPCOES = [
+  { value: "ceo", label: "CEO", icon: Crown, color: "#c8960c", bg: "rgba(200,150,12,0.15)", border: "rgba(200,150,12,0.5)" },
+  { value: "admin", label: "Administração", icon: Shield, color: "#60a5fa", bg: "rgba(96,165,250,0.15)", border: "rgba(96,165,250,0.5)" },
+  { value: "supervisor", label: "Supervisor", icon: UserCheck, color: "#a78bfa", bg: "rgba(167,139,250,0.15)", border: "rgba(167,139,250,0.5)" },
+  { value: "suporte", label: "Suporte", icon: Headphones, color: "#34d399", bg: "rgba(52,211,153,0.15)", border: "rgba(52,211,153,0.5)" },
+];
 
 // ── Partículas de estrelas / confetes ────────────────────────────────────────
 const COLORS = ["#FFD700", "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98FB98", "#F0E68C", "#87CEEB", "#FFA07A", "#20B2AA"];
@@ -280,17 +286,30 @@ export function BoasVindasComemorativo({ onClose }: { onClose: () => void }) {
 
                 <div>
                   <label className="block text-xs font-medium text-gray-300 mb-1.5">Destinatário *</label>
-                  <Select value={destinatario} onValueChange={setDestinatario}>
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                      <SelectValue placeholder="Selecione o destinatário..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ceo">👑 CEO</SelectItem>
-                      <SelectItem value="admin">🛡️ Administração</SelectItem>
-                      <SelectItem value="supervisor">👔 Supervisor</SelectItem>
-                      <SelectItem value="suporte">🎧 Suporte</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="grid grid-cols-2 gap-2">
+                    {DESTINATARIOS_OPCOES.map((opt) => {
+                      const Icon = opt.icon;
+                      const selecionado = destinatario === opt.value;
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => setDestinatario(opt.value)}
+                          className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left"
+                          style={{
+                            background: selecionado ? opt.bg : "rgba(255,255,255,0.05)",
+                            border: `1.5px solid ${selecionado ? opt.border : "rgba(255,255,255,0.1)"}`,
+                            color: selecionado ? opt.color : "#9ca3af",
+                            boxShadow: selecionado ? `0 0 12px ${opt.bg}` : "none",
+                          }}
+                        >
+                          <Icon className="w-4 h-4 shrink-0" style={{ color: selecionado ? opt.color : "#6b7280" }} />
+                          <span>{opt.label}</span>
+                          {selecionado && <CheckCircle2 className="w-3.5 h-3.5 ml-auto" style={{ color: opt.color }} />}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div>
