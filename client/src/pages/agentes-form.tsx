@@ -373,16 +373,6 @@ export default function AgentesFormPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="numCadastro">Número de Cadastro</Label>
-                <Input
-                  id="numCadastro"
-                  name="numCadastro"
-                  value={formData.numCadastro}
-                  disabled
-                  className="bg-gray-100 cursor-not-allowed"
-                />
-              </div>
-              <div>
                 <Label htmlFor="chaveJ">Chave J *</Label>
                 <Input
                   id="chaveJ"

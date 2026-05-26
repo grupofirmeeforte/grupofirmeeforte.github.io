@@ -129,9 +129,11 @@ function PermissoesEditor({
   const [expandido, setExpandido] = useState<string | null>(null);
 
   const setNivelModulo = (modulo: string, nivel: NivelPermissao) => {
-    const novo = { ...mapa, [modulo]: { ...mapa[modulo] } };
-    for (const key of Object.keys(novo[modulo])) novo[modulo][key] = nivel;
-    onChange(novo);
+    const moduloDef = MODULOS_PERMISSOES.find(m => m.modulo === modulo);
+    const subabas = moduloDef ? moduloDef.subabas.map(s => s.key) : Object.keys(mapa[modulo] ?? {});
+    const novoModulo: Record<string, NivelPermissao> = {};
+    for (const key of subabas) novoModulo[key] = nivel;
+    onChange({ ...mapa, [modulo]: novoModulo });
   };
 
   const setNivelSubaba = (modulo: string, key: string, nivel: NivelPermissao) => {
