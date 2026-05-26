@@ -9,10 +9,9 @@ import { getDb } from "../db";
 import { agentes } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { ENV } from "../_core/env";
-import FormData from "form-data";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const fetch = require("node-fetch") as typeof import("node-fetch").default;
 import { TRPCError } from "@trpc/server";
+import axios from "axios";
+import FormData from "form-data";
 import {
   getLoginAttempts,
   incrementLoginAttempts,
@@ -38,8 +37,10 @@ async function detectFace(imageBase64: string): Promise<string | null> {
   form.append("return_landmark", "0");
   form.append("return_attributes", "");
 
-  const res = await fetch(`${FACEPP_BASE}/detect`, { method: "POST", body: form as any });
-  const data = await res.json() as any;
+  const res = await axios.post(`${FACEPP_BASE}/detect`, form, {
+    headers: form.getHeaders(),
+  });
+  const data = res.data as any;
   if (data.error_message) throw new Error(`Face++ detect: ${data.error_message}`);
   if (!data.faces || data.faces.length === 0) return null;
   return data.faces[0].face_token as string;
@@ -52,16 +53,20 @@ async function ensureFaceSet(): Promise<string> {
   form.append("outer_id", SYSTEM_OUTER_ID);
   form.append("display_name", "Grupo Firme e Forte - Agentes");
 
-  const res = await fetch(`${FACEPP_BASE}/faceset/create`, { method: "POST", body: form as any });
-  const data = await res.json() as any;
+  const res = await axios.post(`${FACEPP_BASE}/faceset/create`, form, {
+    headers: form.getHeaders(),
+  });
+  const data = res.data as any;
   if (data.faceset_token) return data.faceset_token as string;
   if (data.error_message?.includes("FACESET_EXIST")) {
     const form2 = new FormData();
     form2.append("api_key", ENV.faceppApiKey);
     form2.append("api_secret", ENV.faceppApiSecret);
     form2.append("outer_id", SYSTEM_OUTER_ID);
-    const res2 = await fetch(`${FACEPP_BASE}/faceset/getdetail`, { method: "POST", body: form2 as any });
-    const data2 = await res2.json() as any;
+    const res2 = await axios.post(`${FACEPP_BASE}/faceset/getdetail`, form2, {
+      headers: form2.getHeaders(),
+    });
+    const data2 = res2.data as any;
     return data2.faceset_token as string;
   }
   throw new Error(`Face++ faceset: ${data.error_message}`);
@@ -73,8 +78,10 @@ async function addFaceToFaceSet(facesetToken: string, faceToken: string): Promis
   form.append("api_secret", ENV.faceppApiSecret);
   form.append("faceset_token", facesetToken);
   form.append("face_tokens", faceToken);
-  const res = await fetch(`${FACEPP_BASE}/faceset/addface`, { method: "POST", body: form as any });
-  const data = await res.json() as any;
+  const res = await axios.post(`${FACEPP_BASE}/faceset/addface`, form, {
+    headers: form.getHeaders(),
+  });
+  const data = res.data as any;
   if (data.error_message) throw new Error(`Face++ addface: ${data.error_message}`);
 }
 
@@ -84,7 +91,9 @@ async function removeFaceFromFaceSet(facesetToken: string, faceToken: string): P
   form.append("api_secret", ENV.faceppApiSecret);
   form.append("faceset_token", facesetToken);
   form.append("face_tokens", faceToken);
-  await fetch(`${FACEPP_BASE}/faceset/removeface`, { method: "POST", body: form as any });
+  await axios.post(`${FACEPP_BASE}/faceset/removeface`, form, {
+    headers: form.getHeaders(),
+  }).catch(() => {});
 }
 
 async function setFaceUserId(faceToken: string, userId: string): Promise<void> {
@@ -93,7 +102,9 @@ async function setFaceUserId(faceToken: string, userId: string): Promise<void> {
   form.append("api_secret", ENV.faceppApiSecret);
   form.append("face_token", faceToken);
   form.append("user_id", userId);
-  await fetch(`${FACEPP_BASE}/face/setuserid`, { method: "POST", body: form as any });
+  await axios.post(`${FACEPP_BASE}/face/setuserid`, form, {
+    headers: form.getHeaders(),
+  });
 }
 
 async function searchFace(facesetToken: string, faceToken: string): Promise<{ userId: string; confidence: number } | null> {
@@ -103,8 +114,10 @@ async function searchFace(facesetToken: string, faceToken: string): Promise<{ us
   form.append("faceset_token", facesetToken);
   form.append("face_token", faceToken);
 
-  const res = await fetch(`${FACEPP_BASE}/search`, { method: "POST", body: form as any });
-  const data = await res.json() as any;
+  const res = await axios.post(`${FACEPP_BASE}/search`, form, {
+    headers: form.getHeaders(),
+  });
+  const data = res.data as any;
   if (data.error_message) throw new Error(`Face++ search: ${data.error_message}`);
   if (!data.results || data.results.length === 0) return null;
   const best = data.results[0];

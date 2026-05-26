@@ -212,11 +212,11 @@ export function BoasVindasComemorativo({ onClose }: { onClose: () => void }) {
                 <div>
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <Sparkles className="w-5 h-5 text-yellow-400" />
-                    <span className="text-yellow-400 text-sm font-semibold tracking-widest uppercase">Bem-vindo ao Sistema</span>
+                    <span className="text-yellow-400 text-sm font-semibold tracking-widest uppercase">Sistema de Gestão</span>
                     <Sparkles className="w-5 h-5 text-yellow-400" />
                   </div>
                   <h1 className="text-4xl font-black text-white leading-tight" style={{ textShadow: "0 0 30px rgba(200,150,12,0.5)" }}>
-                    Parabéns, {primeiroNome}!
+                    Parabéns, {primeiroNome}! 🎉
                   </h1>
                   <div className="mt-2 flex justify-center">
                     <div className="h-0.5 w-32" style={{ background: "linear-gradient(90deg, transparent, #c8960c, transparent)" }} />
