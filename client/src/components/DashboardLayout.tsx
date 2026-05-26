@@ -21,8 +21,10 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { KeyRound, LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { KeyRound, LayoutDashboard, LogOut, PanelLeft, Paperclip, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
+import { PopupComunicado } from "@/components/PopupComunicado";
+import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
@@ -266,6 +268,33 @@ function DashboardLayoutContent({
         )}
         <main className="flex-1 p-4">{children}</main>
       </SidebarInset>
+      <BotaoComunicado />
+    </>
+  );
+}
+
+function BotaoComunicado() {
+  const [aberto, setAberto] = useState(false);
+  const naoLidosQuery = trpc.comunicados.contarNaoLidos.useQuery(undefined, {
+    refetchInterval: 30000,
+  });
+  const total = naoLidosQuery.data?.total ?? 0;
+
+  return (
+    <>
+      <button
+        onClick={() => setAberto(true)}
+        title="Enviar Comunicado"
+        className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-blue-700 hover:bg-blue-800 text-white shadow-2xl transition-all hover:scale-110 active:scale-95"
+      >
+        <Paperclip className="w-6 h-6" />
+        {total > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+            {total > 9 ? "9+" : total}
+          </span>
+        )}
+      </button>
+      {aberto && <PopupComunicado onClose={() => setAberto(false)} />}
     </>
   );
 }

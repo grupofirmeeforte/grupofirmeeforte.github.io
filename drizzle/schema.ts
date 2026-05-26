@@ -1413,3 +1413,30 @@ export const boasVindasVisto = mysqlTable('boas_vindas_visto', {
   agenteIdIdx: index("idx_boas_vindas_agenteId").on(table.agenteId),
 }));
 export type BoasVindasVisto = typeof boasVindasVisto.$inferSelect;
+
+// ============================================================================
+// COMUNICADOS COM ARQUIVO (prints, fotos, documentos)
+// ============================================================================
+export const comunicados = mysqlTable("comunicados", {
+  id: int("id").autoincrement().primaryKey(),
+  remetenteId: int("remetenteId").notNull(),
+  remetenteNome: varchar("remetenteNome", { length: 255 }),
+  remetenteChaveJ: varchar("remetenteChaveJ", { length: 50 }),
+  tipoDestinatario: mysqlEnum("tipoDestinatario", ["todos", "promotores", "especifico"]).notNull().default("todos"),
+  destinatarioId: int("destinatarioId"),
+  destinatarioNome: varchar("destinatarioNome", { length: 255 }),
+  titulo: varchar("titulo", { length: 255 }),
+  descricao: text("descricao"),
+  arquivoUrl: text("arquivoUrl"),
+  arquivoKey: text("arquivoKey"),
+  arquivoTipo: varchar("arquivoTipo", { length: 100 }),
+  arquivoNome: varchar("arquivoNome", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export const comunicadosLidos = mysqlTable("comunicados_lidos", {
+  id: int("id").autoincrement().primaryKey(),
+  comunicadoId: int("comunicadoId").notNull(),
+  agenteId: int("agenteId").notNull(),
+  lidoEm: timestamp("lidoEm").defaultNow().notNull(),
+});

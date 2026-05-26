@@ -32,6 +32,7 @@ import { mailingCrmRouter } from "./routers/mailingCrm";
 import { cargoPermissoesRouter } from "./routers/cargoPermissoes";
 import { loginRapidoRouter } from "./routers/loginRapido";
 import { recadosRouter } from "./routers/recados";
+import { comunicadosRouter } from "./routers/comunicados";
 import { chatInternoRouter } from "./routers/chatInterno";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
@@ -372,6 +373,7 @@ export const appRouter = router({
   cargoPermissoes: cargoPermissoesRouter,
   loginRapido: loginRapidoRouter,
   recados: recadosRouter,
+  comunicados: comunicadosRouter,
   chatInterno: chatInternoRouter,
   crm: crmRouter,
   mailingCrm: mailingCrmRouter,
