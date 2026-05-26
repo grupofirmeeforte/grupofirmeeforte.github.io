@@ -3,7 +3,7 @@ import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Shield, Users, ChevronDown, ChevronUp, Save, Copy } from 'lucide-react';
+import { Shield, Users, ChevronDown, ChevronUp, Save, Settings } from 'lucide-react';
 
 // ─── Tipos e constantes ────────────────────────────────────────────────────────
 type NivelPermissao = 'sem_acesso' | 'leitura' | 'editar' | 'admin';
@@ -87,19 +87,16 @@ function buildDefaultPermissoes(nivel: NivelPermissao): PermissoesMap {
   return map;
 }
 
-// Mescla o JSON salvo no banco com os defaults (sem_acesso para módulos/subabas não salvos)
-// Isso garante que módulos novos adicionados ao MODULOS_PERMISSOES apareçam como sem_acesso
-// em vez de herdarem 'leitura' do nível geral
-function mergeComDefaults(savedJson: string | null): PermissoesMap {
+// Mescla o JSON salvo no banco com os defaults.
+// Para módulos/subabas não presentes no JSON salvo, usa o fallbackNivel (padrão: sem_acesso).
+function mergeComDefaults(savedJson: string | null, fallbackNivel: NivelPermissao = 'sem_acesso'): PermissoesMap {
   let saved: PermissoesMap = {};
   try { saved = JSON.parse(savedJson ?? '{}') ?? {}; } catch { saved = {}; }
   const result: PermissoesMap = {};
   for (const m of MODULOS_PERMISSOES) {
     result[m.modulo] = {};
     for (const s of m.subabas) {
-      // Se o módulo e subaba existem no banco, usa o valor salvo
-      // Caso contrário, default = sem_acesso (não herda o nível geral)
-      result[m.modulo][s.key] = saved[m.modulo]?.[s.key] ?? 'sem_acesso';
+      result[m.modulo][s.key] = saved[m.modulo]?.[s.key] ?? fallbackNivel;
     }
   }
   return result;
@@ -121,41 +118,228 @@ function NivelSelect({ value, onChange }: { value: NivelPermissao; onChange: (v:
   );
 }
 
-// ─── Painel de template por cargo ─────────────────────────────────────────────
-function TemplateCargo({ cargos, onAplicar }: { cargos: string[]; onAplicar: (cargo: string, nivelGeral: NivelPermissao, mapa: PermissoesMap) => void }) {
-  const [cargoSelecionado, setCargoSelecionado] = useState('');
-  const [nivelGlobal, setNivelGlobal] = useState<NivelPermissao>('leitura');
-  const [mapa, setMapa] = useState<PermissoesMap>(() => buildDefaultPermissoes('leitura'));
+// ─── Editor de permissões reutilizável ────────────────────────────────────────
+function PermissoesEditor({
+  mapa,
+  onChange,
+}: {
+  mapa: PermissoesMap;
+  onChange: (mapa: PermissoesMap) => void;
+}) {
   const [expandido, setExpandido] = useState<string | null>(null);
+
+  const setNivelModulo = (modulo: string, nivel: NivelPermissao) => {
+    const novo = { ...mapa, [modulo]: { ...mapa[modulo] } };
+    for (const key of Object.keys(novo[modulo])) novo[modulo][key] = nivel;
+    onChange(novo);
+  };
+
+  const setNivelSubaba = (modulo: string, key: string, nivel: NivelPermissao) => {
+    onChange({ ...mapa, [modulo]: { ...mapa[modulo], [key]: nivel } });
+  };
+
+  return (
+    <div className="space-y-1">
+      {MODULOS_PERMISSOES.map(m => {
+        const aberto = expandido === m.modulo;
+        const niveis = m.subabas.map(s => mapa[m.modulo]?.[s.key] ?? 'sem_acesso');
+        const nivelMod: NivelPermissao = niveis.length === 0
+          ? 'sem_acesso'
+          : niveis.every(v => v === niveis[0]) ? (niveis[0] as NivelPermissao) : 'editar';
+        return (
+          <div key={m.modulo} className="border rounded-lg overflow-hidden">
+            <div
+              className="flex items-center justify-between px-3 py-2 bg-gray-50 cursor-pointer hover:bg-gray-100"
+              onClick={() => setExpandido(aberto ? null : m.modulo)}
+            >
+              <div className="flex items-center gap-2">
+                {aberto ? <ChevronUp className="w-3 h-3 text-gray-400" /> : <ChevronDown className="w-3 h-3 text-gray-400" />}
+                <span className="text-sm font-medium text-gray-700">{m.label}</span>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${nivelColor(nivelMod).bg} ${nivelColor(nivelMod).color}`}>
+                  {nivelColor(nivelMod).label}
+                </span>
+              </div>
+              <NivelSelect value={nivelMod} onChange={v => { setNivelModulo(m.modulo, v); }} />
+            </div>
+            {aberto && (
+              <div className="px-4 py-2 space-y-1.5 bg-white">
+                {m.subabas.map(s => (
+                  <div key={s.key} className="flex items-center justify-between">
+                    <span className="text-xs text-gray-600">{s.label}</span>
+                    <NivelSelect
+                      value={mapa[m.modulo]?.[s.key] ?? 'sem_acesso'}
+                      onChange={v => setNivelSubaba(m.modulo, s.key, v)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Painel de templates por cargo ────────────────────────────────────────────
+function TemplatesCargo({ cargos }: { cargos: string[] }) {
+  const utils = trpc.useUtils();
+  const { data: templates = [] } = trpc.cargoPermissoes.list.useQuery();
+  const salvarTemplate = trpc.cargoPermissoes.salvar.useMutation({
+    onSuccess: () => {
+      toast.success('Template salvo!');
+      utils.cargoPermissoes.list.invalidate();
+    },
+    onError: () => toast.error('Erro ao salvar template'),
+  });
+
+  const [cargoSelecionado, setCargoSelecionado] = useState('');
+  const [nivelGlobal, setNivelGlobal] = useState<NivelPermissao>('sem_acesso');
+  const [mapa, setMapa] = useState<PermissoesMap>(() => buildDefaultPermissoes('sem_acesso'));
+
+  // Quando selecionar um cargo, carregar o template existente (se houver)
+  useEffect(() => {
+    if (!cargoSelecionado) return;
+    const tpl = templates.find(t => t.cargo === cargoSelecionado);
+    if (tpl) {
+      const nivel = (tpl.nivelGeral as NivelPermissao) ?? 'sem_acesso';
+      setNivelGlobal(nivel);
+      setMapa(mergeComDefaults(tpl.permissoesModulos, nivel));
+    } else {
+      setNivelGlobal('sem_acesso');
+      setMapa(buildDefaultPermissoes('sem_acesso'));
+    }
+  }, [cargoSelecionado, templates]);
 
   const aplicarGlobal = (nivel: NivelPermissao) => {
     setNivelGlobal(nivel);
     setMapa(buildDefaultPermissoes(nivel));
   };
 
-  const setNivelModulo = (modulo: string, nivel: NivelPermissao) => {
-    setMapa(prev => {
-      const novo = { ...prev, [modulo]: { ...prev[modulo] } };
-      for (const key of Object.keys(novo[modulo])) novo[modulo][key] = nivel;
-      return novo;
-    });
-  };
-
-  const setNivelSubaba = (modulo: string, key: string, nivel: NivelPermissao) => {
-    setMapa(prev => ({ ...prev, [modulo]: { ...prev[modulo], [key]: nivel } }));
-  };
+  const todosCargos = Array.from(new Set([
+    ...cargos,
+    ...templates.map(t => t.cargo),
+  ])).filter(Boolean).sort();
 
   return (
     <div className="bg-white rounded-xl border border-blue-200 shadow-sm p-5 mb-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Users className="w-5 h-5 text-blue-600" />
-        <h3 className="font-semibold text-blue-800 text-base">Aplicar Template por Cargo</h3>
+      <div className="flex items-center gap-2 mb-2">
+        <Settings className="w-5 h-5 text-blue-600" />
+        <h3 className="font-semibold text-blue-800 text-base">Templates de Permissão por Cargo</h3>
       </div>
       <p className="text-xs text-gray-500 mb-4">
-        Configure um template de permissões e aplique para <strong>todos os agentes</strong> de um cargo de uma só vez.
+        Configure as permissões padrão para cada cargo. Ao abrir um agente sem permissões individuais, o sistema usará o template do cargo dele automaticamente.
       </p>
 
-      {/* Seletor de cargo e nível global */}
+      <div className="flex flex-wrap gap-3 mb-4 items-end">
+        <div>
+          <label className="text-xs font-medium text-gray-600 block mb-1">Cargo</label>
+          <select
+            value={cargoSelecionado}
+            onChange={e => setCargoSelecionado(e.target.value)}
+            className="border rounded px-3 py-1.5 text-sm min-w-[180px]"
+          >
+            <option value="">-- Selecione um cargo --</option>
+            {todosCargos.map(c => (
+              <option key={c} value={c}>
+                {c} {templates.find(t => t.cargo === c) ? '✓' : ''}
+              </option>
+            ))}
+          </select>
+        </div>
+        {cargoSelecionado && (
+          <div>
+            <label className="text-xs font-medium text-gray-600 block mb-1">Nível padrão</label>
+            <select
+              value={nivelGlobal}
+              onChange={e => aplicarGlobal(e.target.value as NivelPermissao)}
+              className="border rounded px-3 py-1.5 text-sm"
+            >
+              {NIVEIS.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
+            </select>
+          </div>
+        )}
+      </div>
+
+      {cargoSelecionado && (
+        <>
+          <div className="mb-4">
+            <PermissoesEditor mapa={mapa} onChange={setMapa} />
+          </div>
+          <Button
+            onClick={() => salvarTemplate.mutate({
+              cargo: cargoSelecionado,
+              nivelGeral: nivelGlobal,
+              permissoesModulos: JSON.stringify(mapa),
+            })}
+            disabled={salvarTemplate.isPending}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Salvar Template para "{cargoSelecionado}"
+          </Button>
+        </>
+      )}
+
+      {templates.length > 0 && (
+        <div className="mt-4 pt-4 border-t">
+          <p className="text-xs font-medium text-gray-600 mb-2">Templates configurados:</p>
+          <div className="flex flex-wrap gap-2">
+            {templates.map(t => {
+              const n = nivelColor((t.nivelGeral as NivelPermissao) ?? 'sem_acesso');
+              return (
+                <span key={t.cargo} className={`text-xs px-2 py-1 rounded border font-medium ${n.bg} ${n.color}`}>
+                  {t.cargo} → {n.label}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Painel de aplicação em massa por cargo ───────────────────────────────────
+function AplicarEmMassa({ cargos, onAplicar }: {
+  cargos: string[];
+  onAplicar: (cargo: string, nivelGeral: NivelPermissao, mapa: PermissoesMap) => void;
+}) {
+  const { data: templates = [] } = trpc.cargoPermissoes.list.useQuery();
+  const [cargoSelecionado, setCargoSelecionado] = useState('');
+  const [nivelGlobal, setNivelGlobal] = useState<NivelPermissao>('sem_acesso');
+  const [mapa, setMapa] = useState<PermissoesMap>(() => buildDefaultPermissoes('sem_acesso'));
+  const [expandido, setExpandido] = useState(false);
+
+  // Ao selecionar cargo, pré-carregar o template salvo para esse cargo
+  useEffect(() => {
+    if (!cargoSelecionado) return;
+    const tpl = templates.find(t => t.cargo === cargoSelecionado);
+    if (tpl) {
+      const nivel = (tpl.nivelGeral as NivelPermissao) ?? 'sem_acesso';
+      setNivelGlobal(nivel);
+      setMapa(mergeComDefaults(tpl.permissoesModulos, nivel));
+    } else {
+      setNivelGlobal('sem_acesso');
+      setMapa(buildDefaultPermissoes('sem_acesso'));
+    }
+  }, [cargoSelecionado, templates]);
+
+  const aplicarGlobal = (nivel: NivelPermissao) => {
+    setNivelGlobal(nivel);
+    setMapa(buildDefaultPermissoes(nivel));
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-orange-200 shadow-sm p-5 mb-6">
+      <div className="flex items-center gap-2 mb-2">
+        <Users className="w-5 h-5 text-orange-600" />
+        <h3 className="font-semibold text-orange-800 text-base">Aplicar Permissões em Massa por Cargo</h3>
+      </div>
+      <p className="text-xs text-gray-500 mb-4">
+        Aplica as permissões para <strong>todos os agentes</strong> de um cargo de uma só vez. Pré-carrega o template salvo para o cargo selecionado.
+      </p>
+
       <div className="flex flex-wrap gap-3 mb-4 items-end">
         <div>
           <label className="text-xs font-medium text-gray-600 block mb-1">Cargo alvo</label>
@@ -178,44 +362,20 @@ function TemplateCargo({ cargos, onAplicar }: { cargos: string[]; onAplicar: (ca
             {NIVEIS.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
           </select>
         </div>
+        <button
+          className="text-xs text-blue-500 hover:underline flex items-center gap-1 mt-4"
+          onClick={() => setExpandido(!expandido)}
+        >
+          {expandido ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          {expandido ? 'Ocultar módulos' : 'Editar módulos individualmente'}
+        </button>
       </div>
 
-      {/* Módulos expansíveis */}
-      <div className="space-y-1 mb-4">
-        {MODULOS_PERMISSOES.map(m => {
-          const aberto = expandido === m.modulo;
-          // Nível predominante do módulo
-          const niveis = Object.values(mapa[m.modulo] ?? {});
-          const nivelMod = niveis.length > 0 ? (niveis.every(v => v === niveis[0]) ? niveis[0] : 'editar') : 'sem_acesso';
-          return (
-            <div key={m.modulo} className="border rounded-lg overflow-hidden">
-              <div
-                className="flex items-center justify-between px-3 py-2 bg-gray-50 cursor-pointer hover:bg-gray-100"
-                onClick={() => setExpandido(aberto ? null : m.modulo)}
-              >
-                <div className="flex items-center gap-2">
-                  {aberto ? <ChevronUp className="w-3 h-3 text-gray-400" /> : <ChevronDown className="w-3 h-3 text-gray-400" />}
-                  <span className="text-sm font-medium text-gray-700">{m.label}</span>
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${nivelColor(nivelMod as NivelPermissao).bg} ${nivelColor(nivelMod as NivelPermissao).color}`}>
-                    {nivelColor(nivelMod as NivelPermissao).label}
-                  </span>
-                </div>
-                <NivelSelect value={nivelMod as NivelPermissao} onChange={v => setNivelModulo(m.modulo, v)} />
-              </div>
-              {aberto && (
-                <div className="px-4 py-2 space-y-1.5 bg-white">
-                  {m.subabas.map(s => (
-                    <div key={s.key} className="flex items-center justify-between">
-                      <span className="text-xs text-gray-600">{s.label}</span>
-                      <NivelSelect value={mapa[m.modulo]?.[s.key] ?? 'sem_acesso'} onChange={v => setNivelSubaba(m.modulo, s.key, v)} />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {expandido && (
+        <div className="mb-4">
+          <PermissoesEditor mapa={mapa} onChange={setMapa} />
+        </div>
+      )}
 
       <Button
         disabled={!cargoSelecionado}
@@ -223,7 +383,7 @@ function TemplateCargo({ cargos, onAplicar }: { cargos: string[]; onAplicar: (ca
           if (!cargoSelecionado) return;
           onAplicar(cargoSelecionado, nivelGlobal, mapa);
         }}
-        className="bg-blue-600 hover:bg-blue-700 text-white"
+        className="bg-orange-600 hover:bg-orange-700 text-white"
       >
         <Shield className="w-4 h-4 mr-2" />
         Aplicar para todos os {cargoSelecionado || 'agentes do cargo'}
@@ -233,22 +393,56 @@ function TemplateCargo({ cargos, onAplicar }: { cargos: string[]; onAplicar: (ca
 }
 
 // ─── Linha individual de agente ───────────────────────────────────────────────
-function AgentePermissaoRow({ agente, onSalvar }: {
-  agente: { id: number; nomeAgente: string | null; chaveJ: string | null; empresa: string | null; cargo: string | null; situacao: string | null; permissoes: string | null; permissoesModulos: string | null };
+function AgentePermissaoRow({ agente, templatesCargo, onSalvar }: {
+  agente: {
+    id: number;
+    nomeAgente: string | null;
+    chaveJ: string | null;
+    empresa: string | null;
+    cargo: string | null;
+    situacao: string | null;
+    permissoes: string | null;
+    permissoesModulos: string | null;
+  };
+  templatesCargo: Array<{ cargo: string; nivelGeral: string | null; permissoesModulos: string | null }>;
   onSalvar: (id: number, permissoes: string, permissoesModulos: string) => void;
 }) {
+  // Determinar o fallback: template do cargo do agente (se existir)
+  const templateDoCargo = templatesCargo.find(t => t.cargo === agente.cargo);
+  const fallbackNivel = (templateDoCargo?.nivelGeral as NivelPermissao) ?? 'sem_acesso';
+
+  // Se o agente tem permissoesModulos salvas, usa elas (mesclando com defaults do cargo)
+  // Se não tem, usa o template do cargo como base
+  const calcularMapa = (permissoesModulosJson: string | null) => {
+    if (permissoesModulosJson && permissoesModulosJson !== '{}' && permissoesModulosJson !== 'null') {
+      // Agente tem permissões individuais: mescla com defaults do cargo
+      return mergeComDefaults(permissoesModulosJson, fallbackNivel);
+    } else if (templateDoCargo?.permissoesModulos) {
+      // Agente sem permissões individuais: usa template do cargo
+      return mergeComDefaults(templateDoCargo.permissoesModulos, fallbackNivel);
+    } else {
+      // Sem template de cargo: tudo sem_acesso
+      return buildDefaultPermissoes('sem_acesso');
+    }
+  };
+
+  const calcularNivelGeral = (permissoesJson: string | null) => {
+    if (permissoesJson) return permissoesJson as NivelPermissao;
+    return fallbackNivel;
+  };
+
   const [expandido, setExpandido] = useState(false);
-  const [mapa, setMapa] = useState<PermissoesMap>(() => mergeComDefaults(agente.permissoesModulos));
-  const [nivelGeral, setNivelGeral] = useState<NivelPermissao>((agente.permissoes as NivelPermissao) ?? 'sem_acesso');
+  const [mapa, setMapa] = useState<PermissoesMap>(() => calcularMapa(agente.permissoesModulos));
+  const [nivelGeral, setNivelGeral] = useState<NivelPermissao>(() => calcularNivelGeral(agente.permissoes));
   const [alterado, setAlterado] = useState(false);
 
-  // Sincronizar estado local quando os dados do agente mudarem (ex: após aplicar template)
-  // Usa mergeComDefaults para garantir que módulos novos (não salvos no banco) apareçam como sem_acesso
+  // Sincronizar quando os dados do agente ou templates mudarem
   useEffect(() => {
-    setMapa(mergeComDefaults(agente.permissoesModulos));
-    setNivelGeral((agente.permissoes as NivelPermissao) ?? 'sem_acesso');
+    setMapa(calcularMapa(agente.permissoesModulos));
+    setNivelGeral(calcularNivelGeral(agente.permissoes));
     setAlterado(false);
-  }, [agente.permissoesModulos, agente.permissoes]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [agente.permissoesModulos, agente.permissoes, agente.cargo, templatesCargo]);
 
   const setNivelSubaba = (modulo: string, key: string, nivel: NivelPermissao) => {
     setMapa(prev => ({ ...prev, [modulo]: { ...prev[modulo], [key]: nivel } }));
@@ -266,11 +460,12 @@ function AgentePermissaoRow({ agente, onSalvar }: {
     setAlterado(false);
   };
 
+  // Badge indicando se está usando template do cargo ou permissões individuais
+  const usandoTemplate = !agente.permissoesModulos || agente.permissoesModulos === '{}';
+
   // Resumo de permissões por módulo
   const resumo = MODULOS_PERMISSOES.map(m => {
     const niveis = m.subabas.map(s => mapa[m.modulo]?.[s.key] ?? 'sem_acesso');
-    // Se todos os níveis são iguais, usa esse nível; caso contrário 'editar' (misto)
-    // Garante que array vazio retorne 'sem_acesso'
     const predominante: NivelPermissao = niveis.length === 0
       ? 'sem_acesso'
       : niveis.every(v => v === niveis[0])
@@ -292,6 +487,9 @@ function AgentePermissaoRow({ agente, onSalvar }: {
         </div>
         <div className="text-sm text-gray-800">{agente.nomeAgente || '-'}</div>
         <div className="text-[11px] text-gray-500">{agente.empresa} · {agente.cargo}</div>
+        {usandoTemplate && templateDoCargo && (
+          <span className="text-[10px] text-blue-500 italic">usando template do cargo</span>
+        )}
       </TableCell>
       <TableCell>
         <NivelSelect value={nivelGeral} onChange={setNivelGlobal} />
@@ -351,8 +549,10 @@ export default function AuditoriaPermissoes() {
   const utils = trpc.useUtils();
   const { data: agentesLista = [], isLoading } = trpc.agentes.listComPermissoes.useQuery();
   const { data: cargos = [] } = trpc.agentes.getCargos.useQuery();
+  const { data: templates = [] } = trpc.cargoPermissoes.list.useQuery();
   const [filtroCargo, setFiltroCargo] = useState('');
   const [filtroNome, setFiltroNome] = useState('');
+  const [aba, setAba] = useState<'individuais' | 'templates' | 'massa'>('individuais');
 
   const aplicarTemplate = trpc.agentes.aplicarTemplatePermissoes.useMutation({
     onSuccess: (data) => {
@@ -379,70 +579,105 @@ export default function AuditoriaPermissoes() {
   }, [agentesLista, filtroCargo, filtroNome]);
 
   return (
-    <div className="space-y-6">
-      {/* Template em massa */}
-      <TemplateCargo
-        cargos={(cargos as string[]).filter(Boolean)}
-        onAplicar={(cargo, nivelGeral, mapa) => {
-          aplicarTemplate.mutate({
-            cargo,
-            permissoes: nivelGeral,
-            permissoesModulos: JSON.stringify(mapa),
-          });
-        }}
-      />
-
-      {/* Lista individual */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div className="flex flex-wrap items-center gap-3 p-4 border-b">
-          <Shield className="w-5 h-5 text-blue-600" />
-          <h3 className="font-semibold text-gray-800">Permissões Individuais</h3>
-          <div className="flex gap-2 ml-auto">
-            <input
-              placeholder="Buscar agente ou ChaveJ..."
-              value={filtroNome}
-              onChange={e => setFiltroNome(e.target.value)}
-              className="border rounded px-3 py-1.5 text-sm w-52"
-            />
-            <select
-              value={filtroCargo}
-              onChange={e => setFiltroCargo(e.target.value)}
-              className="border rounded px-3 py-1.5 text-sm"
-            >
-              <option value="">Todos os cargos</option>
-              {(cargos as string[]).filter(Boolean).map(c => <option key={c} value={c!}>{c}</option>)}
-            </select>
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-blue-700 hover:bg-blue-700">
-                <TableHead className="text-white font-semibold">Agente</TableHead>
-                <TableHead className="text-white font-semibold">Nível Geral</TableHead>
-                <TableHead className="text-white font-semibold">Permissões por Módulo</TableHead>
-                <TableHead className="text-white font-semibold text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow><TableCell colSpan={4} className="text-center py-8">Carregando...</TableCell></TableRow>
-              ) : listaFiltrada.length === 0 ? (
-                <TableRow><TableCell colSpan={4} className="text-center py-8 text-slate-400">Nenhum agente encontrado.</TableCell></TableRow>
-              ) : listaFiltrada.map(a => (
-                <AgentePermissaoRow
-                  key={a.id}
-                  agente={a}
-                  onSalvar={(id, permissoes, permissoesModulos) =>
-                    atualizarPermissoes.mutate({ id, permissoes, permissoesModulos })
-                  }
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-        <p className="text-xs text-slate-400 p-3">{listaFiltrada.length} agente(s)</p>
+    <div className="space-y-4">
+      {/* Abas de navegação */}
+      <div className="flex gap-1 border-b border-gray-200">
+        {[
+          { key: 'individuais', label: 'Permissões Individuais' },
+          { key: 'templates', label: 'Templates por Cargo' },
+          { key: 'massa', label: 'Aplicar em Massa' },
+        ].map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setAba(tab.key as typeof aba)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              aba === tab.key
+                ? 'border-blue-600 text-blue-700'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
+
+      {/* Aba: Templates por Cargo */}
+      {aba === 'templates' && (
+        <TemplatesCargo cargos={(cargos as string[]).filter(Boolean)} />
+      )}
+
+      {/* Aba: Aplicar em Massa */}
+      {aba === 'massa' && (
+        <AplicarEmMassa
+          cargos={(cargos as string[]).filter(Boolean)}
+          onAplicar={(cargo, nivelGeral, mapa) => {
+            aplicarTemplate.mutate({
+              cargo,
+              permissoes: nivelGeral,
+              permissoesModulos: JSON.stringify(mapa),
+            });
+          }}
+        />
+      )}
+
+      {/* Aba: Permissões Individuais */}
+      {aba === 'individuais' && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="flex flex-wrap items-center gap-3 p-4 border-b">
+            <Shield className="w-5 h-5 text-blue-600" />
+            <h3 className="font-semibold text-gray-800">Permissões Individuais</h3>
+            <div className="flex gap-2 ml-auto">
+              <input
+                placeholder="Buscar agente ou ChaveJ..."
+                value={filtroNome}
+                onChange={e => setFiltroNome(e.target.value)}
+                className="border rounded px-3 py-1.5 text-sm w-52"
+              />
+              <select
+                value={filtroCargo}
+                onChange={e => setFiltroCargo(e.target.value)}
+                className="border rounded px-3 py-1.5 text-sm"
+              >
+                <option value="">Todos os cargos</option>
+                {(cargos as string[]).filter(Boolean).map(c => <option key={c} value={c!}>{c}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-blue-700 hover:bg-blue-700">
+                  <TableHead className="text-white font-semibold">Agente</TableHead>
+                  <TableHead className="text-white font-semibold">Nível Geral</TableHead>
+                  <TableHead className="text-white font-semibold">Permissões por Módulo</TableHead>
+                  <TableHead className="text-white font-semibold text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableRow><TableCell colSpan={4} className="text-center py-8">Carregando...</TableCell></TableRow>
+                ) : listaFiltrada.length === 0 ? (
+                  <TableRow><TableCell colSpan={4} className="text-center py-8 text-slate-400">Nenhum agente encontrado.</TableCell></TableRow>
+                ) : listaFiltrada.map(a => (
+                  <AgentePermissaoRow
+                    key={a.id}
+                    agente={a}
+                    templatesCargo={templates.map(t => ({
+                      cargo: t.cargo,
+                      nivelGeral: t.nivelGeral,
+                      permissoesModulos: t.permissoesModulos,
+                    }))}
+                    onSalvar={(id, permissoes, permissoesModulos) =>
+                      atualizarPermissoes.mutate({ id, permissoes, permissoesModulos })
+                    }
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <p className="text-xs text-slate-400 p-3">{listaFiltrada.length} agente(s)</p>
+        </div>
+      )}
     </div>
   );
 }

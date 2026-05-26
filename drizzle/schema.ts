@@ -1332,3 +1332,20 @@ export const crm = mysqlTable("crm", {
 }));
 export type Crm = typeof crm.$inferSelect;
 export type InsertCrm = typeof crm.$inferInsert;
+
+/**
+ * Templates de Permissão por Cargo
+ * Define as permissões padrão para cada cargo (Promotor, Admin, CEO, etc.)
+ * Usado como base ao carregar permissões de agentes sem configuração individual
+ */
+export const cargoPermissoes = mysqlTable('cargo_permissoes', {
+  id: int("id").autoincrement().primaryKey(),
+  cargo: varchar("cargo", { length: 100 }).notNull().unique(),
+  nivelGeral: varchar("nivelGeral", { length: 50 }).default('sem_acesso'),
+  permissoesModulos: text("permissoesModulos"), // JSON com mapa de módulos
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CargoPermissao = typeof cargoPermissoes.$inferSelect;
+export type InsertCargoPermissao = typeof cargoPermissoes.$inferInsert;
