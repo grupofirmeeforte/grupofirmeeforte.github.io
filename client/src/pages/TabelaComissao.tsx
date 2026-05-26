@@ -15,7 +15,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Plus, Pencil, Trash2, Search, X } from 'lucide-react';
+import { ArrowLeft, Plus, Pencil, Trash2, Search, X, Upload, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
 import PageHeader from "@/components/PageHeader";
 
@@ -377,6 +378,79 @@ export default function TabelaComissao() {
 
   const isSaving = criarMutation.isPending || atualizarMutation.isPending;
 
+  // ── Importação em lote ──────────────────────────────────────────────────────
+  const importarLoteMutation = trpc.tabelaComissao.importarLote.useMutation({
+    onSuccess: (res) => {
+      toast.success(`Importação concluída: ${res.atualizados} atualizados, ${res.criados} criados`);
+      utils.tabelaComissao.listar.invalidate();
+    },
+    onError: (e) => toast.error('Erro na importação: ' + e.message),
+  });
+
+  function handleExportarTemplate() {
+    // Exporta os dados atuais como template CSV para edição
+    const ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
+    const header = ['id','empresa','convenio','codigo','txJurosDe','txJurosAte','valorMinimo','mesesDe','mesesAte',...ATIVOS,'faixa1','faixa2','faixa3','faixa4','faixa5','tabelaCalculo','referencia'];
+    const dataRows = filteredRows.map(r => header.map(h => {
+      const v = (r as any)[h];
+      if (ATIVOS.includes(h) && v) {
+        const n = parseFloat(String(v).replace(',','.'));
+        return isNaN(n) ? v : (n * 100).toFixed(4);
+      }
+      return v ?? '';
+    }));
+    const ws = XLSX.utils.aoa_to_sheet([header, ...dataRows]);
+    // Estilo do cabeçalho
+    const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+    for (let c = range.s.c; c <= range.e.c; c++) {
+      const cell = XLSX.utils.encode_cell({ r: 0, c });
+      if (!ws[cell]) continue;
+      ws[cell].s = { font: { bold: true }, fill: { fgColor: { rgb: '002776' } }, font2: { color: { rgb: 'FFFFFF' } } };
+    }
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'TabelaComissao');
+    XLSX.writeFile(wb, 'template_tabela_comissao.xlsx');
+    toast.success('Template exportado! Edite os valores e importe de volta.');
+  }
+
+  function handleImportarExcel(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = new Uint8Array(ev.target?.result as ArrayBuffer);
+        const wb = XLSX.read(data, { type: 'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows: any[] = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        if (rows.length === 0) { toast.error('Planilha vazia'); return; }
+        const ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
+        const parsed = rows.map((r: any) => {
+          const obj: any = {};
+          // id
+          if (r.id !== '' && r.id !== undefined) obj.id = Number(r.id);
+          // campos texto
+          ['empresa','convenio','codigo','txJurosDe','txJurosAte','valorMinimo','mesesDe','mesesAte','faixa1','faixa2','faixa3','faixa4','faixa5','tabelaCalculo','referencia'].forEach(k => {
+            if (r[k] !== '' && r[k] !== undefined) obj[k] = String(r[k]);
+          });
+          // ativos: converte percentual para decimal (ex: 0.80 → 0.008)
+          ATIVOS.forEach(k => {
+            if (r[k] !== '' && r[k] !== undefined) {
+              const n = parseFloat(String(r[k]).replace(',','.'));
+              if (!isNaN(n)) obj[k] = (n / 100).toString();
+            }
+          });
+          return obj;
+        });
+        importarLoteMutation.mutate(parsed);
+      } catch (err) {
+        toast.error('Erro ao ler planilha: ' + String(err));
+      }
+    };
+    reader.readAsArrayBuffer(file);
+    e.target.value = '';
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <PageHeader />
@@ -388,10 +462,33 @@ export default function TabelaComissao() {
             <p className="text-xs text-gray-500">{filteredRows.length} registros</p>
           </div>
           <div className="ml-auto flex items-center gap-2">
+            {/* Exportar template */}
+            <Button
+              variant="outline"
+              onClick={handleExportarTemplate}
+              className="flex items-center gap-2 text-green-700 border-green-300 hover:bg-green-50"
+              title="Exportar tabela atual como Excel para edição em massa"
+            >
+              <Download className="w-4 h-4" /> Exportar Template
+            </Button>
+            {/* Importar Excel */}
+            <label className="cursor-pointer">
+              <input type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportarExcel} />
+              <Button
+                variant="outline"
+                asChild
+                className="flex items-center gap-2 text-blue-700 border-blue-300 hover:bg-blue-50"
+                title="Importar planilha editada de volta para o sistema"
+              >
+                <span>
+                  <Upload className="w-4 h-4" />
+                  {importarLoteMutation.isPending ? 'Importando...' : 'Importar Excel'}
+                </span>
+              </Button>
+            </label>
             <Button onClick={openNovo} className="flex items-center gap-2" style={{ backgroundColor: '#002776' }}>
               <Plus className="w-4 h-4" /> Novo
             </Button>
-            
           </div>
         </div>
       </div>

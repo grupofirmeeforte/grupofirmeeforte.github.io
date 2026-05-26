@@ -634,6 +634,53 @@ export const appRouter = router({
       const rows = await db.selectDistinct({ convenio: tabelasComissao.convenio }).from(tabelasComissao).orderBy(tabelasComissao.convenio);
       return rows.map(r => r.convenio).filter(Boolean);
     }),
+
+    // Importação em lote: atualiza registros existentes (por id) ou cria novos
+    importarLote: protectedProcedure
+      .input(z.array(z.object({
+        id: z.number().optional(), // se informado, atualiza; senão cria
+        empresa: z.string().optional(),
+        codigo: z.string().max(24).optional(),
+        convenio: z.string().optional(),
+        txJurosDe: z.string().optional(), txJurosAte: z.string().optional(),
+        valorMinimo: z.string().optional(),
+        mesesDe: z.string().optional(), mesesAte: z.string().optional(),
+        ativo01: z.string().optional(), ativo02: z.string().optional(),
+        ativo03: z.string().optional(), ativo04: z.string().optional(),
+        ativo05: z.string().optional(), ativo06: z.string().optional(),
+        ativo07: z.string().optional(), ativo08: z.string().optional(),
+        ativo09: z.string().optional(), ativo10: z.string().optional(),
+        faixa1: z.string().optional(), faixa2: z.string().optional(),
+        faixa3: z.string().optional(), faixa4: z.string().optional(), faixa5: z.string().optional(),
+        tabelaCalculo: z.string().optional(), referencia: z.string().optional(),
+      })))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { tabelasComissao } = await import('../drizzle/schema');
+        const { eq } = await import('drizzle-orm');
+        let atualizados = 0, criados = 0;
+        for (const row of input) {
+          const { id, ...data } = row;
+          // Converter percentuais: se valor > 1, assume que está em formato percentual (ex: 0.80) e divide por 100
+          const campos = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10','txJurosDe','txJurosAte'] as const;
+          for (const c of campos) {
+            const v = (data as any)[c];
+            if (v !== undefined && v !== null && v !== '') {
+              const n = parseFloat(String(v).replace(',', '.'));
+              if (!isNaN(n) && n > 1) (data as any)[c] = (n / 100).toString();
+            }
+          }
+          if (id) {
+            await db.update(tabelasComissao).set(data).where(eq(tabelasComissao.id, id));
+            atualizados++;
+          } else {
+            await db.insert(tabelasComissao).values(data);
+            criados++;
+          }
+        }
+        return { atualizados, criados, total: input.length };
+      }),
   }),
 
   consignado: router({
