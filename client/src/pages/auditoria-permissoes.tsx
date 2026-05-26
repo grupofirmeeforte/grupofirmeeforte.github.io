@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -219,6 +219,13 @@ function AgentePermissaoRow({ agente, onSalvar }: {
   });
   const [nivelGeral, setNivelGeral] = useState<NivelPermissao>((agente.permissoes as NivelPermissao) ?? 'sem_acesso');
   const [alterado, setAlterado] = useState(false);
+
+  // Sincronizar estado local quando os dados do agente mudarem (ex: após aplicar template)
+  useEffect(() => {
+    try { setMapa(JSON.parse(agente.permissoesModulos ?? '{}')); } catch { setMapa({}); }
+    setNivelGeral((agente.permissoes as NivelPermissao) ?? 'sem_acesso');
+    setAlterado(false);
+  }, [agente.permissoesModulos, agente.permissoes]);
 
   const setNivelSubaba = (modulo: string, key: string, nivel: NivelPermissao) => {
     setMapa(prev => ({ ...prev, [modulo]: { ...prev[modulo], [key]: nivel } }));
