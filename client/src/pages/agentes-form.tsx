@@ -329,7 +329,7 @@ export default function AgentesFormPage() {
         pix: agente.pix || "",
         dataNascimento: agente.dataNascimento || "", // Manter como string YYYY-MM-DD
         celular: agente.celular || "",
-        signo: (agente as any).signo || "",
+        signo: (agente as any).signo || getSignoFromDate(agente.dataNascimento || "") || "",
         permissoes: agente.permissoes || "leitor",
       });
       // Carregar permissoesModulos do JSON
