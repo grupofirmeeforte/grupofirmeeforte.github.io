@@ -1372,3 +1372,42 @@ export const periodosTravados = mysqlTable('periodos_travados', {
 }));
 export type PeriodoTravado = typeof periodosTravados.$inferSelect;
 export type InsertPeriodoTravado = typeof periodosTravados.$inferInsert;
+
+/**
+ * Caixa de Recados
+ * Mensagens enviadas por agentes para CEO, Admin, Supervisor ou Suporte.
+ * CEO pode ler todos os recados independente do destinatário.
+ */
+export const recados = mysqlTable('recados', {
+  id: int("id").autoincrement().primaryKey(),
+  remetenteId: int("remetenteId").notNull(),
+  remetenteNome: varchar("remetenteNome", { length: 255 }).notNull(),
+  remetenteChaveJ: varchar("remetenteChaveJ", { length: 50 }),
+  destinatario: varchar("destinatario", { length: 50 }).notNull(), // ceo | admin | supervisor | suporte
+  assunto: varchar("assunto", { length: 255 }),
+  mensagem: text("mensagem").notNull(),
+  lido: tinyint("lido").default(0).notNull(),
+  lidoEm: timestamp("lidoEm"),
+  lidoPor: varchar("lidoPor", { length: 100 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  destinatarioIdx: index("idx_recados_destinatario").on(table.destinatario),
+  remetenteIdx: index("idx_recados_remetenteId").on(table.remetenteId),
+  lidoIdx: index("idx_recados_lido").on(table.lido),
+}));
+export type Recado = typeof recados.$inferSelect;
+export type InsertRecado = typeof recados.$inferInsert;
+
+/**
+ * Controle de exibição da tela de boas-vindas comemorativa
+ * Garante que cada agente veja apenas uma vez
+ */
+export const boasVindasVisto = mysqlTable('boas_vindas_visto', {
+  id: int("id").autoincrement().primaryKey(),
+  agenteId: int("agenteId").notNull().unique(),
+  chaveJ: varchar("chaveJ", { length: 50 }),
+  vistoEm: timestamp("vistoEm").defaultNow().notNull(),
+}, (table) => ({
+  agenteIdIdx: index("idx_boas_vindas_agenteId").on(table.agenteId),
+}));
+export type BoasVindasVisto = typeof boasVindasVisto.$inferSelect;

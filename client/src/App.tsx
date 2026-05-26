@@ -41,11 +41,13 @@ import MensagemDoDiaHub from './pages/MensagemDoDiaHub';
 import MailingCrmPage from './pages/MailingCrm';
 import RelatorioChaveJ from './pages/RelatorioChaveJ';
 import MeuPin from './pages/MeuPin';
+import CaixaRecados from './pages/CaixaRecados';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
 import { useDisconnectNotification } from "./hooks/useDisconnectNotification";
 import { LGPDModal } from "./components/LGPDModal";
+import { BoasVindasComemorativo } from "./components/BoasVindasComemorativo";
 import { useState, useEffect } from "react";
 import { useAuth } from "./hooks/useAuth";
 import { trpc } from "./lib/trpc";
@@ -68,6 +70,7 @@ function RouterWithInactivity() {
     <Switch>
       <Route path={"/login"} component={Login} />
       <Route path={"/meu-pin"} component={MeuPin} />
+      <Route path={"/caixa-recados"} component={CaixaRecados} />
       <Route path={"/"} component={Home} />
       <Route path={"/agentes"} component={AgentesPage} />
       <Route path={"/agentes/novo"} component={AgentesFormPage} />
@@ -117,13 +120,26 @@ function LGPDGate() {
   const { user, isAuthenticated } = useAuth();
   const [showLGPD, setShowLGPD] = useState(false);
   const [isAccepting, setIsAccepting] = useState(false);
+  const [showBoasVindas, setShowBoasVindas] = useState(false);
   const acceptLGPDMutation = trpc.auth.acceptLGPD.useMutation();
+  const verificarBoasVindas = trpc.recados.verificarBoasVindas.useQuery(undefined, {
+    enabled: isAuthenticated && !!user,
+    staleTime: Infinity,
+  });
 
   useEffect(() => {
     if (isAuthenticated && user && !user.lgpdAceito) {
       setShowLGPD(true);
     }
   }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    if (verificarBoasVindas.data?.deveExibir) {
+      // Aguardar 1.5s após login para exibir a tela comemorativa
+      const timer = setTimeout(() => setShowBoasVindas(true), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [verificarBoasVindas.data]);
 
   const handleAcceptLGPD = async () => {
     setIsAccepting(true);
@@ -140,6 +156,9 @@ function LGPDGate() {
   return (
     <>
       {showLGPD && <LGPDModal onAccept={handleAcceptLGPD} isLoading={isAccepting} />}
+      {showBoasVindas && !showLGPD && (
+        <BoasVindasComemorativo onClose={() => setShowBoasVindas(false)} />
+      )}
       <RouterWithInactivity />
     </>
   );
