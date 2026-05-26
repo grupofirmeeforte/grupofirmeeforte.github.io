@@ -391,10 +391,10 @@ export default function TabelaComissao() {
     // Exporta os dados atuais como template para edição
     // Campos que são percentuais salvos como decimal no banco (ex: 0.0065 = 0,65%)
     const ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
-    const CAMPOS_PCT = [...ATIVOS, 'faixa1','faixa2','faixa3','faixa4','faixa5'];
+    const CAMPOS_PCT = [...ATIVOS, 'faixa1','faixa2','faixa3','faixa4','faixa5','tabelaCalculo','referencia'];
     // txJurosDe e txJurosAte são salvos como string direta (ex: '0.0175') e representam percentual
     const CAMPOS_JUROS = ['txJurosDe','txJurosAte'];
-    const header = ['id','empresa','convenio','codigo','txJurosDe_%','txJurosAte_%','valorMinimo','mesesDe','mesesAte',...ATIVOS.map(a => a + '_%'),'faixa1_%','faixa2_%','faixa3_%','faixa4_%','faixa5_%','tabelaCalculo','referencia'];
+    const header = ['id','empresa','convenio','codigo','txJurosDe_%','txJurosAte_%','valorMinimo','mesesDe','mesesAte',...ATIVOS.map(a => a + '_%'),'faixa1_%','faixa2_%','faixa3_%','faixa4_%','faixa5_%','tabelaCalculo_%','referencia_%'];
     const headerKeys = ['id','empresa','convenio','codigo','txJurosDe','txJurosAte','valorMinimo','mesesDe','mesesAte',...ATIVOS,'faixa1','faixa2','faixa3','faixa4','faixa5','tabelaCalculo','referencia'];
     const dataRows = filteredRows.map(r => headerKeys.map(h => {
       const v = (r as any)[h];
@@ -434,13 +434,13 @@ export default function TabelaComissao() {
         const rows: any[] = XLSX.utils.sheet_to_json(ws, { defval: '' });
         if (rows.length === 0) { toast.error('Planilha vazia'); return; }
         const ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
-        const FAIXAS = ['faixa1','faixa2','faixa3','faixa4','faixa5'];
+        const FAIXAS = ['faixa1','faixa2','faixa3','faixa4','faixa5','tabelaCalculo','referencia'];
         const parsed = rows.map((r: any) => {
           const obj: any = {};
           // id
           if (r.id !== '' && r.id !== undefined) obj.id = Number(r.id);
           // campos texto simples
-          ['empresa','convenio','codigo','valorMinimo','mesesDe','mesesAte','tabelaCalculo','referencia'].forEach(k => {
+          ['empresa','convenio','codigo','valorMinimo','mesesDe','mesesAte'].forEach(k => {
             if (r[k] !== '' && r[k] !== undefined) obj[k] = String(r[k]);
           });
           // juros: aceita 'txJurosDe_%' (novo) ou 'txJurosDe' (legado)
