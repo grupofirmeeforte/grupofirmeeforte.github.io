@@ -91,7 +91,8 @@ function EditableCell({
       // Remove % e espaços, troca vírgula por ponto, converte para decimal
       const cleaned = tempValue.replace(/%/g, '').replace(/\s/g, '').replace(',', '.');
       const n = parseFloat(cleaned);
-      const stored = isNaN(n) ? '' : (n / 100).toString();
+      // Usar toFixed(10) para evitar erros de ponto flutuante (ex: 0.40/100 = 0.003999...)
+      const stored = isNaN(n) ? '' : parseFloat((n / 100).toFixed(10)).toString();
       // Sempre salva ao confirmar (não compara com value para evitar falsos negativos)
       onSave(stored);
     } else {
