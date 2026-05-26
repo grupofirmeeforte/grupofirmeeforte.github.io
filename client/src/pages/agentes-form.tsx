@@ -178,6 +178,29 @@ export default function AgentesFormPage() {
     return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`;
   };
 
+  // Calcula o signo a partir de uma data no formato YYYY-MM-DD
+  function getSignoFromDate(dateStr: string): string {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length < 3) return '';
+    const month = parseInt(parts[1], 10);
+    const day = parseInt(parts[2], 10);
+    if (isNaN(month) || isNaN(day)) return '';
+    if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return 'Áries';
+    if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return 'Touro';
+    if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return 'Gêmeos';
+    if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return 'Câncer';
+    if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return 'Leão';
+    if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return 'Virgem';
+    if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return 'Libra';
+    if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return 'Escorpião';
+    if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return 'Sagitário';
+    if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return 'Capricórnio';
+    if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return 'Aquário';
+    if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return 'Peixes';
+    return '';
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     // Aplicar formatação de nome para campos de nome (MAIUSCULO)
@@ -194,6 +217,17 @@ export default function AgentesFormPage() {
       formattedValue = formatCelular(value);
     }
     
+    // Preencher signo automaticamente ao alterar data de nascimento
+    if (name === 'dataNascimento') {
+      const signoAuto = getSignoFromDate(value);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: formattedValue,
+        ...(signoAuto ? { signo: signoAuto } : {}),
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: formattedValue,
