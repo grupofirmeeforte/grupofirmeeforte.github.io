@@ -323,7 +323,9 @@ export default function AgentesPage() {
                 ) : agentes && agentes.length > 0 ? (
                   agentes.map((agente, index) => (
                     <TableRow key={agente.id} className={`${
-                      index % 2 === 0 
+                      agente.situacao === 'Cancelado'
+                        ? 'bg-red-50 border-l-4 border-l-red-500 opacity-80'
+                        : index % 2 === 0 
                         ? 'bg-gradient-to-r from-blue-50 to-transparent' 
                         : 'bg-gradient-to-r from-blue-100 to-transparent'
                     } hover:from-blue-200 hover:to-blue-100 transition-colors`}>
