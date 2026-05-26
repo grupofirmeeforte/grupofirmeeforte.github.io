@@ -87,6 +87,24 @@ function buildDefaultPermissoes(nivel: NivelPermissao): PermissoesMap {
   return map;
 }
 
+// Mescla o JSON salvo no banco com os defaults (sem_acesso para módulos/subabas não salvos)
+// Isso garante que módulos novos adicionados ao MODULOS_PERMISSOES apareçam como sem_acesso
+// em vez de herdarem 'leitura' do nível geral
+function mergeComDefaults(savedJson: string | null): PermissoesMap {
+  let saved: PermissoesMap = {};
+  try { saved = JSON.parse(savedJson ?? '{}') ?? {}; } catch { saved = {}; }
+  const result: PermissoesMap = {};
+  for (const m of MODULOS_PERMISSOES) {
+    result[m.modulo] = {};
+    for (const s of m.subabas) {
+      // Se o módulo e subaba existem no banco, usa o valor salvo
+      // Caso contrário, default = sem_acesso (não herda o nível geral)
+      result[m.modulo][s.key] = saved[m.modulo]?.[s.key] ?? 'sem_acesso';
+    }
+  }
+  return result;
+}
+
 // ─── Componente de seletor de nível ───────────────────────────────────────────
 function NivelSelect({ value, onChange }: { value: NivelPermissao; onChange: (v: NivelPermissao) => void }) {
   const n = nivelColor(value);
@@ -220,15 +238,14 @@ function AgentePermissaoRow({ agente, onSalvar }: {
   onSalvar: (id: number, permissoes: string, permissoesModulos: string) => void;
 }) {
   const [expandido, setExpandido] = useState(false);
-  const [mapa, setMapa] = useState<PermissoesMap>(() => {
-    try { return JSON.parse(agente.permissoesModulos ?? '{}'); } catch { return {}; }
-  });
+  const [mapa, setMapa] = useState<PermissoesMap>(() => mergeComDefaults(agente.permissoesModulos));
   const [nivelGeral, setNivelGeral] = useState<NivelPermissao>((agente.permissoes as NivelPermissao) ?? 'sem_acesso');
   const [alterado, setAlterado] = useState(false);
 
   // Sincronizar estado local quando os dados do agente mudarem (ex: após aplicar template)
+  // Usa mergeComDefaults para garantir que módulos novos (não salvos no banco) apareçam como sem_acesso
   useEffect(() => {
-    try { setMapa(JSON.parse(agente.permissoesModulos ?? '{}')); } catch { setMapa({}); }
+    setMapa(mergeComDefaults(agente.permissoesModulos));
     setNivelGeral((agente.permissoes as NivelPermissao) ?? 'sem_acesso');
     setAlterado(false);
   }, [agente.permissoesModulos, agente.permissoes]);
@@ -252,8 +269,14 @@ function AgentePermissaoRow({ agente, onSalvar }: {
   // Resumo de permissões por módulo
   const resumo = MODULOS_PERMISSOES.map(m => {
     const niveis = m.subabas.map(s => mapa[m.modulo]?.[s.key] ?? 'sem_acesso');
-    const predominante = niveis.every(v => v === niveis[0]) ? niveis[0] : 'editar';
-    return { ...m, nivel: predominante as NivelPermissao };
+    // Se todos os níveis são iguais, usa esse nível; caso contrário 'editar' (misto)
+    // Garante que array vazio retorne 'sem_acesso'
+    const predominante: NivelPermissao = niveis.length === 0
+      ? 'sem_acesso'
+      : niveis.every(v => v === niveis[0])
+        ? (niveis[0] as NivelPermissao)
+        : 'editar';
+    return { ...m, nivel: predominante };
   });
 
   return (
