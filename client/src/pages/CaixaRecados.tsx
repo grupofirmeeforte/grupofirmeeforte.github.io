@@ -209,48 +209,65 @@ export default function CaixaRecados() {
                   </div>
                 )}
 
-                {/* Seletor de destinatário */}
+                {/* Seletor de destinatário — botões visuais (sem z-index issues) */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Destinatário *</label>
                   {tipoDestinatario === "cargo" || isPromotor ? (
-                    <Select value={destinatarioCargo} onValueChange={setDestinatarioCargo}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o destinatário..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {DESTINATARIOS_CARGO.map(d => (
-                          <SelectItem key={d.value} value={d.value}>
-                            <div className="flex items-center gap-2">
-                              <d.icon className="w-4 h-4" />
-                              {d.label}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="grid grid-cols-2 gap-2">
+                      {DESTINATARIOS_CARGO.map(d => {
+                        const Icon = d.icon;
+                        const sel = destinatarioCargo === d.value;
+                        return (
+                          <button
+                            key={d.value}
+                            type="button"
+                            onClick={() => setDestinatarioCargo(d.value)}
+                            className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all text-left ${
+                              sel ? d.color + " shadow-sm" : "bg-white border-gray-200 text-gray-500 hover:border-gray-300"
+                            }`}
+                          >
+                            <Icon className="w-4 h-4 shrink-0" />
+                            <span className="flex-1">{d.label}</span>
+                            {sel && <CheckCheck className="w-3.5 h-3.5 shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
                   ) : (
-                    <Select value={destinatarioPromotorId} onValueChange={setDestinatarioPromotorId}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o promotor..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {promotoresQuery.isLoading ? (
-                          <SelectItem value="__loading" disabled>Carregando...</SelectItem>
-                        ) : !promotoresQuery.data?.length ? (
-                          <SelectItem value="__empty" disabled>Nenhum promotor ativo encontrado</SelectItem>
-                        ) : (
-                          promotoresQuery.data.map(p => (
-                            <SelectItem key={p.id} value={String(p.id)}>
-                              <div className="flex items-center gap-2">
-                                <Users className="w-4 h-4 text-orange-500" />
-                                <span>{p.nomeAgente}</span>
-                                <span className="text-xs text-gray-400 font-mono">{p.chaveJ}</span>
+                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                      {promotoresQuery.isLoading ? (
+                        <div className="flex items-center gap-2 text-sm text-gray-400 py-3">
+                          <RefreshCw className="w-4 h-4 animate-spin" /> Carregando promotores...
+                        </div>
+                      ) : !promotoresQuery.data?.length ? (
+                        <p className="text-sm text-gray-400 py-3">Nenhum promotor ativo encontrado.</p>
+                      ) : (
+                        promotoresQuery.data.map(p => {
+                          const sel = destinatarioPromotorId === String(p.id);
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => setDestinatarioPromotorId(String(p.id))}
+                              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all text-left ${
+                                sel
+                                  ? "bg-orange-50 border-orange-400 text-orange-700 shadow-sm"
+                                  : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
+                              }`}
+                            >
+                              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0 text-sm font-bold text-orange-600">
+                                {p.nomeAgente?.charAt(0).toUpperCase()}
                               </div>
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold truncate">{p.nomeAgente}</p>
+                                <p className="text-xs text-gray-400 font-mono">{p.chaveJ}</p>
+                              </div>
+                              {sel && <CheckCheck className="w-4 h-4 text-orange-500 shrink-0" />}
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
                   )}
                 </div>
 
