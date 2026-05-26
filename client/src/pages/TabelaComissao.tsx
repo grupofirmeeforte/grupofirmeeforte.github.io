@@ -53,8 +53,8 @@ function pct(val: string | null) {
   const normalized = String(val).replace(',', '.').replace('%', '');
   const n = parseFloat(normalized);
   if (isNaN(n)) return val;
-  // Valor já é percentual direto (ex: 0.50 = 0,50%, 1.50 = 1,50%, 55 = 55,00%)
-  return n.toFixed(2).replace('.', ',') + '%';
+  // Banco guarda decimal (ex: 0.0065 = 0,65%), multiplica por 100 para exibir
+  return (n * 100).toFixed(2).replace('.', ',') + '%';
 }
 
 function moeda(val: string | null | undefined) {
@@ -86,8 +86,13 @@ function EditableCell({
   const [tempValue, setTempValue] = useState(value || '');
 
   const handleSave = () => {
-    if (tempValue !== value) {
-      onSave(tempValue);
+    if (format === 'percent') {
+      // Converte o valor digitado (ex: 0,50) de volta para decimal (0.005)
+      const n = parseFloat(tempValue.replace(',', '.'));
+      const stored = isNaN(n) ? '' : (n / 100).toString();
+      if (stored !== value) onSave(stored);
+    } else {
+      if (tempValue !== value) onSave(tempValue);
     }
     setIsEditing(false);
   };
@@ -105,12 +110,28 @@ function EditableCell({
     }
   };
 
+  // Ao entrar em edição de percentual, mostra o valor já multiplicado por 100 (formato humano)
+  const handleStartEdit = () => {
+    if (format === 'percent' && value) {
+      const n = parseFloat(String(value).replace(',', '.'));
+      if (!isNaN(n)) {
+        setTempValue((n * 100).toFixed(2).replace('.', ','));
+      } else {
+        setTempValue(value || '');
+      }
+    } else {
+      setTempValue(value || '');
+    }
+    setIsEditing(true);
+  };
+
   if (isEditing) {
     return (
       <input
         autoFocus
         type={format === 'number' ? 'number' : 'text'}
         step={format === 'number' ? '0.01' : undefined}
+        placeholder={format === 'percent' ? 'Ex: 0,50' : undefined}
         value={tempValue}
         onChange={(e) => setTempValue(e.target.value)}
         onBlur={handleSave}
@@ -125,7 +146,7 @@ function EditableCell({
 
   return (
     <div
-      onClick={() => setIsEditing(true)}
+      onClick={handleStartEdit}
       className="cursor-pointer px-2 py-1 rounded hover:bg-blue-100 transition-colors"
       title="Clique para editar"
     >
