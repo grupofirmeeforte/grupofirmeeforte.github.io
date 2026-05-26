@@ -309,8 +309,6 @@ function AplicarEmMassa({ cargos, onAplicar }: {
   const [cargoSelecionado, setCargoSelecionado] = useState('');
   const [nivelGlobal, setNivelGlobal] = useState<NivelPermissao>('sem_acesso');
   const [mapa, setMapa] = useState<PermissoesMap>(() => buildDefaultPermissoes('sem_acesso'));
-  const [expandido, setExpandido] = useState(false);
-
   // Ao selecionar cargo, pré-carregar o template salvo para esse cargo
   useEffect(() => {
     if (!cargoSelecionado) return;
@@ -352,27 +350,23 @@ function AplicarEmMassa({ cargos, onAplicar }: {
             {cargos.map(c => <option key={c} value={c!}>{c}</option>)}
           </select>
         </div>
-        <div>
-          <label className="text-xs font-medium text-gray-600 block mb-1">Nível padrão</label>
-          <select
-            value={nivelGlobal}
-            onChange={e => aplicarGlobal(e.target.value as NivelPermissao)}
-            className="border rounded px-3 py-1.5 text-sm"
-          >
-            {NIVEIS.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
-          </select>
-        </div>
-        <button
-          className="text-xs text-blue-500 hover:underline flex items-center gap-1 mt-4"
-          onClick={() => setExpandido(!expandido)}
-        >
-          {expandido ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-          {expandido ? 'Ocultar módulos' : 'Editar módulos individualmente'}
-        </button>
+        {cargoSelecionado && (
+          <div>
+            <label className="text-xs font-medium text-gray-600 block mb-1">Nível padrão (aplica a todos os módulos)</label>
+            <select
+              value={nivelGlobal}
+              onChange={e => aplicarGlobal(e.target.value as NivelPermissao)}
+              className="border rounded px-3 py-1.5 text-sm"
+            >
+              {NIVEIS.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
+            </select>
+          </div>
+        )}
       </div>
 
-      {expandido && (
+      {cargoSelecionado && (
         <div className="mb-4">
+          <p className="text-xs font-medium text-gray-600 mb-2">Ajuste módulo por módulo (clique para expandir sub-abas):</p>
           <PermissoesEditor mapa={mapa} onChange={setMapa} />
         </div>
       )}
