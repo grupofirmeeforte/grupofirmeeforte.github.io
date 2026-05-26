@@ -440,8 +440,8 @@ export default function AgentesPage() {
                           <div className="text-[10px] text-slate-600 mt-0.5 flex items-center gap-1">
                             <span className="font-medium">Fav:</span>
                             {(agente as any).favProprio
-                              ? <span className="text-emerald-700">{agente.nomeAgente} <span className="text-[9px] bg-emerald-100 text-emerald-700 rounded px-1">próprio</span></span>
-                              : <span>{agente.favorecido}</span>
+                              ? <span className="text-emerald-700 font-medium">{agente.nomeAgente} <span className="text-[9px] bg-emerald-100 text-emerald-700 rounded px-1 font-semibold">próprio</span></span>
+                              : <span className="text-orange-600 font-semibold">{agente.favorecido} <span className="text-[9px] bg-orange-100 text-orange-700 rounded px-1">favorecido</span></span>
                             }
                           </div>
                         )}
