@@ -92,7 +92,8 @@ function EditableCell({
       const cleaned = tempValue.replace(/%/g, '').replace(/\s/g, '').replace(',', '.');
       const n = parseFloat(cleaned);
       const stored = isNaN(n) ? '' : (n / 100).toString();
-      if (stored !== value) onSave(stored);
+      // Sempre salva ao confirmar (não compara com value para evitar falsos negativos)
+      onSave(stored);
     } else {
       if (tempValue !== value) onSave(tempValue);
     }
