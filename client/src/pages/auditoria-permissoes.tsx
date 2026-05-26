@@ -126,7 +126,20 @@ function PermissoesEditor({
   mapa: PermissoesMap;
   onChange: (mapa: PermissoesMap) => void;
 }) {
-  const [expandido, setExpandido] = useState<string | null>(null);
+  const [expandidos, setExpandidos] = useState<Set<string>>(new Set());
+
+  const toggleModulo = (modulo: string) => {
+    setExpandidos(prev => {
+      const next = new Set(prev);
+      if (next.has(modulo)) next.delete(modulo);
+      else next.add(modulo);
+      return next;
+    });
+  };
+
+  const expandirTodos = () => setExpandidos(new Set(MODULOS_PERMISSOES.map(m => m.modulo)));
+  const recolherTodos = () => setExpandidos(new Set());
+  const todosExpandidos = expandidos.size === MODULOS_PERMISSOES.length;
 
   const setNivelModulo = (modulo: string, nivel: NivelPermissao) => {
     const moduloDef = MODULOS_PERMISSOES.find(m => m.modulo === modulo);
@@ -142,8 +155,18 @@ function PermissoesEditor({
 
   return (
     <div className="space-y-1">
+      <div className="flex gap-2 mb-2">
+        <button
+          type="button"
+          onClick={todosExpandidos ? recolherTodos : expandirTodos}
+          className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+        >
+          {todosExpandidos ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          {todosExpandidos ? 'Recolher tudo' : 'Expandir tudo'}
+        </button>
+      </div>
       {MODULOS_PERMISSOES.map(m => {
-        const aberto = expandido === m.modulo;
+        const aberto = expandidos.has(m.modulo);
         const niveis = m.subabas.map(s => mapa[m.modulo]?.[s.key] ?? 'sem_acesso');
         const nivelMod: NivelPermissao = niveis.length === 0
           ? 'sem_acesso'
@@ -152,7 +175,7 @@ function PermissoesEditor({
           <div key={m.modulo} className="border rounded-lg overflow-hidden">
             <div
               className="flex items-center justify-between px-3 py-2 bg-gray-50 cursor-pointer hover:bg-gray-100"
-              onClick={() => setExpandido(aberto ? null : m.modulo)}
+              onClick={() => toggleModulo(m.modulo)}
             >
               <div className="flex items-center gap-2">
                 {aberto ? <ChevronUp className="w-3 h-3 text-gray-400" /> : <ChevronDown className="w-3 h-3 text-gray-400" />}
