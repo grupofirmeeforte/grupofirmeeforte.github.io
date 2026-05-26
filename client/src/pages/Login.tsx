@@ -179,11 +179,13 @@ export default function Login() {
   // Biometria
   const { supported: webAuthnSupported, platformAvailable } = useWebAuthnSupport();
   const [bioChaveJ, setBioChaveJ] = useState('');
+  const [bioSenha, setBioSenha] = useState('');
   // Sincronizar bioChaveJ com chaveJ do formulário principal automaticamente
   useEffect(() => { if (chaveJ.trim().length >= 4) setBioChaveJ(chaveJ.trim().toUpperCase()); }, [chaveJ]);
+  useEffect(() => { if (senha.trim().length >= 3) setBioSenha(senha.trim()); }, [senha]);
   const [bioStatus, setBioStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [bioMessage, setBioMessage] = useState('');
-  const [showBioSection, setShowBioSection] = useState(false);
+  const [showBioSection, setShowBioSection] = useState(true);
 
   // Verificar se o usuário já tem biometria cadastrada (ao digitar chaveJ)
   const hasBiometriaQuery = trpc.webauthn.hasBiometria.useQuery(
@@ -282,17 +284,21 @@ export default function Login() {
 
   // ── Cadastrar biometria (após login normal) ──────────────────────────────
   const handleRegistrarBiometria = async () => {
-    if (!bioChaveJ) { setBioMessage('Digite sua ChaveJ primeiro.'); setBioStatus('error'); return; }
+    if (!bioChaveJ) { setBioMessage('Digite sua ChaveJ para cadastrar a biometria.'); setBioStatus('error'); return; }
+    if (!bioSenha) { setBioMessage('Digite sua senha para confirmar o cadastro biométrico.'); setBioStatus('error'); return; }
     setBioStatus('loading');
-    setBioMessage('Aguarde, iniciando cadastro biométrico...');
+    setBioMessage('Aguarde, preparando cadastro biométrico...');
     try {
+      const deviceName = navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')
+        ? 'iPhone/iPad' : navigator.userAgent.includes('Android') ? 'Android'
+        : navigator.userAgent.includes('Mac') ? 'Mac' : 'Computador';
       const options = await registrationOptionsMutation.mutateAsync({
         chaveJ: bioChaveJ,
+        senha: bioSenha,
         origin: window.location.origin,
-        deviceName: navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')
-          ? 'iPhone/iPad' : navigator.userAgent.includes('Android') ? 'Android'
-          : navigator.userAgent.includes('Mac') ? 'Mac' : 'Computador',
+        deviceName,
       });
+      setBioMessage('Siga as instruções do seu dispositivo para registrar a biometria...');
       const attResp = await startRegistration({ optionsJSON: options });
       await registrationVerifyMutation.mutateAsync({
         chaveJ: bioChaveJ,
@@ -300,15 +306,22 @@ export default function Login() {
         origin: window.location.origin,
       });
       setBioStatus('success');
-      setBioMessage('✅ Biometria cadastrada com sucesso! Na próxima entrada, use o botão de biometria.');
+      setBioMessage('Biometria cadastrada! Na próxima vez, use o botão "Entrar com Biometria".');
     } catch (e: any) {
       setBioStatus('error');
       if (e.name === 'NotAllowedError') {
-        setBioMessage('Acesso à biometria negado. Verifique as permissões do navegador.');
+        setBioMessage('Cadastro cancelado. Tente novamente e siga as instruções do dispositivo.');
       } else if (e.name === 'InvalidStateError') {
         setBioMessage('Este dispositivo já está cadastrado para esta conta.');
       } else {
-        setBioMessage(e.message || 'Erro ao cadastrar biometria.');
+        const msg = (e.message || '') as string;
+        if (msg.includes('Senha incorreta')) {
+          setBioMessage('Senha incorreta. Verifique e tente novamente.');
+        } else if (msg.includes('não encontrado')) {
+          setBioMessage('ChaveJ não encontrada. Verifique e tente novamente.');
+        } else {
+          setBioMessage(msg || 'Erro ao cadastrar biometria. Tente novamente.');
+        }
       }
     }
   };
@@ -468,14 +481,9 @@ export default function Login() {
 
               {showBioSection && (
                 <div className="mt-3 p-4 border border-blue-200 rounded-xl bg-blue-50 space-y-3">
-                  <p className="text-xs text-blue-700 font-medium">
-                    Use a biometria do seu dispositivo para entrar rapidamente.
-                  </p>
-                  {bioChaveJ ? (
-                    <div className="text-xs text-blue-700 bg-blue-100 rounded-lg px-3 py-2 font-medium">
-                      ChaveJ: <span className="font-bold">{bioChaveJ}</span>
-                    </div>
-                  ) : (
+
+                  {/* Campo ChaveJ — exibido apenas quando não veio do formulário principal */}
+                  {!bioChaveJ ? (
                     <div>
                       <label className="block text-xs font-medium text-gray-700 mb-1">Sua ChaveJ</label>
                       <Input
@@ -483,6 +491,25 @@ export default function Login() {
                         placeholder="Digite sua ChaveJ"
                         value={bioChaveJ}
                         onChange={(e) => { setBioChaveJ(e.target.value.toUpperCase()); setBioStatus('idle'); setBioMessage(''); }}
+                        className="w-full text-sm"
+                        autoComplete="off"
+                      />
+                    </div>
+                  ) : (
+                    <div className="text-xs text-blue-700 bg-blue-100 rounded-lg px-3 py-2 font-medium">
+                      ChaveJ: <span className="font-bold">{bioChaveJ}</span>
+                    </div>
+                  )}
+
+                  {/* Campo senha — exibido apenas quando não veio do formulário principal */}
+                  {!bioSenha && (
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Senha (para cadastrar biometria)</label>
+                      <Input
+                        type="password"
+                        placeholder="Digite sua senha"
+                        value={bioSenha}
+                        onChange={(e) => { setBioSenha(e.target.value); setBioStatus('idle'); setBioMessage(''); }}
                         className="w-full text-sm"
                         autoComplete="off"
                       />
@@ -539,7 +566,7 @@ export default function Login() {
                   </div>
 
                   <p className="text-xs text-gray-400 text-center">
-                    🔒 Sua biometria nunca sai do dispositivo. Apenas uma chave criptográfica é armazenada.
+                    Sua biometria nunca sai do dispositivo. Apenas uma chave criptográfica é armazenada.
                   </p>
                 </div>
               )}

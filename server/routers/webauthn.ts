@@ -52,6 +52,7 @@ export const webauthnRouter = router({
   registrationOptions: publicProcedure
     .input(z.object({
       chaveJ: z.string(),
+      senha: z.string().optional(),
       deviceName: z.string().optional().default("Meu dispositivo"),
       origin: z.string().optional().default("http://localhost:3000"),
     }))
@@ -62,6 +63,11 @@ export const webauthnRouter = router({
       // Buscar agente
       const [agente] = await db.select().from(agentes).where(eq(agentes.chaveJ, input.chaveJ));
       if (!agente) throw new Error("Agente não encontrado");
+
+      // Validar senha se fornecida
+      if (input.senha) {
+        if (agente.senha !== input.senha) throw new Error("Senha incorreta. Verifique e tente novamente.");
+      }
 
       // Buscar credenciais existentes
       const existingCreds = await db
