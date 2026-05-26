@@ -76,6 +76,8 @@ export const agentes = mysqlTable('agentes', {
   dataNascimento: varchar("dataNascimento", { length: 10 }), // YYYY-MM-DD format
   celular: varchar("celular", { length: 20 }),
   pinAcesso: varchar("pinAcesso", { length: 10 }),   // PIN de 4-6 dígitos para acesso rápido
+  faceToken: varchar("faceToken", { length: 100 }),              // Token do rosto no Face++
+  faceFacesetToken: varchar("faceFacesetToken", { length: 100 }), // FaceSet token no Face++
   permissoes: varchar("permissoes", { length: 50 }).default("leitor"), // admin, editor, leitor, sem_acesso
   permissoesModulos: text("permissoesModulos"), // JSON com permissoes por sub-aba: {modulo: {subaba: nivel}}
   signo: varchar("signo", { length: 20 }), // signo zodiacal para horóscopo diário

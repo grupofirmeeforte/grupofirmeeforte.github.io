@@ -41,6 +41,7 @@ import MensagemDoDiaHub from './pages/MensagemDoDiaHub';
 import MailingCrmPage from './pages/MailingCrm';
 import RelatorioChaveJ from './pages/RelatorioChaveJ';
 import MeuPin from './pages/MeuPin';
+import MeuRosto from './pages/MeuRosto';
 import CaixaRecados from './pages/CaixaRecados';
 
 // import ChangePasswordPage from "./pages/change-password";
@@ -104,6 +105,7 @@ function RouterWithInactivity() {
     <Switch>
       <Route path={"/login"} component={Login} />
       <Route path={"/meu-pin"} component={MeuPin} />
+      <Route path={"/meu-rosto"} component={MeuRosto} />
       <Route path={"/caixa-recados"} component={CaixaRecados} />
       <Route path={"/"} component={Home} />
       <Route path={"/agentes"} component={AgentesPage} />

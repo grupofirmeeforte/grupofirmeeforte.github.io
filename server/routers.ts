@@ -34,6 +34,7 @@ import { loginRapidoRouter } from "./routers/loginRapido";
 import { recadosRouter } from "./routers/recados";
 import { comunicadosRouter } from "./routers/comunicados";
 import { chatInternoRouter } from "./routers/chatInterno";
+import { reconhecimentoFacialRouter } from "./routers/reconhecimentoFacial";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
 import { users, agentes, despesasFixas, pagamentos } from "../drizzle/schema";
@@ -375,6 +376,7 @@ export const appRouter = router({
   recados: recadosRouter,
   comunicados: comunicadosRouter,
   chatInterno: chatInternoRouter,
+  facial: reconhecimentoFacialRouter,
   crm: crmRouter,
   mailingCrm: mailingCrmRouter,
   despesasFixas: despesasFixasRouter,

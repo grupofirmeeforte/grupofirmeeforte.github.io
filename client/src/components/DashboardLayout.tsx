@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { KeyRound, LayoutDashboard, LogOut, PanelLeft, Paperclip, Users } from "lucide-react";
+import { KeyRound, LayoutDashboard, LogOut, PanelLeft, Paperclip, ScanFace, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { PopupComunicado } from "@/components/PopupComunicado";
 import { trpc } from "@/lib/trpc";
@@ -229,6 +229,13 @@ function DashboardLayoutContent({
                 >
                   <KeyRound className="mr-2 h-4 w-4" />
                   <span>Cadastrar PIN</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setLocation('/meu-rosto')}
+                  className="cursor-pointer"
+                >
+                  <ScanFace className="mr-2 h-4 w-4" />
+                  <span>Cadastrar Rosto</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={logout}

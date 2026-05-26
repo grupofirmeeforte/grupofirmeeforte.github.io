@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { trpc } from '@/lib/trpc';
-import { AlertCircle, Lock, RefreshCw, Smartphone, KeyRound, ChevronDown, ChevronUp } from 'lucide-react';
+import { AlertCircle, Lock, RefreshCw, Smartphone, KeyRound, ChevronDown, ChevronUp, ScanFace } from 'lucide-react';
+import { LoginFacial } from '@/components/LoginFacial';
 import type { TRPCClientErrorLike } from '@trpc/client';
 
 // ── CAPTCHA matemático ───────────────────────────────────────────────────────
@@ -111,6 +112,7 @@ function BalloonCanvas() {
 // ── Tipo de acesso rápido ────────────────────────────────────────────────────
 type MetodoRapido = 'celular' | 'pin';
 
+
 export default function Login() {
   const [chaveJ, setChaveJ] = useState('');
   const [senha, setSenha] = useState('');
@@ -139,6 +141,8 @@ export default function Login() {
   const [pinDigitado, setPinDigitado] = useState('');
   const [rapidoStatus, setRapidoStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [rapidoMessage, setRapidoMessage] = useState('');
+
+  const [showFacial, setShowFacial] = useState(false);
 
   // Sincronizar chaveJ do formulário principal com o campo de acesso rápido
   useEffect(() => {
@@ -346,6 +350,32 @@ export default function Login() {
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-1">Grupo Firme & Forte</h1>
             <p className="text-gray-600 text-sm">Sistema de Gestão</p>
+          </div>
+
+          {/* ── LOGIN FACIAL ─────────────────────────────────────────────── */}
+          <div className="mb-4">
+            <button
+              type="button"
+              onClick={() => setShowFacial(v => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-colors text-indigo-800 font-medium text-sm"
+            >
+              <span className="flex items-center gap-2">
+                <ScanFace className="w-5 h-5" />
+                Entrar com Reconhecimento Facial
+              </span>
+              {showFacial ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+            {showFacial && (
+              <div className="mt-2 border border-indigo-200 rounded-xl overflow-hidden bg-white">
+                <LoginFacial
+                  onSuccess={(data) => {
+                    setWelcomeData({ nome: data.nomeAgente, isAniversario: false });
+                    setTimeout(() => setLocation('/'), 1500);
+                  }}
+                  onClose={() => setShowFacial(false)}
+                />
+              </div>
+            )}
           </div>
 
           {/* ── SEÇÃO ACESSO RÁPIDO ─────────────────────────────────────── */}
