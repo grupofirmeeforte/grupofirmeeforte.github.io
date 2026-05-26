@@ -64,6 +64,7 @@ export const agentesRouter = router({
         empresa: z.string().optional(),
         situacao: z.string().optional(),
         cidade: z.string().optional(),
+        cargo: z.string().optional(),
         search: z.string().optional(),
         limit: z.number().default(50),
         offset: z.number().default(0),
@@ -83,6 +84,9 @@ export const agentesRouter = router({
       }
       if (input.cidade) {
         conditions.push(eq(agentes.cidade, input.cidade));
+      }
+      if (input.cargo) {
+        conditions.push(eq(agentes.cargo, input.cargo));
       }
       if (input.search) {
         conditions.push(
@@ -110,6 +114,7 @@ export const agentesRouter = router({
         empresa: z.string().optional(),
         situacao: z.string().optional(),
         cidade: z.string().optional(),
+        cargo: z.string().optional(),
         search: z.string().optional(),
       })
     )
@@ -127,6 +132,9 @@ export const agentesRouter = router({
       }
       if (input.cidade) {
         conditions.push(eq(agentes.cidade, input.cidade));
+      }
+      if (input.cargo) {
+        conditions.push(eq(agentes.cargo, input.cargo));
       }
       if (input.search) {
         conditions.push(

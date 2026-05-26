@@ -36,6 +36,7 @@ export default function AgentesPage() {
   const [empresa, setEmpresa] = useState<string>("");
   const [situacao, setSituacao] = useState<string>("");
   const [cidade, setCidade] = useState<string>("");
+  const [cargo, setCargo] = useState<string>("");
   const [page, setPage] = useState(0);
   const [showDuplicatas, setShowDuplicatas] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -52,12 +53,14 @@ export default function AgentesPage() {
     empresa: empresa && empresa !== "__all__" ? empresa : undefined,
     situacao: situacao && situacao !== "__all__" ? situacao : undefined,
     cidade: cidade && cidade !== "__all__" ? cidade : undefined,
+    cargo: cargo && cargo !== "__all__" ? cargo : undefined,
     limit,
     offset: page * limit,
   });
 
   const { data: empresas } = trpc.agentes.getEmpresas.useQuery();
   const { data: cidades } = trpc.agentes.getCidades.useQuery();
+  const { data: cargos } = trpc.agentes.getCargos.useQuery();
   const { data: statusCerts } = trpc.agentes.statusCertificacoes.useQuery(undefined, {
     refetchInterval: 24 * 60 * 60 * 1000, // atualiza uma vez por dia
     staleTime: 24 * 60 * 60 * 1000,
@@ -67,6 +70,7 @@ export default function AgentesPage() {
     empresa: empresa && empresa !== "__all__" ? empresa : undefined,
     situacao: situacao && situacao !== "__all__" ? situacao : undefined,
     cidade: cidade && cidade !== "__all__" ? cidade : undefined,
+    cargo: cargo && cargo !== "__all__" ? cargo : undefined,
   });
 
   const deleteAgente = trpc.agentes.delete.useMutation({
@@ -226,6 +230,23 @@ export default function AgentesPage() {
                 {empresas?.map((emp) => (
                   <SelectItem key={emp} value={emp || "__empty__"}>
                     {emp}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={cargo} onValueChange={(value) => {
+              setCargo(value);
+              setPage(0);
+            }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Cargo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">Todos</SelectItem>
+                {cargos?.map((c) => (
+                  <SelectItem key={c} value={c || "__empty__"}>
+                    {c}
                   </SelectItem>
                 ))}
               </SelectContent>
