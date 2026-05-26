@@ -98,7 +98,7 @@ function NivelSelect({ value, onChange }: { value: NivelPermissao; onChange: (v:
 }
 
 // ─── Painel de template por cargo ─────────────────────────────────────────────
-function TemplateCargo({ cargos, onAplicar }: { cargos: string[]; onAplicar: (cargo: string, mapa: PermissoesMap) => void }) {
+function TemplateCargo({ cargos, onAplicar }: { cargos: string[]; onAplicar: (cargo: string, nivelGeral: NivelPermissao, mapa: PermissoesMap) => void }) {
   const [cargoSelecionado, setCargoSelecionado] = useState('');
   const [nivelGlobal, setNivelGlobal] = useState<NivelPermissao>('leitura');
   const [mapa, setMapa] = useState<PermissoesMap>(() => buildDefaultPermissoes('leitura'));
@@ -197,7 +197,7 @@ function TemplateCargo({ cargos, onAplicar }: { cargos: string[]; onAplicar: (ca
         disabled={!cargoSelecionado}
         onClick={() => {
           if (!cargoSelecionado) return;
-          onAplicar(cargoSelecionado, mapa);
+          onAplicar(cargoSelecionado, nivelGlobal, mapa);
         }}
         className="bg-blue-600 hover:bg-blue-700 text-white"
       >
@@ -347,10 +347,10 @@ export default function AuditoriaPermissoes() {
       {/* Template em massa */}
       <TemplateCargo
         cargos={(cargos as string[]).filter(Boolean)}
-        onAplicar={(cargo, mapa) => {
+        onAplicar={(cargo, nivelGeral, mapa) => {
           aplicarTemplate.mutate({
             cargo,
-            permissoes: 'leitura',
+            permissoes: nivelGeral,
             permissoesModulos: JSON.stringify(mapa),
           });
         }}
