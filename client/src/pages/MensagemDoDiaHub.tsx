@@ -228,167 +228,231 @@ function AbaMotivacional() {
 }
 
 // ─── ABA ORIXÁS ──────────────────────────────────────────────────────────────
-const ORIXAS_SEMANA = [
+// Função para selecionar mensagem do dia (muda a cada dia)
+function getMensagemDoDia<T>(lista: T[]): T {
+  const hoje = new Date();
+  const diaAno = Math.floor((hoje.getTime() - new Date(hoje.getFullYear(), 0, 0).getTime()) / 86400000);
+  return lista[diaAno % lista.length];
+}
+
+const ORIXAS_10 = [
   {
-    diaSemana: 0, // Domingo
-    nome: 'Oxumaré',
-    saudacao: 'Arrô Bô!',
-    elemento: 'Arco-íris e Serpente',
-    cor: '#f97316',
-    corSecundaria: '#fbbf24',
-    gradiente: 'linear-gradient(135deg, #f97316, #fbbf24)',
-    emoji: '🌈',
-    simbolo: '🐍',
-    dominio: 'Transformação, renovação e riqueza',
-    mensagem: 'Hoje é dia de renovação. Assim como o arco-íris surge após a tempestade, cada dificuldade que você supera abre espaço para novas conquistas. Renove suas metas, sua energia e sua determinação. O ciclo de abundância começa com a sua transformação interior.',
-    afirmacao: 'Eu me renovo a cada desafio e atraio prosperidade com minha perseverança.',
-  },
-  {
-    diaSemana: 1, // Segunda-feira
     nome: 'Ogum',
     saudacao: 'Ogum Yê!',
-    elemento: 'Ferro e Guerra',
+    elemento: 'Ferro, Guerra e Caminhos',
     cor: '#1d4ed8',
-    corSecundaria: '#3b82f6',
     gradiente: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
     emoji: '⚔️',
     simbolo: '🔱',
     dominio: 'Trabalho, abertura de caminhos e determinação',
-    mensagem: 'Ogum abre os caminhos para quem age com determinação e coragem. Na segunda-feira, o início da semana, carregue a força do guerreiro: enfrente cada cliente com confiança, desbrave novos territórios e não recue diante dos obstáculos. O sucesso pertence a quem avança.',
-    afirmacao: 'Eu abro meus próprios caminhos com trabalho, coragem e determinação.',
+    mensagens: [
+      { texto: 'Ogum abre os caminhos para quem age com determinação e coragem. Enfrente cada desafio com a força do guerreiro: não recue diante dos obstáculos, pois o sucesso pertence a quem avança.', afirmacao: 'Eu abro meus próprios caminhos com trabalho, coragem e determinação.' },
+      { texto: 'O guerreiro de Ogum não teme batalhas, pois sabe que cada dificuldade é uma oportunidade de provar seu valor. Desbrave novos territórios e conquiste seus objetivos.', afirmacao: 'Sou forte, determinado e nenhum obstáculo é grande demais para mim.' },
+      { texto: 'Ogum ensina que a persistência é a arma mais poderosa. Mesmo quando o caminho parece bloqueado, continue avançando — cada passo é uma vitória.', afirmacao: 'Persisto com garra e cada passo me aproxima da minha vitória.' },
+      { texto: 'A força de Ogum está em suas mãos hoje. Use-a para construir, para criar, para abrir portas que pareciam fechadas. O trabalho é o seu maior aliado.', afirmacao: 'Minhas mãos trabalham com força e meu espírito não conhece a derrota.' },
+      { texto: 'Ogum protege quem age com honra e dedicação. Seja íntegro em cada ação, pois a confiança que você constrói hoje é o seu maior patrimônio.', afirmacao: 'Ajo com honra e integridade, e meu caminho está sempre aberto.' },
+      { texto: 'O ferro de Ogum transforma o bruto em precioso. Assim como o ferreiro molda o metal, você tem o poder de moldar sua realidade com esforço e persistência.', afirmacao: 'Tenho o poder de transformar minha realidade com trabalho e dedicação.' },
+      { texto: 'Ogum é o senhor dos novos começos. Se algo não está funcionando, é hora de abrir um novo caminho. A coragem de recomeçar é o maior sinal de força.', afirmacao: 'Tenho coragem para recomeçar e sabedoria para escolher novos caminhos.' },
+    ],
   },
   {
-    diaSemana: 2, // Terça-feira
-    nome: 'Xangô',
-    saudacao: 'Kaô Kabiesilê!',
-    elemento: 'Trovão e Fogo',
-    cor: '#b91c1c',
-    corSecundaria: '#f97316',
-    gradiente: 'linear-gradient(135deg, #b91c1c, #f97316)',
-    emoji: '⚡',
-    simbolo: '🪓',
-    dominio: 'Justiça, poder e liderança',
-    mensagem: 'Xangô é o senhor da justiça e do poder. Hoje, aja com integridade em cada negociação, seja justo com seus clientes e com você mesmo. A verdadeira liderança nasce de quem age com honestidade. Seu poder de persuasão é maior quando vem da transparência.',
-    afirmacao: 'Eu lidero com justiça e honestidade, e minha palavra tem o peso do trovão.',
-  },
-  {
-    diaSemana: 3, // Quarta-feira
-    nome: 'Oxóssi',
-    saudacao: 'Okê Arô!',
-    elemento: 'Floresta e Caça',
-    cor: '#15803d',
-    corSecundaria: '#22c55e',
-    gradiente: 'linear-gradient(135deg, #15803d, #22c55e)',
-    emoji: '🏹',
-    simbolo: '🌿',
-    dominio: 'Prosperidade, foco e conquista',
-    mensagem: 'Oxóssi é o caçador que nunca erra o alvo. Na quarta-feira, afie sua mira: identifique seus melhores prospects, foque nas oportunidades certas e não desperdice energia com o que não traz resultado. Um bom caçador conhece o terreno e escolhe o momento certo para agir.',
-    afirmacao: 'Eu miro com precisão nas minhas metas e nunca perco o foco do que é importante.',
-  },
-  {
-    diaSemana: 4, // Quinta-feira
-    nome: 'Oxalá',
-    saudacao: 'Êpa Babá!',
-    elemento: 'Paz e Criação',
-    cor: '#6b7280',
-    corSecundaria: '#e5e7eb',
-    gradiente: 'linear-gradient(135deg, #6b7280, #d1d5db)',
-    emoji: '🕊️',
-    simbolo: '🌟',
-    dominio: 'Paz, sabedoria e criação',
-    mensagem: 'Oxalá é o pai criador, senhor da paz e da sabedoria. Na quinta-feira, cultive a serenidade nas suas relações: escute mais do que fala, compreenda as necessidades do cliente antes de oferecer soluções. A venda mais poderosa nasce da conexão genuína e da paz no coração.',
-    afirmacao: 'Eu ajo com sabedoria e paz, criando conexões verdadeiras que geram resultados duradouros.',
-  },
-  {
-    diaSemana: 5, // Sexta-feira
     nome: 'Oxum',
     saudacao: 'Ora Yeyê Ô!',
     elemento: 'Água Doce e Ouro',
     cor: '#d97706',
-    corSecundaria: '#fbbf24',
     gradiente: 'linear-gradient(135deg, #d97706, #fbbf24)',
     emoji: '💛',
     simbolo: '🪙',
-    dominio: 'Amor, riqueza e fertilidade',
-    mensagem: 'Oxum é a rainha das águas doces, senhora do amor e da prosperidade. Na sexta-feira, deixe fluir sua simpatia e charme natural: construa relacionamentos com seus clientes, mostre que você se importa genuinamente com o bem-estar deles. O ouro de Oxum é a confiança que você conquista.',
-    afirmacao: 'Eu fluo com leveza e charme, atraindo prosperidade e relacionamentos que florescem.',
+    dominio: 'Amor, riqueza e prosperidade',
+    mensagens: [
+      { texto: 'Oxum é a rainha das águas doces, senhora do amor e da prosperidade. Deixe fluir sua simpatia e charme natural: construa relacionamentos autênticos, pois o ouro de Oxum é a confiança que você conquista.', afirmacao: 'Eu fluo com leveza e charme, atraindo prosperidade e relacionamentos que florescem.' },
+      { texto: 'Como as águas de Oxum que nutrem a terra, seu amor e sua generosidade nutrem tudo ao seu redor. Dê com o coração aberto e receba em abundância.', afirmacao: 'Sou abundante em amor e riqueza. Tudo que ofereço retorna multiplicado.' },
+      { texto: 'Oxum ensina que a beleza está em cada detalhe da vida. Valorize o que você tem, cuide do que é seu e atraia mais bens com gratidão e alegria.', afirmacao: 'Sou grato pelo que tenho e atraio mais bens com minha alegria.' },
+      { texto: 'A doçura de Oxum é sua maior força. Trate cada pessoa com carinho e respeito, pois é assim que se constroem pontes duradouras e oportunidades verdadeiras.', afirmacao: 'Minha doçura e empatia abrem portas que a força sozinha não abre.' },
+      { texto: 'Oxum é a senhora da fertilidade e da criação. Seus projetos estão prontos para florescer — regue-os com atenção, paciência e amor.', afirmacao: 'Meus projetos florescem porque os cuido com amor e dedicação.' },
+      { texto: 'O espelho de Oxum reflete sua verdadeira beleza interior. Acredite no seu valor, pois quem se reconhece digno atrai as melhores oportunidades.', afirmacao: 'Reconheço meu valor e atraio oportunidades à altura do meu potencial.' },
+      { texto: 'Oxum protege os que buscam a prosperidade com honestidade. Seus esforços serão recompensados — continue fluindo com fé e persistência.', afirmacao: 'Meus esforços honestos são recompensados com prosperidade e alegria.' },
+    ],
   },
   {
-    diaSemana: 6, // Sábado
+    nome: 'Xangô',
+    saudacao: 'Kaô Kabiesilê!',
+    elemento: 'Trovão e Fogo',
+    cor: '#b91c1c',
+    gradiente: 'linear-gradient(135deg, #b91c1c, #f97316)',
+    emoji: '⚡',
+    simbolo: '🪣',
+    dominio: 'Justiça, poder e liderança',
+    mensagens: [
+      { texto: 'Xangô é o senhor da justiça e do poder. Aja com integridade em cada negociação, seja justo com todos. A verdadeira liderança nasce de quem age com honestidade.', afirmacao: 'Eu lidero com justiça e honestidade, e minha palavra tem o peso do trovão.' },
+      { texto: 'O trovão de Xangô anuncia que a justiça sempre prevalece. Não tema os desafios — enfrente-os com a certeza de que quem age com retidão sempre vence.', afirmacao: 'A justiça está do meu lado e minha integridade é minha maior proteção.' },
+      { texto: 'Xangô ensina que o poder verdadeiro vem de dentro. Cultive sua autoconfiança, fale com autoridade e lidere pelo exemplo — as pessoas seguem quem inspira.', afirmacao: 'Tenho autoridade natural e inspiro todos ao meu redor com meu exemplo.' },
+      { texto: 'Como o fogo de Xangô que purifica, deixe para trás o que não te serve mais. Renove-se, fortaleça-se e siga em frente com mais clareza e propósito.', afirmacao: 'Me liberto do que não me serve e avanço com clareza e propósito.' },
+      { texto: 'Xangô é o rei que julga com sabedoria. Tome decisões importantes com calma e equilíbrio — a pressa é inimiga da boa escolha.', afirmacao: 'Tomo decisões sábias e equilibradas que me levam ao sucesso.' },
+      { texto: 'O fogo de Xangô aquece e ilumina. Seja a luz que guia sua equipe, sua família e seus clientes. Quem ilumina o caminho dos outros nunca anda no escuro.', afirmacao: 'Sou luz e referência para todos ao meu redor.' },
+      { texto: 'Xangô protege os que buscam a verdade. Seja transparente em suas relações, pois a confiança é o alicerce de toda parceria duradoura.', afirmacao: 'Minha transparência e verdade constroem relações sólidas e duradouras.' },
+    ],
+  },
+  {
+    nome: 'Oxóssi',
+    saudacao: 'Okê Arô!',
+    elemento: 'Floresta e Caça',
+    cor: '#15803d',
+    gradiente: 'linear-gradient(135deg, #15803d, #22c55e)',
+    emoji: '🏹',
+    simbolo: '🌿',
+    dominio: 'Prosperidade, foco e conquista',
+    mensagens: [
+      { texto: 'Oxóssi é o caçador que nunca erra o alvo. Afie sua mira: identifique suas melhores oportunidades, foque no que traz resultado e não desperdice energia com o que não vale.', afirmacao: 'Eu miro com precisão nas minhas metas e nunca perco o foco do que é importante.' },
+      { texto: 'O caçador de Oxóssi conhece a floresta como a palma da mão. Estude seu mercado, conheça seus clientes e esteja sempre um passo à frente da concorrência.', afirmacao: 'Conheço meu terreno e ajo com precisão e inteligência.' },
+      { texto: 'Oxóssi ensina que a prosperidade vem para quem é paciente e persistente. O caçador espera o momento certo para agir — e quando age, não erra.', afirmacao: 'Tenho paciência e precisão. Ajo no momento certo e alcanço meus objetivos.' },
+      { texto: 'A floresta de Oxóssi é cheia de riquezas para quem sabe onde procurar. Abra os olhos para as oportunidades ao seu redor — elas estão mais próximas do que você imagina.', afirmacao: 'Vejo oportunidades onde outros vêem obstáculos.' },
+      { texto: 'Oxóssi é o senhor da abundância natural. Cultive o que você planta com cuidado e dedicação, e a colheita será farta e generosa.', afirmacao: 'Planto com cuidado e colho com abundância.' },
+      { texto: 'O arco de Oxóssi simboliza o foco total. Elimine as distrações, concentre-se no que realmente importa e sua produtividade vai disparar.', afirmacao: 'Meu foco é total e minha produtividade é máxima.' },
+      { texto: 'Oxóssi protege os que respeitam a natureza e os ciclos da vida. Respeite seus próprios limites, descanse quando preciso e volte mais forte.', afirmacao: 'Respeito meus ciclos e volto sempre mais forte e renovado.' },
+    ],
+  },
+  {
+    nome: 'Oxalá',
+    saudacao: 'Êpa Babá!',
+    elemento: 'Paz e Criação',
+    cor: '#6b7280',
+    gradiente: 'linear-gradient(135deg, #6b7280, #d1d5db)',
+    emoji: '🕊️',
+    simbolo: '🌟',
+    dominio: 'Paz, sabedoria e criação',
+    mensagens: [
+      { texto: 'Oxalá é o pai criador, senhor da paz e da sabedoria. Cultive a serenidade nas suas relações: escute mais do que fala, pois a venda mais poderosa nasce da conexão genuína.', afirmacao: 'Ajo com sabedoria e paz, criando conexões verdadeiras que geram resultados duradouros.' },
+      { texto: 'A brancura de Oxalá simboliza a pureza de intenções. Aja sempre com sinceridade e boa-fé, pois quem tem a consciência limpa caminha com mais leveza e confiança.', afirmacao: 'Minhas intenções são puras e meu caminho é iluminado.' },
+      { texto: 'Oxalá ensina que a paciência é uma virtude divina. Nem tudo acontece no nosso tempo — confie no processo e saiba que cada etapa tem seu propósito.', afirmacao: 'Confio no processo e sei que tudo acontece no tempo certo.' },
+      { texto: 'O bastão de Oxalá sustenta e guia. Seja o apoio que as pessoas ao seu redor precisam — quem sustenta os outros é sustentado por forças maiores.', afirmacao: 'Sou apoio e referência para todos ao meu redor.' },
+      { texto: 'Oxalá é o criador de todas as coisas. Você também tem o poder de criar — use sua criatividade e imaginação para encontrar soluções inovadoras.', afirmacao: 'Sou criativo e inovador. Encontro soluções onde outros vêem problemas.' },
+      { texto: 'A paz de Oxalá não é ausência de conflito, mas presença de equilíbrio. Mantenha a calma nos momentos difíceis — é aí que os verdadeiros líderes se revelam.', afirmacao: 'Mantenho minha paz interior mesmo diante dos maiores desafios.' },
+      { texto: 'Oxalá abençoa os que buscam o bem coletivo. Pense no impacto positivo que suas ações têm na vida das pessoas ao seu redor.', afirmacao: 'Minhas ações geram impacto positivo e abençoam a todos ao meu redor.' },
+    ],
+  },
+  {
     nome: 'Iemanjá',
     saudacao: 'Odoyá!',
     elemento: 'Mar e Maternidade',
     cor: '#0369a1',
-    corSecundaria: '#38bdf8',
     gradiente: 'linear-gradient(135deg, #0369a1, #38bdf8)',
     emoji: '🌊',
     simbolo: '🐚',
     dominio: 'Proteção, abundância e emoções',
-    mensagem: 'Iemanjá é a mãe das águas, protetora e abundante como o mar. No sábado, reflita sobre sua semana: celebre cada conquista, aprenda com cada desafio e renove suas forças para a próxima semana. Assim como o mar nunca para, sua jornada de crescimento também não tem fim.',
-    afirmacao: 'Eu sou protegido e abundante. Cada semana me traz novas ondas de oportunidades.',
+    mensagens: [
+      { texto: 'Iemanjá é a mãe das águas, protetora e abundante como o mar. Celebre cada conquista, aprenda com cada desafio e renove suas forças. Assim como o mar nunca para, sua jornada também não tem fim.', afirmacao: 'Sou protegido e abundante. Cada dia me traz novas ondas de oportunidades.' },
+      { texto: 'O mar de Iemanjá é vasto e profundo. Assim como ele, você tem uma capacidade ilimitada de crescer, aprender e se renovar. Não subestime seu próprio potencial.', afirmacao: 'Meu potencial é ilimitado e estou sempre crescendo.' },
+      { texto: 'Iemanjá ensina que as marés sobem e descem, mas o mar permanece. Nos momentos difíceis, lembre-se: isso também vai passar, e você sairá mais forte.', afirmacao: 'Supero as marés da vida e sempre emerjo mais forte e sábio.' },
+      { texto: 'A proteção de Iemanjá envolve seus filhos como as águas do mar. Sinta-se amparado e seguro para arriscar, criar e crescer sem medo.', afirmacao: 'Sou amparado e protegido. Avanço com confiança em direção aos meus sonhos.' },
+      { texto: 'Iemanjá é a rainha da fertilidade e da abundância. Tudo que você semeia com amor e dedicação será colhido em grande quantidade.', afirmacao: 'Colho abundância em tudo que semeio com amor e dedicação.' },
+      { texto: 'As águas de Iemanjá limpam e purificam. Liberte-se de mágoas, ressentimentos e pensamentos negativos — a leveza que você sentirá atrairá coisas boas.', afirmacao: 'Me liberto do passado e atraio leveza, alegria e prosperidade.' },
+      { texto: 'Iemanjá abençoa os que cuidam dos outros. Sua generosidade e cuidado com as pessoas ao seu redor serão recompensados com lealdade e gratidão.', afirmacao: 'Meu cuidado com os outros retorna para mim em forma de lealdade e abundância.' },
+    ],
+  },
+  {
+    nome: 'Iansã',
+    saudacao: 'Epà Héi!',
+    elemento: 'Vento e Tempestade',
+    cor: '#7c3aed',
+    gradiente: 'linear-gradient(135deg, #7c3aed, #c026d3)',
+    emoji: '🌪️',
+    simbolo: '⚡',
+    dominio: 'Coragem, transformação e liberdade',
+    mensagens: [
+      { texto: 'Iansã é a senhora dos ventos e das tempestades, guerreira destemida. Enfrente seus medos de frente — a coragem não é a ausência do medo, mas a decisão de agir apesar dele.', afirmacao: 'Sou corajoso e destemido. Enfrento qualquer tempestade com força e determinação.' },
+      { texto: 'Como o vento de Iansã que varre o velho para dar lugar ao novo, é hora de liberar o que já não serve. A transformação que você busca começa com a coragem de mudar.', afirmacao: 'Abraço a mudança com coragem e sei que o novo que chega é melhor.' },
+      { texto: 'Iansã ensina que a liberdade é um direito sagrado. Liberte-se das limitações que você mesmo se impõe e voe tão alto quanto seus sonhos permitirem.', afirmacao: 'Sou livre para sonhar alto e realizar tudo que desejo.' },
+      { texto: 'A guerreira Iansã nunca recua. Quando a vida apresentar obstáculos, lembre-se: você foi feito para superar, não para se render.', afirmacao: 'Fui feito para superar e nunca me rendo diante dos desafios.' },
+      { texto: 'Os ventos de Iansã trazem mudanças necessárias. Abrace as transformações em sua vida — elas estão te levando para um lugar melhor.', afirmacao: 'Abraço as transformações sabendo que elas me levam a um lugar melhor.' },
+      { texto: 'Iansã é a senhora da intuição e da percepção aguçada. Confie no que seu coração sente — sua intuição é um guia poderoso.', afirmacao: 'Confio na minha intuição e ela sempre me guia pelo caminho certo.' },
+      { texto: 'A tempestade de Iansã purifica e renova. Após cada dificuldade, você emerge mais forte, mais sábio e mais preparado para o que vem pela frente.', afirmacao: 'Cada dificuldade me torna mais forte e mais preparado para o sucesso.' },
+    ],
+  },
+  {
+    nome: 'Omolu',
+    saudacao: 'Atotô!',
+    elemento: 'Terra e Cura',
+    cor: '#92400e',
+    gradiente: 'linear-gradient(135deg, #92400e, #d97706)',
+    emoji: '🌻',
+    simbolo: '💀',
+    dominio: 'Saúde, cura e renovação',
+    mensagens: [
+      { texto: 'Omolu é o senhor da cura e da renovação. Cuide do seu corpo, da sua mente e do seu espírito — a saúde é o seu maior bem e o alicerce de todas as suas conquistas.', afirmacao: 'Cuido de mim com amor e minha saúde é minha maior riqueza.' },
+      { texto: 'Omolu ensina que toda ferida pode ser curada. Independente dos erros do passado, você tem o poder de se curar, se renovar e recomeçar com mais sabedoria.', afirmacao: 'Tenho o poder de me curar e recomeçar sempre mais forte.' },
+      { texto: 'A força de Omolu vem da terra, firme e sólida. Construa suas bases com solidez: invista em conhecimento, em relacionamentos e em sua saúde.', afirmacao: 'Minhas bases são sólidas e construo meu futuro com firmeza.' },
+      { texto: 'Omolu é o protetor dos mais humildes. Lembre-se de que a humildade é uma virtude poderosa — quem se mantém humilde continua aprendendo e crescendo.', afirmacao: 'Sou humilde o suficiente para aprender e forte o suficiente para crescer.' },
+      { texto: 'A cura de Omolu é profunda e transformadora. Liberte-se de hábitos que te prejudicam e adote práticas que nutram seu corpo, mente e alma.', afirmacao: 'Me liberto de hábitos negativos e adoto práticas que me fortalecem.' },
+      { texto: 'Omolu conhece os ciclos da vida e da morte. Cada fim é um novo começo — o que termina em sua vida abre espaço para algo ainda melhor.', afirmacao: 'Cada fim em minha vida abre espaço para um começo ainda mais glorioso.' },
+      { texto: 'A sabedoria de Omolu vem da experiência. Cada desafio que você enfrentou te tornou mais sábio — use esse conhecimento para guiar seus próximos passos.', afirmacao: 'Minha experiência é minha maior riqueza e me guia com sabedoria.' },
+    ],
+  },
+  {
+    nome: 'Nanã',
+    saudacao: 'Saluba Nanã!',
+    elemento: 'Água Parada e Lama',
+    cor: '#6d28d9',
+    gradiente: 'linear-gradient(135deg, #6d28d9, #7c3aed)',
+    emoji: '💜',
+    simbolo: '🌿',
+    dominio: 'Sabedoria ancestral e proteção',
+    mensagens: [
+      { texto: 'Nanã é a mais velha das águas, guardiã da sabedoria ancestral. Honre suas raízes, aprenda com os mais velhos e carregue com orgulho a herança de quem veio antes de você.', afirmacao: 'Honro minhas raízes e carrego a sabedoria dos meus ancestrais.' },
+      { texto: 'A lama de Nanã é a origem de toda vida. Do que parece difícil e pesado, nasce a maior fertilidade — seus desafios são o adubo do seu crescimento.', afirmacao: 'Meus desafios são o adubo que nutre meu crescimento e sucesso.' },
+      { texto: 'Nanã ensina que a paciência é a virtude dos sábios. Não se apresse — o que é seu chegará no tempo certo, mais maduro e mais valioso.', afirmacao: 'Tenho paciência sábia e sei que o que é meu chega no tempo perfeito.' },
+      { texto: 'A proteção de Nanã é profunda como as águas antigas. Sinta-se amparado pela força dos seus ancestrais — você nunca está sozinho.', afirmacao: 'Sou amparado pela força dos meus ancestrais e nunca estou sozinho.' },
+      { texto: 'Nanã guarda os segredos da vida e da morte. Respeite os ciclos naturais e saiba que tudo tem seu tempo — inclusive suas conquistas.', afirmacao: 'Respeito os ciclos da vida e confio que minhas conquistas chegam no tempo certo.' },
+      { texto: 'A sabedoria de Nanã é acumulada ao longo de eras. Invista em seu aprendizado contínuo — cada novo conhecimento é uma ferramenta poderosa para o seu sucesso.', afirmacao: 'Invisto em meu crescimento contínuo e cada dia fico mais sábio e capaz.' },
+      { texto: 'Nanã é a mãe que acolhe todos os seus filhos. Acolha-se também — trate-se com a mesma compaixão que você oferece aos outros.', afirmacao: 'Me acolho com amor e compaixão, e isso me fortalece para ajudar os outros.' },
+    ],
+  },
+  {
+    nome: 'Oxumaré',
+    saudacao: 'Arrô Bô!',
+    elemento: 'Arco-íris e Serpente',
+    cor: '#f97316',
+    gradiente: 'linear-gradient(135deg, #f97316, #fbbf24)',
+    emoji: '🌈',
+    simbolo: '🐍',
+    dominio: 'Transformação, renovação e riqueza',
+    mensagens: [
+      { texto: 'Oxumaré é o arco-íris que conecta o céu e a terra. Assim como ele, você tem o poder de conectar mundos diferentes e criar pontes que geram oportunidades únicas.', afirmacao: 'Eu me renovo a cada desafio e atraio prosperidade com minha perseverança.' },
+      { texto: 'A serpente de Oxumaré troca de pele e se renova. Você também tem esse poder — liberte-se do que já não serve e emerge renovado, mais forte e mais brilhante.', afirmacao: 'Me renovo constantemente e cada versão minha é melhor que a anterior.' },
+      { texto: 'Oxumaré representa os ciclos eternos da vida. Confie que após cada período difícil vem um arco-íris — a recompensa pelo que você suportou com fé.', afirmacao: 'Confio nos ciclos da vida e sei que após a chuva sempre vem o arco-íris.' },
+      { texto: 'As cores de Oxumaré representam a diversidade e a riqueza da vida. Abrace todas as suas facetas — suas diferenças são seus maiores talentos.', afirmacao: 'Abraço minha diversidade e cada aspecto meu é um talento único.' },
+      { texto: 'Oxumaré é o senhor da riqueza que circula. O dinheiro, como a serpente, precisa se mover — invista, compartilhe e faça circular sua prosperidade.', afirmacao: 'Minha prosperidade circula e se multiplica a cada dia.' },
+      { texto: 'O arco-íris de Oxumaré aparece após a tempestade. Seus melhores momentos estão por vir — cada dificuldade é apenas o prenuncio de algo maravilhoso.', afirmacao: 'Meus melhores momentos estão por vir e estou pronto para recebê-los.' },
+      { texto: 'Oxumaré conecta o passado e o futuro em um ciclo eterno. Use as lições do passado para construir um futuro brilhante e cheio de possibilidades.', afirmacao: 'Uso as lições do passado para construir um futuro extraordinário.' },
+    ],
   },
 ];
 
 function AbaOrixas() {
-  const hoje = new Date();
-  const diaSemana = hoje.getDay(); // 0=Dom, 1=Seg, ..., 6=Sáb
-  const [orixaSelecionado, setOrixaSelecionado] = useState(diaSemana);
-  const orixaExibido = ORIXAS_SEMANA[orixaSelecionado];
-  const diasNomes = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-  const diasCompletos = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+  const [orixaSelecionado, setOrixaSelecionado] = useState(0);
+  const orixa = ORIXAS_10[orixaSelecionado];
+  const mensagemHoje = getMensagemDoDia(orixa.mensagens);
 
   return (
     <div className="max-w-2xl mx-auto py-8 space-y-6">
 
-      {/* Card principal do Orixá do DIA */}
-      <div className="rounded-2xl overflow-hidden shadow-xl border-0">
-        <div className="px-6 py-3 text-center" style={{ background: ORIXAS_SEMANA[diaSemana].gradiente }}>
-          <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Orixá de Hoje</p>
-          <p className="text-white text-xl font-bold mt-0.5">{ORIXAS_SEMANA[diaSemana].saudacao}</p>
-        </div>
-        <div className="p-5 flex items-center gap-4" style={{ background: `${ORIXAS_SEMANA[diaSemana].cor}12` }}>
-          <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-md flex-shrink-0"
-            style={{ background: ORIXAS_SEMANA[diaSemana].gradiente }}>
-            {ORIXAS_SEMANA[diaSemana].emoji}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className="text-xl font-bold" style={{ color: ORIXAS_SEMANA[diaSemana].cor }}>{ORIXAS_SEMANA[diaSemana].nome}</h3>
-              <span className="text-xs px-2 py-0.5 rounded-full text-white font-medium" style={{ background: ORIXAS_SEMANA[diaSemana].cor }}>Hoje</span>
-            </div>
-            <p className="text-slate-500 text-xs mt-0.5">{ORIXAS_SEMANA[diaSemana].dominio}</p>
-            <p className="text-slate-600 text-sm mt-2 leading-relaxed line-clamp-2">{ORIXAS_SEMANA[diaSemana].mensagem}</p>
-          </div>
-          <div className="text-3xl flex-shrink-0">{ORIXAS_SEMANA[diaSemana].simbolo}</div>
-        </div>
-        <div className="px-5 py-3 bg-white border-t">
-          <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: ORIXAS_SEMANA[diaSemana].cor }}>Afirmação do Dia</p>
-          <p className="text-slate-700 text-sm font-medium italic">"{ORIXAS_SEMANA[diaSemana].afirmacao}"</p>
-        </div>
-      </div>
-
-      {/* Seletor de Orixá por nome */}
+      {/* Seletor dos 10 Orixás */}
       <div className="bg-white rounded-2xl shadow-md p-4">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 text-center">Escolha um Orixá</p>
-        <div className="grid grid-cols-7 gap-1.5">
-          {ORIXAS_SEMANA.map((o, idx) => (
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 text-center">Escolha seu Orixá</p>
+        <div className="grid grid-cols-5 gap-2">
+          {ORIXAS_10.map((o, idx) => (
             <button
               key={idx}
               onClick={() => setOrixaSelecionado(idx)}
               className={`flex flex-col items-center p-2 rounded-xl border-2 transition-all ${
-                orixaSelecionado === idx
-                  ? 'shadow-md scale-105'
-                  : 'border-gray-100 hover:border-gray-300 opacity-70 hover:opacity-100'
+                orixaSelecionado === idx ? 'shadow-md scale-105' : 'border-gray-100 hover:border-gray-300 opacity-70 hover:opacity-100'
               }`}
               style={orixaSelecionado === idx ? { borderColor: o.cor, background: `${o.cor}18` } : {}}
             >
-              <span className="text-xl">{o.emoji}</span>
-              <span className="text-[10px] font-semibold mt-0.5 leading-tight text-center" style={orixaSelecionado === idx ? { color: o.cor } : { color: '#64748b' }}>
+              <span className="text-2xl">{o.emoji}</span>
+              <span className="text-[10px] font-semibold mt-1 leading-tight text-center" style={orixaSelecionado === idx ? { color: o.cor } : { color: '#64748b' }}>
                 {o.nome}
               </span>
-              {idx === diaSemana && (
-                <span className="text-[10px] font-bold" style={{ color: o.cor }}>hoje</span>
-              )}
             </button>
           ))}
         </div>
@@ -396,42 +460,36 @@ function AbaOrixas() {
 
       {/* Card da mensagem do Orixá selecionado */}
       <Card className="border-0 shadow-2xl overflow-hidden">
-        <div className="px-8 py-4 text-center" style={{ background: orixaExibido.gradiente }}>
-          <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Mensagem de {orixaExibido.nome}</p>
-          <p className="text-white text-2xl font-bold mt-1">{orixaExibido.saudacao}</p>
+        <div className="px-8 py-5 text-center" style={{ background: orixa.gradiente }}>
+          <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Mensagem dos Orixás</p>
+          <p className="text-white text-2xl font-bold mt-1">{orixa.saudacao}</p>
         </div>
         <CardContent className="p-0">
-          <div className="p-8 pb-4" style={{ background: `${orixaExibido.cor}15` }}>
-            <div className="flex items-center gap-5">
-              <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl shadow-lg flex-shrink-0"
-                style={{ background: orixaExibido.gradiente }}>
-                {orixaExibido.emoji}
+          <div className="p-6 pb-4" style={{ background: `${orixa.cor}15` }}>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-lg flex-shrink-0"
+                style={{ background: orixa.gradiente }}>
+                {orixa.emoji}
               </div>
               <div>
-                <h2 className="text-3xl font-bold" style={{ color: orixaExibido.cor }}>{orixaExibido.nome}</h2>
-                <p className="text-slate-500 text-sm mt-0.5">{orixaExibido.elemento}</p>
-                <p className="text-slate-600 text-xs mt-1 font-medium">{orixaExibido.dominio}</p>
+                <h2 className="text-2xl font-bold" style={{ color: orixa.cor }}>{orixa.nome}</h2>
+                <p className="text-slate-500 text-sm mt-0.5">{orixa.elemento}</p>
+                <p className="text-slate-600 text-xs mt-1 font-medium">{orixa.dominio}</p>
               </div>
-              <div className="ml-auto text-4xl">{orixaExibido.simbolo}</div>
+              <div className="ml-auto text-3xl">{orixa.simbolo}</div>
             </div>
           </div>
-          <div className="px-8 py-6 bg-white">
-            <div className="w-full h-0.5 rounded-full mb-5" style={{ background: orixaExibido.gradiente }} />
-            <p className="text-slate-700 text-base leading-relaxed">{orixaExibido.mensagem}</p>
-            <div className="mt-6 p-4 rounded-xl border-l-4" style={{ borderColor: orixaExibido.cor, background: `${orixaExibido.cor}10` }}>
-              <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: orixaExibido.cor }}>Afirmação do Dia</p>
-              <p className="text-slate-700 font-medium italic">"{orixaExibido.afirmacao}"</p>
+          <div className="px-6 py-5 bg-white">
+            <div className="w-full h-0.5 rounded-full mb-4" style={{ background: orixa.gradiente }} />
+            <p className="text-slate-700 text-base leading-relaxed">{mensagemHoje.texto}</p>
+            <div className="mt-5 p-4 rounded-xl border-l-4" style={{ borderColor: orixa.cor, background: `${orixa.cor}10` }}>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: orixa.cor }}>Afirmação do Dia</p>
+              <p className="text-slate-700 font-medium italic">"{mensagemHoje.afirmacao}"</p>
             </div>
-            <div className="mt-6 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                {orixaSelecionado === diaSemana && (
-                  <span className="text-xs px-2 py-1 rounded-full font-medium text-white" style={{ background: orixaExibido.cor }}>Hoje</span>
-                )}
-                <span className="text-xs text-slate-400">{diasCompletos[orixaSelecionado]}</span>
-              </div>
+            <div className="mt-5 flex justify-end">
               <Button variant="outline" size="sm" className="gap-2 text-slate-600"
                 onClick={() => {
-                  const txt = `${orixaExibido.saudacao}\n\n${orixaExibido.nome} — ${orixaExibido.dominio}\n\n${orixaExibido.mensagem}\n\nAfirmação: "${orixaExibido.afirmacao}"`;
+                  const txt = `${orixa.saudacao}\n\n${orixa.nome} — ${orixa.dominio}\n\n${mensagemHoje.texto}\n\nAfirmação: "${mensagemHoje.afirmacao}"`;
                   if (navigator.share) navigator.share({ text: txt });
                   else navigator.clipboard.writeText(txt);
                 }}>
