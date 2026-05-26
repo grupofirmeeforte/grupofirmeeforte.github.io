@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
 // Definição dos módulos e sub-abas para permissões
+// ATENÇÃO: Esta lista deve ser idêntica à de auditoria-permissoes.tsx
 const MODULOS_PERMISSOES = [
   { modulo: 'meu-painel', label: 'Meu Painel', subabas: [
     { key: 'painel-agente', label: 'Meu Painel' },
@@ -43,10 +44,6 @@ const MODULOS_PERMISSOES = [
     { key: 'ourocap-prod', label: 'OuroCap' },
     { key: 'seguros-prod', label: 'Seguros' },
   ]},
-  { modulo: 'febraban', label: 'Febraban', subabas: [
-    { key: 'producao-bb', label: 'Produção BB' },
-    { key: 'acompanhamento-diario', label: 'Acompanhamento Diário' },
-  ]},
   { modulo: 'extratos', label: 'Extratos', subabas: [
     { key: 'consignado', label: 'Extrato Consignado' },
     { key: 'cc', label: 'Extrato C/C' },
@@ -64,6 +61,12 @@ const MODULOS_PERMISSOES = [
     { key: 'oportunidades', label: 'Oportunidades' },
     { key: 'relatorios-crm', label: 'Relatórios CRM' },
     { key: 'tarefas', label: 'Tarefas / Follow-up' },
+  ]},
+  { modulo: 'febraban', label: 'Febraban', subabas: [
+    { key: 'producao-bb', label: 'Produção BB' },
+    { key: 'acompanhamento-diario', label: 'Acompanhamento Diário' },
+    { key: 'graficos', label: 'Gráficos' },
+    { key: 'relatorio-chavej', label: 'Relatório por Chave J' },
   ]},
   { modulo: 'mensagem-dia', label: 'Mensagem do Dia', subabas: [
     { key: 'minutos-sabedoria', label: 'Minutos de Sabedoria' },
@@ -292,11 +295,18 @@ export default function AgentesFormPage() {
         permissoes: agente.permissoes || "leitor",
       });
       // Carregar permissoesModulos do JSON
-      if ((agente as any).permissoesModulos) {
-        try {
-          setPermissoesModulos(JSON.parse((agente as any).permissoesModulos));
-        } catch {}
+      // Mescla com defaults (sem_acesso) para garantir que módulos novos apareçam corretamente
+      const savedJson = (agente as any).permissoesModulos;
+      let savedMap: PermissoesMap = {};
+      try { savedMap = JSON.parse(savedJson ?? '{}') ?? {}; } catch { savedMap = {}; }
+      const mergedMap: PermissoesMap = {};
+      for (const m of MODULOS_PERMISSOES) {
+        mergedMap[m.modulo] = {};
+        for (const s of m.subabas) {
+          mergedMap[m.modulo][s.key] = savedMap[m.modulo]?.[s.key] ?? 'sem_acesso';
+        }
       }
+      setPermissoesModulos(mergedMap);
     }
   }, [agente]);
 
@@ -735,7 +745,7 @@ export default function AgentesFormPage() {
                   <div className="bg-slate-100 px-4 py-2 font-semibold text-slate-700 text-sm">{label}</div>
                   <div className="divide-y divide-slate-100">
                     {subabas.map(({ key, label: subLabel }) => {
-                      const nivel = (permissoesModulos[modulo]?.[key] ?? 'leitura') as NivelPermissao;
+                      const nivel = (permissoesModulos[modulo]?.[key] ?? 'sem_acesso') as NivelPermissao;
                       return (
                         <div key={key} className="flex items-center gap-3 px-4 py-2">
                           <span className="w-48 text-sm text-slate-600">{subLabel}</span>
