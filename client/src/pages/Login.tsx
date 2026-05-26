@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,6 +31,110 @@ function gerarOperacao() {
     resultado = a * b;
   }
   return { pergunta: `Quanto é ${a} ${op} ${b}?`, resultado };
+}
+
+// ── Balões de aniversário ───────────────────────────────────────────────────
+const BALLOON_COLORS = [
+  '#FF6B6B', '#FF8E53', '#FFD93D', '#6BCB77', '#4D96FF',
+  '#C77DFF', '#FF6FD8', '#00C9FF', '#FF4E50', '#43E97B',
+];
+
+function BalloonCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const balloons: {
+      x: number; y: number; r: number; color: string;
+      speed: number; sway: number; swaySpeed: number; swayOffset: number;
+      stringLen: number;
+    }[] = [];
+
+    // Criar 35 balões
+    for (let i = 0; i < 35; i++) {
+      balloons.push({
+        x: Math.random() * canvas.width,
+        y: canvas.height + Math.random() * 400 + 50,
+        r: 22 + Math.random() * 20,
+        color: BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)],
+        speed: 1.2 + Math.random() * 2.2,
+        sway: 30 + Math.random() * 40,
+        swaySpeed: 0.015 + Math.random() * 0.025,
+        swayOffset: Math.random() * Math.PI * 2,
+        stringLen: 35 + Math.random() * 25,
+      });
+    }
+
+    let frame = 0;
+    let animId: number;
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      frame++;
+      balloons.forEach(b => {
+        b.y -= b.speed;
+        const bx = b.x + Math.sin(frame * b.swaySpeed + b.swayOffset) * b.sway;
+
+        // Sombra suave
+        ctx.shadowColor = 'rgba(0,0,0,0.18)';
+        ctx.shadowBlur = 8;
+
+        // Corpo do balão (elipse)
+        ctx.beginPath();
+        ctx.ellipse(bx, b.y, b.r, b.r * 1.22, 0, 0, Math.PI * 2);
+        ctx.fillStyle = b.color;
+        ctx.fill();
+
+        // Brilho
+        ctx.shadowBlur = 0;
+        const grad = ctx.createRadialGradient(
+          bx - b.r * 0.3, b.y - b.r * 0.4, b.r * 0.05,
+          bx, b.y, b.r
+        );
+        grad.addColorStop(0, 'rgba(255,255,255,0.55)');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.beginPath();
+        ctx.ellipse(bx, b.y, b.r, b.r * 1.22, 0, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Nozinho
+        ctx.beginPath();
+        ctx.arc(bx, b.y + b.r * 1.22, 4, 0, Math.PI * 2);
+        ctx.fillStyle = b.color;
+        ctx.fill();
+
+        // Fio
+        ctx.beginPath();
+        ctx.moveTo(bx, b.y + b.r * 1.22 + 4);
+        ctx.bezierCurveTo(
+          bx + 8, b.y + b.r * 1.22 + b.stringLen * 0.4,
+          bx - 8, b.y + b.r * 1.22 + b.stringLen * 0.7,
+          bx, b.y + b.r * 1.22 + b.stringLen
+        );
+        ctx.strokeStyle = 'rgba(180,180,180,0.7)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      });
+      animId = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 50 }}
+    />
+  );
 }
 
 // ── Detectar suporte WebAuthn ────────────────────────────────────────────────
@@ -90,7 +194,9 @@ export default function Login() {
   const loginMutation = trpc.auth.loginCustom.useMutation({
     onSuccess: (data) => {
       setWelcomeData({ nome: data.agente.nome || '', isAniversario: data.isAniversario });
-      setTimeout(() => setLocation('/'), 3000);
+      // Aniversário: 13s (10s balões + 3s leitura da mensagem), normal: 3s
+      const delay = data.isAniversario ? 13000 : 3000;
+      setTimeout(() => setLocation('/'), delay);
     },
     onError: (err: TRPCClientErrorLike<any>) => {
       const message = err.message || '';
@@ -235,7 +341,19 @@ export default function Login() {
   };
 
   // ── Tela de boas-vindas ──────────────────────────────────────────────────
+  const [showBalloons, setShowBalloons] = useState(true);
+  const [showMessage, setShowMessage] = useState(false);
+
+  useEffect(() => {
+    if (!welcomeData?.isAniversario) return;
+    // Após 10s, esconder balões e mostrar mensagem
+    const t1 = setTimeout(() => setShowBalloons(false), 10000);
+    const t2 = setTimeout(() => setShowMessage(true), 10200);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [welcomeData?.isAniversario]);
+
   if (welcomeData) {
+    // Redirecionar: 13s para aniversário (10s balões + 3s leitura), 3s para normal
     return (
       <div
         className="min-h-screen flex items-center justify-center relative overflow-hidden"
@@ -245,19 +363,52 @@ export default function Login() {
         }}
       >
         <div className="absolute inset-0 bg-black/55" />
-        <Card className="relative z-10 w-full max-w-lg bg-white shadow-2xl animate-in fade-in zoom-in duration-500">
+
+        {/* Balões animados — apenas no aniversário, durante 10s */}
+        {welcomeData.isAniversario && showBalloons && <BalloonCanvas />}
+
+        <Card
+          className="relative w-full max-w-lg bg-white shadow-2xl animate-in fade-in zoom-in duration-500"
+          style={{ zIndex: 60 }}
+        >
           <div className="p-10 text-center">
             {welcomeData.isAniversario ? (
               <>
-                <div className="flex justify-center mb-4">
-                  <img src="/manus-storage/logo-firme-forte-v2_bac9b5e6.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
-                </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">🎂 Feliz Aniversário!</h2>
-                <p className="text-xl text-gray-700 mb-4">Parabéns, <span className="font-bold text-blue-800">{welcomeData.nome}</span>!</p>
-                <p className="text-gray-500 mb-6">Que este novo ano seja repleto de conquistas e sucesso! 🎉</p>
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                  <p className="text-yellow-800 font-medium">🌟 Hoje é o seu dia especial! Seja muito bem-vindo(a) ao sistema.</p>
-                </div>
+                {/* Durante balões: mostrar só contagem regressiva animada */}
+                {showBalloons && !showMessage && (
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="text-7xl animate-bounce">🎈</div>
+                    <h2 className="text-3xl font-bold text-gray-900">🎂 Feliz Aniversário!</h2>
+                    <p className="text-xl text-gray-700">
+                      Parabéns, <span className="font-bold text-blue-800">{welcomeData.nome}</span>!
+                    </p>
+                    <p className="text-4xl">🎉 🎊 🎈 🎁 🎂</p>
+                  </div>
+                )}
+
+                {/* Após 10s: mensagem completa com fade-in */}
+                {showMessage && (
+                  <div
+                    className="animate-in fade-in duration-700"
+                    style={{ animationFillMode: 'both' }}
+                  >
+                    <div className="flex justify-center mb-4">
+                      <img src="/manus-storage/logo-firme-forte-v2_bac9b5e6.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
+                    </div>
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">🎂 Feliz Aniversário!</h2>
+                    <p className="text-xl text-gray-700 mb-4">
+                      Parabéns, <span className="font-bold text-blue-800">{welcomeData.nome}</span>!
+                    </p>
+                    <p className="text-gray-500 mb-6">Que este novo ano seja repleto de conquistas e sucesso! 🎉</p>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                      <p className="text-yellow-800 font-medium">🌟 Hoje é o seu dia especial! Seja muito bem-vindo(a) ao sistema.</p>
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                      Redirecionando para o sistema...
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <>
@@ -267,12 +418,12 @@ export default function Login() {
                 <h2 className="text-3xl font-bold text-gray-900 mb-2">Seja bem-vindo(a)!</h2>
                 <p className="text-xl text-gray-700 mb-4">Olá, <span className="font-bold text-blue-800">{welcomeData.nome}</span>! 👋</p>
                 <p className="text-gray-500 mb-6">Você entrou no sistema com sucesso. Tenha um ótimo dia de trabalho!</p>
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+                  <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                  Redirecionando para o sistema...
+                </div>
               </>
             )}
-            <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-              <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-              Redirecionando para o sistema...
-            </div>
           </div>
         </Card>
       </div>
