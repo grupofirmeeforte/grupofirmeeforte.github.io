@@ -53,6 +53,12 @@ const MODULOS_PERMISSOES = [
     { key: 'relatorios-crm', label: 'Relatórios CRM' },
     { key: 'tarefas', label: 'Tarefas / Follow-up' },
   ]},
+  { modulo: 'febraban', label: 'Febraban', subabas: [
+    { key: 'producao-bb', label: 'Produção BB' },
+    { key: 'acompanhamento-diario', label: 'Acompanhamento Diário' },
+    { key: 'graficos', label: 'Gráficos' },
+    { key: 'relatorio-chavej', label: 'Relatório por Chave J' },
+  ]},
   { modulo: 'auditoria', label: 'Auditoria', subabas: [
     { key: 'logs', label: 'Logs de Acesso' },
     { key: 'feriados', label: 'Feriados' },
