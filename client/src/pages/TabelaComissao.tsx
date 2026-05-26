@@ -388,14 +388,23 @@ export default function TabelaComissao() {
   });
 
   function handleExportarTemplate() {
-    // Exporta os dados atuais como template CSV para edição
+    // Exporta os dados atuais como template para edição
+    // Campos que são percentuais salvos como decimal no banco (ex: 0.0065 = 0,65%)
     const ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
-    const header = ['id','empresa','convenio','codigo','txJurosDe','txJurosAte','valorMinimo','mesesDe','mesesAte',...ATIVOS,'faixa1','faixa2','faixa3','faixa4','faixa5','tabelaCalculo','referencia'];
-    const dataRows = filteredRows.map(r => header.map(h => {
+    const CAMPOS_PCT = [...ATIVOS, 'faixa1','faixa2','faixa3','faixa4','faixa5'];
+    // txJurosDe e txJurosAte são salvos como string direta (ex: '0.0175') e representam percentual
+    const CAMPOS_JUROS = ['txJurosDe','txJurosAte'];
+    const header = ['id','empresa','convenio','codigo','txJurosDe_%','txJurosAte_%','valorMinimo','mesesDe','mesesAte',...ATIVOS.map(a => a + '_%'),'faixa1_%','faixa2_%','faixa3_%','faixa4_%','faixa5_%','tabelaCalculo','referencia'];
+    const headerKeys = ['id','empresa','convenio','codigo','txJurosDe','txJurosAte','valorMinimo','mesesDe','mesesAte',...ATIVOS,'faixa1','faixa2','faixa3','faixa4','faixa5','tabelaCalculo','referencia'];
+    const dataRows = filteredRows.map(r => headerKeys.map(h => {
       const v = (r as any)[h];
-      if (ATIVOS.includes(h) && v) {
+      if (CAMPOS_PCT.includes(h) && v !== null && v !== undefined && v !== '') {
         const n = parseFloat(String(v).replace(',','.'));
-        return isNaN(n) ? v : (n * 100).toFixed(4);
+        return isNaN(n) ? v : parseFloat((n * 100).toFixed(4));
+      }
+      if (CAMPOS_JUROS.includes(h) && v !== null && v !== undefined && v !== '') {
+        const n = parseFloat(String(v).replace(',','.'));
+        return isNaN(n) ? v : parseFloat((n * 100).toFixed(4));
       }
       return v ?? '';
     }));
@@ -425,18 +434,35 @@ export default function TabelaComissao() {
         const rows: any[] = XLSX.utils.sheet_to_json(ws, { defval: '' });
         if (rows.length === 0) { toast.error('Planilha vazia'); return; }
         const ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
+        const FAIXAS = ['faixa1','faixa2','faixa3','faixa4','faixa5'];
         const parsed = rows.map((r: any) => {
           const obj: any = {};
           // id
           if (r.id !== '' && r.id !== undefined) obj.id = Number(r.id);
-          // campos texto
-          ['empresa','convenio','codigo','txJurosDe','txJurosAte','valorMinimo','mesesDe','mesesAte','faixa1','faixa2','faixa3','faixa4','faixa5','tabelaCalculo','referencia'].forEach(k => {
+          // campos texto simples
+          ['empresa','convenio','codigo','valorMinimo','mesesDe','mesesAte','tabelaCalculo','referencia'].forEach(k => {
             if (r[k] !== '' && r[k] !== undefined) obj[k] = String(r[k]);
           });
-          // ativos: converte percentual para decimal (ex: 0.80 → 0.008)
-          ATIVOS.forEach(k => {
-            if (r[k] !== '' && r[k] !== undefined) {
-              const n = parseFloat(String(r[k]).replace(',','.'));
+          // juros: aceita 'txJurosDe_%' (novo) ou 'txJurosDe' (legado)
+          // No template novo, os juros já estão em percentual (ex: 1.75 = 1,75%)
+          // Precisa dividir por 100 para salvar como decimal no banco
+          ['txJurosDe','txJurosAte'].forEach(k => {
+            const vNovo = r[k + '_%'];
+            const vLegado = r[k];
+            const raw = vNovo !== '' && vNovo !== undefined ? vNovo : vLegado;
+            if (raw !== '' && raw !== undefined) {
+              const n = parseFloat(String(raw).replace(',','.'));
+              if (!isNaN(n)) obj[k] = (n / 100).toString();
+              else obj[k] = String(raw);
+            }
+          });
+          // ativos e faixas: aceita 'ativo01_%' (novo) ou 'ativo01' (legado)
+          [...ATIVOS, ...FAIXAS].forEach(k => {
+            const vNovo = r[k + '_%'];
+            const vLegado = r[k];
+            const raw = vNovo !== '' && vNovo !== undefined ? vNovo : vLegado;
+            if (raw !== '' && raw !== undefined) {
+              const n = parseFloat(String(raw).replace(',','.'));
               if (!isNaN(n)) obj[k] = (n / 100).toString();
             }
           });
