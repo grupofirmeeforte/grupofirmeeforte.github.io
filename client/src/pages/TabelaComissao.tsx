@@ -50,11 +50,11 @@ const EMPTY_FORM: FormData = {};
 
 function pct(val: string | null) {
   if (!val) return '-';
-  const normalized = String(val).replace(',', '.');
+  const normalized = String(val).replace(',', '.').replace('%', '');
   const n = parseFloat(normalized);
   if (isNaN(n)) return val;
-  const pctVal = n > 1 ? n : n * 100;
-  return pctVal.toFixed(2).replace('.', ',') + '%';
+  // Valor já é percentual direto (ex: 0.50 = 0,50%, 1.50 = 1,50%, 55 = 55,00%)
+  return n.toFixed(2).replace('.', ',') + '%';
 }
 
 function moeda(val: string | null | undefined) {
