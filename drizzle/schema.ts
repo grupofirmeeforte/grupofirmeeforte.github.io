@@ -1383,7 +1383,9 @@ export const recados = mysqlTable('recados', {
   remetenteId: int("remetenteId").notNull(),
   remetenteNome: varchar("remetenteNome", { length: 255 }).notNull(),
   remetenteChaveJ: varchar("remetenteChaveJ", { length: 50 }),
-  destinatario: varchar("destinatario", { length: 50 }).notNull(), // ceo | admin | supervisor | suporte
+  destinatario: varchar("destinatario", { length: 50 }).notNull(), // ceo | admin | supervisor | suporte | promotor
+  destinatarioId: int("destinatarioId"), // ID do agente quando destinatario = 'promotor'
+  destinatarioNome: varchar("destinatarioNome", { length: 255 }), // Nome do agente quando destinatario = 'promotor'
   assunto: varchar("assunto", { length: 255 }),
   mensagem: text("mensagem").notNull(),
   lido: tinyint("lido").default(0).notNull(),
