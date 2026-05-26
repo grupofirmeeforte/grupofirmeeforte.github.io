@@ -12,7 +12,14 @@ type PermissoesMap = Record<string, Record<string, NivelPermissao>>;
 const MODULOS_PERMISSOES = [
   { modulo: 'meu-painel', label: 'Meu Painel', subabas: [
     { key: 'painel-agente', label: 'Meu Painel' },
-    { key: 'mensagem-do-dia', label: 'Mensagem do Dia' },
+  ]},
+  { modulo: 'mensagem-dia', label: 'Mensagem do Dia', subabas: [
+    { key: 'motivacional', label: 'Motivacional' },
+    { key: 'minutos-sabedoria', label: 'Minutos de Sabedoria' },
+    { key: 'salmos', label: 'Salmos' },
+    { key: 'versiculos', label: 'Versículos' },
+    { key: 'horoscopo', label: 'Horóscopo' },
+    { key: 'orixas', label: 'Mensagem dos Orixás' },
   ]},
   { modulo: 'cadastros', label: 'Cadastros', subabas: [
     { key: 'agentes', label: 'Agentes' },

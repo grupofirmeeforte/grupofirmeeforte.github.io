@@ -69,10 +69,12 @@ const MODULOS_PERMISSOES = [
     { key: 'relatorio-chavej', label: 'Relatório por Chave J' },
   ]},
   { modulo: 'mensagem-dia', label: 'Mensagem do Dia', subabas: [
+    { key: 'motivacional', label: 'Motivacional' },
     { key: 'minutos-sabedoria', label: 'Minutos de Sabedoria' },
     { key: 'salmos', label: 'Salmos' },
     { key: 'versiculos', label: 'Versículos' },
     { key: 'horoscopo', label: 'Horóscopo' },
+    { key: 'orixas', label: 'Mensagem dos Orixás' },
   ]},
   { modulo: 'controle-ativos', label: 'Controle Ativos', subabas: [
     { key: 'ativo-imobilizado', label: 'Ativo Imobilizado' },
