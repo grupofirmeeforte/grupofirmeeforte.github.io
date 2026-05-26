@@ -7,7 +7,7 @@ import PageHeader from "@/components/PageHeader";
 import { trpc } from "@/lib/trpc";
 
 // ─── TIPOS DE ABAS ────────────────────────────────────────────────────────────
-type Aba = 'horoscopo' | 'minutos-sabedoria' | 'motivacional' | 'salmos' | 'versiculos';
+type Aba = 'horoscopo' | 'minutos-sabedoria' | 'motivacional' | 'salmos' | 'versiculos' | 'orixas';
 
 const ABAS: { id: Aba; label: string; icon: React.ElementType; cor: string }[] = [
   { id: 'horoscopo',        label: 'Horóscopo',           icon: Star,      cor: 'bg-blue-600'   },
@@ -15,6 +15,7 @@ const ABAS: { id: Aba; label: string; icon: React.ElementType; cor: string }[] =
   { id: 'motivacional',     label: 'Motivacional',         icon: Zap,       cor: 'bg-amber-600'  },
   { id: 'salmos',           label: 'Salmos',               icon: BookOpen,  cor: 'bg-emerald-600'},
   { id: 'versiculos',       label: 'Versículos',           icon: BookMarked,cor: 'bg-rose-600'   },
+  { id: 'orixas',           label: 'Mensagem dos Orixás',  icon: Sparkles,  cor: 'bg-orange-600' },
 ];
 
 // ─── DADOS LOCAIS ─────────────────────────────────────────────────────────────
@@ -226,6 +227,205 @@ function AbaMotivacional() {
   );
 }
 
+// ─── ABA ORIXÁS ──────────────────────────────────────────────────────────────
+const ORIXAS_SEMANA = [
+  {
+    diaSemana: 0, // Domingo
+    nome: 'Oxumaré',
+    saudacao: 'Arrô Bô!',
+    elemento: 'Arco-íris e Serpente',
+    cor: '#f97316',
+    corSecundaria: '#fbbf24',
+    gradiente: 'linear-gradient(135deg, #f97316, #fbbf24)',
+    emoji: '🌈',
+    simbolo: '🐍',
+    dominio: 'Transformação, renovação e riqueza',
+    mensagem: 'Hoje é dia de renovação. Assim como o arco-íris surge após a tempestade, cada dificuldade que você supera abre espaço para novas conquistas. Renove suas metas, sua energia e sua determinação. O ciclo de abundância começa com a sua transformação interior.',
+    afirmacao: 'Eu me renovo a cada desafio e atraio prosperidade com minha perseverança.',
+  },
+  {
+    diaSemana: 1, // Segunda-feira
+    nome: 'Ogum',
+    saudacao: 'Ogum Yê!',
+    elemento: 'Ferro e Guerra',
+    cor: '#1d4ed8',
+    corSecundaria: '#3b82f6',
+    gradiente: 'linear-gradient(135deg, #1d4ed8, #3b82f6)',
+    emoji: '⚔️',
+    simbolo: '🔱',
+    dominio: 'Trabalho, abertura de caminhos e determinação',
+    mensagem: 'Ogum abre os caminhos para quem age com determinação e coragem. Na segunda-feira, o início da semana, carregue a força do guerreiro: enfrente cada cliente com confiança, desbrave novos territórios e não recue diante dos obstáculos. O sucesso pertence a quem avança.',
+    afirmacao: 'Eu abro meus próprios caminhos com trabalho, coragem e determinação.',
+  },
+  {
+    diaSemana: 2, // Terça-feira
+    nome: 'Xangô',
+    saudacao: 'Kaô Kabiesilê!',
+    elemento: 'Trovão e Fogo',
+    cor: '#b91c1c',
+    corSecundaria: '#f97316',
+    gradiente: 'linear-gradient(135deg, #b91c1c, #f97316)',
+    emoji: '⚡',
+    simbolo: '🪓',
+    dominio: 'Justiça, poder e liderança',
+    mensagem: 'Xangô é o senhor da justiça e do poder. Hoje, aja com integridade em cada negociação, seja justo com seus clientes e com você mesmo. A verdadeira liderança nasce de quem age com honestidade. Seu poder de persuasão é maior quando vem da transparência.',
+    afirmacao: 'Eu lidero com justiça e honestidade, e minha palavra tem o peso do trovão.',
+  },
+  {
+    diaSemana: 3, // Quarta-feira
+    nome: 'Oxóssi',
+    saudacao: 'Okê Arô!',
+    elemento: 'Floresta e Caça',
+    cor: '#15803d',
+    corSecundaria: '#22c55e',
+    gradiente: 'linear-gradient(135deg, #15803d, #22c55e)',
+    emoji: '🏹',
+    simbolo: '🌿',
+    dominio: 'Prosperidade, foco e conquista',
+    mensagem: 'Oxóssi é o caçador que nunca erra o alvo. Na quarta-feira, afie sua mira: identifique seus melhores prospects, foque nas oportunidades certas e não desperdice energia com o que não traz resultado. Um bom caçador conhece o terreno e escolhe o momento certo para agir.',
+    afirmacao: 'Eu miro com precisão nas minhas metas e nunca perco o foco do que é importante.',
+  },
+  {
+    diaSemana: 4, // Quinta-feira
+    nome: 'Oxalá',
+    saudacao: 'Êpa Babá!',
+    elemento: 'Paz e Criação',
+    cor: '#6b7280',
+    corSecundaria: '#e5e7eb',
+    gradiente: 'linear-gradient(135deg, #6b7280, #d1d5db)',
+    emoji: '🕊️',
+    simbolo: '🌟',
+    dominio: 'Paz, sabedoria e criação',
+    mensagem: 'Oxalá é o pai criador, senhor da paz e da sabedoria. Na quinta-feira, cultive a serenidade nas suas relações: escute mais do que fala, compreenda as necessidades do cliente antes de oferecer soluções. A venda mais poderosa nasce da conexão genuína e da paz no coração.',
+    afirmacao: 'Eu ajo com sabedoria e paz, criando conexões verdadeiras que geram resultados duradouros.',
+  },
+  {
+    diaSemana: 5, // Sexta-feira
+    nome: 'Oxum',
+    saudacao: 'Ora Yeyê Ô!',
+    elemento: 'Água Doce e Ouro',
+    cor: '#d97706',
+    corSecundaria: '#fbbf24',
+    gradiente: 'linear-gradient(135deg, #d97706, #fbbf24)',
+    emoji: '💛',
+    simbolo: '🪙',
+    dominio: 'Amor, riqueza e fertilidade',
+    mensagem: 'Oxum é a rainha das águas doces, senhora do amor e da prosperidade. Na sexta-feira, deixe fluir sua simpatia e charme natural: construa relacionamentos com seus clientes, mostre que você se importa genuinamente com o bem-estar deles. O ouro de Oxum é a confiança que você conquista.',
+    afirmacao: 'Eu fluo com leveza e charme, atraindo prosperidade e relacionamentos que florescem.',
+  },
+  {
+    diaSemana: 6, // Sábado
+    nome: 'Iemanjá',
+    saudacao: 'Odoyá!',
+    elemento: 'Mar e Maternidade',
+    cor: '#0369a1',
+    corSecundaria: '#38bdf8',
+    gradiente: 'linear-gradient(135deg, #0369a1, #38bdf8)',
+    emoji: '🌊',
+    simbolo: '🐚',
+    dominio: 'Proteção, abundância e emoções',
+    mensagem: 'Iemanjá é a mãe das águas, protetora e abundante como o mar. No sábado, reflita sobre sua semana: celebre cada conquista, aprenda com cada desafio e renove suas forças para a próxima semana. Assim como o mar nunca para, sua jornada de crescimento também não tem fim.',
+    afirmacao: 'Eu sou protegido e abundante. Cada semana me traz novas ondas de oportunidades.',
+  },
+];
+
+function AbaOrixas() {
+  const hoje = new Date();
+  const diaSemana = hoje.getDay(); // 0=Dom, 1=Seg, ..., 6=Sáb
+  const orixa = ORIXAS_SEMANA[diaSemana];
+  const [diaSelecionado, setDiaSelecionado] = useState(diaSemana);
+  const orixaExibido = ORIXAS_SEMANA[diaSelecionado];
+  const diasNomes = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+  return (
+    <div className="max-w-2xl mx-auto py-8">
+      {/* Card principal do Orixá */}
+      <Card className="border-0 shadow-2xl overflow-hidden mb-6">
+        <div className="px-8 py-4 text-center" style={{ background: orixaExibido.gradiente }}>
+          <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Mensagem dos Orixás</p>
+          <p className="text-white text-2xl font-bold mt-1">{orixaExibido.saudacao}</p>
+        </div>
+        <CardContent className="p-0">
+          {/* Cabeçalho do Orixá */}
+          <div className="p-8 pb-4" style={{ background: `${orixaExibido.cor}15` }}>
+            <div className="flex items-center gap-5">
+              <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl shadow-lg flex-shrink-0"
+                style={{ background: orixaExibido.gradiente }}>
+                {orixaExibido.emoji}
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold" style={{ color: orixaExibido.cor }}>{orixaExibido.nome}</h2>
+                <p className="text-slate-500 text-sm mt-0.5">{orixaExibido.elemento}</p>
+                <p className="text-slate-600 text-xs mt-1 font-medium">{orixaExibido.dominio}</p>
+              </div>
+              <div className="ml-auto text-4xl">{orixaExibido.simbolo}</div>
+            </div>
+          </div>
+          {/* Mensagem */}
+          <div className="px-8 py-6 bg-white">
+            <div className="w-full h-0.5 rounded-full mb-5" style={{ background: orixaExibido.gradiente }} />
+            <p className="text-slate-700 text-base leading-relaxed">{orixaExibido.mensagem}</p>
+            <div className="mt-6 p-4 rounded-xl border-l-4" style={{ borderColor: orixaExibido.cor, background: `${orixaExibido.cor}10` }}>
+              <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: orixaExibido.cor }}>Afirmação do Dia</p>
+              <p className="text-slate-700 font-medium italic">"{orixaExibido.afirmacao}"</p>
+            </div>
+            <div className="mt-6 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                {diaSelecionado === diaSemana && (
+                  <span className="text-xs px-2 py-1 rounded-full font-medium text-white" style={{ background: orixaExibido.cor }}>
+                    Hoje
+                  </span>
+                )}
+                <span className="text-xs text-slate-400">
+                  {diasNomes[diaSelecionado] === diasNomes[diaSemana] ? hoje.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) : `${['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][diaSelecionado]}`}
+                </span>
+              </div>
+              <Button variant="outline" size="sm" className="gap-2 text-slate-600"
+                onClick={() => {
+                  const txt = `${orixaExibido.saudacao}\n\n${orixaExibido.nome} — ${orixaExibido.dominio}\n\n${orixaExibido.mensagem}\n\nAfirmação: "${orixaExibido.afirmacao}"`;
+                  if (navigator.share) navigator.share({ text: txt });
+                  else navigator.clipboard.writeText(txt);
+                }}>
+                <Share2 className="w-4 h-4" /> Compartilhar
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Seletor de dias da semana */}
+      <div className="bg-white rounded-2xl shadow-md p-4">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 text-center">Ver outros dias</p>
+        <div className="grid grid-cols-7 gap-1">
+          {ORIXAS_SEMANA.map((o, idx) => (
+            <button
+              key={idx}
+              onClick={() => setDiaSelecionado(idx)}
+              className={`flex flex-col items-center p-2 rounded-xl border-2 transition-all ${
+                diaSelecionado === idx
+                  ? 'border-current shadow-md scale-105'
+                  : idx === diaSemana
+                  ? 'border-dashed opacity-80'
+                  : 'border-gray-100 hover:border-gray-300 opacity-60 hover:opacity-100'
+              }`}
+              style={diaSelecionado === idx ? { borderColor: o.cor, background: `${o.cor}15`, color: o.cor } : {}}
+            >
+              <span className="text-lg">{o.emoji}</span>
+              <span className="text-xs font-medium mt-0.5" style={diaSelecionado === idx ? { color: o.cor } : { color: '#64748b' }}>
+                {diasNomes[idx]}
+              </span>
+              {idx === diaSemana && (
+                <span className="text-xs font-bold" style={{ color: o.cor }}>•</span>
+              )}
+            </button>
+          ))}
+        </div>
+        <p className="text-center text-slate-400 text-xs mt-3">• indica o dia de hoje</p>
+      </div>
+    </div>
+  );
+}
+
 // ─── ABA HORÓSCOPO ────────────────────────────────────────────────────────────
 function AbaHoroscopo() {
   const [signoSelecionado, setSignoSelecionado] = useState("");
@@ -340,6 +540,7 @@ export default function MensagemDoDiaHub() {
         {aba === 'motivacional'      && <AbaMotivacional />}
         {aba === 'salmos'            && <AbaSalmos />}
         {aba === 'versiculos'        && <AbaVersiculos />}
+        {aba === 'orixas'            && <AbaOrixas />}
       </div>
     </div>
   );
