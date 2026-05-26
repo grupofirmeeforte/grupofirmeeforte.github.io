@@ -103,6 +103,10 @@ export default function AgentesFormPage() {
   const agenteId = params?.id ? parseInt(params.id) : null;
   const { user: currentUser } = useAuth();
   const isAdmin = (currentUser as any)?.permissoes === 'admin' || (currentUser as any)?.cargo === 'CEO' || (currentUser as any)?.cargo === 'ADM' || (currentUser as any)?.cargo === 'Admin';
+  // Somente estes dois agentes podem alterar permissões de acesso
+  const AUTORIZADOS_PERMISSOES = ['SIDNEI HONORATO ULTRAMARE', 'THIAGO VIANA ULTRAMARE'];
+  const nomeUsuarioAtual = ((currentUser as any)?.nomeAgente || '').toUpperCase().trim();
+  const podeEditarPermissoes = AUTORIZADOS_PERMISSOES.includes(nomeUsuarioAtual);
 
   const [formData, setFormData] = useState({
     numCadastro: "",
@@ -272,8 +276,8 @@ export default function AgentesFormPage() {
       // Garantir que campos obrigatórios estejam presentes
       normalizedData.chaveJ = formData.chaveJ;
       normalizedData.nomeAgente = formData.nomeAgente;
-      // Incluir permissoesModulos como JSON string (apenas admin pode alterar)
-      if (isAdmin) {
+      // Incluir permissoesModulos como JSON string (apenas autorizados podem alterar)
+      if (podeEditarPermissoes) {
         normalizedData.permissoesModulos = JSON.stringify(permissoesModulos);
         normalizedData.permissoes = formData.permissoes;
       }
@@ -745,8 +749,8 @@ export default function AgentesFormPage() {
           </CardContent>
         </Card>
 
-        {/* Seção de Permissões — visível apenas para admin */}
-        {isAdmin && (
+        {/* Seção de Permissões — visível apenas para Sidnei Honorato Ultramare e Thiago Viana Ultramare */}
+        {podeEditarPermissoes && (
           <Card className="border-2 border-indigo-200 bg-indigo-50/30">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-indigo-800">
