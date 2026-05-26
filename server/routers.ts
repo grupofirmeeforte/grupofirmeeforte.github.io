@@ -30,6 +30,7 @@ import { webauthnRouter } from "./routers/webauthn";
 import { backupRouter } from "./routers/backup";
 import { mailingCrmRouter } from "./routers/mailingCrm";
 import { cargoPermissoesRouter } from "./routers/cargoPermissoes";
+import { loginRapidoRouter } from "./routers/loginRapido";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
 import { users, agentes, despesasFixas, pagamentos } from "../drizzle/schema";
@@ -367,6 +368,7 @@ export const appRouter = router({
   }),
   agentes: agentesRouter,
   cargoPermissoes: cargoPermissoesRouter,
+  loginRapido: loginRapidoRouter,
   crm: crmRouter,
   mailingCrm: mailingCrmRouter,
   despesasFixas: despesasFixasRouter,

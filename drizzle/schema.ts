@@ -75,6 +75,7 @@ export const agentes = mysqlTable('agentes', {
   pix: varchar("pix", { length: 255 }),
   dataNascimento: varchar("dataNascimento", { length: 10 }), // YYYY-MM-DD format
   celular: varchar("celular", { length: 20 }),
+  pinAcesso: varchar("pinAcesso", { length: 10 }),   // PIN de 4-6 dígitos para acesso rápido
   permissoes: varchar("permissoes", { length: 50 }).default("leitor"), // admin, editor, leitor, sem_acesso
   permissoesModulos: text("permissoesModulos"), // JSON com permissoes por sub-aba: {modulo: {subaba: nivel}}
   signo: varchar("signo", { length: 20 }), // signo zodiacal para horóscopo diário
@@ -1349,3 +1350,25 @@ export const cargoPermissoes = mysqlTable('cargo_permissoes', {
 
 export type CargoPermissao = typeof cargoPermissoes.$inferSelect;
 export type InsertCargoPermissao = typeof cargoPermissoes.$inferInsert;
+
+/**
+ * Tabela de Períodos Travados
+ * Registra quais meses estão travados para edição em cada módulo de produção.
+ * Todo dia 25 do mês corrente, o mês anterior (e todos os anteriores) são travados.
+ * Módulos: consignado, consorcio, conta_corrente, ourocap, seguros, bbdental, producao
+ */
+export const periodosTravados = mysqlTable('periodos_travados', {
+  id: int("id").autoincrement().primaryKey(),
+  mesAno: varchar("mesAno", { length: 7 }).notNull(),    // MM/AAAA
+  modulo: varchar("modulo", { length: 50 }).notNull(),   // consignado | consorcio | conta_corrente | ourocap | seguros | bbdental | producao | todos
+  travadoPor: varchar("travadoPor", { length: 100 }),    // ChaveJ ou 'sistema'
+  travadoEm: timestamp("travadoEm").defaultNow().notNull(),
+  destravadoPor: varchar("destravadoPor", { length: 100 }), // ChaveJ de quem destravou (se desbloqueado manualmente)
+  destravadoEm: timestamp("destravadoEm"),
+  ativo: tinyint("ativo").default(1).notNull(),          // 1=travado, 0=destravado
+}, (table) => ({
+  mesAnoModuloIdx: index("idx_periodos_travados_mesAno_modulo").on(table.mesAno, table.modulo),
+  ativoIdx: index("idx_periodos_travados_ativo").on(table.ativo),
+}));
+export type PeriodoTravado = typeof periodosTravados.$inferSelect;
+export type InsertPeriodoTravado = typeof periodosTravados.$inferInsert;

@@ -4,13 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { trpc } from '@/lib/trpc';
-import { AlertCircle, Lock, RefreshCw, Fingerprint, ScanFace, ChevronDown, ChevronUp } from 'lucide-react';
+import { AlertCircle, Lock, RefreshCw, Smartphone, KeyRound, ChevronDown, ChevronUp } from 'lucide-react';
 import type { TRPCClientErrorLike } from '@trpc/client';
-import {
-  startRegistration,
-  startAuthentication,
-  browserSupportsWebAuthn,
-} from '@simplewebauthn/browser';
 
 // ── CAPTCHA matemático ───────────────────────────────────────────────────────
 function gerarOperacao() {
@@ -57,7 +52,6 @@ function BalloonCanvas() {
       stringLen: number;
     }[] = [];
 
-    // Criar 35 balões
     for (let i = 0; i < 35; i++) {
       balloons.push({
         x: Math.random() * canvas.width,
@@ -80,44 +74,27 @@ function BalloonCanvas() {
       balloons.forEach(b => {
         b.y -= b.speed;
         const bx = b.x + Math.sin(frame * b.swaySpeed + b.swayOffset) * b.sway;
-
-        // Sombra suave
         ctx.shadowColor = 'rgba(0,0,0,0.18)';
         ctx.shadowBlur = 8;
-
-        // Corpo do balão (elipse)
         ctx.beginPath();
         ctx.ellipse(bx, b.y, b.r, b.r * 1.22, 0, 0, Math.PI * 2);
         ctx.fillStyle = b.color;
         ctx.fill();
-
-        // Brilho
         ctx.shadowBlur = 0;
-        const grad = ctx.createRadialGradient(
-          bx - b.r * 0.3, b.y - b.r * 0.4, b.r * 0.05,
-          bx, b.y, b.r
-        );
+        const grad = ctx.createRadialGradient(bx - b.r * 0.3, b.y - b.r * 0.4, b.r * 0.05, bx, b.y, b.r);
         grad.addColorStop(0, 'rgba(255,255,255,0.55)');
         grad.addColorStop(1, 'rgba(255,255,255,0)');
         ctx.beginPath();
         ctx.ellipse(bx, b.y, b.r, b.r * 1.22, 0, 0, Math.PI * 2);
         ctx.fillStyle = grad;
         ctx.fill();
-
-        // Nozinho
         ctx.beginPath();
         ctx.arc(bx, b.y + b.r * 1.22, 4, 0, Math.PI * 2);
         ctx.fillStyle = b.color;
         ctx.fill();
-
-        // Fio
         ctx.beginPath();
         ctx.moveTo(bx, b.y + b.r * 1.22 + 4);
-        ctx.bezierCurveTo(
-          bx + 8, b.y + b.r * 1.22 + b.stringLen * 0.4,
-          bx - 8, b.y + b.r * 1.22 + b.stringLen * 0.7,
-          bx, b.y + b.r * 1.22 + b.stringLen
-        );
+        ctx.bezierCurveTo(bx + 8, b.y + b.r * 1.22 + b.stringLen * 0.4, bx - 8, b.y + b.r * 1.22 + b.stringLen * 0.7, bx, b.y + b.r * 1.22 + b.stringLen);
         ctx.strokeStyle = 'rgba(180,180,180,0.7)';
         ctx.lineWidth = 1.2;
         ctx.stroke();
@@ -128,33 +105,11 @@ function BalloonCanvas() {
     return () => cancelAnimationFrame(animId);
   }, []);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 50 }}
-    />
-  );
+  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none" style={{ zIndex: 50 }} />;
 }
 
-// ── Detectar suporte WebAuthn ────────────────────────────────────────────────
-function useWebAuthnSupport() {
-  const [supported, setSupported] = useState(false);
-  const [platformAvailable, setPlatformAvailable] = useState(false);
-
-  useEffect(() => {
-    if (!browserSupportsWebAuthn()) return;
-    setSupported(true);
-    // Verificar se há autenticador de plataforma (face/digital)
-    if (window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable) {
-      window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
-        .then(setPlatformAvailable)
-        .catch(() => setPlatformAvailable(false));
-    }
-  }, []);
-
-  return { supported, platformAvailable };
-}
+// ── Tipo de acesso rápido ────────────────────────────────────────────────────
+type MetodoRapido = 'celular' | 'pin';
 
 export default function Login() {
   const [chaveJ, setChaveJ] = useState('');
@@ -176,27 +131,32 @@ export default function Login() {
   const [respostaMath, setRespostaMath] = useState('');
   const [mathError, setMathError] = useState(false);
 
-  // Biometria
-  const { supported: webAuthnSupported, platformAvailable } = useWebAuthnSupport();
-  const [bioChaveJ, setBioChaveJ] = useState('');
-  const [bioSenha, setBioSenha] = useState('');
-  // Sincronizar bioChaveJ com chaveJ do formulário principal automaticamente
-  useEffect(() => { if (chaveJ.trim().length >= 4) setBioChaveJ(chaveJ.trim().toUpperCase()); }, [chaveJ]);
-  useEffect(() => { if (senha.trim().length >= 3) setBioSenha(senha.trim()); }, [senha]);
-  const [bioStatus, setBioStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [bioMessage, setBioMessage] = useState('');
-  const [showBioSection, setShowBioSection] = useState(true);
+  // ── Acesso Rápido (Celular / PIN) ────────────────────────────────────────
+  const [showRapidoSection, setShowRapidoSection] = useState(true);
+  const [metodoRapido, setMetodoRapido] = useState<MetodoRapido>('celular');
+  const [rapidoChaveJ, setRapidoChaveJ] = useState('');
+  const [digitosCelular, setDigitosCelular] = useState('');
+  const [pinDigitado, setPinDigitado] = useState('');
+  const [rapidoStatus, setRapidoStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [rapidoMessage, setRapidoMessage] = useState('');
 
-  // Verificar se o usuário já tem biometria cadastrada (ao digitar chaveJ)
-  const hasBiometriaQuery = trpc.webauthn.hasBiometria.useQuery(
-    { chaveJ: bioChaveJ },
-    { enabled: bioChaveJ.length >= 4, staleTime: 30000 }
+  // Sincronizar chaveJ do formulário principal com o campo de acesso rápido
+  useEffect(() => {
+    if (chaveJ.trim().length >= 4) setRapidoChaveJ(chaveJ.trim().toUpperCase());
+  }, [chaveJ]);
+
+  // Buscar métodos disponíveis para a ChaveJ digitada
+  const metodosQuery = trpc.loginRapido.verificarMetodos.useQuery(
+    { chaveJ: rapidoChaveJ },
+    { enabled: rapidoChaveJ.length >= 4, staleTime: 30000 }
   );
+
+  const loginCelularMutation = trpc.loginRapido.loginCelular.useMutation();
+  const loginPinMutation = trpc.loginRapido.loginPin.useMutation();
 
   const loginMutation = trpc.auth.loginCustom.useMutation({
     onSuccess: (data) => {
       setWelcomeData({ nome: data.agente.nome || '', isAniversario: data.isAniversario });
-      // Aniversário: 13s (10s balões + 3s leitura da mensagem), normal: 3s
       const delay = data.isAniversario ? 13000 : 3000;
       setTimeout(() => setLocation('/'), delay);
     },
@@ -220,11 +180,6 @@ export default function Login() {
     },
   });
 
-  const registrationOptionsMutation = trpc.webauthn.registrationOptions.useMutation();
-  const registrationVerifyMutation = trpc.webauthn.registrationVerify.useMutation();
-  const authenticationOptionsMutation = trpc.webauthn.authenticationOptions.useMutation();
-  const authenticationVerifyMutation = trpc.webauthn.authenticationVerify.useMutation();
-
   const renovarOperacao = useCallback(() => {
     setOperacao(gerarOperacao());
     setRespostaMath('');
@@ -245,19 +200,14 @@ export default function Login() {
     document.cookie = 'app_session_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     document.cookie = 'sessionId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 
-    // Se isento de geo, faz login direto
     if (isIsentoGeo) {
       loginMutation.mutate({ chaveJ, senha });
       return;
     }
-
-    // Verificar se geo já foi capturada
     if (geoCoords) {
       loginMutation.mutate({ chaveJ, senha, latitude: geoCoords.latitude, longitude: geoCoords.longitude });
       return;
     }
-
-    // Solicitar geolocalização antes do login
     if (!navigator.geolocation) {
       setGeoStatus('unavailable');
       setError('Geolocalização não suportada neste navegador. Acesso bloqueado.');
@@ -266,10 +216,7 @@ export default function Login() {
     setGeoStatus('requesting');
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const coords = {
-          latitude: String(pos.coords.latitude),
-          longitude: String(pos.coords.longitude),
-        };
+        const coords = { latitude: String(pos.coords.latitude), longitude: String(pos.coords.longitude) };
         setGeoCoords(coords);
         setGeoStatus('granted');
         loginMutation.mutate({ chaveJ, senha, latitude: coords.latitude, longitude: coords.longitude });
@@ -282,73 +229,40 @@ export default function Login() {
     );
   };
 
-  // ── Cadastrar biometria (após login normal) ──────────────────────────────
-  const handleRegistrarBiometria = async () => {
-    if (!bioChaveJ) { setBioMessage('Digite sua ChaveJ para cadastrar a biometria.'); setBioStatus('error'); return; }
-    if (!bioSenha) { setBioMessage('Digite sua senha para confirmar o cadastro biométrico.'); setBioStatus('error'); return; }
-    setBioStatus('loading');
-    setBioMessage('Aguarde, preparando cadastro biométrico...');
+  // ── Handler de acesso rápido ─────────────────────────────────────────────
+  const handleAcessoRapido = async () => {
+    if (!rapidoChaveJ) { setRapidoMessage('Digite sua ChaveJ.'); setRapidoStatus('error'); return; }
+    setRapidoStatus('loading');
+    setRapidoMessage('');
     try {
-      const deviceName = navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad')
-        ? 'iPhone/iPad' : navigator.userAgent.includes('Android') ? 'Android'
-        : navigator.userAgent.includes('Mac') ? 'Mac' : 'Computador';
-      const options = await registrationOptionsMutation.mutateAsync({
-        chaveJ: bioChaveJ,
-        senha: bioSenha,
-        origin: window.location.origin,
-        deviceName,
-      });
-      setBioMessage('Siga as instruções do seu dispositivo para registrar a biometria...');
-      const attResp = await startRegistration({ optionsJSON: options });
-      await registrationVerifyMutation.mutateAsync({
-        chaveJ: bioChaveJ,
-        response: attResp,
-        origin: window.location.origin,
-      });
-      setBioStatus('success');
-      setBioMessage('Biometria cadastrada! Na próxima vez, use o botão "Entrar com Biometria".');
-    } catch (e: any) {
-      setBioStatus('error');
-      if (e.name === 'NotAllowedError') {
-        setBioMessage('Cadastro cancelado. Tente novamente e siga as instruções do dispositivo.');
-      } else if (e.name === 'InvalidStateError') {
-        setBioMessage('Este dispositivo já está cadastrado para esta conta.');
-      } else {
-        const msg = (e.message || '') as string;
-        if (msg.includes('Senha incorreta')) {
-          setBioMessage('Senha incorreta. Verifique e tente novamente.');
-        } else if (msg.includes('não encontrado')) {
-          setBioMessage('ChaveJ não encontrada. Verifique e tente novamente.');
-        } else {
-          setBioMessage(msg || 'Erro ao cadastrar biometria. Tente novamente.');
+      let data: any;
+      if (metodoRapido === 'celular') {
+        if (!digitosCelular || digitosCelular.length !== 4) {
+          setRapidoMessage('Digite os 4 últimos dígitos do seu celular.'); setRapidoStatus('error'); return;
         }
-      }
-    }
-  };
-
-  // ── Entrar com biometria ─────────────────────────────────────────────────
-  const handleLoginBiometria = async () => {
-    if (!bioChaveJ) { setBioMessage('Digite sua ChaveJ primeiro.'); setBioStatus('error'); return; }
-    setBioStatus('loading');
-    setBioMessage('Aguarde, verificando biometria...');
-    try {
-      const options = await authenticationOptionsMutation.mutateAsync({ chaveJ: bioChaveJ, origin: window.location.origin });
-      const authResp = await startAuthentication({ optionsJSON: options });
-      await authenticationVerifyMutation.mutateAsync({
-        chaveJ: bioChaveJ,
-        response: authResp,
-        origin: window.location.origin,
-        userAgent: navigator.userAgent,
-      });
-      setBioStatus('success');
-      setBioMessage('✅ Biometria verificada! Entrando...');
-      setTimeout(() => setLocation('/'), 1500);
-    } catch (e: any) {
-      setBioStatus('error');
-      if (e.name === 'NotAllowedError') {
-        setBioMessage('Biometria cancelada ou não reconhecida. Tente novamente.');
+        data = await loginCelularMutation.mutateAsync({ chaveJ: rapidoChaveJ, digitosCelular });
       } else {
-        setBioMessage(e.message || 'Falha na autenticação biométrica.');
+        if (!pinDigitado || pinDigitado.length < 4) {
+          setRapidoMessage('Digite seu PIN (4 a 6 dígitos).'); setRapidoStatus('error'); return;
+        }
+        data = await loginPinMutation.mutateAsync({ chaveJ: rapidoChaveJ, pin: pinDigitado });
+      }
+      setRapidoStatus('success');
+      setRapidoMessage('Acesso confirmado! Entrando...');
+      setWelcomeData({ nome: data.agente.nome || '', isAniversario: data.isAniversario });
+      const delay = data.isAniversario ? 13000 : 3000;
+      setTimeout(() => setLocation('/'), delay);
+    } catch (e: any) {
+      setRapidoStatus('error');
+      const msg = e.message || '';
+      if (msg.includes('bloqueado')) {
+        setRapidoMessage('Sistema bloqueado após 3 tentativas. Contate o administrador.');
+      } else if (msg.includes('incorretos') || msg.includes('incorreto') || msg.includes('inválid')) {
+        setRapidoMessage(msg);
+      } else if (msg.includes('não cadastrado')) {
+        setRapidoMessage(msg);
+      } else {
+        setRapidoMessage(msg || 'Erro ao verificar. Tente novamente.');
       }
     }
   };
@@ -359,14 +273,12 @@ export default function Login() {
 
   useEffect(() => {
     if (!welcomeData?.isAniversario) return;
-    // Após 10s, esconder balões e mostrar mensagem
     const t1 = setTimeout(() => setShowBalloons(false), 10000);
     const t2 = setTimeout(() => setShowMessage(true), 10200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [welcomeData?.isAniversario]);
 
   if (welcomeData) {
-    // Redirecionar: 13s para aniversário (10s balões + 3s leitura), 3s para normal
     return (
       <div
         className="min-h-screen flex items-center justify-center relative overflow-hidden"
@@ -376,83 +288,56 @@ export default function Login() {
         }}
       >
         <div className="absolute inset-0 bg-black/55" />
-
-        {/* Balões animados — apenas no aniversário, durante 10s */}
         {welcomeData.isAniversario && showBalloons && <BalloonCanvas />}
-
         <Card
           className="relative w-full max-w-lg bg-white shadow-2xl animate-in fade-in zoom-in duration-500"
-          style={{ zIndex: 60 }}
+          style={{ borderRadius: '1.5rem', padding: '2.5rem', textAlign: 'center', zIndex: 10 }}
         >
-          <div className="p-10 text-center">
-            {welcomeData.isAniversario ? (
-              <>
-                {/* Durante balões: mostrar só contagem regressiva animada */}
-                {showBalloons && !showMessage && (
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="text-7xl animate-bounce">🎈</div>
-                    <h2 className="text-3xl font-bold text-gray-900">🎂 Feliz Aniversário!</h2>
-                    <p className="text-xl text-gray-700">
-                      Parabéns, <span className="font-bold text-blue-800">{welcomeData.nome}</span>!
-                    </p>
-                    <p className="text-4xl">🎉 🎊 🎈 🎁 🎂</p>
-                  </div>
-                )}
-
-                {/* Após 10s: mensagem completa com fade-in */}
-                {showMessage && (
-                  <div
-                    className="animate-in fade-in duration-700"
-                    style={{ animationFillMode: 'both' }}
-                  >
-                    <div className="flex justify-center mb-4">
-                      <img src="/manus-storage/logo-firme-forte-v2_bac9b5e6.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
-                    </div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-2">🎂 Feliz Aniversário!</h2>
-                    <p className="text-xl text-gray-700 mb-4">
-                      Parabéns, <span className="font-bold text-blue-800">{welcomeData.nome}</span>!
-                    </p>
-                    <p className="text-gray-500 mb-6">Que este novo ano seja repleto de conquistas e sucesso! 🎉</p>
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                      <p className="text-yellow-800 font-medium">🌟 Hoje é o seu dia especial! Seja muito bem-vindo(a) ao sistema.</p>
-                    </div>
-                    <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                      Redirecionando para o sistema...
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <div className="flex justify-center mb-4">
-                  <img src="/manus-storage/logo-firme-forte-v2_bac9b5e6.png" alt="Grupo Firme & Forte" className="w-24 h-24 object-contain" />
+          {welcomeData.isAniversario ? (
+            <>
+              <div className="text-6xl mb-4">🎂</div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                Feliz Aniversário, {welcomeData.nome.split(' ')[0]}!
+              </h2>
+              {showMessage && (
+                <div className="animate-in fade-in duration-700">
+                  <p className="text-gray-600 text-lg mb-4">
+                    Que este novo ano seja repleto de conquistas, saúde e muito sucesso!
+                  </p>
+                  <p className="text-blue-700 font-semibold">
+                    Com carinho, toda a equipe Grupo Firme & Forte 💙
+                  </p>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">Seja bem-vindo(a)!</h2>
-                <p className="text-xl text-gray-700 mb-4">Olá, <span className="font-bold text-blue-800">{welcomeData.nome}</span>! 👋</p>
-                <p className="text-gray-500 mb-6">Você entrou no sistema com sucesso. Tenha um ótimo dia de trabalho!</p>
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-                  <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                  Redirecionando para o sistema...
-                </div>
-              </>
-            )}
-          </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="text-5xl mb-4">👋</div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                Bem-vindo, {welcomeData.nome.split(' ')[0]}!
+              </h2>
+              <p className="text-gray-500">Carregando o sistema...</p>
+            </>
+          )}
         </Card>
       </div>
     );
   }
 
+  // ── Tela de login ────────────────────────────────────────────────────────
   return (
     <div
-      className="min-h-screen flex items-center justify-end p-6 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center relative overflow-hidden"
       style={{
         backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663564665591/SMgJn6AGQCNfDq7mPzPqc9/coban-bg-972o7wqxPoimymB3vuTFrF.webp')`,
         backgroundSize: 'cover', backgroundPosition: 'center',
       }}
     >
-      <div className="absolute inset-0 bg-black/50" />
-      <Card className="relative z-10 w-full max-w-md bg-white shadow-2xl">
+      <div className="absolute inset-0 bg-black/55" />
+      <Card
+        className="relative w-full max-w-md bg-white shadow-2xl"
+        style={{ borderRadius: '1.5rem', zIndex: 10, maxHeight: '95vh', overflowY: 'auto' }}
+      >
         <div className="p-8">
           {/* Logo */}
           <div className="text-center mb-6">
@@ -463,124 +348,152 @@ export default function Login() {
             <p className="text-gray-600 text-sm">Sistema de Gestão</p>
           </div>
 
-          {/* ── SEÇÃO BIOMETRIA ─────────────────────────────────────────── */}
-          {webAuthnSupported && platformAvailable && (
-            <div className="mb-5">
-              <button
-                type="button"
-                onClick={() => setShowBioSection(v => !v)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors text-blue-800 font-medium text-sm"
-              >
-                <span className="flex items-center gap-2">
-                  <Fingerprint className="w-5 h-5" />
-                  <ScanFace className="w-5 h-5" />
-                  Entrar com Digital ou Reconhecimento Facial
-                </span>
-                {showBioSection ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </button>
+          {/* ── SEÇÃO ACESSO RÁPIDO ─────────────────────────────────────── */}
+          <div className="mb-5">
+            <button
+              type="button"
+              onClick={() => setShowRapidoSection(v => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors text-blue-800 font-medium text-sm"
+            >
+              <span className="flex items-center gap-2">
+                <Smartphone className="w-5 h-5" />
+                <KeyRound className="w-5 h-5" />
+                Acesso Rápido (Celular ou PIN)
+              </span>
+              {showRapidoSection ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
 
-              {showBioSection && (
-                <div className="mt-3 p-4 border border-blue-200 rounded-xl bg-blue-50 space-y-3">
+            {showRapidoSection && (
+              <div className="mt-3 p-4 border border-blue-200 rounded-xl bg-blue-50 space-y-3">
 
-                  {/* Campo ChaveJ — exibido apenas quando não veio do formulário principal */}
-                  {!bioChaveJ ? (
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Sua ChaveJ</label>
-                      <Input
-                        type="text"
-                        placeholder="Digite sua ChaveJ"
-                        value={bioChaveJ}
-                        onChange={(e) => { setBioChaveJ(e.target.value.toUpperCase()); setBioStatus('idle'); setBioMessage(''); }}
-                        className="w-full text-sm"
-                        autoComplete="off"
-                      />
-                    </div>
-                  ) : (
-                    <div className="text-xs text-blue-700 bg-blue-100 rounded-lg px-3 py-2 font-medium">
-                      ChaveJ: <span className="font-bold">{bioChaveJ}</span>
-                    </div>
-                  )}
-
-                  {/* Campo senha — exibido apenas quando não veio do formulário principal */}
-                  {!bioSenha && (
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Senha (para cadastrar biometria)</label>
-                      <Input
-                        type="password"
-                        placeholder="Digite sua senha"
-                        value={bioSenha}
-                        onChange={(e) => { setBioSenha(e.target.value); setBioStatus('idle'); setBioMessage(''); }}
-                        className="w-full text-sm"
-                        autoComplete="off"
-                      />
-                    </div>
-                  )}
-
-                  {/* Mensagem de status */}
-                  {bioMessage && (
-                    <div className={`text-xs px-3 py-2 rounded-lg ${
-                      bioStatus === 'success' ? 'bg-green-100 text-green-800' :
-                      bioStatus === 'error' ? 'bg-red-100 text-red-800' :
-                      'bg-blue-100 text-blue-800'
-                    }`}>
-                      {bioMessage}
-                    </div>
-                  )}
-
-                  <div className="flex gap-2">
-                    {/* Botão entrar com biometria */}
-                    {hasBiometriaQuery.data && (
-                      <Button
-                        type="button"
-                        onClick={handleLoginBiometria}
-                        disabled={bioStatus === 'loading' || !bioChaveJ}
-                        className="flex-1 flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm py-2"
-                      >
-                        {bioStatus === 'loading' && authenticationOptionsMutation.isPending ? (
-                          <span className="animate-spin">⏳</span>
-                        ) : (
-                          <>
-                            <Fingerprint className="w-4 h-4" />
-                            <ScanFace className="w-4 h-4" />
-                          </>
-                        )}
-                        Entrar com Biometria
-                      </Button>
-                    )}
-
-                    {/* Botão cadastrar biometria */}
-                    <Button
-                      type="button"
-                      onClick={handleRegistrarBiometria}
-                      disabled={bioStatus === 'loading' || !bioChaveJ}
-                      variant="outline"
-                      className="flex-1 flex items-center justify-center gap-2 border-blue-300 text-blue-700 hover:bg-blue-100 text-sm py-2"
-                    >
-                      {bioStatus === 'loading' && registrationOptionsMutation.isPending ? (
-                        <span className="animate-spin">⏳</span>
-                      ) : (
-                        <Fingerprint className="w-4 h-4" />
-                      )}
-                      {hasBiometriaQuery.data ? 'Adicionar Dispositivo' : 'Cadastrar Biometria'}
-                    </Button>
+                {/* ChaveJ */}
+                {!rapidoChaveJ ? (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">Sua ChaveJ</label>
+                    <Input
+                      type="text"
+                      placeholder="Digite sua ChaveJ"
+                      value={rapidoChaveJ}
+                      onChange={(e) => { setRapidoChaveJ(e.target.value.toUpperCase()); setRapidoStatus('idle'); setRapidoMessage(''); }}
+                      className="w-full text-sm"
+                      autoComplete="off"
+                    />
                   </div>
+                ) : (
+                  <div className="text-xs text-blue-700 bg-blue-100 rounded-lg px-3 py-2 font-medium flex items-center justify-between">
+                    <span>ChaveJ: <span className="font-bold">{rapidoChaveJ}</span></span>
+                    {metodosQuery.data && (
+                      <span className="text-blue-500 text-xs">
+                        {metodosQuery.data.temCelular && metodosQuery.data.temPin ? '📱 + 🔑' :
+                         metodosQuery.data.temCelular ? '📱 celular' :
+                         metodosQuery.data.temPin ? '🔑 PIN' : ''}
+                      </span>
+                    )}
+                  </div>
+                )}
 
-                  <p className="text-xs text-gray-400 text-center">
-                    Sua biometria nunca sai do dispositivo. Apenas uma chave criptográfica é armazenada.
-                  </p>
+                {/* Seletor de método */}
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { setMetodoRapido('celular'); setRapidoStatus('idle'); setRapidoMessage(''); }}
+                    className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                      metodoRapido === 'celular'
+                        ? 'bg-blue-700 text-white border-blue-700'
+                        : 'bg-white text-blue-700 border-blue-300 hover:bg-blue-50'
+                    }`}
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    Celular
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setMetodoRapido('pin'); setRapidoStatus('idle'); setRapidoMessage(''); }}
+                    className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium border transition-colors ${
+                      metodoRapido === 'pin'
+                        ? 'bg-blue-700 text-white border-blue-700'
+                        : 'bg-white text-blue-700 border-blue-300 hover:bg-blue-50'
+                    }`}
+                  >
+                    <KeyRound className="w-3.5 h-3.5" />
+                    PIN
+                  </button>
                 </div>
-              )}
-            </div>
-          )}
+
+                {/* Campo de entrada conforme método */}
+                {metodoRapido === 'celular' ? (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Últimos 4 dígitos do celular
+                      {metodosQuery.data?.celularMascarado && (
+                        <span className="text-blue-600 ml-1">({metodosQuery.data.celularMascarado})</span>
+                      )}
+                    </label>
+                    <Input
+                      type="tel"
+                      inputMode="numeric"
+                      placeholder="Ex: 1234"
+                      maxLength={4}
+                      value={digitosCelular}
+                      onChange={(e) => { setDigitosCelular(e.target.value.replace(/\D/g, '').slice(0, 4)); setRapidoStatus('idle'); setRapidoMessage(''); }}
+                      className="w-full text-sm tracking-widest text-center text-lg font-bold"
+                      autoComplete="off"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Digite os 4 últimos dígitos do celular cadastrado no seu perfil.</p>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1">PIN de acesso (4 a 6 dígitos)</label>
+                    <Input
+                      type="password"
+                      inputMode="numeric"
+                      placeholder="••••"
+                      maxLength={6}
+                      value={pinDigitado}
+                      onChange={(e) => { setPinDigitado(e.target.value.replace(/\D/g, '').slice(0, 6)); setRapidoStatus('idle'); setRapidoMessage(''); }}
+                      className="w-full text-sm tracking-widest text-center text-lg font-bold"
+                      autoComplete="off"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">PIN cadastrado no seu perfil. Não tem PIN? Entre com senha e cadastre em Configurações.</p>
+                  </div>
+                )}
+
+                {/* Mensagem de status */}
+                {rapidoMessage && (
+                  <div className={`text-xs px-3 py-2 rounded-lg ${
+                    rapidoStatus === 'success' ? 'bg-green-100 text-green-800' :
+                    rapidoStatus === 'error' ? 'bg-red-100 text-red-800' :
+                    'bg-blue-100 text-blue-800'
+                  }`}>
+                    {rapidoMessage}
+                  </div>
+                )}
+
+                <Button
+                  type="button"
+                  onClick={handleAcessoRapido}
+                  disabled={rapidoStatus === 'loading' || !rapidoChaveJ}
+                  className="w-full flex items-center justify-center gap-2 bg-blue-700 hover:bg-blue-800 text-white text-sm py-2"
+                >
+                  {rapidoStatus === 'loading' ? (
+                    <span className="animate-spin">⏳</span>
+                  ) : metodoRapido === 'celular' ? (
+                    <Smartphone className="w-4 h-4" />
+                  ) : (
+                    <KeyRound className="w-4 h-4" />
+                  )}
+                  {rapidoStatus === 'loading' ? 'Verificando...' : 'Entrar com Acesso Rápido'}
+                </Button>
+              </div>
+            )}
+          </div>
 
           {/* ── DIVISOR ─────────────────────────────────────────────────── */}
-          {webAuthnSupported && platformAvailable && (
-            <div className="flex items-center gap-3 mb-5">
-              <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-xs text-gray-400">ou entre com senha</span>
-              <div className="flex-1 h-px bg-gray-200" />
-            </div>
-          )}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400">ou entre com senha</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
 
           {/* ── FORMULÁRIO SENHA ─────────────────────────────────────────── */}
           <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
@@ -674,7 +587,7 @@ export default function Login() {
           </form>
 
           <p className="text-center text-xs text-gray-500 mt-6">
-            Sistema seguro · Autenticação por ChaveJ{webAuthnSupported && platformAvailable ? ' · Biometria disponível' : ''}
+            Sistema seguro · Autenticação por ChaveJ · Acesso rápido disponível
           </p>
         </div>
       </Card>

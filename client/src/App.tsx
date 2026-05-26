@@ -40,6 +40,7 @@ import MensagemMotivacional from './pages/MensagemMotivacional';
 import MensagemDoDiaHub from './pages/MensagemDoDiaHub';
 import MailingCrmPage from './pages/MailingCrm';
 import RelatorioChaveJ from './pages/RelatorioChaveJ';
+import MeuPin from './pages/MeuPin';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -66,6 +67,7 @@ function RouterWithInactivity() {
   return (
     <Switch>
       <Route path={"/login"} component={Login} />
+      <Route path={"/meu-pin"} component={MeuPin} />
       <Route path={"/"} component={Home} />
       <Route path={"/agentes"} component={AgentesPage} />
       <Route path={"/agentes/novo"} component={AgentesFormPage} />
