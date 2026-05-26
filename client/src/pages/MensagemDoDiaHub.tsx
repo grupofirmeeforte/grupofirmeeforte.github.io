@@ -332,21 +332,75 @@ const ORIXAS_SEMANA = [
 function AbaOrixas() {
   const hoje = new Date();
   const diaSemana = hoje.getDay(); // 0=Dom, 1=Seg, ..., 6=Sáb
-  const orixa = ORIXAS_SEMANA[diaSemana];
-  const [diaSelecionado, setDiaSelecionado] = useState(diaSemana);
-  const orixaExibido = ORIXAS_SEMANA[diaSelecionado];
+  const [orixaSelecionado, setOrixaSelecionado] = useState(diaSemana);
+  const orixaExibido = ORIXAS_SEMANA[orixaSelecionado];
   const diasNomes = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  const diasCompletos = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
 
   return (
-    <div className="max-w-2xl mx-auto py-8">
-      {/* Card principal do Orixá */}
-      <Card className="border-0 shadow-2xl overflow-hidden mb-6">
+    <div className="max-w-2xl mx-auto py-8 space-y-6">
+
+      {/* Card principal do Orixá do DIA */}
+      <div className="rounded-2xl overflow-hidden shadow-xl border-0">
+        <div className="px-6 py-3 text-center" style={{ background: ORIXAS_SEMANA[diaSemana].gradiente }}>
+          <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Orixá de Hoje</p>
+          <p className="text-white text-xl font-bold mt-0.5">{ORIXAS_SEMANA[diaSemana].saudacao}</p>
+        </div>
+        <div className="p-5 flex items-center gap-4" style={{ background: `${ORIXAS_SEMANA[diaSemana].cor}12` }}>
+          <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-md flex-shrink-0"
+            style={{ background: ORIXAS_SEMANA[diaSemana].gradiente }}>
+            {ORIXAS_SEMANA[diaSemana].emoji}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xl font-bold" style={{ color: ORIXAS_SEMANA[diaSemana].cor }}>{ORIXAS_SEMANA[diaSemana].nome}</h3>
+              <span className="text-xs px-2 py-0.5 rounded-full text-white font-medium" style={{ background: ORIXAS_SEMANA[diaSemana].cor }}>Hoje</span>
+            </div>
+            <p className="text-slate-500 text-xs mt-0.5">{ORIXAS_SEMANA[diaSemana].dominio}</p>
+            <p className="text-slate-600 text-sm mt-2 leading-relaxed line-clamp-2">{ORIXAS_SEMANA[diaSemana].mensagem}</p>
+          </div>
+          <div className="text-3xl flex-shrink-0">{ORIXAS_SEMANA[diaSemana].simbolo}</div>
+        </div>
+        <div className="px-5 py-3 bg-white border-t">
+          <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: ORIXAS_SEMANA[diaSemana].cor }}>Afirmação do Dia</p>
+          <p className="text-slate-700 text-sm font-medium italic">"{ORIXAS_SEMANA[diaSemana].afirmacao}"</p>
+        </div>
+      </div>
+
+      {/* Seletor de Orixá por nome */}
+      <div className="bg-white rounded-2xl shadow-md p-4">
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 text-center">Escolha um Orixá</p>
+        <div className="grid grid-cols-7 gap-1.5">
+          {ORIXAS_SEMANA.map((o, idx) => (
+            <button
+              key={idx}
+              onClick={() => setOrixaSelecionado(idx)}
+              className={`flex flex-col items-center p-2 rounded-xl border-2 transition-all ${
+                orixaSelecionado === idx
+                  ? 'shadow-md scale-105'
+                  : 'border-gray-100 hover:border-gray-300 opacity-70 hover:opacity-100'
+              }`}
+              style={orixaSelecionado === idx ? { borderColor: o.cor, background: `${o.cor}18` } : {}}
+            >
+              <span className="text-xl">{o.emoji}</span>
+              <span className="text-[10px] font-semibold mt-0.5 leading-tight text-center" style={orixaSelecionado === idx ? { color: o.cor } : { color: '#64748b' }}>
+                {o.nome}
+              </span>
+              {idx === diaSemana && (
+                <span className="text-[10px] font-bold" style={{ color: o.cor }}>hoje</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Card da mensagem do Orixá selecionado */}
+      <Card className="border-0 shadow-2xl overflow-hidden">
         <div className="px-8 py-4 text-center" style={{ background: orixaExibido.gradiente }}>
-          <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Mensagem dos Orixás</p>
+          <p className="text-white text-xs font-bold tracking-widest uppercase opacity-80">Mensagem de {orixaExibido.nome}</p>
           <p className="text-white text-2xl font-bold mt-1">{orixaExibido.saudacao}</p>
         </div>
         <CardContent className="p-0">
-          {/* Cabeçalho do Orixá */}
           <div className="p-8 pb-4" style={{ background: `${orixaExibido.cor}15` }}>
             <div className="flex items-center gap-5">
               <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl shadow-lg flex-shrink-0"
@@ -361,7 +415,6 @@ function AbaOrixas() {
               <div className="ml-auto text-4xl">{orixaExibido.simbolo}</div>
             </div>
           </div>
-          {/* Mensagem */}
           <div className="px-8 py-6 bg-white">
             <div className="w-full h-0.5 rounded-full mb-5" style={{ background: orixaExibido.gradiente }} />
             <p className="text-slate-700 text-base leading-relaxed">{orixaExibido.mensagem}</p>
@@ -371,14 +424,10 @@ function AbaOrixas() {
             </div>
             <div className="mt-6 flex justify-between items-center">
               <div className="flex items-center gap-2">
-                {diaSelecionado === diaSemana && (
-                  <span className="text-xs px-2 py-1 rounded-full font-medium text-white" style={{ background: orixaExibido.cor }}>
-                    Hoje
-                  </span>
+                {orixaSelecionado === diaSemana && (
+                  <span className="text-xs px-2 py-1 rounded-full font-medium text-white" style={{ background: orixaExibido.cor }}>Hoje</span>
                 )}
-                <span className="text-xs text-slate-400">
-                  {diasNomes[diaSelecionado] === diasNomes[diaSemana] ? hoje.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) : `${['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'][diaSelecionado]}`}
-                </span>
+                <span className="text-xs text-slate-400">{diasCompletos[orixaSelecionado]}</span>
               </div>
               <Button variant="outline" size="sm" className="gap-2 text-slate-600"
                 onClick={() => {
@@ -392,36 +441,6 @@ function AbaOrixas() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Seletor de dias da semana */}
-      <div className="bg-white rounded-2xl shadow-md p-4">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 text-center">Ver outros dias</p>
-        <div className="grid grid-cols-7 gap-1">
-          {ORIXAS_SEMANA.map((o, idx) => (
-            <button
-              key={idx}
-              onClick={() => setDiaSelecionado(idx)}
-              className={`flex flex-col items-center p-2 rounded-xl border-2 transition-all ${
-                diaSelecionado === idx
-                  ? 'border-current shadow-md scale-105'
-                  : idx === diaSemana
-                  ? 'border-dashed opacity-80'
-                  : 'border-gray-100 hover:border-gray-300 opacity-60 hover:opacity-100'
-              }`}
-              style={diaSelecionado === idx ? { borderColor: o.cor, background: `${o.cor}15`, color: o.cor } : {}}
-            >
-              <span className="text-lg">{o.emoji}</span>
-              <span className="text-xs font-medium mt-0.5" style={diaSelecionado === idx ? { color: o.cor } : { color: '#64748b' }}>
-                {diasNomes[idx]}
-              </span>
-              {idx === diaSemana && (
-                <span className="text-xs font-bold" style={{ color: o.cor }}>•</span>
-              )}
-            </button>
-          ))}
-        </div>
-        <p className="text-center text-slate-400 text-xs mt-3">• indica o dia de hoje</p>
-      </div>
     </div>
   );
 }
