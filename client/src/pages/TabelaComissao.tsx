@@ -88,8 +88,9 @@ function EditableCell({
 
   const handleSave = () => {
     if (format === 'percent') {
-      // Converte o valor digitado (ex: 0,50) de volta para decimal (0.005)
-      const n = parseFloat(tempValue.replace(',', '.'));
+      // Remove % e espaços, troca vírgula por ponto, converte para decimal
+      const cleaned = tempValue.replace(/%/g, '').replace(/\s/g, '').replace(',', '.');
+      const n = parseFloat(cleaned);
       const stored = isNaN(n) ? '' : (n / 100).toString();
       if (stored !== value) onSave(stored);
     } else {
