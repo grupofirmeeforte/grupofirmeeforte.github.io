@@ -122,13 +122,15 @@ export default function CaixaRecados() {
       {/* Header */}
       <div className="bg-white border-b shadow-sm sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setLocation("/")}
-            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors"
+            className="flex items-center gap-1.5"
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar
-          </button>
+          </Button>
           <div className="h-5 w-px bg-gray-200" />
           <div className="flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-blue-700" />
