@@ -166,6 +166,21 @@ export default function TabelaComissao() {
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [savingCell, setSavingCell] = useState<string | null>(null);
+  const [showColSelector, setShowColSelector] = useState(false);
+  const ALL_ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'] as const;
+  const [colsVisiveis, setColsVisiveis] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('tabela_comissao_cols');
+      return saved ? JSON.parse(saved) : [...ALL_ATIVOS];
+    } catch { return [...ALL_ATIVOS]; }
+  });
+  const toggleCol = (col: string) => {
+    setColsVisiveis(prev => {
+      const next = prev.includes(col) ? prev.filter(c => c !== col) : [...prev, col];
+      localStorage.setItem('tabela_comissao_cols', JSON.stringify(next));
+      return next;
+    });
+  };
   const NIVEIS = ['Ativo01','Ativo02','Ativo03','Ativo04','Ativo05','Ativo06','Ativo07','Ativo08','Ativo09','Ativo10'];
   const { user } = useAuth();
   const isAdminOuCeo = (user as any)?.cargo === 'CEO' || (user as any)?.cargo === 'SUPORTE' || (user as any)?.role === 'admin';
@@ -480,6 +495,49 @@ export default function TabelaComissao() {
               <X className="w-4 h-4 mr-1" /> Limpar filtros
             </Button>
           )}
+
+          {/* Seletor de colunas visíveis (só admin) */}
+          {isAdminOuCeo && (
+            <div className="relative ml-auto">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowColSelector(v => !v)}
+                className="gap-1.5 border-blue-300 text-blue-700 hover:bg-blue-50"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" /></svg>
+                Colunas ({colsVisiveis.length}/10)
+              </Button>
+              {showColSelector && (
+                <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-3 w-52">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Ativos visíveis</span>
+                    <button onClick={() => setShowColSelector(false)} className="text-gray-400 hover:text-gray-600">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <div className="space-y-1">
+                    {ALL_ATIVOS.map((col, i) => (
+                      <label key={col} className="flex items-center gap-2 cursor-pointer hover:bg-blue-50 rounded px-1.5 py-1">
+                        <input
+                          type="checkbox"
+                          checked={colsVisiveis.includes(col)}
+                          onChange={() => toggleCol(col)}
+                          className="accent-blue-600"
+                        />
+                        <span className="text-sm text-gray-700">Ativo {String(i + 1).padStart(2, '0')}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="flex gap-1 mt-2 pt-2 border-t">
+                    <button onClick={() => { setColsVisiveis([...ALL_ATIVOS]); localStorage.setItem('tabela_comissao_cols', JSON.stringify([...ALL_ATIVOS])); }} className="text-xs text-blue-600 hover:underline">Todos</button>
+                    <span className="text-gray-300">|</span>
+                    <button onClick={() => { setColsVisiveis([]); localStorage.setItem('tabela_comissao_cols', '[]'); }} className="text-xs text-red-500 hover:underline">Nenhum</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -501,16 +559,11 @@ export default function TabelaComissao() {
                   <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Faixas</th>
                   {isAdminOuCeo ? (
                     <>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 01</th>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 02</th>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 03</th>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.08)'}}>Ativo 04</th>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 05</th>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 06</th>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 07</th>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.12)'}}>Ativo 08</th>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.16)'}}>Ativo 09</th>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,255,255,0.16)'}}>Ativo 10</th>
+                      {ALL_ATIVOS.map((col, i) => colsVisiveis.includes(col) && (
+                        <th key={col} className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:`rgba(255,255,255,${0.08 + i * 0.01})`}}>
+                          Ativo {String(i + 1).padStart(2, '0')}
+                        </th>
+                      ))}
                       <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide">Ações</th>
                     </>
                   ) : ativoAgente ? (
@@ -582,18 +635,18 @@ export default function TabelaComissao() {
                         </td>
                         {/* Ativos: admin vê todos editáveis, agente vê só o dele */}
                         {isAdminOuCeo ? (
-                          <>{
-                            (['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'] as (keyof TabelaRow)[]).map((key) => (
+                          <>
+                            {ALL_ATIVOS.map((key) => colsVisiveis.includes(key) && (
                               <td key={String(key)} className="px-3 py-1.5 text-center text-blue-700 font-medium whitespace-nowrap">
                                 <EditableCell
                                   value={(row as any)[key]}
-                                  onSave={(v) => handleCellSave(row.id, key, v)}
+                                  onSave={(v) => handleCellSave(row.id, key as keyof TabelaRow, v)}
                                   isSaving={savingCell === `${row.id}-${String(key)}`}
                                   format="percent"
                                 />
                               </td>
-                            ))
-                          }</>
+                            ))}
+                          </>
                         ) : ativoAgente ? (
                           <>
                             <td className="px-3 py-2 font-semibold text-gray-800 whitespace-nowrap">
