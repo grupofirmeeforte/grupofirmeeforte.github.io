@@ -233,6 +233,35 @@ function ContratoBMF({ ag }: { ag: any }) {
         <p className="mb-2">B – Relação de documentos a serem escanados e arquivados nos equipamentos até solicitação de envio para nosso servidor, e físico a serem entregues nas agências do Banco do Brasil.</p>
         <p className="mb-2">C - Documentos exigidos Correntistas:</p>
         <p>1 - Contrato assinado igual identidade</p>
+        <p>2 - RG (Identidade) / Habilitação</p>
+        <p>3 - CPF</p>
+        <p className="mb-2">4 - Comprovante de endereço nome do Cliente atualizado último mês.</p>
+        <p className="mb-2">5 - Detalhamento de crédito ou contracheque</p>
+        <p className="mb-2">D - Documentos exigidos não correntistas:</p>
+        <p>1 - Contrato assinado igual identidade</p>
+        <p>2 - RG</p>
+        <p>3 - CPF</p>
+        <p>4 - Comprovante de endereço nome do Cliente atualizado último mês</p>
+        <p>5 - Detalhamento de crédito emitido pelo terminal de autoatendimento na data do empréstimo.</p>
+        <p>6 - Cartão INSS</p>
+        <p>7 - Título de eleitor para conferência no e-título</p>
+        <p className="mb-2">8 - Foto Digital com a identidade na mão</p>
+        <p className="mb-4">E – Todos os documentos devem serem escaneados de sua via original colorido em 100 dbi com condições de visualização ou impressão do mesmo em qualidade nítida.</p>
+        <p className="mb-6">Por estar ciente assino e concordo com esse adendo.</p>
+
+        {/* Assinatura do adendo */}
+        <div className="text-right text-xs text-gray-600 mb-6">
+          Barreiras (BA) {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+        </div>
+        <div className="flex justify-center">
+          <div className="text-center">
+            <div className="border-t border-gray-800 pt-1 w-64">
+              <p className="text-xs font-semibold">{ag.nomeAgente}</p>
+              <p className="text-xs">CPF: {ag.cpfAgente}</p>
+              <p className="text-xs text-gray-500">Contratado(a)</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
