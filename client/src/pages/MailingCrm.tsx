@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import PageHeader from "@/components/PageHeader";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -173,9 +174,10 @@ export default function MailingCrm() {
     onError: (e) => toast.error("Erro: " + e.message),
   });
   const importar = trpc.mailingCrm.importar.useMutation({
-    onSuccess: (r) => { utils.mailingCrm.list.invalidate(); utils.mailingCrm.count.invalidate(); toast.success(`${r.inseridos} registros importados!`); },
     onError: (e) => toast.error("Erro ao importar: " + e.message),
   });
+  const [importando, setImportando] = useState(false);
+  const [importProgress, setImportProgress] = useState("");
 
   // Limpeza em lote
   const [confirmLimpeza, setConfirmLimpeza] = useState<'falecidos' | 'acima78' | null>(null);
@@ -253,82 +255,106 @@ export default function MailingCrm() {
     XLSX.writeFile(wb, `mailing_crm_${new Date().toISOString().slice(0,10)}.xlsx`);
   };
 
-  // Importar Excel
+  // Importar Excel — envia em lotes de 500 para evitar timeout
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      const wb = XLSX.read(ev.target?.result, { type: "array", cellDates: true });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      // Usa header:1 (array de arrays) para controle total — evita problemas de acentos nos cabeçalhos
-      const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: "" });
-      if (!json || json.length < 2) { toast.warning("Arquivo vazio ou sem dados."); return; }
-      // Normaliza cabeçalhos: uppercase + remove acentos
-      const normStr = (h: any) => String(h ?? "").trim().toUpperCase()
-        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const rawHeaders = json[0] || [];
-      const colMap: Record<string, number> = {};
-      rawHeaders.forEach((h: any, i: number) => { colMap[normStr(h)] = i; });
-      // Mapa normalizado: chave normalizada -> campo Row
-      const NORM_MAP: Record<string, keyof Row> = {};
-      for (const [k, v] of Object.entries(EXCEL_MAP)) {
-        NORM_MAP[normStr(k)] = v;
-      }
-      const SKIP_PATTERNS = [
-        /^ex:/i, /^dd\/mm\/aaaa$/i, /^m ou f$/i, /^nome completo$/i,
-        /^numero da conta$/i, /^sigla/i,
-      ];
-      const mapped = json.slice(1).map(row => {
-        const nomeIdx = colMap[normStr("NOME")];
-        const cpfIdx = colMap[normStr("CPF")];
-        const nome = String(nomeIdx !== undefined ? row[nomeIdx] : "").trim();
-        const cpf = String(cpfIdx !== undefined ? row[cpfIdx] : "").trim();
-        // Pula linhas de instrução/exemplo
-        if (SKIP_PATTERNS.some(p => p.test(nome) || p.test(cpf))) return null;
-        if (!nome && !cpf) return null;
-        const obj: Partial<Row> = {};
-        for (const [normKey, field] of Object.entries(NORM_MAP)) {
-          const idx = colMap[normKey];
-          if (idx === undefined) continue;
-          const val = row[idx];
-          if (val === undefined || val === null || String(val).trim() === "") continue;
-          // Formata datas JS → DD/MM/AAAA
-          if (val instanceof Date && !isNaN(val.getTime())) {
-            const d = val.getDate().toString().padStart(2, '0');
-            const m = (val.getMonth() + 1).toString().padStart(2, '0');
-            const y = val.getFullYear();
-            (obj as any)[field] = `${d}/${m}/${y}`;
-          } else {
-            const s = String(val).trim();
-            if (s === "0" || s === "") continue;
-            // Formata CPF automaticamente — sempre padStart(11) para preservar zero à esquerda
-            if (field === "cpf") {
-              const digits = s.replace(/\D/g, "").padStart(11, "0").slice(-11);
-              (obj as any)[field] = `${digits.slice(0,3)}.${digits.slice(3,6)}.${digits.slice(6,9)}-${digits.slice(9,11)}`;
-            // Formata DDD: só números
-            } else if (field.startsWith("ddd")) {
-              const digits = s.replace(/\D/g, "");
-              if (digits) (obj as any)[field] = digits;
-            // Formata telefone: 00000-0000 ou 0000-0000
-            } else if (field.startsWith("tel")) {
-              const digits = s.replace(/\D/g, "");
-              if (digits && digits !== "0") {
-                const t = digits.length >= 9
-                  ? `${digits.slice(0,5)}-${digits.slice(5,9)}`
-                  : `${digits.slice(0,4)}-${digits.slice(4,8)}`;
-                (obj as any)[field] = t;
-              }
-            } else {
-              (obj as any)[field] = s;
-            }
-          }
+    reader.onload = async (ev) => {
+      try {
+        const wb = XLSX.read(ev.target?.result, { type: "array", cellDates: true });
+        // Procura a planilha com dados (ignora planilha de instruções)
+        const sheetName = wb.SheetNames.find(n => !n.toUpperCase().includes("INSTRU")) ?? wb.SheetNames[0];
+        const ws = wb.Sheets[sheetName];
+        const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: "" });
+        if (!json || json.length < 2) { toast.warning("Arquivo vazio ou sem dados."); return; }
+
+        const normStr = (h: any) => String(h ?? "").trim().toUpperCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const rawHeaders = json[0] || [];
+        const colMap: Record<string, number> = {};
+        rawHeaders.forEach((h: any, i: number) => { colMap[normStr(h)] = i; });
+
+        const NORM_MAP: Record<string, keyof Row> = {};
+        for (const [k, v] of Object.entries(EXCEL_MAP)) {
+          NORM_MAP[normStr(k)] = v;
         }
-        return obj;
-      }).filter((r): r is Partial<Row> => !!r && !!r.nome);
-      if (mapped.length === 0) { toast.warning("Nenhum registro válido encontrado."); return; }
-      toast.info(`Importando ${mapped.length} registros...`);
-      importar.mutate(mapped as any);
+
+        // Padrões de linhas de instrução/exemplo a ignorar (em QUALQUER campo)
+        const isLinhaInstrucao = (row: any[]) => {
+          const vals = row.map(v => String(v ?? "").trim().toUpperCase());
+          return vals.some(v =>
+            v === "DD/MM/AAAA" || v === "DD/MM/AAAA (DATA CONTATO)" ||
+            v.startsWith("EX:") || v === "M OU F" ||
+            v === "NOME COMPLETO" || v.startsWith("SIGLA") ||
+            v === "NUMERO DA CONTA"
+          );
+        };
+
+        const mapped = json.slice(1)
+          .filter(row => !isLinhaInstrucao(row))
+          .map(row => {
+            const nomeIdx = colMap[normStr("NOME")];
+            const nome = String(nomeIdx !== undefined ? row[nomeIdx] : "").trim();
+            if (!nome) return null;
+            const obj: Partial<Row> = {};
+            for (const [normKey, field] of Object.entries(NORM_MAP)) {
+              const idx = colMap[normKey];
+              if (idx === undefined) continue;
+              const val = row[idx];
+              if (val === undefined || val === null || String(val).trim() === "") continue;
+              if (val instanceof Date && !isNaN(val.getTime())) {
+                const d = val.getDate().toString().padStart(2, '0');
+                const m = (val.getMonth() + 1).toString().padStart(2, '0');
+                (obj as any)[field] = `${d}/${m}/${val.getFullYear()}`;
+              } else {
+                const s = String(val).trim();
+                if (s === "0" || s === "") continue;
+                if (field === "cpf") {
+                  const digits = s.replace(/\D/g, "").padStart(11, "0").slice(-11);
+                  (obj as any)[field] = `${digits.slice(0,3)}.${digits.slice(3,6)}.${digits.slice(6,9)}-${digits.slice(9,11)}`;
+                } else if (field.startsWith("ddd")) {
+                  const digits = s.replace(/\D/g, "");
+                  if (digits) (obj as any)[field] = digits;
+                } else if (field.startsWith("tel")) {
+                  const digits = s.replace(/\D/g, "");
+                  if (digits && digits !== "0") {
+                    (obj as any)[field] = digits.length >= 9
+                      ? `${digits.slice(0,5)}-${digits.slice(5,9)}`
+                      : `${digits.slice(0,4)}-${digits.slice(4,8)}`;
+                  }
+                } else {
+                  (obj as any)[field] = s;
+                }
+              }
+            }
+            return obj;
+          })
+          .filter((r): r is Partial<Row> => !!r && !!r.nome);
+
+        if (mapped.length === 0) { toast.warning("Nenhum registro válido encontrado."); return; }
+
+        // Envia em lotes de 500 para não dar timeout
+        const LOTE = 500;
+        const totalLotes = Math.ceil(mapped.length / LOTE);
+        setImportando(true);
+        let totalInseridos = 0;
+        for (let i = 0; i < totalLotes; i++) {
+          const lote = mapped.slice(i * LOTE, (i + 1) * LOTE);
+          setImportProgress(`Importando lote ${i + 1}/${totalLotes} (${Math.round(((i+1)/totalLotes)*100)}%)...`);
+          const res = await importar.mutateAsync(lote as any);
+          totalInseridos += res.inseridos;
+        }
+        setImportando(false);
+        setImportProgress("");
+        utils.mailingCrm.list.invalidate();
+        utils.mailingCrm.count.invalidate();
+        toast.success(`✅ ${totalInseridos} registros importados com sucesso!`);
+      } catch (err: any) {
+        setImportando(false);
+        setImportProgress("");
+        toast.error("Erro ao importar: " + (err?.message ?? "Erro desconhecido"));
+      }
     };
     reader.readAsArrayBuffer(file);
     e.target.value = "";
@@ -354,6 +380,7 @@ export default function MailingCrm() {
 
   return (
     <div className="p-4 space-y-4 bg-gray-50 min-h-screen">
+      <PageHeader />
       {/* Cabeçalho */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
@@ -361,8 +388,8 @@ export default function MailingCrm() {
           <p className="text-gray-500 text-sm">{total} registros encontrados</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()} className="gap-1.5 border-blue-400 text-blue-600 hover:bg-blue-50">
-            <Upload className="w-3.5 h-3.5" /> Importar Excel
+          <Button variant="outline" size="sm" onClick={() => !importando && fileRef.current?.click()} disabled={importando} className="gap-1.5 border-blue-400 text-blue-600 hover:bg-blue-50">
+            <Upload className="w-3.5 h-3.5" /> {importando ? importProgress || "Importando..." : "Importar Excel"}
           </Button>
           <input ref={fileRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImport} />
           <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5 border-green-500 text-green-600 hover:bg-green-50">
