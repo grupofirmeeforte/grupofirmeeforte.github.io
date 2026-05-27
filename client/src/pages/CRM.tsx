@@ -691,7 +691,7 @@ function AbaMailing() {
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-3 flex-wrap">
-          <Button size="sm" onClick={() => { setListaAtiva(null); setBusca(""); setFiltroStatus("todos"); setPagina(1); }} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
+          <Button size="sm" onClick={() => { setListaAtiva(null); setBusca(""); setFiltroStatus("todos"); setPagina(1); }} className="gap-1 rounded-full font-semibold" style={{background:"linear-gradient(135deg,#1d4ed8 0%,#1e40af 100%)",color:"#fff",border:"1.5px solid #3b82f6",boxShadow:"0 2px 12px rgba(59,130,246,0.35)"}}><ArrowLeft className="w-4 h-4" /> Voltar</Button>
           <h3 className="font-semibold text-gray-800">{listaNomeAtiva}</h3>
           <span className="text-sm text-gray-500">{contatos?.total ?? 0} contatos</span>
         </div>

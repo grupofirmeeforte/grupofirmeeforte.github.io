@@ -190,7 +190,7 @@ export default function DocumentacaoAgentes() {
             <Button
               size="sm"
               onClick={() => { setAgenteSelecionado(null); setFiltroTipoDoc(''); }}
-              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white border-0"
+              className="flex items-center gap-2 rounded-full font-semibold" style={{background:"linear-gradient(135deg,#1d4ed8 0%,#1e40af 100%)",color:"#fff",border:"1.5px solid #3b82f6",boxShadow:"0 2px 12px rgba(59,130,246,0.35)"}}
             >
               <ArrowLeft className="w-4 h-4" /> Voltar
             </Button>

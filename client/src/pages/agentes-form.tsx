@@ -376,7 +376,7 @@ export default function AgentesFormPage() {
           </h1>
           <p className="text-gray-600 text-sm mt-1">Preencha os campos obrigatórios (*)</p>
         </div>
-        <Button size="sm" onClick={() => navigate("/agentes")} className="gap-1 bg-orange-500 hover:bg-orange-600 text-white">
+        <Button size="sm" onClick={() => navigate("/agentes")} className="gap-1 rounded-full font-semibold" style={{background:"linear-gradient(135deg,#1d4ed8 0%,#1e40af 100%)",color:"#fff",border:"1.5px solid #3b82f6",boxShadow:"0 2px 12px rgba(59,130,246,0.35)"}}>
           <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
       </div>

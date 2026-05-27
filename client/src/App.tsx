@@ -79,7 +79,7 @@ function BotaoComunicadoGlobal() {
       <button
         onClick={() => setAberto(true)}
         title="Enviar Comunicado com Arquivo"
-        className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-blue-700 hover:bg-blue-800 text-white shadow-2xl transition-all hover:scale-110 active:scale-95"
+        className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-14 h-14 rounded-full bg-blue-700 hover:bg-blue-800 text-white shadow-2xl transition-all hover:scale-110 active:scale-95 print:hidden"
       >
         <Paperclip className="w-6 h-6" />
         {total > 0 && (

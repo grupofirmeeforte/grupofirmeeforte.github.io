@@ -102,8 +102,8 @@ export default function MeuRosto() {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <Button variant="outline" size="sm" onClick={() => setLocation("/")}>
-            <ArrowLeft className="w-4 h-4 mr-1" />
+          <Button size="sm" onClick={() => setLocation("/")} className="gap-1 rounded-full font-semibold" style={{background:'linear-gradient(135deg,#1d4ed8 0%,#1e40af 100%)',color:'#fff',border:'1.5px solid #3b82f6',boxShadow:'0 2px 12px rgba(59,130,246,0.35)'}}>
+            <ArrowLeft className="w-4 h-4" />
             Voltar
           </Button>
           <div>
