@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { BookMarked, BookOpen, Sparkles, Star, Zap, Share2, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PageHeader from "@/components/PageHeader";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/hooks/useAuth";
 
 // ─── TIPOS DE ABAS ────────────────────────────────────────────────────────────
 type Aba = 'horoscopo' | 'minutos-sabedoria' | 'motivacional' | 'salmos' | 'versiculos' | 'orixas';
@@ -505,7 +506,18 @@ function AbaOrixas() {
 
 // ─── ABA HORÓSCOPO ────────────────────────────────────────────────────────────
 function AbaHoroscopo() {
+  const { user } = useAuth();
+  const signoDoAgente = (user as any)?.signo || "";
   const [signoSelecionado, setSignoSelecionado] = useState("");
+  const [mostrarTodos, setMostrarTodos] = useState(false);
+
+  // Inicializar automaticamente com o signo do agente logado quando carregar
+  useEffect(() => {
+    if (signoDoAgente && !signoSelecionado) {
+      setSignoSelecionado(signoDoAgente);
+    }
+  }, [signoDoAgente]);
+
   const { data: horoscopo, isLoading, error } = trpc.horoscopo.getHoroscopo.useQuery(
     { signo: signoSelecionado },
     { enabled: !!signoSelecionado, refetchOnWindowFocus: false }
@@ -514,26 +526,44 @@ function AbaHoroscopo() {
     <div className="max-w-2xl mx-auto py-8">
       <Card className="border-0 shadow-2xl overflow-hidden">
         <div className="px-8 py-3 text-center" style={{ background: 'linear-gradient(135deg, #1e3a5f, #c8960c)' }}>
-          <p className="text-yellow-300 text-xs font-bold tracking-widest uppercase">✨ Selecione seu signo</p>
+          {signoDoAgente ? (
+            <p className="text-yellow-300 text-xs font-bold tracking-widest uppercase">✨ Seu Horóscopo — {signoDoAgente} {SIGNO_EMOJIS[signoDoAgente]}</p>
+          ) : (
+            <p className="text-yellow-300 text-xs font-bold tracking-widest uppercase">✨ Selecione seu signo</p>
+          )}
         </div>
         <CardContent className="p-8 bg-white">
-          <div className="mb-6">
-            <div className="grid grid-cols-4 gap-2">
-              {TODOS_SIGNOS.map((signo) => (
-                <button key={signo} onClick={() => setSignoSelecionado(signo)}
-                  className={`flex flex-col items-center p-2 rounded-lg border-2 transition-all text-xs font-medium ${
-                    signoSelecionado === signo ? "border-yellow-500 bg-yellow-50 text-yellow-800" : "border-gray-200 hover:border-blue-300 text-slate-600"
-                  }`}>
-                  <span className="text-xl">{SIGNO_EMOJIS[signo]}</span>
-                  <span className="mt-1 leading-tight text-center">{signo}</span>
-                </button>
-              ))}
-            </div>
+          {/* Botão para trocar signo */}
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={() => setMostrarTodos(!mostrarTodos)}
+              className="text-xs text-blue-500 hover:text-blue-700 underline"
+            >
+              {mostrarTodos ? "Ocultar seletor" : "Trocar signo"}
+            </button>
           </div>
-          {!signoSelecionado && (
+
+          {/* Seletor de signos (expandível) */}
+          {mostrarTodos && (
+            <div className="mb-6">
+              <div className="grid grid-cols-4 gap-2">
+                {TODOS_SIGNOS.map((signo) => (
+                  <button key={signo} onClick={() => { setSignoSelecionado(signo); setMostrarTodos(false); }}
+                    className={`flex flex-col items-center p-2 rounded-lg border-2 transition-all text-xs font-medium ${
+                      signoSelecionado === signo ? "border-yellow-500 bg-yellow-50 text-yellow-800" : "border-gray-200 hover:border-blue-300 text-slate-600"
+                    }`}>
+                    <span className="text-xl">{SIGNO_EMOJIS[signo]}</span>
+                    <span className="mt-1 leading-tight text-center">{signo}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!signoSelecionado && !signoDoAgente && (
             <div className="flex flex-col items-center gap-3 py-6 text-slate-400">
               <Star className="w-12 h-12 text-yellow-200" />
-              <p className="text-sm">Escolha seu signo acima para ver o horóscopo de hoje</p>
+              <p className="text-sm">Clique em "Trocar signo" acima para ver o horóscopo de hoje</p>
             </div>
           )}
           {signoSelecionado && isLoading && (

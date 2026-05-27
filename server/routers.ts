@@ -69,6 +69,8 @@ export const appRouter = router({
             nomeAgente: agentes.nomeAgente,
             chaveJ: agentes.chaveJ,
             situacao: agentes.situacao,
+            signo: agentes.signo,
+            dataNascimento: agentes.dataNascimento,
           }).from(agentes).where(eq(agentes.id, agenteId)).limit(1);
           if (agenteRow) {
             return {
@@ -79,6 +81,8 @@ export const appRouter = router({
               nomeAgente: agenteRow.nomeAgente ?? null,
               chaveJ: agenteRow.chaveJ ?? null,
               situacao: agenteRow.situacao ?? null,
+              signo: agenteRow.signo ?? null,
+              dataNascimento: agenteRow.dataNascimento ?? null,
             };
           }
         }
