@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import AgentesPage from "./pages/agentes";
 import AgentesFormPage from "./pages/agentes-form";
 import AgentePdf from "./pages/AgentePdf";
+import AgenteContrato from "./pages/AgenteContrato";
 import Login from "./pages/Login";
 import AuditoriaPage from "./pages/auditoria";
 import TabelaComissao from './pages/TabelaComissao';
@@ -112,6 +113,7 @@ function RouterWithInactivity() {
       <Route path={"/agentes"} component={AgentesPage} />
       <Route path={"/agentes/novo"} component={AgentesFormPage} />
       <Route path={"/agentes/:id/pdf"} component={AgentePdf} />
+      <Route path={"/agentes/:id/contrato"} component={AgenteContrato} />
       <Route path={"/agentes/:id"} component={AgentesFormPage} />
       <Route path={"/auditoria"} component={AuditoriaPage} />
       <Route path={"/tabela-comissao"} component={TabelaComissao} />

@@ -54,7 +54,8 @@ export const appRouter = router({
       // Owner do projeto sempre tem acesso admin
       const ownerOpenId = process.env.OWNER_OPEN_ID;
       if (ownerOpenId && user.openId === ownerOpenId) {
-        return { ...user, permissoes: 'admin', cargo: 'CEO', permissoesModulos: null };
+        const ownerName = process.env.OWNER_NAME || user.name || '';
+        return { ...user, permissoes: 'admin', cargo: 'CEO', permissoesModulos: null, nomeAgente: ownerName, chaveJ: null };
       }
       // Buscar permissoesModulos e cargo do agente logado
       if (user.openId?.startsWith('agente_')) {

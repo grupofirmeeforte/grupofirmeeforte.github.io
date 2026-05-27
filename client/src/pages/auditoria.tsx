@@ -836,8 +836,8 @@ function DespesasInternasAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any)
   const chaveJ = (user as any)?.chaveJ ?? '';
   const nome = (user as any)?.nomeAgente?.toLowerCase?.() ?? '';
   const temAcesso = CHAVES_AUTORIZADAS.includes(chaveJ) ||
-    nome.includes('sidnei honorato ultramare') ||
-    nome.includes('thiago viana ultramare');
+    nome.includes('sidnei') ||
+    nome.includes('thiago viana');
   if (!temAcesso) return null;
   return (
     <button
@@ -882,8 +882,8 @@ function DespesasInternasAba() {
   const chaveJUser = (user as any)?.chaveJ ?? '';
   const nomeUser = (user as any)?.nomeAgente?.toLowerCase?.() ?? '';
   const acesso = { temAcesso: CHAVES_AUTORIZADAS.includes(chaveJUser) ||
-    nomeUser.includes('sidnei honorato ultramare') ||
-    nomeUser.includes('thiago viana ultramare') };
+    nomeUser.includes('sidnei') ||
+    nomeUser.includes('thiago viana') };
   // Segunda senha CEO
   const [senhaDesbloqueada, setSenhaDesbloqueada] = useState(false);
   const [senhaInput, setSenhaInput] = useState('');

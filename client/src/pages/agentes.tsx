@@ -466,8 +466,8 @@ export default function AgentesPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          title="Gerar PDF do agente"
-                          onClick={() => navigate(`/agentes/${agente.id}/pdf`)}
+                          title="Gerar Contrato PDF"
+                          onClick={() => navigate(`/agentes/${agente.id}/contrato`)}
                         >
                           <FileText className="w-4 h-4 text-orange-600" />
                         </Button>

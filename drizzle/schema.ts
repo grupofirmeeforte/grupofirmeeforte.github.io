@@ -86,6 +86,9 @@ export const agentes = mysqlTable('agentes', {
   numero: varchar("numero", { length: 20 }),
   complemento: varchar("complemento", { length: 100 }),
   bairro: varchar("bairro", { length: 100 }),
+  rg: varchar("rg", { length: 30 }),
+  estadoCivil: varchar("estadoCivil", { length: 30 }),
+  nacionalidade: varchar("nacionalidade", { length: 50 }).default('brasileiro(a)'),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({

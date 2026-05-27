@@ -39,6 +39,9 @@ const agenteSchema = z.object({
   numero: z.string().optional(),
   complemento: z.string().optional(),
   bairro: z.string().optional(),
+  rg: z.string().optional(),
+  estadoCivil: z.string().optional(),
+  nacionalidade: z.string().optional(),
 });
 
 const agenteUpdateSchema = agenteSchema.partial();

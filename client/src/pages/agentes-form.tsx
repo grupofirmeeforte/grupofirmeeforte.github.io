@@ -143,6 +143,9 @@ export default function AgentesFormPage() {
     numero: "",
     complemento: "",
     bairro: "",
+    rg: "",
+    estadoCivil: "",
+    nacionalidade: "brasileiro(a)",
   });
 
   const [permissoesModulos, setPermissoesModulos] = useState<PermissoesMap>({});
@@ -343,6 +346,9 @@ export default function AgentesFormPage() {
         numero: (agente as any).numero || "",
         complemento: (agente as any).complemento || "",
         bairro: (agente as any).bairro || "",
+        rg: (agente as any).rg || "",
+        estadoCivil: (agente as any).estadoCivil || "",
+        nacionalidade: (agente as any).nacionalidade || "brasileiro(a)",
       });
       // Carregar permissoesModulos do JSON
       // Mescla com defaults (sem_acesso) para garantir que módulos novos apareçam corretamente
@@ -678,6 +684,43 @@ export default function AgentesFormPage() {
                   name="celular"
                   placeholder="(00) 00000-0000"
                   value={formData.celular}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <Label htmlFor="rg">RG</Label>
+                <Input
+                  id="rg"
+                  name="rg"
+                  placeholder="00.000.000-0"
+                  value={(formData as any).rg || ''}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <Label htmlFor="estadoCivil">Estado Civil</Label>
+                <select
+                  id="estadoCivil"
+                  name="estadoCivil"
+                  value={(formData as any).estadoCivil || ''}
+                  onChange={handleInputChange as any}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="">-- Selecione --</option>
+                  <option value="Solteiro(a)">Solteiro(a)</option>
+                  <option value="Casado(a)">Casado(a)</option>
+                  <option value="Divorciado(a)">Divorciado(a)</option>
+                  <option value="Viúvo(a)">Viúvo(a)</option>
+                  <option value="União Estável">União Estável</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="nacionalidade">Nacionalidade</Label>
+                <Input
+                  id="nacionalidade"
+                  name="nacionalidade"
+                  placeholder="brasileiro(a)"
+                  value={(formData as any).nacionalidade || 'brasileiro(a)'}
                   onChange={handleInputChange}
                 />
               </div>
