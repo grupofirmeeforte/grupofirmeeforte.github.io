@@ -5,7 +5,6 @@ import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProper
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
-import { ChatWidget } from "@/components/ChatWidget";
 import { useState } from "react";
 import { usePermissao } from "@/hooks/usePermissao";
 
@@ -461,7 +460,6 @@ export default function Home() {
         </div>
       )}
 
-      <ChatWidget />
     </div>
   );
 }

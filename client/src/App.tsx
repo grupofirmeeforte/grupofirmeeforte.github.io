@@ -60,6 +60,7 @@ import BloqueioGeolocalizacao from "./components/BloqueioGeolocalizacao";
 import { PopupComunicado } from "./components/PopupComunicado";
 import { Paperclip } from "lucide-react";
 import { useLocation } from "wouter";
+import { ChatWidget } from "./components/ChatWidget";
 
 function BotaoComunicadoGlobal() {
   const [aberto, setAberto] = useState(false);
@@ -158,6 +159,7 @@ function RouterWithInactivity() {
 
 function LGPDGate() {
   const { user, isAuthenticated } = useAuth();
+  const [currentLocation] = useLocation();
   const [showLGPD, setShowLGPD] = useState(false);
   const [isAccepting, setIsAccepting] = useState(false);
   const [showBoasVindas, setShowBoasVindas] = useState(false);
@@ -201,6 +203,7 @@ function LGPDGate() {
       )}
       <RouterWithInactivity />
       <BotaoComunicadoGlobal />
+      {isAuthenticated && currentLocation !== "/login" && <ChatWidget />}
     </>
   );
 }
