@@ -1,4 +1,4 @@
-import { eq, and, lt, desc } from "drizzle-orm";
+import { eq, and, lt, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao, mensagens, InsertMensagem, Mensagem, valoresCalculo, ValoresCalculo, consignados, tabelasComissao } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -301,11 +301,12 @@ export async function criarMensagem(data: InsertMensagem) {
   if (!db) return undefined;
 
   const agora = new Date();
-  return await db.insert(mensagens).values({
-    ...data,
-    createdAt: agora,
-    updatedAt: agora,
-  });
+  const agoraStr = agora.toISOString().slice(0, 19).replace('T', ' ');
+  // Usar SQL raw para evitar problema de DEFAULT no TiDB com campos boolean e timestamp
+  return await db.execute(
+    sql`INSERT INTO mensagens (remetenteId, remetenteNome, destinatarioId, destinatarioNome, conteudo, tipo, lida, grupoChat, createdAt, updatedAt)
+        VALUES (${data.remetenteId}, ${data.remetenteNome}, ${data.destinatarioId ?? null}, ${data.destinatarioNome ?? null}, ${data.conteudo}, ${'texto'}, ${0}, ${null}, ${agoraStr}, ${agoraStr})`
+  );
 }
 
 export async function obterMensagensPrivadas(usuarioId: number, outroUsuarioId: number) {

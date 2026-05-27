@@ -520,6 +520,7 @@ export const appRouter = router({
           conteudo: input.conteudo,
           tipo: "texto",
           lida: false,
+          grupoChat: null,
         });
       }),
     
