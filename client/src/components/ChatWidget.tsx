@@ -24,16 +24,22 @@ export function ChatWidget() {
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [novaMensagem, setNovaMensagem] = useState("");
+  const [erroEnvio, setErroEnvio] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Extrair agenteId do openId (formato: "agente_123")
+  const openId = (user as any)?.openId ?? "";
+  const agenteId = openId.startsWith("agente_") ? parseInt(openId.replace("agente_", ""), 10) : null;
+  const nomeAgente = (user as any)?.nomeAgente ?? user?.name ?? "Usuário";
 
   // APIs
   const enviarMensagem = trpc.chat.enviarMensagem.useMutation();
   const { data: usuariosConectados } = trpc.sessoes.getAtivas.useQuery(undefined, {
-    refetchInterval: 10000, // Atualizar a cada 10 segundos
+    refetchInterval: 10000,
   });
   const { data: mensagensPrivadas } = trpc.chat.obterMensagensPrivadas.useQuery(
-    selectedUser && user?.id ? { usuarioId: user.id, outroUsuarioId: selectedUser } : { usuarioId: 0, outroUsuarioId: 0 },
-    { enabled: !!selectedUser && !!user?.id }
+    selectedUser && agenteId ? { usuarioId: agenteId, outroUsuarioId: selectedUser } : { usuarioId: 0, outroUsuarioId: 0 },
+    { enabled: !!selectedUser && !!agenteId }
   );
 
   // Auto-scroll para a última mensagem
@@ -49,12 +55,15 @@ export function ChatWidget() {
   }, [mensagensPrivadas]);
 
   const handleEnviarMensagem = async () => {
-    if (!novaMensagem.trim() || !selectedUser || !user) return;
+    if (!novaMensagem.trim()) return;
+    if (!selectedUser) { setErroEnvio("Selecione um usuário."); return; }
+    if (!agenteId) { setErroEnvio("Usuário não identificado."); return; }
+    setErroEnvio("");
 
     try {
       await enviarMensagem.mutateAsync({
-        remetenteId: user.id,
-        remetenteNome: user.name || "Usuário",
+        remetenteId: agenteId,
+        remetenteNome: nomeAgente,
         destinatarioId: selectedUser,
         destinatarioNome: "Destinatário",
         conteudo: novaMensagem,
@@ -65,8 +74,8 @@ export function ChatWidget() {
         ...mensagens,
         {
           id: Date.now(),
-          remetenteId: user.id,
-          remetenteNome: user.name || "Você",
+          remetenteId: agenteId,
+          remetenteNome: nomeAgente,
           destinatarioId: selectedUser,
           destinatarioNome: "Destinatário",
           conteudo: novaMensagem,
@@ -76,8 +85,9 @@ export function ChatWidget() {
       ]);
 
       setNovaMensagem("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao enviar mensagem:", error);
+      setErroEnvio(error?.message || "Erro ao enviar mensagem.");
     }
   };
 
@@ -136,12 +146,12 @@ export function ChatWidget() {
                   <div
                     key={msg.id}
                     className={`flex ${
-                      msg.remetenteId === user.id ? "justify-end" : "justify-start"
+                      msg.remetenteId === agenteId ? "justify-end" : "justify-start"
                     }`}
                   >
                     <div
                       className={`max-w-xs px-3 py-2 rounded-lg ${
-                        msg.remetenteId === user.id
+                        msg.remetenteId === agenteId
                           ? "bg-blue-500 text-white"
                           : "bg-gray-200 text-gray-900"
                       }`}
@@ -156,14 +166,20 @@ export function ChatWidget() {
                 <div ref={messagesEndRef} />
               </div>
 
+              {/* Erro de envio */}
+              {erroEnvio && (
+                <p className="px-4 py-1 text-xs text-red-500 bg-red-50">{erroEnvio}</p>
+              )}
+
               {/* Input */}
               <div className="p-4 border-t flex gap-2">
                 <Input
                   placeholder="Digite uma mensagem..."
                   value={novaMensagem}
-                  onChange={(e) => setNovaMensagem(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
+                  onChange={(e) => { setNovaMensagem(e.target.value); setErroEnvio(""); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
                       handleEnviarMensagem();
                     }
                   }}
@@ -171,7 +187,7 @@ export function ChatWidget() {
                 <Button
                   size="icon"
                   onClick={handleEnviarMensagem}
-                  disabled={!novaMensagem.trim()}
+                  disabled={!novaMensagem.trim() || enviarMensagem.isPending}
                 >
                   <Send className="w-4 h-4" />
                 </Button>
