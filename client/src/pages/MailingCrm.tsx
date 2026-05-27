@@ -241,35 +241,58 @@ export default function MailingCrm() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const wb = XLSX.read(ev.target?.result, { type: "binary" });
+      const wb = XLSX.read(ev.target?.result, { type: "array", cellDates: true });
       const ws = wb.Sheets[wb.SheetNames[0]];
-      // Lê com header:1 para pegar a linha 1 como cabeçalho
-      // Pula linhas que são claramente de descrição/exemplo (sem CPF ou nome real)
-      const raw: Record<string, any>[] = XLSX.utils.sheet_to_json(ws, { defval: "", raw: false });
+      // Usa header:1 (array de arrays) para controle total — evita problemas de acentos nos cabeçalhos
+      const json: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: "" });
+      if (!json || json.length < 2) { toast.warning("Arquivo vazio ou sem dados."); return; }
+      // Normaliza cabeçalhos: uppercase + remove acentos
+      const normStr = (h: any) => String(h ?? "").trim().toUpperCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const rawHeaders = json[0] || [];
+      const colMap: Record<string, number> = {};
+      rawHeaders.forEach((h: any, i: number) => { colMap[normStr(h)] = i; });
+      // Mapa normalizado: chave normalizada -> campo Row
+      const NORM_MAP: Record<string, keyof Row> = {};
+      for (const [k, v] of Object.entries(EXCEL_MAP)) {
+        NORM_MAP[normStr(k)] = v;
+      }
       const SKIP_PATTERNS = [
         /^ex:/i, /^dd\/mm\/aaaa$/i, /^m ou f$/i, /^nome completo$/i,
-        /^número da conta$/i, /^sigla/i, /^ex:/i,
+        /^numero da conta$/i, /^sigla/i,
       ];
-      const isDescRow = (r: Record<string, any>) => {
-        const nome = String(r["NOME"] ?? "").trim();
-        const cpf = String(r["CPF"] ?? "").trim();
-        // Pula se nome ou CPF parecerem texto de instrução
-        return SKIP_PATTERNS.some(p => p.test(nome) || p.test(cpf)) || (!nome && !cpf);
-      };
-      const mapped = raw.filter(r => !isDescRow(r)).map(r => {
+      const mapped = json.slice(1).map(row => {
+        const nomeIdx = colMap[normStr("NOME")];
+        const cpfIdx = colMap[normStr("CPF")];
+        const nome = String(nomeIdx !== undefined ? row[nomeIdx] : "").trim();
+        const cpf = String(cpfIdx !== undefined ? row[cpfIdx] : "").trim();
+        // Pula linhas de instrução/exemplo
+        if (SKIP_PATTERNS.some(p => p.test(nome) || p.test(cpf))) return null;
+        if (!nome && !cpf) return null;
         const obj: Partial<Row> = {};
-        for (const [col, field] of Object.entries(EXCEL_MAP)) {
-          const val = r[col];
-          if (val !== undefined && val !== null && String(val).trim() !== "" && String(val) !== "0") {
-            (obj as any)[field] = String(val).trim();
+        for (const [normKey, field] of Object.entries(NORM_MAP)) {
+          const idx = colMap[normKey];
+          if (idx === undefined) continue;
+          const val = row[idx];
+          if (val === undefined || val === null || String(val).trim() === "") continue;
+          // Formata datas JS → DD/MM/AAAA
+          if (val instanceof Date && !isNaN(val.getTime())) {
+            const d = val.getDate().toString().padStart(2, '0');
+            const m = (val.getMonth() + 1).toString().padStart(2, '0');
+            const y = val.getFullYear();
+            (obj as any)[field] = `${d}/${m}/${y}`;
+          } else {
+            const s = String(val).trim();
+            if (s !== "0") (obj as any)[field] = s;
           }
         }
         return obj;
-      }).filter(r => r.nome);
+      }).filter((r): r is Partial<Row> => !!r && !!r.nome);
       if (mapped.length === 0) { toast.warning("Nenhum registro válido encontrado."); return; }
+      toast.info(`Importando ${mapped.length} registros...`);
       importar.mutate(mapped as any);
     };
-    reader.readAsBinaryString(file);
+    reader.readAsArrayBuffer(file);
     e.target.value = "";
   };
 
