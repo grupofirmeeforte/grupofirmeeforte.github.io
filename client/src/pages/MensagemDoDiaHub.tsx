@@ -229,11 +229,19 @@ function AbaMotivacional() {
 }
 
 // ─── ABA ORIXÁS ──────────────────────────────────────────────────────────────
-// Função para selecionar mensagem do dia (muda a cada dia)
-function getMensagemDoDia<T>(lista: T[]): T {
+// Função para selecionar mensagem do dia (muda a cada dia, seed por data + nome do orixá)
+function getMensagemDoDia<T>(lista: T[], seed: string = ''): T {
   const hoje = new Date();
-  const diaAno = Math.floor((hoje.getTime() - new Date(hoje.getFullYear(), 0, 0).getTime()) / 86400000);
-  return lista[diaAno % lista.length];
+  // Usar data completa (ano+mes+dia) como base para garantir troca diária
+  const dataStr = `${hoje.getFullYear()}${String(hoje.getMonth() + 1).padStart(2,'0')}${String(hoje.getDate()).padStart(2,'0')}`;
+  // Combinar data com seed (nome do orixá) para variar entre orixás
+  const combined = dataStr + seed;
+  let hash = 0;
+  for (let i = 0; i < combined.length; i++) {
+    hash = ((hash << 5) - hash) + combined.charCodeAt(i);
+    hash |= 0;
+  }
+  return lista[Math.abs(hash) % lista.length];
 }
 
 const ORIXAS_10 = [
@@ -432,7 +440,7 @@ const ORIXAS_10 = [
 function AbaOrixas() {
   const [orixaSelecionado, setOrixaSelecionado] = useState(0);
   const orixa = ORIXAS_10[orixaSelecionado];
-  const mensagemHoje = getMensagemDoDia(orixa.mensagens);
+  const mensagemHoje = getMensagemDoDia(orixa.mensagens, orixa.nome);
 
   return (
     <div className="max-w-2xl mx-auto py-8 space-y-6">
