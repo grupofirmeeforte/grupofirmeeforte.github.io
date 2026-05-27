@@ -54,6 +54,24 @@ type Row = {
 const EMPTY: Partial<Row> = {};
 const PER_PAGE = 50;
 
+// Formata CPF: 000.000.000-00 (aceita qualquer entrada)
+function formatCpf(v?: string | null): string {
+  if (!v) return "";
+  const d = String(v).replace(/\D/g, "").padStart(11, "0").slice(-11);
+  return `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9,11)}`;
+}
+
+// Formata telefone: (DDD) 00000-0000 ou (DDD) 0000-0000
+function formatTel(ddd?: string | null, tel?: string | null): string {
+  const d = String(ddd ?? "").replace(/\D/g, "");
+  const t = String(tel ?? "").replace(/\D/g, "");
+  if (!t || t === "0") return "";
+  const telFmt = t.length >= 9
+    ? `${t.slice(0, 5)}-${t.slice(5, 9)}`
+    : `${t.slice(0, 4)}-${t.slice(4, 8)}`;
+  return d ? `(${d}) ${telFmt}` : telFmt;
+}
+
 // Monta lista de telefones com DDD
 function fones(row: Row): string[] {
   const pares: [string | null | undefined, string | null | undefined][] = [
@@ -63,8 +81,8 @@ function fones(row: Row): string[] {
     [row.ddd10, row.tel10],
   ];
   return pares
-    .filter(([, t]) => t && t !== "0")
-    .map(([d, t]) => d && d !== "0" ? `(${d}) ${t}` : String(t));
+    .map(([d, t]) => formatTel(d, t))
+    .filter(Boolean);
 }
 
 // Mapeamento Excel → campos
@@ -283,7 +301,27 @@ export default function MailingCrm() {
             (obj as any)[field] = `${d}/${m}/${y}`;
           } else {
             const s = String(val).trim();
-            if (s !== "0") (obj as any)[field] = s;
+            if (s === "0" || s === "") continue;
+            // Formata CPF automaticamente — sempre padStart(11) para preservar zero à esquerda
+            if (field === "cpf") {
+              const digits = s.replace(/\D/g, "").padStart(11, "0").slice(-11);
+              (obj as any)[field] = `${digits.slice(0,3)}.${digits.slice(3,6)}.${digits.slice(6,9)}-${digits.slice(9,11)}`;
+            // Formata DDD: só números
+            } else if (field.startsWith("ddd")) {
+              const digits = s.replace(/\D/g, "");
+              if (digits) (obj as any)[field] = digits;
+            // Formata telefone: 00000-0000 ou 0000-0000
+            } else if (field.startsWith("tel")) {
+              const digits = s.replace(/\D/g, "");
+              if (digits && digits !== "0") {
+                const t = digits.length >= 9
+                  ? `${digits.slice(0,5)}-${digits.slice(5,9)}`
+                  : `${digits.slice(0,4)}-${digits.slice(4,8)}`;
+                (obj as any)[field] = t;
+              }
+            } else {
+              (obj as any)[field] = s;
+            }
           }
         }
         return obj;
@@ -442,7 +480,7 @@ export default function MailingCrm() {
                       )}
                     </div>
                     <div className="text-[11px] text-gray-500">
-                      {r.cpf && <span className="font-mono">{r.cpf}</span>}
+                      {r.cpf && <span className="font-mono">{formatCpf(r.cpf)}</span>}
                     </div>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       {r.dtaNasc && <span className="text-[10px] text-gray-400">Nasc: {r.dtaNasc}</span>}
