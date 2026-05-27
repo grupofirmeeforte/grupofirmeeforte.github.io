@@ -300,7 +300,12 @@ export async function criarMensagem(data: InsertMensagem) {
   const db = await getDb();
   if (!db) return undefined;
 
-  return await db.insert(mensagens).values(data);
+  const agora = new Date();
+  return await db.insert(mensagens).values({
+    ...data,
+    createdAt: agora,
+    updatedAt: agora,
+  });
 }
 
 export async function obterMensagensPrivadas(usuarioId: number, outroUsuarioId: number) {
