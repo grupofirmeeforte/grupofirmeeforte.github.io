@@ -287,11 +287,21 @@ export const appRouter = router({
         const diaHoje = hoje.getDate();
         const mesHoje = hoje.getMonth() + 1;
         let isAniversario = false;
+        let diasParaAniversario = 0; // -1 = véspera, 0 = dia exato, 1 = dia seguinte
         if (agente.dataNascimento) {
           const partes = agente.dataNascimento.split('-');
           const mesNasc = parseInt(partes[1], 10);
           const diaNasc = parseInt(partes[2], 10);
-          isAniversario = diaNasc === diaHoje && mesNasc === mesHoje;
+          // Verificar janela de 3 dias: véspera, dia e dia seguinte
+          for (const delta of [-1, 0, 1]) {
+            const dataVerif = new Date(hoje);
+            dataVerif.setDate(hoje.getDate() + delta);
+            if (diaNasc === dataVerif.getDate() && mesNasc === dataVerif.getMonth() + 1) {
+              isAniversario = true;
+              diasParaAniversario = -delta; // -1=amanhã é aniv, 0=hoje, 1=ontem foi aniv
+              break;
+            }
+          }
         }
 
         // Verificar se o agente tem acesso irrestrito (sem bloqueio de horário)
@@ -331,6 +341,7 @@ export const appRouter = router({
           success: true,
           numeroEntrada,
           isAniversario,
+          diasParaAniversario,
           acessoIrrestrito,
           isentoGeo,
           agente: {

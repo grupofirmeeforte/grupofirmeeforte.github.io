@@ -119,7 +119,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isBlocked, setIsBlocked] = useState(false);
   const [attemptCount, setAttemptCount] = useState(0);
-  const [welcomeData, setWelcomeData] = useState<{ nome: string; isAniversario: boolean } | null>(null);
+  const [welcomeData, setWelcomeData] = useState<{ nome: string; isAniversario: boolean; diasParaAniversario: number } | null>(null);
   const [, setLocation] = useLocation();
 
   // Geolocalização
@@ -160,9 +160,9 @@ export default function Login() {
 
   const loginMutation = trpc.auth.loginCustom.useMutation({
     onSuccess: (data) => {
-      setWelcomeData({ nome: data.agente.nome || '', isAniversario: data.isAniversario });
-      const delay = data.isAniversario ? 13000 : 3000;
-      setTimeout(() => setLocation('/'), delay);
+      setWelcomeData({ nome: data.agente.nome || '', isAniversario: data.isAniversario, diasParaAniversario: data.diasParaAniversario ?? 0 });
+      // Não redirecionar automaticamente no aniversário — o usuário fecha com o botão X
+      if (!data.isAniversario) setTimeout(() => setLocation('/'), 3000);
     },
     onError: (err: TRPCClientErrorLike<any>) => {
       const message = err.message || '';
@@ -253,9 +253,9 @@ export default function Login() {
       }
       setRapidoStatus('success');
       setRapidoMessage('Acesso confirmado! Entrando...');
-      setWelcomeData({ nome: data.agente.nome || '', isAniversario: data.isAniversario });
-      const delay = data.isAniversario ? 13000 : 3000;
-      setTimeout(() => setLocation('/'), delay);
+      setWelcomeData({ nome: data.agente.nome || '', isAniversario: data.isAniversario, diasParaAniversario: data.diasParaAniversario ?? 0 });
+      // Não redirecionar automaticamente no aniversário — o usuário fecha com o botão X
+      if (!data.isAniversario) setTimeout(() => setLocation('/'), 3000);
     } catch (e: any) {
       setRapidoStatus('error');
       const msg = e.message || '';
@@ -274,15 +274,32 @@ export default function Login() {
   // ── Tela de boas-vindas ──────────────────────────────────────────────────
   const [showBalloons, setShowBalloons] = useState(true);
   const [showMessage, setShowMessage] = useState(false);
+  const [showCloseBtn, setShowCloseBtn] = useState(false);
 
   useEffect(() => {
     if (!welcomeData?.isAniversario) return;
-    const t1 = setTimeout(() => setShowBalloons(false), 10000);
-    const t2 = setTimeout(() => setShowMessage(true), 10200);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    // Balões nos 3 dias, mensagem após 4s, botão X após 8s
+    const t1 = setTimeout(() => setShowMessage(true), 4000);
+    const t2 = setTimeout(() => setShowCloseBtn(true), 8000);
+    const t3 = setTimeout(() => setShowBalloons(false), 14000);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [welcomeData?.isAniversario]);
 
   if (welcomeData) {
+    const primeiroNome = welcomeData.nome.split(' ')[0];
+    const dias = welcomeData.diasParaAniversario;
+    // dias: -1 = amanhã é o aniversário, 0 = hoje, 1 = ontem foi o aniversário
+    const tituloAniv = dias === 0
+      ? `🎉 Feliz Aniversário, ${primeiroNome}!`
+      : dias === -1
+      ? `🎂 Amanhã é seu Aniversário, ${primeiroNome}!`
+      : `🎈 Ontem foi seu Aniversário, ${primeiroNome}!`;
+    const mensagemAniv = dias === 0
+      ? 'Que este novo ano de vida seja repleto de conquistas, saúde e muito sucesso! Toda a equipe está comemorando com você!'
+      : dias === -1
+      ? 'Amanhã é um dia muito especial! Que a véspera do seu aniversário seja cheia de alegria e antecipação de coisas maravilhosas!'
+      : 'Esperamos que seu aniversário de ontem tenha sido incrivel! Que as boas energias deste novo ano de vida continuem com você!';
+
     return (
       <div
         className="min-h-screen flex items-center justify-center relative overflow-hidden"
@@ -299,26 +316,42 @@ export default function Login() {
         >
           {welcomeData.isAniversario ? (
             <>
-              <div className="text-6xl mb-4">🎂</div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">
-                Feliz Aniversário, {welcomeData.nome.split(' ')[0]}!
-              </h2>
-              {showMessage && (
+              {/* Botão X para fechar */}
+              {showCloseBtn && (
+                <button
+                  onClick={() => setLocation('/')}
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors text-lg font-bold"
+                  title="Entrar no sistema"
+                >
+                  ×
+                </button>
+              )}
+              <div className="text-6xl mb-4">{dias === 0 ? '🎂' : dias === -1 ? '🎉' : '🎈'}</div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">{tituloAniv}</h2>
+              {showMessage ? (
                 <div className="animate-in fade-in duration-700">
-                  <p className="text-gray-600 text-lg mb-4">
-                    Que este novo ano seja repleto de conquistas, saúde e muito sucesso!
-                  </p>
+                  <p className="text-gray-600 text-base mb-4">{mensagemAniv}</p>
                   <p className="text-blue-700 font-semibold">
                     Com carinho, toda a equipe Grupo Firme & Forte 💙
                   </p>
+                  {showCloseBtn && (
+                    <button
+                      onClick={() => setLocation('/')}
+                      className="mt-6 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors"
+                    >
+                      Entrar no Sistema →
+                    </button>
+                  )}
                 </div>
+              ) : (
+                <p className="text-gray-400 text-sm mt-2">Aguarde um momento...</p>
               )}
             </>
           ) : (
             <>
               <div className="text-5xl mb-4">👋</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Bem-vindo, {welcomeData.nome.split(' ')[0]}!
+                Bem-vindo, {primeiroNome}!
               </h2>
               <p className="text-gray-500">Carregando o sistema...</p>
             </>
@@ -369,7 +402,7 @@ export default function Login() {
               <div className="mt-2 border border-indigo-200 rounded-xl overflow-hidden bg-white">
                 <LoginFacial
                   onSuccess={(data) => {
-                    setWelcomeData({ nome: data.nomeAgente, isAniversario: false });
+                    setWelcomeData({ nome: data.nomeAgente, isAniversario: false, diasParaAniversario: 0 });
                     setTimeout(() => setLocation('/'), 1500);
                   }}
                   onClose={() => setShowFacial(false)}

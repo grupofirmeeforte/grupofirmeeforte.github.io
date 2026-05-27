@@ -83,15 +83,26 @@ async function criarSessaoAgente(
     ctx.res.cookie("sessionId", String((sessaoResult as any).insertId), { ...cookieOptions, maxAge: ONE_YEAR_MS });
   }
 
-  // Verificar aniversário
+  // Verificar aniversário (janela de 3 dias: véspera, dia e dia seguinte)
   const hoje = new Date();
   let isAniversario = false;
+  let diasParaAniversario = 0;
   if (agente.dataNascimento) {
     const partes = agente.dataNascimento.split("-");
-    isAniversario = parseInt(partes[2], 10) === hoje.getDate() && parseInt(partes[1], 10) === hoje.getMonth() + 1;
+    const mesNasc = parseInt(partes[1], 10);
+    const diaNasc = parseInt(partes[2], 10);
+    for (const delta of [-1, 0, 1]) {
+      const dataVerif = new Date(hoje);
+      dataVerif.setDate(hoje.getDate() + delta);
+      if (diaNasc === dataVerif.getDate() && mesNasc === dataVerif.getMonth() + 1) {
+        isAniversario = true;
+        diasParaAniversario = -delta;
+        break;
+      }
+    }
   }
 
-  return { success: true, numeroEntrada, isAniversario, agente: { id: agente.id, chaveJ: agente.chaveJ, nome: agente.nomeAgente, dataNascimento: agente.dataNascimento } };
+  return { success: true, numeroEntrada, isAniversario, diasParaAniversario, agente: { id: agente.id, chaveJ: agente.chaveJ, nome: agente.nomeAgente, dataNascimento: agente.dataNascimento } };
 }
 
 // ── Router ────────────────────────────────────────────────────────────────────
