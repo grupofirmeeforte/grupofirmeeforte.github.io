@@ -138,6 +138,11 @@ export default function AgentesFormPage() {
     celular: "",
     signo: "",
     permissoes: "leitor",
+    cep: "",
+    endereco: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
   });
 
   const [permissoesModulos, setPermissoesModulos] = useState<PermissoesMap>({});
@@ -333,6 +338,11 @@ export default function AgentesFormPage() {
         celular: agente.celular || "",
         signo: (agente as any).signo || getSignoFromDate(agente.dataNascimento || "") || "",
         permissoes: agente.permissoes || "leitor",
+        cep: (agente as any).cep || "",
+        endereco: (agente as any).endereco || "",
+        numero: (agente as any).numero || "",
+        complemento: (agente as any).complemento || "",
+        bairro: (agente as any).bairro || "",
       });
       // Carregar permissoesModulos do JSON
       // Mescla com defaults (sem_acesso) para garantir que módulos novos apareçam corretamente
@@ -551,6 +561,56 @@ export default function AgentesFormPage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
+                <Label htmlFor="cep">CEP</Label>
+                <Input
+                  id="cep"
+                  name="cep"
+                  placeholder="00000-000"
+                  value={formData.cep}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="endereco">Endereço (Logradouro)</Label>
+                <Input
+                  id="endereco"
+                  name="endereco"
+                  placeholder="Rua, Avenida..."
+                  value={formData.endereco}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <Label htmlFor="numero">Número</Label>
+                <Input
+                  id="numero"
+                  name="numero"
+                  value={formData.numero}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <Label htmlFor="complemento">Complemento</Label>
+                <Input
+                  id="complemento"
+                  name="complemento"
+                  placeholder="Apto, Sala..."
+                  value={formData.complemento}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <Label htmlFor="bairro">Bairro</Label>
+                <Input
+                  id="bairro"
+                  name="bairro"
+                  value={formData.bairro}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
                 <Label htmlFor="cidade">Cidade</Label>
                 <Input
                   id="cidade"
@@ -559,6 +619,8 @@ export default function AgentesFormPage() {
                   onChange={handleInputChange}
                 />
               </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <Label htmlFor="uf">UF</Label>
                 <Input

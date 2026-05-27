@@ -33,6 +33,12 @@ const agenteSchema = z.object({
   celular: z.string().optional(),
   permissoes: z.string().optional(),
   permissoesModulos: z.string().optional(), // JSON string com permissoes por sub-aba
+  signo: z.string().optional(),
+  cep: z.string().optional(),
+  endereco: z.string().optional(),
+  numero: z.string().optional(),
+  complemento: z.string().optional(),
+  bairro: z.string().optional(),
 });
 
 const agenteUpdateSchema = agenteSchema.partial();

@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit2, Trash2, Search, ExternalLink, GitMerge, Copy, Check } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, ExternalLink, GitMerge, Copy, Check, FileText } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useLocation } from "wouter";
 
@@ -383,10 +383,10 @@ export default function AgentesPage() {
                         <div className="font-medium text-sm text-gray-900 leading-tight mt-0.5">
                           {agente.nomeAgente}{agente.dataNascimento ? <span className="font-normal text-gray-400 text-xs ml-1">· {formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '')}</span> : ''}
                         </div>
-                        {/* Linha 4: Empresa + Email */}
-                        <div className="text-xs text-gray-500 mt-0.5">{agente.empresa || '-'}{agente.email ? <span className="text-blue-500 ml-1">{agente.email}</span> : ''}</div>
-                        {/* Linha 5: Cidade/UF */}
-                        <div className="text-xs text-gray-400">{agente.cidade ? `${agente.cidade}${agente.uf ? `/${agente.uf}` : ''}` : (agente.uf || '')}</div>
+                        {/* Linha 4: Empresa + Email + CEP */}
+                        <div className="text-xs text-gray-500 mt-0.5">{agente.empresa || '-'}{agente.email ? <span className="text-blue-500 ml-1">{agente.email}</span> : ''}{(agente as any).cep ? <span className="text-gray-400 ml-1">· CEP {(agente as any).cep}</span> : ''}</div>
+                        {/* Linha 5: Endereço + Cidade/UF */}
+                        <div className="text-xs text-gray-400">{(agente as any).endereco ? `${(agente as any).endereco}${(agente as any).numero ? `, ${(agente as any).numero}` : ''}${(agente as any).bairro ? ` - ${(agente as any).bairro}` : ''} · ` : ''}{agente.cidade ? `${agente.cidade}${agente.uf ? `/${agente.uf}` : ''}` : (agente.uf || '')}</div>
                       </TableCell>
                       {/* Função / Certificações unificadas */}
                       <TableCell className="min-w-[200px]">
@@ -466,10 +466,17 @@ export default function AgentesPage() {
                         <Button
                           variant="ghost"
                           size="sm"
+                          title="Gerar PDF do agente"
+                          onClick={() => navigate(`/agentes/${agente.id}/pdf`)}
+                        >
+                          <FileText className="w-4 h-4 text-orange-600" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => navigate(`/agentes/${agente.id}`)}
                         >
                           <Edit2 className="w-4 h-4" />
-
                         </Button>
                         <Button
                           variant="ghost"

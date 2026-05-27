@@ -81,6 +81,11 @@ export const agentes = mysqlTable('agentes', {
   permissoes: varchar("permissoes", { length: 50 }).default("leitor"), // admin, editor, leitor, sem_acesso
   permissoesModulos: text("permissoesModulos"), // JSON com permissoes por sub-aba: {modulo: {subaba: nivel}}
   signo: varchar("signo", { length: 20 }), // signo zodiacal para horóscopo diário
+  cep: varchar("cep", { length: 10 }),
+  endereco: varchar("endereco", { length: 255 }),
+  numero: varchar("numero", { length: 20 }),
+  complemento: varchar("complemento", { length: 100 }),
+  bairro: varchar("bairro", { length: 100 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
