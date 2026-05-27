@@ -43,6 +43,29 @@ import { notifyOwner } from "./_core/notification";
 import { sdk } from "./_core/sdk";
 import { TRPCError } from "@trpc/server";
 
+// Calcular signo zodiacal a partir de data de nascimento (formato YYYY-MM-DD)
+function calcularSigno(dataNascimento: string): string | null {
+  try {
+    const partes = dataNascimento.split('-');
+    if (partes.length < 3) return null;
+    const mes = parseInt(partes[1], 10);
+    const dia = parseInt(partes[2], 10);
+    if (mes === 3 && dia >= 21 || mes === 4 && dia <= 19) return 'Áries';
+    if (mes === 4 && dia >= 20 || mes === 5 && dia <= 20) return 'Touro';
+    if (mes === 5 && dia >= 21 || mes === 6 && dia <= 20) return 'Gêmeos';
+    if (mes === 6 && dia >= 21 || mes === 7 && dia <= 22) return 'Câncer';
+    if (mes === 7 && dia >= 23 || mes === 8 && dia <= 22) return 'Leão';
+    if (mes === 8 && dia >= 23 || mes === 9 && dia <= 22) return 'Virgem';
+    if (mes === 9 && dia >= 23 || mes === 10 && dia <= 22) return 'Libra';
+    if (mes === 10 && dia >= 23 || mes === 11 && dia <= 21) return 'Escorpião';
+    if (mes === 11 && dia >= 22 || mes === 12 && dia <= 21) return 'Sagitário';
+    if (mes === 12 && dia >= 22 || mes === 1 && dia <= 19) return 'Capricórnio';
+    if (mes === 1 && dia >= 20 || mes === 2 && dia <= 18) return 'Aquário';
+    if (mes === 2 && dia >= 19 || mes === 3 && dia <= 20) return 'Peixes';
+    return null;
+  } catch { return null; }
+}
+
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
@@ -73,6 +96,11 @@ export const appRouter = router({
             dataNascimento: agentes.dataNascimento,
           }).from(agentes).where(eq(agentes.id, agenteId)).limit(1);
           if (agenteRow) {
+            // Calcular signo automaticamente pela data de nascimento se não estiver preenchido
+            let signoFinal = agenteRow.signo ?? null;
+            if (!signoFinal && agenteRow.dataNascimento) {
+              signoFinal = calcularSigno(agenteRow.dataNascimento);
+            }
             return {
               ...user,
               permissoes: agenteRow.permissoes ?? 'leitor',
@@ -81,7 +109,7 @@ export const appRouter = router({
               nomeAgente: agenteRow.nomeAgente ?? null,
               chaveJ: agenteRow.chaveJ ?? null,
               situacao: agenteRow.situacao ?? null,
-              signo: agenteRow.signo ?? null,
+              signo: signoFinal,
               dataNascimento: agenteRow.dataNascimento ?? null,
             };
           }

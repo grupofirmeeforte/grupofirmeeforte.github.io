@@ -123,10 +123,10 @@ export default function CaixaRecados() {
       <div className="bg-white border-b shadow-sm sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
           <Button
-            variant="outline"
             size="sm"
             onClick={() => setLocation("/")}
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1.5 rounded-full font-semibold"
+            style={{background:'linear-gradient(135deg,#1d4ed8 0%,#1e40af 100%)',color:'#fff',border:'1.5px solid #3b82f6',boxShadow:'0 2px 12px rgba(59,130,246,0.35)'}}
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar
