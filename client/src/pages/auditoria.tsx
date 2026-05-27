@@ -835,9 +835,12 @@ function DespesasInternasAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any)
   const CHAVES_AUTORIZADAS = ['J1234568', 'J1234569', 'J9624265', 'JG701582'];
   const chaveJ = (user as any)?.chaveJ ?? '';
   const nome = (user as any)?.nomeAgente?.toLowerCase?.() ?? '';
+  const cargo = (user as any)?.cargo ?? '';
   const temAcesso = CHAVES_AUTORIZADAS.includes(chaveJ) ||
+    cargo === 'CEO' ||
     nome.includes('sidnei') ||
-    nome.includes('thiago viana');
+    nome.includes('thiago viana') ||
+    nome.includes('thiago v ultramare');
   if (!temAcesso) return null;
   return (
     <button
