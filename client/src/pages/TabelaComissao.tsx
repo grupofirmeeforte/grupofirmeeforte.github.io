@@ -159,6 +159,68 @@ function EditableCell({
   );
 }
 
+// Célula especial para Rec%: digita número, exibe com % automático
+function ReceboCelula({
+  value,
+  onSave,
+  isSaving,
+}: {
+  value: string | null;
+  onSave: (v: string) => void;
+  isSaving: boolean;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempValue, setTempValue] = useState('');
+
+  const handleStartEdit = () => {
+    // Ao editar, mostra o valor sem %
+    const raw = value ? String(value).replace('%','').trim() : '';
+    setTempValue(raw);
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    setIsEditing(false);
+    if (tempValue !== (value ? String(value).replace('%','').trim() : '')) {
+      onSave(tempValue);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSave();
+    if (e.key === 'Escape') setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <input
+        autoFocus
+        type="text"
+        value={tempValue}
+        onChange={e => setTempValue(e.target.value)}
+        onBlur={handleSave}
+        onKeyDown={handleKeyDown}
+        disabled={isSaving}
+        className="w-full px-1 py-0.5 border border-yellow-400 rounded bg-white text-sm text-center focus:outline-none focus:ring-1 focus:ring-yellow-500"
+        placeholder="ex: 1,96"
+      />
+    );
+  }
+
+  // Display: mostra valor + % automaticamente
+  const display = value ? `${String(value).replace('%','').trim()}%` : '-';
+
+  return (
+    <div
+      onClick={handleStartEdit}
+      className="cursor-pointer px-1 py-1 rounded hover:bg-yellow-100 transition-colors text-sm font-semibold text-yellow-700 text-center"
+      title="Clique para editar"
+    >
+      {display}
+    </div>
+  );
+}
+
 export default function TabelaComissao() {
   const [, setLocation] = useLocation();
   const [filtroEmpresa, setFiltroEmpresa] = useState('');
@@ -760,8 +822,8 @@ export default function TabelaComissao() {
                           const temAlerta = ativos.some((a: any) => a.excede);
                           return (
                             <>
-                              <td className="py-1 text-center whitespace-nowrap" style={{width:'60px'}}>
-                                <EditableCell
+                              <td className="py-1 text-center whitespace-nowrap" style={{width:'68px'}}>
+                                <ReceboCelula
                                   value={(row as any).receboPct}
                                   onSave={(v) => handleCellSave(row.id, 'receboPct' as any, v)}
                                   isSaving={savingCell === `${row.id}-receboPct`}
