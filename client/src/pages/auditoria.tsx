@@ -832,8 +832,9 @@ export default function AuditoriaPage() {
 // ─── BOTÃO DA ABA DESPESAS INTERNAS (só renderiza se tiver acesso) ────────────
 function DespesasInternasAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => void }) {
   const { user } = useAuth();
-  const { data: acesso } = trpc.despesasInternas.verificarAcesso.useQuery(undefined, { enabled: !!user });
-  if (!acesso?.temAcesso) return null;
+  // Verificar acesso diretamente pelo cargo/permissoes do usuário (já retornados pelo auth.me)
+  const temAcesso = !!(user && ((user as any).cargo === 'CEO' || (user as any).permissoes === 'admin'));
+  if (!temAcesso) return null;
   return (
     <button
       onClick={() => setAba('despesas-internas')}
@@ -872,8 +873,8 @@ type DespesaInterna = {
 function DespesasInternasAba() {
   const utils = trpc.useUtils();
   const { user } = useAuth();
-  // Acesso via servidor (mais confiável que user.cargo local)
-  const { data: acesso } = trpc.despesasInternas.verificarAcesso.useQuery(undefined, { enabled: !!user });
+  // Verificar acesso diretamente pelo cargo/permissoes do usuário (retornados pelo auth.me)
+  const temAcesso = !!(user && ((user as any).cargo === 'CEO' || (user as any).permissoes === 'admin'));
   // Segunda senha CEO
   const [senhaDesbloqueada, setSenhaDesbloqueada] = useState(false);
   const [senhaInput, setSenhaInput] = useState('');
@@ -935,7 +936,7 @@ function DespesasInternasAba() {
     else criarMutation.mutate(payload);
   };
 
-  if (!acesso?.temAcesso) {
+  if (!temAcesso) {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
         <AlertTriangle className="w-16 h-16 text-red-400" />
