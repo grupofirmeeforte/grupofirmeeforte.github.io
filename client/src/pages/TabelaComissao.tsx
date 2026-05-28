@@ -733,22 +733,29 @@ export default function TabelaComissao() {
                         </td>
                         {/* Colunas CEO: Recebo e Pago */}
                         {isAdminOuCeo && (() => {
-                          // Recebo: converte para número decimal para comparação
+                          // Recebo: converte para percentual comparável
                           const receboRaw = (row as any).receboPct;
                           const receboNum = receboRaw ? parseFloat(String(receboRaw).replace(',','.').replace('%','')) : null;
-                          // Pago: lista compacta dos 10 ativos com seus valores e flag de alerta
+                          // Recebo pode ser digitado como "1,96" (já em %) ou "0.0196" (decimal)
+                          const receboPct2 = receboNum !== null
+                            ? (receboNum < 1 ? receboNum * 100 : receboNum)
+                            : null;
+                          // Pago: calcula (ativo / recebo) * 100 para cada ativo
                           const ativos = ALL_ATIVOS.map((key, i) => {
                             const v = (row as any)[key];
                             if (!v) return null;
                             const ativoNum = parseFloat(String(v).replace(',','.').replace('%',''));
-                            // Banco guarda decimal (ex: 0.0065), receboPct é digitado pelo usuário como string livre
-                            // Normalizar: se receboNum < 1 assume decimal, senão assume percentual direto
-                            const receboComparavel = receboNum !== null
-                              ? (receboNum < 1 ? receboNum * 100 : receboNum)
+                            // Banco guarda decimal (ex: 0.0065 = 0,65%)
+                            const ativoPct = ativoNum < 1 ? ativoNum * 100 : ativoNum;
+                            // Percentual do recebo que está sendo pago: (ativo / recebo) * 100
+                            const pagoProporcao = receboPct2 !== null && receboPct2 > 0
+                              ? (ativoPct / receboPct2) * 100
                               : null;
-                            const ativoComparavel = ativoNum < 1 ? ativoNum * 100 : ativoNum;
-                            const excede = receboComparavel !== null && ativoComparavel > receboComparavel;
-                            return { label: `A${String(i+1).padStart(2,'0')}`, value: pct(v), excede };
+                            const excede = pagoProporcao !== null && pagoProporcao >= 100;
+                            const pagoPropStr = pagoProporcao !== null
+                              ? pagoProporcao.toFixed(4).replace('.', ',') + '%'
+                              : pct(v);
+                            return { label: `A${String(i+1).padStart(2,'0')}`, value: pagoPropStr, excede };
                           }).filter(Boolean);
                           const temAlerta = ativos.some((a: any) => a.excede);
                           return (
