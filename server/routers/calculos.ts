@@ -306,6 +306,7 @@ export const calculosRouter = router({
     .input(z.object({
       ano: z.string(), // ex: "2026"
       empresa: z.string().optional(), // "BMF" | "FLEX" | undefined = todas
+      mes: z.string().optional(), // ex: "05" | undefined = todos os meses
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -313,9 +314,13 @@ export const calculosRouter = router({
 
       const toN = (v: any) => parseFloat(String(v ?? 0)) || 0;
 
-      // 1. Buscar todos os cálculos do ano filtrado
-      const mesPattern = `%/${input.ano}`;
-      const calcConds: any[] = [like(calculos.mesRef, mesPattern)];
+      // 1. Buscar todos os cálculos do ano (e mês) filtrado
+      // mesRef formato: MM/AAAA
+      const mesPattern = input.mes ? `${input.mes}/${input.ano}` : `%/${input.ano}`;
+      const calcConds: any[] = [input.mes
+        ? eq(calculos.mesRef, mesPattern)
+        : like(calculos.mesRef, mesPattern)
+      ];
       if (input.empresa && input.empresa !== 'Todas') {
         calcConds.push(eq(calculos.empresa, input.empresa));
       }
@@ -352,16 +357,22 @@ export const calculosRouter = router({
         if (r.mesRef) ag.meses.add(r.mesRef);
       }
 
-      // 3. Buscar despesas fixas do ano
+      // 3. Buscar despesas fixas do ano (e mês)
       const { despesasFixas } = await import('../../drizzle/schema');
-      const dfConds: any[] = [like(despesasFixas.mesAno, mesPattern)];
+      const dfConds: any[] = [input.mes
+        ? eq(despesasFixas.mesAno, mesPattern)
+        : like(despesasFixas.mesAno, mesPattern)
+      ];
       if (input.empresa && input.empresa !== 'Todas') {
         dfConds.push(eq(despesasFixas.empresa, input.empresa));
       }
       const dfRows = await db.select().from(despesasFixas).where(and(...dfConds));
 
-      // 4. Buscar despesas avulsas (pagamentos) do ano — excluindo comissões de agentes
-      const pgConds: any[] = [like(pagamentos.mesAno, mesPattern)];
+      // 4. Buscar despesas avulsas (pagamentos) do ano (e mês) — excluindo comissões de agentes
+      const pgConds: any[] = [input.mes
+        ? eq(pagamentos.mesAno, mesPattern)
+        : like(pagamentos.mesAno, mesPattern)
+      ];
       if (input.empresa && input.empresa !== 'Todas') {
         pgConds.push(eq(pagamentos.empresa, input.empresa));
       }
@@ -429,7 +440,7 @@ export const calculosRouter = router({
           saldo,
           pctConsumido,
         };
-      }).sort((a, b) => b.rbmTotal - a.rbmTotal);
+      }).sort((a, b) => a.nomeAgente.localeCompare(b.nomeAgente, 'pt-BR', { sensitivity: 'base' }));
 
       return resultado;
     }),

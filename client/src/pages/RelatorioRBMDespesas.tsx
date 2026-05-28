@@ -15,12 +15,13 @@ export default function RelatorioRBMDespesas() {
   const [, navigate] = useLocation();
   const [ano, setAno] = useState("2026");
   const [empresa, setEmpresa] = useState("Todas");
+  const [mes, setMes] = useState(""); // "" = todos os meses
 
   // Anos dinâmicos do banco
   const { data: anosDisponiveis = ["2026"] } = trpc.calculosImportados.anosDisponiveis.useQuery();
 
   const { data = [], isLoading } = trpc.calculosImportados.relatorioRbmDespesas.useQuery(
-    { ano, empresa: empresa === "Todas" ? undefined : empresa },
+    { ano, empresa: empresa === "Todas" ? undefined : empresa, mes: mes || undefined },
     { enabled: !!ano }
   );
 
@@ -88,6 +89,18 @@ export default function RelatorioRBMDespesas() {
           <select value={ano} onChange={e => setAno(e.target.value)}
             className="border border-gray-300 rounded px-2 py-1 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
             {anosDisponiveis.map(a => <option key={a} value={a!}>{a}</option>)}
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="text-xs text-gray-500 font-medium">Mês</label>
+          <select value={mes} onChange={e => setMes(e.target.value)}
+            className="border border-gray-300 rounded px-2 py-1 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <option value="">Todos</option>
+            {["01","02","03","04","05","06","07","08","09","10","11","12"].map(m => (
+              <option key={m} value={m}>
+                {new Date(2000, parseInt(m)-1, 1).toLocaleString('pt-BR', { month: 'long' }).replace(/^./, c => c.toUpperCase())}
+              </option>
+            ))}
           </select>
         </div>
         <div className="flex items-center gap-2">
