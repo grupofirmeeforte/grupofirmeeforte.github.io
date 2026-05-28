@@ -733,12 +733,24 @@ export default function TabelaComissao() {
                         </td>
                         {/* Colunas CEO: Recebo e Pago */}
                         {isAdminOuCeo && (() => {
-                          // Pago: lista compacta dos 10 ativos com seus valores
+                          // Recebo: converte para número decimal para comparação
+                          const receboRaw = (row as any).receboPct;
+                          const receboNum = receboRaw ? parseFloat(String(receboRaw).replace(',','.').replace('%','')) : null;
+                          // Pago: lista compacta dos 10 ativos com seus valores e flag de alerta
                           const ativos = ALL_ATIVOS.map((key, i) => {
                             const v = (row as any)[key];
                             if (!v) return null;
-                            return { label: `A${String(i+1).padStart(2,'0')}`, value: pct(v) };
+                            const ativoNum = parseFloat(String(v).replace(',','.').replace('%',''));
+                            // Banco guarda decimal (ex: 0.0065), receboPct é digitado pelo usuário como string livre
+                            // Normalizar: se receboNum < 1 assume decimal, senão assume percentual direto
+                            const receboComparavel = receboNum !== null
+                              ? (receboNum < 1 ? receboNum * 100 : receboNum)
+                              : null;
+                            const ativoComparavel = ativoNum < 1 ? ativoNum * 100 : ativoNum;
+                            const excede = receboComparavel !== null && ativoComparavel > receboComparavel;
+                            return { label: `A${String(i+1).padStart(2,'0')}`, value: pct(v), excede };
                           }).filter(Boolean);
+                          const temAlerta = ativos.some((a: any) => a.excede);
                           return (
                             <>
                               <td className="py-1 text-center whitespace-nowrap" style={{width:'60px'}}>
@@ -748,15 +760,24 @@ export default function TabelaComissao() {
                                   isSaving={savingCell === `${row.id}-receboPct`}
                                 />
                               </td>
-                              <td className="px-2 py-1 text-left" style={{maxWidth:'160px'}}>
+                              <td className={`px-2 py-1 text-left ${temAlerta ? 'bg-red-50' : ''}`} style={{maxWidth:'180px'}}>
+                                {temAlerta && (
+                                  <div className="flex items-center gap-1 mb-0.5">
+                                    <span className="text-red-600 text-xs font-bold">⚠️ Pago &gt; Recebo!</span>
+                                  </div>
+                                )}
                                 {ativos.length === 0 ? (
                                   <span className="text-gray-400 text-xs">-</span>
                                 ) : (
                                   <div className="flex flex-wrap gap-x-1.5 gap-y-0.5">
                                     {ativos.map((a: any) => (
-                                      <span key={a.label} className="text-xs whitespace-nowrap">
+                                      <span
+                                        key={a.label}
+                                        className="text-xs whitespace-nowrap"
+                                        title={a.excede ? `⚠️ ${a.label} (${a.value}) é maior que o que você recebe!` : ''}
+                                      >
                                         <span className="text-gray-400">{a.label}:</span>
-                                        <span className="text-red-600 font-medium ml-0.5">{a.value}</span>
+                                        <span className={`font-medium ml-0.5 ${a.excede ? 'text-red-700 font-bold underline decoration-red-500' : 'text-red-600'}`}>{a.value}</span>
                                       </span>
                                     ))}
                                   </div>
