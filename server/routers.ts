@@ -2007,6 +2007,20 @@ export const appRouter = router({
     validarSenhaCeo: protectedProcedure
       .input(z.object({ senha: z.string().min(1) }))
       .mutation(async ({ input, ctx }) => {
+        // Owner do projeto: aceitar qualquer senha (usa a senha do agente associado)
+        const ownerOpenId = process.env.OWNER_OPEN_ID;
+        if (ownerOpenId && ctx.user?.openId === ownerOpenId) {
+          // Owner sempre tem acesso, valida com senha do agente SIDNEI se existir
+          const { agentes: agentesTable } = await import('../drizzle/schema');
+          const dbConn = await getDb();
+          if (!dbConn) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Banco indisponível' });
+          const { like } = await import('drizzle-orm');
+          const [agente] = await dbConn.select({ senha: agentesTable.senha })
+            .from(agentesTable).where(like(agentesTable.nomeAgente, '%SIDNEI%')).limit(1);
+          if (agente?.senha && agente.senha !== input.senha)
+            throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Senha CEO incorreta' });
+          return { ok: true };
+        }
         if (!ctx.user?.openId?.startsWith('agente_')) throw new TRPCError({ code: 'FORBIDDEN', message: 'Acesso negado' });
         const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
         const { agentes: agentesTable } = await import('../drizzle/schema');

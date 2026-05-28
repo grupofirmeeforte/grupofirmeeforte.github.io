@@ -832,11 +832,8 @@ export default function AuditoriaPage() {
 // ─── BOTÃO DA ABA DESPESAS INTERNAS (só renderiza se tiver acesso) ────────────
 function DespesasInternasAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => void }) {
   const { user } = useAuth();
-  const cargo = (user as any)?.cargo ?? '';
-  const permissoes = (user as any)?.permissoes ?? '';
-  // Acesso apenas para CEO
-  const temAcesso = cargo === 'CEO' || permissoes === 'admin';
-  if (!temAcesso) return null;
+  const { data: acesso } = trpc.despesasInternas.verificarAcesso.useQuery(undefined, { enabled: !!user });
+  if (!acesso?.temAcesso) return null;
   return (
     <button
       onClick={() => setAba('despesas-internas')}
@@ -875,10 +872,8 @@ type DespesaInterna = {
 function DespesasInternasAba() {
   const utils = trpc.useUtils();
   const { user } = useAuth();
-  // Acesso apenas para CEO
-  const cargo = (user as any)?.cargo ?? '';
-  const permissoes = (user as any)?.permissoes ?? '';
-  const acesso = { temAcesso: cargo === 'CEO' || permissoes === 'admin' };
+  // Acesso via servidor (mais confiável que user.cargo local)
+  const { data: acesso } = trpc.despesasInternas.verificarAcesso.useQuery(undefined, { enabled: !!user });
   // Segunda senha CEO
   const [senhaDesbloqueada, setSenhaDesbloqueada] = useState(false);
   const [senhaInput, setSenhaInput] = useState('');
