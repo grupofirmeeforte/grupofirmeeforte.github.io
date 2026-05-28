@@ -347,6 +347,21 @@ export default function TabelaComissao() {
   });
 
   // Mapa de cores por convênio (degradê por grupo)
+  // Cores por nome de empresa (badge colorido no nome)
+  const EMPRESA_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+    'BMF':  { bg: 'bg-green-600',  text: 'text-white', border: 'border-green-700' },
+    'FLEX': { bg: 'bg-blue-600',   text: 'text-white', border: 'border-blue-700'  },
+  };
+
+  function getEmpresaStyle(empresa: string | null) {
+    if (!empresa) return null;
+    const upper = empresa.trim().toUpperCase();
+    for (const [key, val] of Object.entries(EMPRESA_COLORS)) {
+      if (upper === key || upper.startsWith(key)) return val;
+    }
+    return null;
+  }
+
   const CONVENIO_COLORS: Record<string, { row: string; badge: string }> = {
     'CONVENIOS BANCO DO BRASIL': { row: 'bg-gradient-to-r from-yellow-50 to-amber-50 hover:from-yellow-100 hover:to-amber-100', badge: 'bg-yellow-200 text-yellow-900 border border-yellow-400' },
     'CREDITO PESSOAL':           { row: 'bg-gradient-to-r from-blue-50 to-sky-50 hover:from-blue-100 hover:to-sky-100',       badge: 'bg-blue-200 text-blue-900 border border-blue-400' },
@@ -783,9 +798,31 @@ export default function TabelaComissao() {
                         <td className="px-3 py-2 whitespace-nowrap">
                           <div className="flex items-center gap-1 text-xs mb-0.5">
                             {isAdminOuCeo ? (
-                              <EditableCell value={row.empresa} onSave={(v) => handleCellSave(row.id, 'empresa', v)} isSaving={savingCell === `${row.id}-empresa`} />
+                              (() => {
+                                const eStyle = getEmpresaStyle(row.empresa);
+                                return eStyle ? (
+                                  <span
+                                    className={`inline-block px-2 py-0.5 rounded font-bold text-xs cursor-pointer ${eStyle.bg} ${eStyle.text} border ${eStyle.border}`}
+                                    onClick={() => handleCellSave(row.id, 'empresa', row.empresa || '')}
+                                    title="Clique para editar"
+                                  >
+                                    {row.empresa}
+                                  </span>
+                                ) : (
+                                  <EditableCell value={row.empresa} onSave={(v) => handleCellSave(row.id, 'empresa', v)} isSaving={savingCell === `${row.id}-empresa`} />
+                                );
+                              })()
                             ) : (
-                              <span className="font-medium text-gray-800">{row.empresa || '-'}</span>
+                              (() => {
+                                const eStyle = getEmpresaStyle(row.empresa);
+                                return eStyle ? (
+                                  <span className={`inline-block px-2 py-0.5 rounded font-bold text-xs ${eStyle.bg} ${eStyle.text} border ${eStyle.border}`}>
+                                    {row.empresa}
+                                  </span>
+                                ) : (
+                                  <span className="font-medium text-gray-800">{row.empresa || '-'}</span>
+                                );
+                              })()
                             )}
                             {(row as any).codigo && <span className="text-gray-400">· {(row as any).codigo}</span>}
                           </div>
