@@ -795,21 +795,19 @@ export default function TabelaComissao() {
                         </td>
                         {/* Colunas CEO: Recebo e Pago */}
                         {isAdminOuCeo && (() => {
-                          // Recebo: converte para percentual comparável
+                          // Recebo: digitado pelo usuário como percentual direto (ex: "1,96" = 1,96%)
                           const receboRaw = (row as any).receboPct;
-                          const receboNum = receboRaw ? parseFloat(String(receboRaw).replace(',','.').replace('%','')) : null;
-                          // Recebo pode ser digitado como "1,96" (já em %) ou "0.0196" (decimal)
-                          const receboPct2 = receboNum !== null
-                            ? (receboNum < 1 ? receboNum * 100 : receboNum)
+                          const receboPct2 = receboRaw
+                            ? parseFloat(String(receboRaw).replace(',','.').replace('%',''))
                             : null;
                           // Pago: calcula (ativo / recebo) * 100 para cada ativo
                           const ativos = ALL_ATIVOS.map((key, i) => {
                             const v = (row as any)[key];
                             if (!v) return null;
                             const ativoNum = parseFloat(String(v).replace(',','.').replace('%',''));
-                            // Banco guarda decimal (ex: 0.0065 = 0,65%)
+                            // Banco guarda decimal (ex: 0.0025 = 0,25%) — converter para %
                             const ativoPct = ativoNum < 1 ? ativoNum * 100 : ativoNum;
-                            // Percentual do recebo que está sendo pago: (ativo / recebo) * 100
+                            // Percentual do recebo que está sendo pago: (ativo% / recebo%) * 100
                             const pagoProporcao = receboPct2 !== null && receboPct2 > 0
                               ? (ativoPct / receboPct2) * 100
                               : null;
