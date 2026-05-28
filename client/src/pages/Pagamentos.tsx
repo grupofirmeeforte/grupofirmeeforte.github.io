@@ -162,6 +162,20 @@ function formatCurrency(v: string | null | undefined) {
   return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function CidadeRespSelectPag({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { data: cidades = [] } = trpc.agentes.getCidades.useQuery();
+  return (
+    <select
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      className="bg-gray-800 border border-gray-600 text-white text-sm rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-purple-500 h-8 w-full"
+    >
+      <option value="">Selecione a cidade...</option>
+      {cidades.map(c => <option key={c} value={c!}>{c}</option>)}
+    </select>
+  );
+}
+
 export default function PagamentosPage() {
   const [, navigate] = useLocation();
 
@@ -899,9 +913,8 @@ export default function PagamentosPage() {
               </div>
             )}
             <div>
-              <Label className="text-xs text-gray-400">Chave Resp.</Label>
-              <Input value={formDesp.chaveResp} onChange={e => setFormDesp(f => ({ ...f, chaveResp: e.target.value }))}
-                className="bg-gray-800 border-gray-600 text-white h-8 text-sm" />
+              <Label className="text-xs text-gray-400">Cidade Resp.</Label>
+              <CidadeRespSelectPag value={formDesp.chaveResp} onChange={v => setFormDesp(f => ({ ...f, chaveResp: v }))} />
             </div>
           </div>
           <DialogFooter>

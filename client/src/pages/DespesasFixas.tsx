@@ -82,6 +82,20 @@ function FormField({ label, value, onChange, placeholder, isMesAno }: { label: s
   );
 }
 
+function CidadeRespSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { data: cidades = [] } = trpc.agentes.getCidades.useQuery();
+  return (
+    <select
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-purple-500 h-[26px] w-full"
+    >
+      <option value="">Selecione a cidade...</option>
+      {cidades.map(c => <option key={c} value={c!}>{c}</option>)}
+    </select>
+  );
+}
+
 export default function DespesasFixasPage() {
   const [, navigate] = useLocation();
 
@@ -404,7 +418,10 @@ export default function DespesasFixasPage() {
               </div>
               <FormField label="Cidade/UF" value={modal.dados.cidadeUF ?? ""} onChange={v => setField("cidadeUF", v)} />
               <FormField label="Empresa" value={modal.dados.empresa ?? ""} onChange={v => setField("empresa", v)} />
-              <FormField label="Chave Resp." value={modal.dados.chaveResp ?? ""} onChange={v => setField("chaveResp", v)} placeholder="Ex: JJ123456" />
+              <div className="flex flex-col gap-0.5">
+                <label className="text-[10px] text-gray-400 font-medium">Cidade Resp.</label>
+                <CidadeRespSelect value={modal.dados.chaveResp ?? ""} onChange={v => setField("chaveResp", v)} />
+              </div>
               <FormField label="Nome" value={modal.dados.nome ?? ""} onChange={v => setField("nome", v)} />
               <div className="col-span-1">
                 <label className="text-[10px] text-gray-400 font-medium">Banco</label>
