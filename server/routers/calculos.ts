@@ -80,6 +80,25 @@ export const calculosRouter = router({
     return result.map(r => r.mesRef).filter(Boolean);
   }),
 
+  // Listar anos disponíveis (extraídos do mesRef MM/AAAA)
+  anosDisponiveis: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) return ['2026'];
+    const result = await db
+      .selectDistinct({ mesRef: calculos.mesRef })
+      .from(calculos)
+      .orderBy(sql`STR_TO_DATE(CONCAT('01/', ${calculos.mesRef}), '%d/%m/%Y') DESC`);
+    const anos = new Set<string>();
+    for (const r of result) {
+      if (r.mesRef) {
+        const parts = r.mesRef.split('/');
+        if (parts.length === 2 && parts[1]) anos.add(parts[1]);
+      }
+    }
+    const lista = Array.from(anos).sort((a, b) => Number(b) - Number(a));
+    return lista.length > 0 ? lista : ['2026'];
+  }),
+
   // Listar empresas disponíveis
   empresasDisponiveis: publicProcedure.query(async () => {
     const db = await getDb();
@@ -282,6 +301,139 @@ export const calculosRouter = router({
       const duplicados = resultados.filter((r) => r.status === "duplicado").length;
       return { enviados, duplicados, resultados };
     }),
+  // Relatório RBM x Despesas por agente (apenas CEO)
+  relatorioRbmDespesas: protectedProcedure
+    .input(z.object({
+      ano: z.string(), // ex: "2026"
+      empresa: z.string().optional(), // "BMF" | "FLEX" | undefined = todas
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponivel' });
+
+      const toN = (v: any) => parseFloat(String(v ?? 0)) || 0;
+
+      // 1. Buscar todos os cálculos do ano filtrado
+      const mesPattern = `%/${input.ano}`;
+      const calcConds: any[] = [like(calculos.mesRef, mesPattern)];
+      if (input.empresa && input.empresa !== 'Todas') {
+        calcConds.push(eq(calculos.empresa, input.empresa));
+      }
+      const calcRows = await db.select().from(calculos)
+        .where(and(...calcConds))
+        .orderBy(asc(calculos.nomeAgente), asc(calculos.mesRef));
+
+      // 2. Agregar por agente (chaveJ)
+      const agentMap = new Map<string, {
+        chaveJ: string; nomeAgente: string; cidade: string; empresa: string;
+        rbmTotal: number; rbmConsig: number; rbmCC: number; rbmConsorcio: number;
+        rbmOurocap: number; rbmSeguros: number;
+        comissaoTotal: number; meses: Set<string>;
+      }>();
+
+      for (const r of calcRows) {
+        const key = `${r.chaveJ}__${r.empresa}`;
+        if (!agentMap.has(key)) {
+          agentMap.set(key, {
+            chaveJ: r.chaveJ ?? '', nomeAgente: r.nomeAgente ?? '',
+            cidade: r.cidade ?? '', empresa: r.empresa ?? '',
+            rbmTotal: 0, rbmConsig: 0, rbmCC: 0, rbmConsorcio: 0,
+            rbmOurocap: 0, rbmSeguros: 0, comissaoTotal: 0, meses: new Set(),
+          });
+        }
+        const ag = agentMap.get(key)!;
+        ag.rbmTotal     += toN(r.rbmTotal);
+        ag.rbmConsig    += toN(r.rbmCreditoC2);
+        ag.rbmCC        += toN(r.rbmContaCorrente);
+        ag.rbmConsorcio += toN(r.rbmConsorcioC2);
+        ag.rbmOurocap   += toN(r.rbmOurocap);
+        ag.rbmSeguros   += toN(r.rbmSeguros);
+        ag.comissaoTotal += toN(r.comissaoTotal);
+        if (r.mesRef) ag.meses.add(r.mesRef);
+      }
+
+      // 3. Buscar despesas fixas do ano
+      const { despesasFixas } = await import('../../drizzle/schema');
+      const dfConds: any[] = [like(despesasFixas.mesAno, mesPattern)];
+      if (input.empresa && input.empresa !== 'Todas') {
+        dfConds.push(eq(despesasFixas.empresa, input.empresa));
+      }
+      const dfRows = await db.select().from(despesasFixas).where(and(...dfConds));
+
+      // 4. Buscar despesas avulsas (pagamentos) do ano — excluindo comissões de agentes
+      const pgConds: any[] = [like(pagamentos.mesAno, mesPattern)];
+      if (input.empresa && input.empresa !== 'Todas') {
+        pgConds.push(eq(pagamentos.empresa, input.empresa));
+      }
+      // Excluir tipos que são comissão de agente
+      pgConds.push(sql`${pagamentos.tipoPagto} NOT IN ('Comissão','Comissao','Adto','Adiantamento')`);
+      const pgRows = await db.select().from(pagamentos).where(and(...pgConds));
+
+      // 5. Montar mapa cidade -> nAgentes
+      const cidadeAgentes = new Map<string, Set<string>>();
+      for (const [, ag] of Array.from(agentMap)) {
+        if (!ag.cidade) continue;
+        if (!cidadeAgentes.has(ag.cidade)) cidadeAgentes.set(ag.cidade, new Set());
+        cidadeAgentes.get(ag.cidade)!.add(ag.chaveJ);
+      }
+
+      // 6. Somar despesas por cidade
+      const despCidade = new Map<string, { fixas: number; avulsas: number; tipos: Map<string, number> }>();
+      const addDesp = (cidade: string, tipo: string, valor: number, fonte: 'fixas'|'avulsas') => {
+        if (!cidade) return;
+        if (!despCidade.has(cidade)) despCidade.set(cidade, { fixas: 0, avulsas: 0, tipos: new Map() });
+        const d = despCidade.get(cidade)!;
+        d[fonte] += valor;
+        d.tipos.set(tipo, (d.tipos.get(tipo) ?? 0) + valor);
+      };
+      for (const r of dfRows) {
+        const cidade = r.chaveResp ?? r.cidadeUF ?? '';
+        addDesp(cidade, r.tipoPagto ?? 'Outros', toN(r.valor), 'fixas');
+      }
+      for (const r of pgRows) {
+        const cidade = r.chaveJ ?? r.cidadeUF ?? '';
+        addDesp(cidade, r.tipoPagto ?? 'Outros', toN(r.valor), 'avulsas');
+      }
+
+      // 7. Montar resultado final
+      const resultado = Array.from(agentMap.values()).map(ag => {
+        const nAgentes = cidadeAgentes.get(ag.cidade)?.size ?? 1;
+        const d = despCidade.get(ag.cidade);
+        const totalDespFixas = (d?.fixas ?? 0) / nAgentes;
+        const totalDespAvulsas = (d?.avulsas ?? 0) / nAgentes;
+        const totalDesp = totalDespFixas + totalDespAvulsas;
+        const tiposDesp: Record<string, number> = {};
+        d?.tipos.forEach((v, k) => { tiposDesp[k] = v / nAgentes; });
+        const saldo = ag.comissaoTotal - totalDesp;
+        const pctConsumido = ag.rbmTotal > 0
+          ? ((ag.comissaoTotal + totalDesp) / ag.rbmTotal) * 100
+          : 0;
+        return {
+          chaveJ: ag.chaveJ,
+          nomeAgente: ag.nomeAgente,
+          cidade: ag.cidade,
+          empresa: ag.empresa,
+          nAgentesNaCidade: nAgentes,
+          meses: ag.meses.size,
+          rbmTotal: ag.rbmTotal,
+          rbmConsig: ag.rbmConsig,
+          rbmCC: ag.rbmCC,
+          rbmConsorcio: ag.rbmConsorcio,
+          rbmOurocap: ag.rbmOurocap,
+          rbmSeguros: ag.rbmSeguros,
+          comissaoTotal: ag.comissaoTotal,
+          totalDespFixas,
+          totalDespAvulsas,
+          totalDesp,
+          tiposDesp,
+          saldo,
+          pctConsumido,
+        };
+      }).sort((a, b) => b.rbmTotal - a.rbmTotal);
+
+      return resultado;
+    }),
+
   // Recalcular comissaoTotal pela nova formula (a partir de 05/2026)
   // Formula: consig + consorcio + ourocap + cc + seguros + ajudaCusto + creditosDebitos - adiantamento
   // Adiantamento e buscado na tabela pagamentos (tipoPagto = 'Adto')

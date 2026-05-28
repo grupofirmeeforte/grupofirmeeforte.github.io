@@ -133,6 +133,7 @@ export default function Home() {
         { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos', subKey: 'pagamentos' },
         { title: 'Contas das Lojas', description: 'Comprovantes e controle de pagamento de contas por loja', icon: FileText, color: 'bg-teal-600', path: '/contas-lojas', subKey: 'contas-lojas' },
         { title: 'Pró Rata', description: 'Operações com controle de parcelas pagas e a receber', icon: DollarSign, color: 'bg-indigo-600', path: '/pro-rata', subKey: 'pro-rata', ceoOnly: true },
+        { title: 'RBM × Despesas', description: 'Relatório anual: produção vs. custos por agente', icon: BarChart2, color: 'bg-rose-700', path: '/relatorio-rbm-despesas', subKey: 'relatorio-rbm-despesas', ceoOnly: true },
       ],
     },
 

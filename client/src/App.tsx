@@ -45,6 +45,7 @@ import RelatorioChaveJ from './pages/RelatorioChaveJ';
 import MeuPin from './pages/MeuPin';
 import MeuRosto from './pages/MeuRosto';
 import CaixaRecados from './pages/CaixaRecados';
+import RelatorioRBMDespesas from './pages/RelatorioRBMDespesas';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -132,6 +133,7 @@ function RouterWithInactivity() {
       <Route path={"/crm"} component={CRMPage} />
       <Route path={"/mailing-crm"} component={MailingCrmPage} />
       <Route path={"/febraban/relatorio-chavej"} component={RelatorioChaveJ} />
+      <Route path={"/relatorio-rbm-despesas"} component={RelatorioRBMDespesas} />
       <Route path={"/extratos"} component={ExtratosPage} />
       <Route path={"/pro-rata"} component={ProRataPage} />
       <Route path={"/producao/consorcio"} component={Consorcio} />
