@@ -832,9 +832,13 @@ export default function AuditoriaPage() {
 // ─── BOTÃO DA ABA DESPESAS INTERNAS (só renderiza se tiver acesso) ────────────
 function DespesasInternasAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => void }) {
   const { user } = useAuth();
-  // Verificar acesso diretamente pelo cargo/permissoes do usuário (já retornados pelo auth.me)
-  const temAcesso = !!(user && ((user as any).cargo === 'CEO' || (user as any).permissoes === 'admin'));
-  if (!temAcesso) return null;
+  // Consulta o servidor para verificar se o agente tem cargo CEO ou permissoes admin
+  const { data: acesso, isLoading } = trpc.despesasInternas.verificarAcesso.useQuery(
+    undefined,
+    { enabled: !!user, retry: false }
+  );
+  // Enquanto carrega ou sem acesso, não renderiza o botão
+  if (isLoading || !acesso?.temAcesso) return null;
   return (
     <button
       onClick={() => setAba('despesas-internas')}
@@ -873,8 +877,7 @@ type DespesaInterna = {
 function DespesasInternasAba() {
   const utils = trpc.useUtils();
   const { user } = useAuth();
-  // Verificar acesso diretamente pelo cargo/permissoes do usuário (retornados pelo auth.me)
-  const temAcesso = !!(user && ((user as any).cargo === 'CEO' || (user as any).permissoes === 'admin'));
+  // A proteção é feita pela senha CEO — qualquer um vê a tela de senha, mas só CEO desbloqueia
   // Segunda senha CEO
   const [senhaDesbloqueada, setSenhaDesbloqueada] = useState(false);
   const [senhaInput, setSenhaInput] = useState('');
@@ -935,16 +938,6 @@ function DespesasInternasAba() {
     if (editando) editarMutation.mutate({ id: editando.id, ...payload });
     else criarMutation.mutate(payload);
   };
-
-  if (!temAcesso) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <AlertTriangle className="w-16 h-16 text-red-400" />
-        <p className="text-red-600 font-semibold text-lg">Acesso Restrito</p>
-        <p className="text-gray-500">Esta seção é exclusiva para a diretoria.</p>
-      </div>
-    );
-  }
 
   if (!senhaDesbloqueada) {
     return (
