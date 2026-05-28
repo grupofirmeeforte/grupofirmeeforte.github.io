@@ -685,8 +685,8 @@ export default function TabelaComissao() {
                   {/* Colunas CEO: Recebo e Pago — invisíveis para promotores */}
                   {isAdminOuCeo && (
                     <>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,215,0,0.18)',color:'#ffe066'}}>Recebo %</th>
-                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,100,100,0.18)',color:'#ffb3b3'}}>Pago %</th>
+                      <th className="px-1.5 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide text-xs" style={{background:'rgba(255,215,0,0.18)',color:'#ffe066',width:'60px'}}>Rec%</th>
+                      <th className="px-2 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide text-xs" style={{background:'rgba(255,100,100,0.18)',color:'#ffb3b3'}}>Pago %</th>
                     </>
                   )}
                   <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Faixas</th>
@@ -732,24 +732,39 @@ export default function TabelaComissao() {
                           </span>
                         </td>
                         {/* Colunas CEO: Recebo e Pago */}
-                        {isAdminOuCeo && (
-                          <>
-                            <td className="px-3 py-2 text-center whitespace-nowrap">
-                              <EditableCell
-                                value={(row as any).receboPct}
-                                onSave={(v) => handleCellSave(row.id, 'receboPct' as any, v)}
-                                isSaving={savingCell === `${row.id}-receboPct`}
-                              />
-                            </td>
-                            <td className="px-3 py-2 text-center whitespace-nowrap">
-                              <EditableCell
-                                value={(row as any).pagoPct}
-                                onSave={(v) => handleCellSave(row.id, 'pagoPct' as any, v)}
-                                isSaving={savingCell === `${row.id}-pagoPct`}
-                              />
-                            </td>
-                          </>
-                        )}
+                        {isAdminOuCeo && (() => {
+                          // Pago: lista compacta dos 10 ativos com seus valores
+                          const ativos = ALL_ATIVOS.map((key, i) => {
+                            const v = (row as any)[key];
+                            if (!v) return null;
+                            return { label: `A${String(i+1).padStart(2,'0')}`, value: pct(v) };
+                          }).filter(Boolean);
+                          return (
+                            <>
+                              <td className="py-1 text-center whitespace-nowrap" style={{width:'60px'}}>
+                                <EditableCell
+                                  value={(row as any).receboPct}
+                                  onSave={(v) => handleCellSave(row.id, 'receboPct' as any, v)}
+                                  isSaving={savingCell === `${row.id}-receboPct`}
+                                />
+                              </td>
+                              <td className="px-2 py-1 text-left" style={{maxWidth:'160px'}}>
+                                {ativos.length === 0 ? (
+                                  <span className="text-gray-400 text-xs">-</span>
+                                ) : (
+                                  <div className="flex flex-wrap gap-x-1.5 gap-y-0.5">
+                                    {ativos.map((a: any) => (
+                                      <span key={a.label} className="text-xs whitespace-nowrap">
+                                        <span className="text-gray-400">{a.label}:</span>
+                                        <span className="text-red-600 font-medium ml-0.5">{a.value}</span>
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </td>
+                            </>
+                          );
+                        })()}
                         {/* Coluna Faixas: Juros, Valor Mín, Prazo */}
                         <td className="px-3 py-2 whitespace-nowrap text-xs">
                           <div className="text-gray-700 flex items-center gap-1">
