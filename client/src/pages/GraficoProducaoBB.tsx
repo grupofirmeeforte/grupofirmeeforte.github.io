@@ -82,19 +82,27 @@ function GraficoPorChaveJ({ periodo, empresa }: { periodo: Periodo; empresa: str
   // Top 10 agentes por total para não poluir o gráfico
   const top10 = useMemo(() => series.slice(0, 10), [series]);
 
+  // Último período disponível (para exibir nos cards)
+  const ultimoLabel = labels[labels.length - 1];
+
   if (isLoading) return <div className="flex items-center justify-center py-16 text-gray-400">Carregando...</div>;
   if (!labels.length) return <div className="flex items-center justify-center py-16 text-gray-400">Nenhum dado disponível para o período selecionado.</div>;
 
   return (
     <div>
-      {/* Ranking de agentes */}
+      {/* Ranking de agentes — valor do último período */}
+      <div className="mb-1 text-xs text-gray-400 text-right pr-1">Valores referentes a: <span className="font-semibold text-gray-600">{ultimoLabel}</span></div>
       <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-        {top10.map((s, i) => (
+        {top10.map((s, i) => {
+          const idxUltimo = labels.indexOf(ultimoLabel);
+          const valorUltimoPeriodo = idxUltimo >= 0 ? (s.data[idxUltimo] ?? 0) : 0;
+          return (
           <div key={s.name} className="rounded-lg border p-2 text-center" style={{ borderColor: CORES_AGENTES[i % CORES_AGENTES.length] + "44", background: CORES_AGENTES[i % CORES_AGENTES.length] + "0d" }}>
             <p className="text-[10px] font-bold uppercase tracking-wide truncate" style={{ color: CORES_AGENTES[i % CORES_AGENTES.length] }}>{s.name}</p>
-            <p className="text-sm font-bold text-gray-800 mt-0.5">{fmtK(s.total)}</p>
+            <p className="text-sm font-bold text-gray-800 mt-0.5">{fmtK(valorUltimoPeriodo)}</p>
           </div>
-        ))}
+          );
+        })}
       </div>
       <ResponsiveContainer width="100%" height={340}>
         <BarChart data={chartData} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
