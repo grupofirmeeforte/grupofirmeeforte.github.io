@@ -267,14 +267,19 @@ export default function Home() {
             <h1 className="text-2xl font-bold text-white tracking-wide">Grupo Firme &amp; Forte</h1>
             <p className="text-xs text-yellow-300 mt-0.5 font-medium tracking-widest uppercase">Coban — Banco do Brasil &nbsp;|&nbsp; Bem-vindo, {user?.name || "Usuário"}</p>
           </div>
-          <Button
-            variant="outline"
-            onClick={handleLogout}
-            className="flex items-center gap-2 border-yellow-400 text-yellow-300 hover:bg-yellow-400/20 bg-transparent"
-          >
-            <LogOut className="w-4 h-4" />
-            Sair
-          </Button>
+          <div className="flex flex-col items-end gap-1.5">
+            <Button
+              variant="outline"
+              onClick={handleLogout}
+              className="flex items-center gap-2 border-yellow-400 text-yellow-300 hover:bg-yellow-400/20 bg-transparent"
+            >
+              <LogOut className="w-4 h-4" />
+              Sair
+            </Button>
+            <div className="text-right">
+              <span className="text-[10px] text-white/40 tracking-wide">v1.0.0 &nbsp;&bull;&nbsp; Desenvolvido por Sidnei H. Ultramare &nbsp;&bull;&nbsp; {new Date().getFullYear()}</span>
+            </div>
+          </div>
         </div>
       </header>
 
