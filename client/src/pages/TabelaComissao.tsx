@@ -753,7 +753,7 @@ export default function TabelaComissao() {
                               : null;
                             const excede = pagoProporcao !== null && pagoProporcao >= 100;
                             const pagoPropStr = pagoProporcao !== null
-                              ? pagoProporcao.toFixed(4).replace('.', ',') + '%'
+                              ? pagoProporcao.toFixed(2).padStart(5, '0').replace('.', ',') + '%'
                               : pct(v);
                             return { label: `A${String(i+1).padStart(2,'0')}`, value: pagoPropStr, excede };
                           }).filter(Boolean);
