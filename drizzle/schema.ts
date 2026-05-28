@@ -232,6 +232,9 @@ export const tabelasComissao = mysqlTable("tabelasComissao", {
   ativo10: varchar("ativo10", { length: 20 }),
   ativo10De: varchar("ativo10De", { length: 20 }),
   ativo10Ate: varchar("ativo10Ate", { length: 20 }),
+  // Campos exclusivos CEO: quanto recebo e quanto pago (apenas visualização, não entra em cálculo)
+  receboPct: varchar("receboPct", { length: 20 }),
+  pagoPct: varchar("pagoPct", { length: 20 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

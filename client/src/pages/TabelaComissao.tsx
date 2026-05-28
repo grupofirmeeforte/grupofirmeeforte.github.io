@@ -682,6 +682,13 @@ export default function TabelaComissao() {
               <thead>
                 <tr style={{background: 'linear-gradient(90deg, #002776 0%, #003d99 40%, #0055cc 70%, #1a6ed8 100%)'}} className="text-white">
                   <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Convênio</th>
+                  {/* Colunas CEO: Recebo e Pago — invisíveis para promotores */}
+                  {isAdminOuCeo && (
+                    <>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,215,0,0.18)',color:'#ffe066'}}>Recebo %</th>
+                      <th className="px-3 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide" style={{background:'rgba(255,100,100,0.18)',color:'#ffb3b3'}}>Pago %</th>
+                    </>
+                  )}
                   <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Faixas</th>
                   {isAdminOuCeo ? (
                     <>
@@ -724,6 +731,25 @@ export default function TabelaComissao() {
                             {row.convenio || '-'}
                           </span>
                         </td>
+                        {/* Colunas CEO: Recebo e Pago */}
+                        {isAdminOuCeo && (
+                          <>
+                            <td className="px-3 py-2 text-center whitespace-nowrap">
+                              <EditableCell
+                                value={(row as any).receboPct}
+                                onSave={(v) => handleCellSave(row.id, 'receboPct' as any, v)}
+                                isSaving={savingCell === `${row.id}-receboPct`}
+                              />
+                            </td>
+                            <td className="px-3 py-2 text-center whitespace-nowrap">
+                              <EditableCell
+                                value={(row as any).pagoPct}
+                                onSave={(v) => handleCellSave(row.id, 'pagoPct' as any, v)}
+                                isSaving={savingCell === `${row.id}-pagoPct`}
+                              />
+                            </td>
+                          </>
+                        )}
                         {/* Coluna Faixas: Juros, Valor Mín, Prazo */}
                         <td className="px-3 py-2 whitespace-nowrap text-xs">
                           <div className="text-gray-700 flex items-center gap-1">
