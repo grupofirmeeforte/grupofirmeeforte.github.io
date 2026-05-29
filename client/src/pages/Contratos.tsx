@@ -36,7 +36,15 @@ export default function ContratosPage() {
 
   const { data: stats } = trpc.contratos.estatisticas.useQuery();
 
-  const uploadMutation = trpc.contratos.upload.useMutation();
+  const uploadLoteMutation = trpc.contratos.uploadLote.useMutation();
+
+  const fileParaBase64 = async (file: File): Promise<string> => {
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let bin = '';
+    for (let j = 0; j < bytes.byteLength; j++) bin += String.fromCharCode(bytes[j]);
+    return btoa(bin);
+  };
 
   const handleUpload = async (files: FileList) => {
     const pdfs = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.pdf'));
@@ -49,29 +57,29 @@ export default function ContratosPage() {
     setProgresso({ atual: 0, total: pdfs.length });
     let ok = 0, erros = 0;
 
-    for (let i = 0; i < pdfs.length; i++) {
-      const file = pdfs[i];
-      setProgresso({ atual: i + 1, total: pdfs.length });
+    // Processar em lotes de 20 em paralelo
+    const LOTE = 20;
+    for (let i = 0; i < pdfs.length; i += LOTE) {
+      const lote = pdfs.slice(i, i + LOTE);
       try {
-        const buffer = await file.arrayBuffer();
-        const bytes = new Uint8Array(buffer);
-        let bin = '';
-        for (let j = 0; j < bytes.byteLength; j++) bin += String.fromCharCode(bytes[j]);
-        const base64 = btoa(bin);
-        const res = await uploadMutation.mutateAsync({
-          fileBase64: base64,
-          nomeArquivo: file.name,
-        });
-        if (res.status === 'ok') ok++;
-        else erros++;
+        const arquivos = await Promise.all(
+          lote.map(async (f) => ({
+            fileBase64: await fileParaBase64(f),
+            nomeArquivo: f.name,
+          }))
+        );
+        const res = await uploadLoteMutation.mutateAsync({ arquivos });
+        ok += res.ok;
+        erros += res.erros;
       } catch {
-        erros++;
+        erros += lote.length;
       }
+      setProgresso({ atual: Math.min(i + LOTE, pdfs.length), total: pdfs.length });
     }
 
     setUploading(false);
-      if (erros > 0) toast.error(`Upload: ${ok} OK, ${erros} com erro`);
-      else toast.success(`Upload concluído: ${ok} contratos processados!`);
+    if (erros > 0) toast.error(`Upload: ${ok} OK, ${erros} com erro`);
+    else toast.success(`Upload concluído: ${ok} contratos processados!`);
     refetch();
     if (ok > 0) setAba('relatorio');
   };
@@ -250,6 +258,7 @@ export default function ContratosPage() {
                   <thead>
                     <tr className="bg-slate-900 text-slate-400 text-xs uppercase">
                       <th className="px-3 py-3 text-left">Proposta</th>
+                      <th className="px-3 py-3 text-left">Empresa</th>
                       <th className="px-3 py-3 text-left">Cliente</th>
                       <th className="px-3 py-3 text-left">CPF</th>
                       <th className="px-3 py-3 text-left">Convênio</th>
@@ -267,6 +276,7 @@ export default function ContratosPage() {
                     {rows.map((r, i) => (
                       <tr key={r.id} className={`border-t border-slate-700 hover:bg-slate-800/50 ${i % 2 === 0 ? 'bg-slate-800/20' : ''}`}>
                         <td className="px-3 py-2 font-mono text-blue-300">{r.numeroProposta ?? '—'}</td>
+                        <td className="px-3 py-2 text-emerald-300 text-xs">{r.empresa ?? '—'}</td>
                         <td className="px-3 py-2 text-white font-medium">{r.nomeCliente ?? '—'}</td>
                         <td className="px-3 py-2 text-slate-300 font-mono text-xs">{r.cpfCliente ? r.cpfCliente.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '—'}</td>
                         <td className="px-3 py-2 text-slate-300 text-xs">{r.nomeConvenio ?? '—'}</td>

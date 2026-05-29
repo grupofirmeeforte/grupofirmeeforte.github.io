@@ -165,6 +165,72 @@ export const contratosRouter = router({
       return { status: statusExtracao, dados };
     }),
 
+  // Upload em lote: processa múltiplos PDFs em paralelo (até 50 por vez)
+  uploadLote: protectedProcedure
+    .input(z.object({
+      arquivos: z.array(z.object({
+        fileBase64: z.string(),
+        nomeArquivo: z.string(),
+      })).max(50),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Banco de dados indisponível');
+
+      const resultados = await Promise.allSettled(
+        input.arquivos.map(async (arq) => {
+          const buffer = Buffer.from(arq.fileBase64, 'base64');
+          const fileKey = `contratos/${Date.now()}_${Math.random().toString(36).slice(2)}_${arq.nomeArquivo.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+          const { key, url } = await storagePut(fileKey, buffer, 'application/pdf');
+
+          let dados: ReturnType<typeof extrairDadosContrato> | null = null;
+          let statusExtracao = 'ok';
+          let erroExtracao: string | null = null;
+
+          try {
+            const parser = new PDFParse({ data: buffer });
+            const parsed = await parser.getText();
+            dados = extrairDadosContrato(parsed.text);
+          } catch (e: unknown) {
+            statusExtracao = 'erro';
+            erroExtracao = e instanceof Error ? e.message : 'Erro ao processar PDF';
+          }
+
+          await db.insert(contratos).values({
+            fileKey: key,
+            fileUrl: url,
+            nomeArquivo: arq.nomeArquivo,
+            statusExtracao,
+            erroExtracao,
+            uploadPorId: ctx.user.id,
+            numeroProposta: dados?.numeroProposta ?? null,
+            linhaCredito: dados?.linhaCredito ?? null,
+            taxaMensalJuros: dados?.taxaMensalJuros != null ? String(dados.taxaMensalJuros) : null,
+            prazoMeses: dados?.prazoMeses ?? null,
+            valorSolicitado: dados?.valorSolicitado != null ? String(dados.valorSolicitado) : null,
+            valorTotalEmprestimo: dados?.valorTotalEmprestimo != null ? String(dados.valorTotalEmprestimo) : null,
+            valorParcela: dados?.valorParcela != null ? String(dados.valorParcela) : null,
+            valorTotalParcelas: dados?.valorTotalParcelas != null ? String(dados.valorTotalParcelas) : null,
+            nomeCliente: dados?.nomeCliente ?? null,
+            cpfCliente: dados?.cpfCliente ?? null,
+            nrConvenio: dados?.nrConvenio ?? null,
+            nomeConvenio: dados?.nomeConvenio ?? null,
+            dataPrimeiraParcela: dados?.dataPrimeiraParcela ?? null,
+            dataUltimaParcela: dados?.dataUltimaParcela ?? null,
+            chaveJOperador: dados?.chaveJOperador ?? null,
+            nomeOperador: dados?.nomeOperador ?? null,
+            empresa: dados?.empresa ?? null,
+          });
+
+          return { nome: arq.nomeArquivo, status: statusExtracao };
+        })
+      );
+
+      const ok = resultados.filter(r => r.status === 'fulfilled').length;
+      const erros = resultados.filter(r => r.status === 'rejected').length;
+      return { ok, erros, total: input.arquivos.length };
+    }),
+
   // Listar contratos com cruzamento de mailing
   listar: protectedProcedure
     .input(z.object({
