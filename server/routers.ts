@@ -36,6 +36,7 @@ import { comunicadosRouter } from "./routers/comunicados";
 import { chatInternoRouter } from "./routers/chatInterno";
 import { reconhecimentoFacialRouter } from "./routers/reconhecimentoFacial";
 import { extratosBancariosRouter } from "./routers/extratosBancarios";
+import { contratosRouter } from "./routers/contratos";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago, updateAuditLogSaidaPorChaveJ } from "./db";
 import { users, agentes, despesasFixas, pagamentos } from "../drizzle/schema";
@@ -1999,6 +2000,7 @@ export const appRouter = router({
 
   // ─── DESPESAS INTERNAS (somente Sidnei e Thiago Ultramare) ─────────────────
   backup: backupRouter,
+  contratos: contratosRouter,
   despesasInternas: router({
     // Verifica se o agente logado tem acesso (cargo CEO)
     verificarAcesso: protectedProcedure

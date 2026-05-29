@@ -211,6 +211,7 @@ export default function Home() {
         { title: 'Tarefas / Follow-up', description: 'Lembretes e tarefas', icon: CheckSquare, color: 'bg-violet-600', path: '/crm?aba=tarefas', subKey: 'tarefas' },
         { title: 'Relatórios CRM', description: 'Funil e produtividade', icon: BarChart2, color: 'bg-teal-600', path: '/crm?aba=relatorios', subKey: 'relatorios' },
         { title: 'Mailing / Leads', description: 'Gestão de mailing e leads do banco', icon: Users, color: 'bg-cyan-600', path: '/mailing-crm', subKey: 'mailing-crm' },
+        { title: 'Contratos PDF', description: 'Upload e análise de contratos BB Consignado + CRM Refinanciamento', icon: FileText, color: 'bg-emerald-600', path: '/contratos', subKey: 'contratos' },
       ],
     },
 

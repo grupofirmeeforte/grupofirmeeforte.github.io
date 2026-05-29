@@ -1498,3 +1498,46 @@ export const extratosBancarios = mysqlTable("extratosBancarios", {
 });
 export type ExtratoBancario = typeof extratosBancarios.$inferSelect;
 export type InsertExtratoBancario = typeof extratosBancarios.$inferInsert;
+
+// ── Contratos PDF ─────────────────────────────────────────────────────────────
+/**
+ * Contratos
+ * Armazena contratos PDF enviados pelos agentes/admin com dados extraídos via IA
+ */
+export const contratos = mysqlTable("contratos", {
+  id: int("id").autoincrement().primaryKey(),
+  // Arquivo
+  fileKey: varchar("fileKey", { length: 500 }).notNull(),       // Chave S3 do PDF
+  fileUrl: varchar("fileUrl", { length: 500 }).notNull(),       // URL de acesso ao PDF
+  nomeArquivo: varchar("nomeArquivo", { length: 255 }),         // Nome original do arquivo
+  // Dados extraídos via IA
+  numeroProposta: varchar("numeroProposta", { length: 50 }),    // Número da proposta
+  linhaCredito: varchar("linhaCredito", { length: 100 }),       // Linha de crédito
+  taxaMensalJuros: decimal("taxaMensalJuros", { precision: 10, scale: 4 }), // Taxa mensal %
+  prazoMeses: int("prazoMeses"),                                // Prazo em meses
+  valorSolicitado: decimal("valorSolicitado", { precision: 15, scale: 2 }),
+  valorTotalEmprestimo: decimal("valorTotalEmprestimo", { precision: 15, scale: 2 }),
+  valorParcela: decimal("valorParcela", { precision: 15, scale: 2 }),
+  valorTotalParcelas: decimal("valorTotalParcelas", { precision: 15, scale: 2 }),
+  nomeCliente: varchar("nomeCliente", { length: 255 }),
+  cpfCliente: varchar("cpfCliente", { length: 20 }),
+  nrConvenio: varchar("nrConvenio", { length: 50 }),
+  nomeConvenio: varchar("nomeConvenio", { length: 150 }),
+  dataPrimeiraParcela: varchar("dataPrimeiraParcela", { length: 20 }),
+  dataUltimaParcela: varchar("dataUltimaParcela", { length: 20 }),
+  // Rastreabilidade
+  chaveJOperador: varchar("chaveJOperador", { length: 50 }),    // ChaveJ do operador
+  nomeOperador: varchar("nomeOperador", { length: 255 }),
+  empresa: varchar("empresa", { length: 100 }),
+  statusExtracao: varchar("statusExtracao", { length: 20 }).default("pendente"), // pendente | ok | erro
+  erroExtracao: text("erroExtracao"),
+  uploadPorId: int("uploadPorId"),                              // FK users.id
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  propostaIdx: index("idx_contratos_proposta").on(table.numeroProposta),
+  chaveJIdx: index("idx_contratos_chaveJ").on(table.chaveJOperador),
+}));
+
+export type Contrato = typeof contratos.$inferSelect;
+export type InsertContrato = typeof contratos.$inferInsert;
