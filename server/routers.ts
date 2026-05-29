@@ -35,8 +35,9 @@ import { recadosRouter } from "./routers/recados";
 import { comunicadosRouter } from "./routers/comunicados";
 import { chatInternoRouter } from "./routers/chatInterno";
 import { reconhecimentoFacialRouter } from "./routers/reconhecimentoFacial";
+import { extratosBancariosRouter } from "./routers/extratosBancarios";
 import { z } from "zod";
-import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago } from "./db";
+import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago, updateAuditLogSaidaPorChaveJ } from "./db";
 import { users, agentes, despesasFixas, pagamentos } from "../drizzle/schema";
 import { eq, and, or, isNull } from "drizzle-orm";
 import { notifyOwner } from "./_core/notification";
@@ -70,6 +71,7 @@ export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
   certificacoes: certificacoesRouter,
+  extratosBancarios: extratosBancariosRouter,
   auth: router({
     me: publicProcedure.query(async (opts) => {
       const user = opts.ctx.user;
@@ -117,8 +119,21 @@ export const appRouter = router({
       }
       return user;
     }),
-    logout: publicProcedure.mutation(({ ctx }) => {
+    logout: publicProcedure.mutation(async ({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
+      // Registrar horário de saída na auditoria se o usuário estiver autenticado
+      if (ctx.user?.openId?.startsWith('agente_')) {
+        try {
+          const db = await getDb();
+          if (db) {
+            const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+            const [ag] = await db.select({ chaveJ: agentes.chaveJ })
+              .from(agentes)
+              .where(eq(agentes.id, agenteId)).limit(1);
+            if (ag?.chaveJ) await updateAuditLogSaidaPorChaveJ(ag.chaveJ);
+          }
+        } catch {}
+      }
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return {
         success: true,

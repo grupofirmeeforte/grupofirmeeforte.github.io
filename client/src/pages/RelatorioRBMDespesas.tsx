@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, TrendingUp, TrendingDown, Minus } from "lucide-react";
-import { useLocation } from "wouter";
+import { Download, TrendingUp, TrendingDown } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 function fmtR(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -10,14 +10,21 @@ function fmtR(v: number) {
 function fmtPct(v: number) {
   return v.toFixed(2).replace(".", ",") + "%";
 }
+// Formata valor monetário de forma compacta (sem "R$", só o número)
+function fmtNum(v: number) {
+  if (v === 0) return <span className="text-gray-300">-</span>;
+  return (
+    <span>
+      {v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+    </span>
+  );
+}
 
 export default function RelatorioRBMDespesas() {
-  const [, navigate] = useLocation();
   const [ano, setAno] = useState("2026");
   const [empresa, setEmpresa] = useState("Todas");
-  const [mes, setMes] = useState(""); // "" = todos os meses
+  const [mes, setMes] = useState("");
 
-  // Anos dinâmicos do banco
   const { data: anosDisponiveis = ["2026"] } = trpc.calculosImportados.anosDisponiveis.useQuery();
 
   const { data = [], isLoading } = trpc.calculosImportados.relatorioRbmDespesas.useQuery(
@@ -25,7 +32,6 @@ export default function RelatorioRBMDespesas() {
     { enabled: !!ano }
   );
 
-  // Totais gerais
   const totais = useMemo(() => {
     return data.reduce((acc, r) => ({
       rbmTotal: acc.rbmTotal + r.rbmTotal,
@@ -68,86 +74,115 @@ export default function RelatorioRBMDespesas() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
-        <button onClick={() => navigate("/")} className="text-gray-500 hover:text-gray-700">
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div className="flex-1">
-          <h1 className="text-lg font-bold text-gray-800">Relatório RBM × Despesas</h1>
-          <p className="text-xs text-gray-500">Produção vs. custos por agente — acumulado anual</p>
+      {/* PageHeader padrão do sistema (logo + botão Voltar) */}
+      <PageHeader />
+
+      {/* Barra de título + filtros + CSV */}
+      <div className="bg-white border-b border-gray-200 px-3 py-2 flex flex-wrap items-center gap-2">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-sm font-bold text-gray-800 leading-tight">Relatório RBM × Despesas</h1>
+          <p className="text-[10px] text-gray-400">Produção vs. custos por agente — acumulado anual</p>
         </div>
-        <Button onClick={exportarCSV} variant="outline" size="sm" className="gap-1 text-xs">
-          <Download className="w-3.5 h-3.5" /> CSV
-        </Button>
+
+        {/* Filtros inline */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1">
+            <label className="text-[10px] text-gray-500 font-medium">Ano</label>
+            <select value={ano} onChange={e => setAno(e.target.value)}
+              className="border border-gray-300 rounded px-1.5 py-0.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              {anosDisponiveis.map(a => <option key={a} value={a!}>{a}</option>)}
+            </select>
+          </div>
+          <div className="flex items-center gap-1">
+            <label className="text-[10px] text-gray-500 font-medium">Mês</label>
+            <select value={mes} onChange={e => setMes(e.target.value)}
+              className="border border-gray-300 rounded px-1.5 py-0.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              <option value="">Todos</option>
+              {["01","02","03","04","05","06","07","08","09","10","11","12"].map(m => (
+                <option key={m} value={m}>
+                  {new Date(2000, parseInt(m)-1, 1).toLocaleString('pt-BR', { month: 'short' }).replace(/^./, c => c.toUpperCase()).replace('.', '')}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-1">
+            <label className="text-[10px] text-gray-500 font-medium">Empresa</label>
+            <select value={empresa} onChange={e => setEmpresa(e.target.value)}
+              className="border border-gray-300 rounded px-1.5 py-0.5 text-xs text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              <option value="Todas">Todas</option>
+              <option value="BMF">BMF</option>
+              <option value="FLEX">FLEX</option>
+            </select>
+          </div>
+          {data.length > 0 && (
+            <span className="text-[10px] text-gray-400">{data.length} ag.</span>
+          )}
+          <Button onClick={exportarCSV} variant="outline" size="sm" className="gap-1 text-[10px] h-6 px-2 py-0">
+            <Download className="w-3 h-3" /> CSV
+          </Button>
+        </div>
       </div>
 
-      {/* Filtros */}
-      <div className="px-4 py-3 bg-white border-b border-gray-100 flex flex-wrap gap-3 items-center">
-        <div className="flex items-center gap-2">
-          <label className="text-xs text-gray-500 font-medium">Ano</label>
-          <select value={ano} onChange={e => setAno(e.target.value)}
-            className="border border-gray-300 rounded px-2 py-1 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
-            {anosDisponiveis.map(a => <option key={a} value={a!}>{a}</option>)}
-          </select>
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="text-xs text-gray-500 font-medium">Mês</label>
-          <select value={mes} onChange={e => setMes(e.target.value)}
-            className="border border-gray-300 rounded px-2 py-1 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
-            <option value="">Todos</option>
-            {["01","02","03","04","05","06","07","08","09","10","11","12"].map(m => (
-              <option key={m} value={m}>
-                {new Date(2000, parseInt(m)-1, 1).toLocaleString('pt-BR', { month: 'long' }).replace(/^./, c => c.toUpperCase())}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="text-xs text-gray-500 font-medium">Empresa</label>
-          <select value={empresa} onChange={e => setEmpresa(e.target.value)}
-            className="border border-gray-300 rounded px-2 py-1 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
-            <option value="Todas">Todas</option>
-            <option value="BMF">BMF</option>
-            <option value="FLEX">FLEX</option>
-          </select>
-        </div>
-        {data.length > 0 && (
-          <span className="text-xs text-gray-400 ml-auto">{data.length} agente(s)</span>
-        )}
-      </div>
-
-      {/* Tabela */}
-      <div className="px-2 py-3 overflow-x-auto">
+      {/* Tabela — sem min-width fixo, colunas ajustadas para caber na tela */}
+      <div className="px-1 py-2">
         {isLoading ? (
           <div className="text-center py-16 text-gray-400 text-sm">Carregando...</div>
         ) : data.length === 0 ? (
           <div className="text-center py-16 text-gray-400 text-sm">Nenhum dado encontrado para {ano}.</div>
         ) : (
-          <table className="w-full text-xs border-collapse min-w-[1100px]">
+          <table className="w-full text-[10px] border-collapse" style={{ tableLayout: 'fixed' }}>
+            <colgroup>
+              {/* Agente */}
+              <col style={{ width: '14%' }} />
+              {/* Empresa */}
+              <col style={{ width: '5%' }} />
+              {/* Cidade */}
+              <col style={{ width: '9%' }} />
+              {/* Meses */}
+              <col style={{ width: '4%' }} />
+              {/* RBM Total */}
+              <col style={{ width: '8%' }} />
+              {/* Consig */}
+              <col style={{ width: '7%' }} />
+              {/* C/C */}
+              <col style={{ width: '6%' }} />
+              {/* Consórc */}
+              <col style={{ width: '6%' }} />
+              {/* Ouro */}
+              <col style={{ width: '5%' }} />
+              {/* Seg */}
+              <col style={{ width: '5%' }} />
+              {/* Comissão */}
+              <col style={{ width: '8%' }} />
+              {/* Desp. Fixas */}
+              <col style={{ width: '7%' }} />
+              {/* Desp. Avuls. */}
+              <col style={{ width: '7%' }} />
+              {/* Total Desp. */}
+              <col style={{ width: '7%' }} />
+              {/* Saldo */}
+              <col style={{ width: '8%' }} />
+              {/* % RBM */}
+              <col style={{ width: '4%' }} />
+            </colgroup>
             <thead>
               <tr className="bg-gray-800 text-white">
-                <th className="px-2 py-2 text-left font-semibold whitespace-nowrap sticky left-0 bg-gray-800 z-10">Agente</th>
-                <th className="px-2 py-2 text-center font-semibold whitespace-nowrap">Empresa</th>
-                <th className="px-2 py-2 text-center font-semibold whitespace-nowrap">Cidade</th>
-                <th className="px-2 py-2 text-center font-semibold whitespace-nowrap">Meses</th>
-                {/* RBM */}
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-blue-800">RBM Total</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-blue-700 text-blue-100">Consig</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-blue-700 text-blue-100">C/C</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-blue-700 text-blue-100">Consórc</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-blue-700 text-blue-100">Ouro</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-blue-700 text-blue-100">Seg</th>
-                {/* Comissão */}
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-green-800">Comissão</th>
-                {/* Despesas */}
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-orange-700">Desp. Fixas</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-orange-700">Desp. Avuls.</th>
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-orange-800">Total Desp.</th>
-                {/* Saldo */}
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-purple-800">Saldo</th>
-                {/* % consumido */}
-                <th className="px-2 py-2 text-right font-semibold whitespace-nowrap bg-red-800">% RBM</th>
+                <th className="px-1 py-1.5 text-left font-semibold truncate">Agente</th>
+                <th className="px-1 py-1.5 text-center font-semibold">Emp.</th>
+                <th className="px-1 py-1.5 text-center font-semibold truncate">Cidade</th>
+                <th className="px-1 py-1.5 text-center font-semibold">Mes</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-blue-800">RBM Tot</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-blue-700 text-blue-100">Consig</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-blue-700 text-blue-100">C/C</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-blue-700 text-blue-100">Cons.</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-blue-700 text-blue-100">Ouro</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-blue-700 text-blue-100">Seg</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-green-800">Comis.</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-orange-700">D.Fix</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-orange-700">D.Avul</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-orange-800">Tot.D.</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-purple-800">Saldo</th>
+                <th className="px-1 py-1.5 text-right font-semibold bg-red-800">%</th>
               </tr>
             </thead>
             <tbody>
@@ -158,44 +193,39 @@ export default function RelatorioRBMDespesas() {
                 return (
                   <tr key={`${r.chaveJ}-${r.empresa}`}
                     className={`border-b border-gray-200 ${i % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-50 transition-colors`}>
-                    <td className={`px-2 py-1.5 font-medium whitespace-nowrap sticky left-0 z-10 ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
-                      <div className="font-semibold text-gray-800">{r.nomeAgente || r.chaveJ}</div>
-                      <div className="text-[10px] text-gray-400">{r.chaveJ}</div>
+                    <td className="px-1 py-1 font-medium truncate">
+                      <div className="font-semibold text-gray-800 truncate text-[10px]">{r.nomeAgente || r.chaveJ}</div>
+                      <div className="text-[9px] text-gray-400 truncate">{r.chaveJ}</div>
                     </td>
-                    <td className="px-2 py-1.5 text-center">
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${r.empresa === 'BMF' ? 'bg-green-100 text-green-800' : r.empresa === 'FLEX' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700'}`}>
+                    <td className="px-1 py-1 text-center">
+                      <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${r.empresa === 'BMF' ? 'bg-green-100 text-green-800' : r.empresa === 'FLEX' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700'}`}>
                         {r.empresa}
                       </span>
                     </td>
-                    <td className="px-2 py-1.5 text-center text-gray-600 whitespace-nowrap">
+                    <td className="px-1 py-1 text-center text-gray-600 truncate text-[9px]">
                       {r.cidade || "-"}
                       {r.nAgentesNaCidade > 1 && (
-                        <span className="ml-1 text-[10px] text-orange-500">÷{r.nAgentesNaCidade}</span>
+                        <span className="ml-0.5 text-[9px] text-orange-500">÷{r.nAgentesNaCidade}</span>
                       )}
                     </td>
-                    <td className="px-2 py-1.5 text-center text-gray-500">{r.meses}</td>
-                    {/* RBM */}
-                    <td className="px-2 py-1.5 text-right font-semibold text-blue-800">{fmtR(r.rbmTotal)}</td>
-                    <td className="px-2 py-1.5 text-right text-blue-600">{r.rbmConsig > 0 ? fmtR(r.rbmConsig) : <span className="text-gray-300">-</span>}</td>
-                    <td className="px-2 py-1.5 text-right text-blue-600">{r.rbmCC > 0 ? fmtR(r.rbmCC) : <span className="text-gray-300">-</span>}</td>
-                    <td className="px-2 py-1.5 text-right text-blue-600">{r.rbmConsorcio > 0 ? fmtR(r.rbmConsorcio) : <span className="text-gray-300">-</span>}</td>
-                    <td className="px-2 py-1.5 text-right text-blue-600">{r.rbmOurocap > 0 ? fmtR(r.rbmOurocap) : <span className="text-gray-300">-</span>}</td>
-                    <td className="px-2 py-1.5 text-right text-blue-600">{r.rbmSeguros > 0 ? fmtR(r.rbmSeguros) : <span className="text-gray-300">-</span>}</td>
-                    {/* Comissão */}
-                    <td className="px-2 py-1.5 text-right font-semibold text-green-700">{fmtR(r.comissaoTotal)}</td>
-                    {/* Despesas */}
-                    <td className="px-2 py-1.5 text-right text-orange-600">{r.totalDespFixas > 0 ? fmtR(r.totalDespFixas) : <span className="text-gray-300">-</span>}</td>
-                    <td className="px-2 py-1.5 text-right text-orange-600">{r.totalDespAvulsas > 0 ? fmtR(r.totalDespAvulsas) : <span className="text-gray-300">-</span>}</td>
-                    <td className="px-2 py-1.5 text-right font-semibold text-orange-700">{fmtR(r.totalDesp)}</td>
-                    {/* Saldo */}
-                    <td className={`px-2 py-1.5 text-right font-bold ${lucro ? "text-green-700" : "text-red-600"}`}>
+                    <td className="px-1 py-1 text-center text-gray-500">{r.meses}</td>
+                    <td className="px-1 py-1 text-right font-semibold text-blue-800">{fmtNum(r.rbmTotal)}</td>
+                    <td className="px-1 py-1 text-right text-blue-600">{fmtNum(r.rbmConsig)}</td>
+                    <td className="px-1 py-1 text-right text-blue-600">{fmtNum(r.rbmCC)}</td>
+                    <td className="px-1 py-1 text-right text-blue-600">{fmtNum(r.rbmConsorcio)}</td>
+                    <td className="px-1 py-1 text-right text-blue-600">{fmtNum(r.rbmOurocap)}</td>
+                    <td className="px-1 py-1 text-right text-blue-600">{fmtNum(r.rbmSeguros)}</td>
+                    <td className="px-1 py-1 text-right font-semibold text-green-700">{fmtNum(r.comissaoTotal)}</td>
+                    <td className="px-1 py-1 text-right text-orange-600">{fmtNum(r.totalDespFixas)}</td>
+                    <td className="px-1 py-1 text-right text-orange-600">{fmtNum(r.totalDespAvulsas)}</td>
+                    <td className="px-1 py-1 text-right font-semibold text-orange-700">{fmtNum(r.totalDesp)}</td>
+                    <td className={`px-1 py-1 text-right font-bold text-[10px] ${lucro ? "text-green-700" : "text-red-600"}`}>
                       <div className="flex items-center justify-end gap-0.5">
-                        {lucro ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                        {fmtR(r.saldo)}
+                        {lucro ? <TrendingUp className="w-2.5 h-2.5 flex-shrink-0" /> : <TrendingDown className="w-2.5 h-2.5 flex-shrink-0" />}
+                        <span className="truncate">{r.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                       </div>
                     </td>
-                    {/* % consumido */}
-                    <td className={`px-2 py-1.5 text-right font-bold ${pctAlto ? "text-red-600" : pctMedio ? "text-orange-500" : "text-gray-600"}`}>
+                    <td className={`px-1 py-1 text-right font-bold ${pctAlto ? "text-red-600" : pctMedio ? "text-orange-500" : "text-gray-600"}`}>
                       {fmtPct(r.pctConsumido)}
                     </td>
                   </tr>
@@ -204,21 +234,21 @@ export default function RelatorioRBMDespesas() {
             </tbody>
             {/* Totais */}
             <tfoot>
-              <tr className="bg-gray-800 text-white font-bold border-t-2 border-gray-600">
-                <td className="px-2 py-2 sticky left-0 bg-gray-800 z-10">TOTAL</td>
+              <tr className="bg-gray-800 text-white font-bold border-t-2 border-gray-600 text-[10px]">
+                <td className="px-1 py-1.5">TOTAL</td>
                 <td colSpan={3}></td>
-                <td className="px-2 py-2 text-right">{fmtR(totais.rbmTotal)}</td>
-                <td className="px-2 py-2 text-right text-blue-300">{fmtR(totais.rbmConsig)}</td>
-                <td className="px-2 py-2 text-right text-blue-300">{fmtR(totais.rbmCC)}</td>
-                <td className="px-2 py-2 text-right text-blue-300">{fmtR(totais.rbmConsorcio)}</td>
-                <td className="px-2 py-2 text-right text-blue-300">{fmtR(totais.rbmOurocap)}</td>
-                <td className="px-2 py-2 text-right text-blue-300">{fmtR(totais.rbmSeguros)}</td>
-                <td className="px-2 py-2 text-right text-green-300">{fmtR(totais.comissaoTotal)}</td>
-                <td className="px-2 py-2 text-right text-orange-300">{fmtR(totais.totalDespFixas)}</td>
-                <td className="px-2 py-2 text-right text-orange-300">{fmtR(totais.totalDespAvulsas)}</td>
-                <td className="px-2 py-2 text-right text-orange-200">{fmtR(totais.totalDesp)}</td>
-                <td className={`px-2 py-2 text-right ${totais.saldo >= 0 ? "text-green-300" : "text-red-300"}`}>{fmtR(totais.saldo)}</td>
-                <td className="px-2 py-2 text-right text-gray-300">
+                <td className="px-1 py-1.5 text-right">{totais.rbmTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-1 py-1.5 text-right text-blue-300">{totais.rbmConsig.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-1 py-1.5 text-right text-blue-300">{totais.rbmCC.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-1 py-1.5 text-right text-blue-300">{totais.rbmConsorcio.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-1 py-1.5 text-right text-blue-300">{totais.rbmOurocap.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-1 py-1.5 text-right text-blue-300">{totais.rbmSeguros.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-1 py-1.5 text-right text-green-300">{totais.comissaoTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-1 py-1.5 text-right text-orange-300">{totais.totalDespFixas.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-1 py-1.5 text-right text-orange-300">{totais.totalDespAvulsas.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-1 py-1.5 text-right text-orange-200">{totais.totalDesp.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className={`px-1 py-1.5 text-right ${totais.saldo >= 0 ? "text-green-300" : "text-red-300"}`}>{totais.saldo.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td className="px-1 py-1.5 text-right text-gray-300">
                   {totais.rbmTotal > 0 ? fmtPct(((totais.comissaoTotal + totais.totalDesp) / totais.rbmTotal) * 100) : "-"}
                 </td>
               </tr>
@@ -227,14 +257,13 @@ export default function RelatorioRBMDespesas() {
         )}
       </div>
 
-      {/* Legenda */}
+      {/* Legenda compacta */}
       {data.length > 0 && (
-        <div className="px-4 pb-4 flex flex-wrap gap-4 text-[10px] text-gray-500">
-          <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3 text-green-600" /> Saldo positivo (lucro)</span>
-          <span className="flex items-center gap-1"><TrendingDown className="w-3 h-3 text-red-500" /> Saldo negativo (prejuízo)</span>
-          <span className="text-orange-500 font-medium">÷N = despesas divididas por N agentes da cidade</span>
-          <span className="text-red-600 font-medium">% RBM ≥ 100% = consumiu mais do que produziu</span>
-          <span className="text-orange-500 font-medium">% RBM 70–99% = atenção</span>
+        <div className="px-3 pb-3 flex flex-wrap gap-3 text-[9px] text-gray-400">
+          <span className="flex items-center gap-0.5"><TrendingUp className="w-2.5 h-2.5 text-green-600" /> Lucro</span>
+          <span className="flex items-center gap-0.5"><TrendingDown className="w-2.5 h-2.5 text-red-500" /> Prejuízo</span>
+          <span className="text-orange-500">÷N = despesas divididas por N agentes da cidade</span>
+          <span className="text-red-600">% ≥ 100% = consumiu mais do que produziu</span>
         </div>
       )}
     </div>

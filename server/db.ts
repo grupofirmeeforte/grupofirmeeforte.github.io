@@ -197,6 +197,21 @@ export async function updateAuditLogSaida(numeroEntrada: string) {
     .where(eq(auditoria.numeroEntrada, numeroEntrada));
 }
 
+export async function updateAuditLogSaidaPorChaveJ(chaveJ: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  // Atualiza todos os registros de Login/Entrada sem horário de saída para este agente
+  return await db.update(auditoria)
+    .set({ horarioSaida: new Date() })
+    .where(
+      and(
+        eq(auditoria.chaveJ, chaveJ),
+        eq(auditoria.acao, 'Entrada'),
+        sql`${auditoria.horarioSaida} IS NULL`
+      )
+    );
+}
+
 // Função para desbloquear manualmente por admin
 export async function unlockLoginAttempts(chaveJ: string) {
   const db = await getDb();

@@ -628,3 +628,15 @@
 - [ ] CRM: página frontend com tabela horizontal scrollável, filtros (nome, CPF, agente, resultado, cidade, UF), paginação
 - [ ] CRM: botão exportar Excel com todos os campos
 - [ ] CRM: adicionar rota /crm no App.tsx e link no menu lateral
+
+## SESSÃO 29/05/2026 — AJUSTES E NOVOS MÓDULOS
+- [x] Relatório RBM × Despesas: adicionar PageHeader com logo e botão Voltar
+- [x] Relatório RBM × Despesas: tabela compacta sem scroll horizontal
+- [x] Home: mover Pró Rata do grupo Financeiro para o grupo Auditoria
+- [x] Home: adicionar RBM × Despesas também no grupo Auditoria
+- [x] Home: adicionar card Extratos Bancários no grupo Financeiro
+- [x] Criar tabelas contasBancarias e extratosBancarios no banco
+- [x] Criar router tRPC extratosBancarios com CRUD completo
+- [x] Criar página ExtratosBancarios.tsx com gestão de contas e lançamentos
+- [x] Registrar rota /extratos-bancarios no App.tsx
+- [x] Auditoria: corrigir bug de sessões "em andamento" — registrar horárioSaida no logout

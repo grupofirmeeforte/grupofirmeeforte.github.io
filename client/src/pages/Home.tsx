@@ -132,8 +132,8 @@ export default function Home() {
         { title: 'Despesas Fixas', description: 'Controle de despesas fixas', icon: Building2, color: 'bg-purple-500', path: '/fornecedores', subKey: 'despesas' },
         { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos', subKey: 'pagamentos' },
         { title: 'Contas das Lojas', description: 'Comprovantes e controle de pagamento de contas por loja', icon: FileText, color: 'bg-teal-600', path: '/contas-lojas', subKey: 'contas-lojas' },
-        { title: 'Pró Rata', description: 'Operações com controle de parcelas pagas e a receber', icon: DollarSign, color: 'bg-indigo-600', path: '/pro-rata', subKey: 'pro-rata', ceoOnly: true },
         { title: 'RBM × Despesas', description: 'Relatório anual: produção vs. custos por agente', icon: BarChart2, color: 'bg-rose-700', path: '/relatorio-rbm-despesas', subKey: 'relatorio-rbm-despesas', ceoOnly: true },
+        { title: 'Extratos Bancários', description: 'Lançamentos e movimentações das contas bancárias', icon: Landmark, color: 'bg-cyan-700', path: '/extratos-bancarios', subKey: 'extratos-bancarios', ceoOnly: true },
       ],
     },
 
@@ -240,6 +240,8 @@ export default function Home() {
       bgColor: 'from-slate-50 to-gray-50',
       subModules: [
         { title: 'Backup', description: 'Exportação completa dos dados do sistema', icon: DatabaseBackup, color: 'bg-emerald-700', path: '/auditoria?aba=backup', subKey: 'backup', ceoOnly: true },
+        { title: 'Pró Rata', description: 'Operações com controle de parcelas pagas e a receber', icon: DollarSign, color: 'bg-indigo-600', path: '/pro-rata', subKey: 'pro-rata', ceoOnly: true },
+        { title: 'RBM × Despesas', description: 'Relatório anual: produção vs. custos por agente', icon: BarChart2, color: 'bg-rose-700', path: '/relatorio-rbm-despesas', subKey: 'relatorio-rbm-despesas-audit', ceoOnly: true },
         { title: 'Feriados', description: 'Calendário de feriados nacionais, estaduais e municipais', icon: BarChart2, color: 'bg-slate-500', path: '/auditoria?aba=feriados', subKey: 'feriados' },
         { title: 'Logs de Acesso', description: 'Histórico de entradas e saídas no sistema', icon: ClipboardList, color: 'bg-slate-600', path: '/auditoria', subKey: 'logs' },
         { title: 'Permissões', description: 'Controle de acesso por módulo e cargo', icon: Shield, color: 'bg-slate-800', path: '/auditoria?aba=permissoes', subKey: 'logs' },

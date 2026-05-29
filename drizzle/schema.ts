@@ -1453,3 +1453,48 @@ export const comunicadosLidos = mysqlTable("comunicados_lidos", {
   agenteId: int("agenteId").notNull(),
   lidoEm: timestamp("lidoEm").defaultNow().notNull(),
 });
+
+
+// ── Extratos Bancários ────────────────────────────────────────────────────────
+/**
+ * Contas Bancárias
+ * Cadastro das contas bancárias das empresas (BMF e FLEX)
+ */
+export const contasBancarias = mysqlTable("contasBancarias", {
+  id: int("id").autoincrement().primaryKey(),
+  empresa: varchar("empresa", { length: 10 }).notNull(),           // BMF ou FLEX
+  banco: varchar("banco", { length: 100 }).notNull(),              // Nome do banco
+  agencia: varchar("agencia", { length: 20 }),
+  conta: varchar("conta", { length: 30 }),
+  tipoConta: varchar("tipoConta", { length: 50 }),                 // Corrente, Poupança, etc.
+  descricao: varchar("descricao", { length: 255 }),
+  ativa: tinyint("ativa").default(1),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type ContaBancaria = typeof contasBancarias.$inferSelect;
+export type InsertContaBancaria = typeof contasBancarias.$inferInsert;
+
+/**
+ * Lançamentos de Extratos Bancários
+ * Importados via OFX ou lançados manualmente
+ */
+export const extratosBancarios = mysqlTable("extratosBancarios", {
+  id: int("id").autoincrement().primaryKey(),
+  contaId: int("contaId").notNull(),                               // FK para contasBancarias
+  empresa: varchar("empresa", { length: 10 }).notNull(),           // BMF ou FLEX (redundante para filtros rápidos)
+  data: varchar("data", { length: 10 }).notNull(),                 // DD/MM/AAAA
+  descricao: varchar("descricao", { length: 500 }).notNull(),
+  valor: decimal("valor", { precision: 15, scale: 2 }).notNull(),  // Positivo = crédito, Negativo = débito
+  tipo: varchar("tipo", { length: 10 }).notNull(),                 // CRÉDITO ou DÉBITO
+  categoria: varchar("categoria", { length: 100 }),                // Classificação manual
+  numeroDocumento: varchar("numeroDocumento", { length: 100 }),    // Número do documento/transação
+  saldo: decimal("saldo", { precision: 15, scale: 2 }),            // Saldo após lançamento
+  origem: varchar("origem", { length: 20 }).default("MANUAL"),     // MANUAL, OFX, OPENFINANCE
+  mesRef: varchar("mesRef", { length: 7 }),                        // MM/AAAA para filtro
+  observacoes: text("observacoes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type ExtratoBancario = typeof extratosBancarios.$inferSelect;
+export type InsertExtratoBancario = typeof extratosBancarios.$inferInsert;
