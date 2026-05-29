@@ -337,7 +337,7 @@ export const contratosRouter = router({
         .map(r => r.cpfCliente)
         .filter((c): c is string => !!c && c.length >= 11);
 
-      let mailingMap: Map<string, { telefones: string[]; cidade: string | null }> = new Map();
+            let mailingMap: Map<string, { telefones: string[]; cidade: string | null; dtaNasc: string | null }> = new Map();
       if (cpfs.length > 0) {
         // Buscar em lotes de 100
         const lote = cpfs.slice(0, 200);
@@ -345,12 +345,11 @@ export const contratosRouter = router({
           .select()
           .from(crm)
           .where(sql`cpf IN (${sql.join(lote.map(c => sql`${c}`), sql`, `)})`);
-
         for (const m of mailingRows) {
           if (!m.cpf) continue;
           const cpfLimpo = m.cpf.replace(/[^\d]/g, '');
           const tels = formatarTelefones(m as unknown as Record<string, unknown>);
-          mailingMap.set(cpfLimpo, { telefones: tels, cidade: m.cidade ?? null });
+          mailingMap.set(cpfLimpo, { telefones: tels, cidade: m.cidade ?? null, dtaNasc: m.dtaNasc ?? null });
         }
       }
 
@@ -361,6 +360,7 @@ export const contratosRouter = router({
           elegivelRefin: calcularElegibilidadeRefin(r.dataPrimeiraParcela),
           telefones: mailing?.telefones ?? [],
           cidade: mailing?.cidade ?? null,
+          dtaNasc: mailing?.dtaNasc ?? null,
         };
       });
 
