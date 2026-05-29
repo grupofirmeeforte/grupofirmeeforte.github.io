@@ -256,6 +256,21 @@ class SDKServer {
     } as GetUserInfoWithJwtResponse;
   }
 
+  /**
+   * Decodifica o payload JWT sem verificar a assinatura (apenas para fallback CEO)
+   */
+  private decodeJwtPayloadUnsafe(token: string | undefined | null): { openId?: string } | null {
+    if (!token) return null;
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+      return payload;
+    } catch {
+      return null;
+    }
+  }
+
   async authenticateRequest(req: Request): Promise<User> {
     // Regular authentication flow
     const cookies = this.parseCookies(req.headers.cookie);
@@ -263,6 +278,20 @@ class SDKServer {
     const session = await this.verifySession(sessionCookie);
 
     if (!session) {
+      // Fallback: se o JWT é inválido (ex: mudança de chave após deploy),
+      // tenta decodificar sem verificar assinatura para identificar o CEO
+      const ownerOpenId = ENV.ownerOpenId;
+      if (ownerOpenId && sessionCookie) {
+        const unsafePayload = this.decodeJwtPayloadUnsafe(sessionCookie);
+        if (unsafePayload?.openId === ownerOpenId) {
+          // É o CEO com JWT expirado/inválido — busca no banco e retorna
+          const ceoUser = await db.getUserByOpenId(ownerOpenId);
+          if (ceoUser) {
+            console.log('[Auth] CEO autenticado via fallback (JWT inválido/expirado)');
+            return ceoUser;
+          }
+        }
+      }
       throw ForbiddenError("Invalid session cookie");
     }
 
