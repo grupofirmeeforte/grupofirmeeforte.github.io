@@ -132,7 +132,6 @@ export default function Home() {
         { title: 'Despesas Fixas', description: 'Controle de despesas fixas', icon: Building2, color: 'bg-purple-500', path: '/fornecedores', subKey: 'despesas' },
         { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos', subKey: 'pagamentos' },
         { title: 'Contas das Lojas', description: 'Comprovantes e controle de pagamento de contas por loja', icon: FileText, color: 'bg-teal-600', path: '/contas-lojas', subKey: 'contas-lojas' },
-        { title: 'RBM × Despesas', description: 'Relatório anual: produção vs. custos por agente', icon: BarChart2, color: 'bg-rose-700', path: '/relatorio-rbm-despesas', subKey: 'relatorio-rbm-despesas', ceoOnly: true },
         { title: 'Extratos Bancários', description: 'Lançamentos e movimentações das contas bancárias', icon: Landmark, color: 'bg-cyan-700', path: '/extratos-bancarios', subKey: 'extratos-bancarios', ceoOnly: true },
       ],
     },
