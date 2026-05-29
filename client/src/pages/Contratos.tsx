@@ -160,7 +160,7 @@ export default function ContratosPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white">
       <PageHeader />
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="w-[90%] mx-auto px-4 py-6">
         {/* Cards de estatísticas */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Card className="bg-slate-800 border-slate-700">
@@ -382,7 +382,7 @@ export default function ContratosPage() {
                   </thead>
                   <tbody>
                     {rows.map((r, i) => (
-                      <tr key={r.id} className={`border-t border-slate-700 hover:bg-slate-800/50 ${i % 2 === 0 ? 'bg-slate-800/20' : ''}`}>
+                      <tr key={r.id} className={`border-t border-slate-700 transition-colors hover:bg-blue-900/20 ${i % 2 === 0 ? 'bg-slate-800/40' : 'bg-slate-900/60'}`}>
                         <td className="px-2 py-1.5 font-mono text-blue-300 truncate">{r.numeroProposta ?? '—'}</td>
                         <td className="px-2 py-1.5 text-emerald-300 truncate" title={r.empresa ?? ''}>{r.empresa ?? '—'}</td>
                         <td className="px-2 py-1.5 text-white font-medium truncate" title={r.nomeCliente ?? ''}>{r.nomeCliente ?? '—'}</td>
