@@ -363,7 +363,7 @@ function PerspectivadeGanho() {
                       </TableCell>
                       <TableCell className="text-gray-700 text-sm">{row.empresa || '—'}</TableCell>
                       <TableCell className="text-right font-bold text-amber-700 bg-amber-50">
-                        {row.perspectivaComissao != null ? fmt(row.perspectivaComissao) : '—'}
+                        {fmt(0)}
                       </TableCell>
                     </TableRow>
                   ))
@@ -385,7 +385,7 @@ function PerspectivadeGanho() {
               </div>
               <div className="text-right">
                 <p className="text-xs text-gray-400">Total Comissão</p>
-                <p className="font-bold text-amber-700">{fmt(totalPerspectiva)}</p>
+                <p className="font-bold text-amber-700">{fmt(0)}</p>
               </div>
             </div>
           </div>
