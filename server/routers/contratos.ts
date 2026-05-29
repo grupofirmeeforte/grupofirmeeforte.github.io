@@ -56,6 +56,11 @@ function extrairDadosContrato(texto: string) {
   // Operador
   const nomeOperador = campo(/\bOperador\b\s*\n([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÀÈÌÒÙÄËÏÖÜ][^\n]+)/i);
   const chaveJOperador = campo(/\bChave\b\s*\n([A-Z]\d+)/i);
+
+  // Agência e Conta do cliente (seção 2 - Dados do Cliente)
+  // Aceita variações de codificação do acento: Agência, Agencia, Agência
+  const agencia = campo(/Ag[eêéè]ncia\s*\n\s*([\d]+)/i);
+  const conta = campo(/\bConta\b\s*\n\s*([\d.\-]+)/i);
   // Nome do correspondente: fica na linha logo após "Correspondente"
   // Estrutura real (pdf-parse): Correspondente -> BRASIL MAIS FORTE LTDA -> Loja -> MAISBB...
   let empresa: string | null = null;
@@ -91,6 +96,8 @@ function extrairDadosContrato(texto: string) {
     chaveJOperador,
     nomeOperador: nomeOperador?.trim() ?? null,
     empresa: empresa?.trim() ?? null,
+    agencia: agencia?.trim() ?? null,
+    conta: conta?.trim() ?? null,
   };
 }
 
@@ -177,6 +184,8 @@ export const contratosRouter = router({
         chaveJOperador: dados?.chaveJOperador ?? null,
         nomeOperador: dados?.nomeOperador ?? null,
         empresa: dados?.empresa ?? null,
+        agencia: dados?.agencia ?? null,
+        conta: dados?.conta ?? null,
       });
 
       return { status: statusExtracao, dados };
@@ -272,11 +281,12 @@ export const contratosRouter = router({
             nomeConvenio: dados?.nomeConvenio ?? null,
             dataPrimeiraParcela: dados?.dataPrimeiraParcela ?? null,
             dataUltimaParcela: dados?.dataUltimaParcela ?? null,
-            chaveJOperador: dados?.chaveJOperador ?? null,
+                        chaveJOperador: dados?.chaveJOperador ?? null,
             nomeOperador: dados?.nomeOperador ?? null,
             empresa: dados?.empresa ?? null,
+            agencia: dados?.agencia ?? null,
+            conta: dados?.conta ?? null,
           });
-
           return { nome: arq.nomeArquivo, status: statusExtracao };
         })
       );

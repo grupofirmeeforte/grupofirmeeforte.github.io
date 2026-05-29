@@ -353,7 +353,9 @@ export default function ContratosPage() {
                     <col className="w-[110px]" />{/* Empresa */}
                     <col className="w-[120px]" />{/* Cliente */}
                     <col className="w-[80px]" />{/* Convênio */}
-                    <col className="w-[70px]" />{/* Operador */}
+                    <col className="w-[110px]" />{/* Operador */}
+                    <col className="w-[65px]" />{/* Agência */}
+                    <col className="w-[65px]" />{/* Conta */}
                     <col className="w-[50px]" />{/* Taxa */}
                     <col className="w-[40px]" />{/* Prazo */}
                     <col className="w-[70px]" />{/* Parcela */}
@@ -369,7 +371,9 @@ export default function ContratosPage() {
                       <th className="px-2 py-2 text-left">Empresa</th>
                       <th className="px-2 py-2 text-left">Cliente</th>
                       <th className="px-2 py-2 text-left">Convênio</th>
-                      <th className="px-2 py-2 text-left">Oper.</th>
+                      <th className="px-2 py-2 text-left">Operador</th>
+                      <th className="px-2 py-2 text-left">Agência</th>
+                      <th className="px-2 py-2 text-left">Conta</th>
                       <th className="px-2 py-2 text-right">Taxa</th>
                       <th className="px-2 py-2 text-right">Prazo</th>
                       <th className="px-2 py-2 text-right">Parcela</th>
@@ -387,7 +391,9 @@ export default function ContratosPage() {
                         <td className="px-2 py-1.5 text-emerald-300 truncate" title={r.empresa ?? ''}>{r.empresa ?? '—'}</td>
                         <td className="px-2 py-1.5 text-white font-medium truncate" title={r.nomeCliente ?? ''}>{r.nomeCliente ?? '—'}</td>
                         <td className="px-2 py-1.5 text-slate-300 truncate" title={r.nomeConvenio ?? ''}>{r.nomeConvenio ?? '—'}</td>
-                        <td className="px-2 py-1.5 text-slate-300 truncate">{r.chaveJOperador ?? '—'}</td>
+                        <td className="px-2 py-1.5 text-slate-300 truncate" title={`${r.nomeOperador ?? ''} (${r.chaveJOperador ?? ''})`.trim()}>{r.nomeOperador ?? r.chaveJOperador ?? '—'}</td>
+                        <td className="px-2 py-1.5 text-slate-300 truncate">{(r as any).agencia ?? '—'}</td>
+                        <td className="px-2 py-1.5 text-slate-300 truncate">{(r as any).conta ?? '—'}</td>
                         <td className="px-2 py-1.5 text-right text-yellow-300 font-medium">
                           {r.taxaMensalJuros ? `${parseFloat(String(r.taxaMensalJuros)).toFixed(2)}%` : '—'}
                         </td>
