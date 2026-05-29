@@ -143,7 +143,8 @@ export const contratosRouter = router({
       let erroExtracao: string | null = null;
 
       try {
-        const parser = new PDFParse({ data: buffer });
+        const uint8 = new Uint8Array(buffer);
+        const parser = new PDFParse(uint8);
         const parsed = await parser.getText();
         dados = extrairDadosContrato(parsed.text);
       } catch (e: unknown) {
@@ -205,7 +206,8 @@ export const contratosRouter = router({
           let erroExtracao: string | null = null;
 
           try {
-            const parser = new PDFParse({ data: buffer });
+            const uint8 = new Uint8Array(buffer);
+            const parser = new PDFParse(uint8);
             const parsed = await parser.getText();
             dados = extrairDadosContrato(parsed.text);
           } catch (e: unknown) {
