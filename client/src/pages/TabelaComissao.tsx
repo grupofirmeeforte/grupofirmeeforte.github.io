@@ -844,14 +844,13 @@ export default function TabelaComissao() {
                             const ativoNum = parseFloat(String(v).replace(',','.').replace('%',''));
                             // Banco guarda decimal (ex: 0.0025 = 0,25%) — converter para %
                             const ativoPct = ativoNum < 1 ? ativoNum * 100 : ativoNum;
-                            // Percentual do recebo que está sendo pago: (ativo% / recebo%) * 100
-                            const pagoProporcao = receboPct2 !== null && receboPct2 > 0
-                              ? (ativoPct / receboPct2) * 100
-                              : null;
-                            const excede = pagoProporcao !== null && pagoProporcao >= 100;
-                            const pagoPropStr = pagoProporcao !== null
-                              ? pagoProporcao.toFixed(2).padStart(5, '0').replace('.', ',') + '%'
-                              : pct(v);
+                            // Só calcula se tiver Rec% preenchido
+                            if (receboPct2 === null || receboPct2 <= 0) {
+                              return { label: `A${String(i+1).padStart(2,'0')}`, value: '-', excede: false };
+                            }
+                            const pagoProporcao = (ativoPct / receboPct2) * 100;
+                            const excede = pagoProporcao >= 100;
+                            const pagoPropStr = pagoProporcao.toFixed(2).padStart(5, '0').replace('.', ',') + '%';
                             return { label: `A${String(i+1).padStart(2,'0')}`, value: pagoPropStr, excede };
                           }).filter(Boolean);
                           const temAlerta = ativos.some((a: any) => a.excede);
@@ -873,7 +872,7 @@ export default function TabelaComissao() {
                                 {ativos.length === 0 ? (
                                   <span className="text-gray-400 text-xs">-</span>
                                 ) : (
-                                  <div className="flex flex-wrap gap-x-1.5 gap-y-0.5">
+                                  <div className="grid gap-x-2 gap-y-0" style={{gridTemplateColumns:'repeat(2, minmax(0, 1fr))'}}>
                                     {ativos.map((a: any) => (
                                       <span
                                         key={a.label}
