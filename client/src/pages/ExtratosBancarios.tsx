@@ -221,12 +221,12 @@ export default function ExtratosBancarios() {
               </div>
               <div>
                 <Label className="text-white/70 text-xs">Mês</Label>
-                <Select value={mesRef} onValueChange={setMesRef}>
+                <Select value={mesRef || "todos-meses"} onValueChange={v => setMesRef(v === "todos-meses" ? "" : v)}>
                   <SelectTrigger className="bg-white/10 border-white/20 text-white h-8 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="todos-meses">Todos</SelectItem>
                     {meses.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                   </SelectContent>
                 </Select>
@@ -463,12 +463,12 @@ export default function ExtratosBancarios() {
             </div>
             <div>
               <Label className="text-white/70 text-xs">Categoria</Label>
-              <Select value={form.categoria || ""} onValueChange={v => setForm({ ...form, categoria: v })}>
+              <Select value={form.categoria || "sem-categoria"} onValueChange={v => setForm({ ...form, categoria: v === "sem-categoria" ? "" : v })}>
                 <SelectTrigger className="bg-white/10 border-white/20 text-white h-8 text-xs">
                   <SelectValue placeholder="Selecione..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Sem categoria</SelectItem>
+                  <SelectItem value="sem-categoria">Sem categoria</SelectItem>
                   {CATEGORIAS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                 </SelectContent>
               </Select>
