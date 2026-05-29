@@ -359,78 +359,84 @@ export default function ContratosPage() {
                 </Button>
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-xl border border-slate-700">
-                <table className="w-full text-sm">
+              <div className="rounded-xl border border-slate-700">
+                <table className="w-full text-xs table-fixed">
+                  <colgroup>
+                    <col className="w-[90px]" />{/* Proposta */}
+                    <col className="w-[110px]" />{/* Empresa */}
+                    <col className="w-[120px]" />{/* Cliente */}
+                    <col className="w-[80px]" />{/* Convênio */}
+                    <col className="w-[70px]" />{/* Operador */}
+                    <col className="w-[50px]" />{/* Taxa */}
+                    <col className="w-[40px]" />{/* Prazo */}
+                    <col className="w-[70px]" />{/* Parcela */}
+                    <col className="w-[75px]" />{/* 1ª Parcela */}
+                    <col className="w-[80px]" />{/* Cidade */}
+                    <col className="w-[90px]" />{/* Telefones */}
+                    <col className="w-[60px]" />{/* Refin */}
+                    <col className="w-[80px]" />{/* Ações */}
+                  </colgroup>
                   <thead>
-                    <tr className="bg-slate-900 text-slate-400 text-xs uppercase">
-                      <th className="px-3 py-3 text-left">Proposta</th>
-                      <th className="px-3 py-3 text-left">Empresa</th>
-                      <th className="px-3 py-3 text-left">Cliente</th>
-                      <th className="px-3 py-3 text-left">CPF</th>
-                      <th className="px-3 py-3 text-left">Convênio</th>
-                      <th className="px-3 py-3 text-left">Operador</th>
-                      <th className="px-3 py-3 text-right">Taxa %</th>
-                      <th className="px-3 py-3 text-right">Prazo</th>
-                      <th className="px-3 py-3 text-right">Parcela</th>
-                      <th className="px-3 py-3 text-left">1ª Parcela</th>
-                      <th className="px-3 py-3 text-left">Cidade</th>
-                      <th className="px-3 py-3 text-left">Telefones</th>
-                      <th className="px-3 py-3 text-center">Refin</th>
-                      <th className="px-3 py-3 text-center">Ações</th>
+                    <tr className="bg-slate-900 text-slate-400 text-[10px] uppercase">
+                      <th className="px-2 py-2 text-left">Proposta</th>
+                      <th className="px-2 py-2 text-left">Empresa</th>
+                      <th className="px-2 py-2 text-left">Cliente</th>
+                      <th className="px-2 py-2 text-left">Convênio</th>
+                      <th className="px-2 py-2 text-left">Oper.</th>
+                      <th className="px-2 py-2 text-right">Taxa</th>
+                      <th className="px-2 py-2 text-right">Prazo</th>
+                      <th className="px-2 py-2 text-right">Parcela</th>
+                      <th className="px-2 py-2 text-left">1ª Parc.</th>
+                      <th className="px-2 py-2 text-left">Cidade</th>
+                      <th className="px-2 py-2 text-left">Telefones</th>
+                      <th className="px-2 py-2 text-center">Refin</th>
+                      <th className="px-2 py-2 text-center">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((r, i) => (
                       <tr key={r.id} className={`border-t border-slate-700 hover:bg-slate-800/50 ${i % 2 === 0 ? 'bg-slate-800/20' : ''}`}>
-                        <td className="px-3 py-2 font-mono text-blue-300">{r.numeroProposta ?? '—'}</td>
-                        <td className="px-3 py-2 text-emerald-300 text-xs">{r.empresa ?? '—'}</td>
-                        <td className="px-3 py-2 text-white font-medium">{r.nomeCliente ?? '—'}</td>
-                        <td className="px-3 py-2 text-slate-300 font-mono text-xs">{r.cpfCliente ? r.cpfCliente.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '—'}</td>
-                        <td className="px-3 py-2 text-slate-300 text-xs">{r.nomeConvenio ?? '—'}</td>
-                        <td className="px-3 py-2 text-slate-300 text-xs">{r.chaveJOperador ?? '—'}</td>
-                        <td className="px-3 py-2 text-right text-yellow-300 font-medium">
+                        <td className="px-2 py-1.5 font-mono text-blue-300 truncate">{r.numeroProposta ?? '—'}</td>
+                        <td className="px-2 py-1.5 text-emerald-300 truncate" title={r.empresa ?? ''}>{r.empresa ?? '—'}</td>
+                        <td className="px-2 py-1.5 text-white font-medium truncate" title={r.nomeCliente ?? ''}>{r.nomeCliente ?? '—'}</td>
+                        <td className="px-2 py-1.5 text-slate-300 truncate" title={r.nomeConvenio ?? ''}>{r.nomeConvenio ?? '—'}</td>
+                        <td className="px-2 py-1.5 text-slate-300 truncate">{r.chaveJOperador ?? '—'}</td>
+                        <td className="px-2 py-1.5 text-right text-yellow-300 font-medium">
                           {r.taxaMensalJuros ? `${parseFloat(String(r.taxaMensalJuros)).toFixed(2)}%` : '—'}
                         </td>
-                        <td className="px-3 py-2 text-right text-slate-300">{r.prazoMeses ? `${r.prazoMeses}m` : '—'}</td>
-                        <td className="px-3 py-2 text-right text-slate-300">{formatarMoeda(r.valorParcela)}</td>
-                        <td className="px-3 py-2 text-slate-300 text-xs">{r.dataPrimeiraParcela ?? '—'}</td>
-                        <td className="px-3 py-2 text-slate-300 text-xs">
-                          {(r as any).cidade ? (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3 text-slate-400" />
-                              {(r as any).cidade}
-                            </span>
-                          ) : '—'}
+                        <td className="px-2 py-1.5 text-right text-slate-300">{r.prazoMeses ? `${r.prazoMeses}m` : '—'}</td>
+                        <td className="px-2 py-1.5 text-right text-slate-300">{formatarMoeda(r.valorParcela)}</td>
+                        <td className="px-2 py-1.5 text-slate-300">{r.dataPrimeiraParcela ?? '—'}</td>
+                        <td className="px-2 py-1.5 text-slate-300 truncate" title={(r as any).cidade ?? ''}>
+                          {(r as any).cidade ?? '—'}
                         </td>
-                        <td className="px-3 py-2">
+                        <td className="px-2 py-1.5">
                           {(r as any).telefones?.length > 0 ? (
                             <div className="flex flex-col gap-0.5">
-                              {((r as any).telefones as string[]).slice(0, 2).map((t: string, ti: number) => (
-                                <span key={ti} className="text-xs text-green-300 flex items-center gap-1">
-                                  <Phone className="w-3 h-3" />{t}
-                                </span>
+                              {((r as any).telefones as string[]).slice(0, 1).map((t: string, ti: number) => (
+                                <span key={ti} className="text-green-300 truncate">{t}</span>
                               ))}
-                              {(r as any).telefones.length > 2 && (
-                                <span className="text-xs text-slate-400">+{(r as any).telefones.length - 2} mais</span>
+                              {(r as any).telefones.length > 1 && (
+                                <span className="text-slate-400">+{(r as any).telefones.length - 1}</span>
                               )}
                             </div>
-                          ) : <span className="text-slate-500 text-xs">Sem tel.</span>}
+                          ) : <span className="text-slate-500">—</span>}
                         </td>
-                        <td className="px-3 py-2 text-center">
+                        <td className="px-2 py-1.5 text-center">
                           {(r as any).elegivelRefin ? (
-                            <Badge className="bg-emerald-600 text-white text-xs">✓ Elegível</Badge>
+                            <span className="text-emerald-400 font-bold">✓</span>
                           ) : (
-                            <Badge variant="outline" className="border-slate-600 text-slate-500 text-xs">Aguardar</Badge>
+                            <span className="text-slate-600">—</span>
                           )}
                         </td>
-                        <td className="px-3 py-2 text-center">
+                        <td className="px-2 py-1.5 text-center">
                           <div className="flex gap-1 justify-center">
-                            <Button size="sm" variant="outline" className="h-6 px-2 text-xs border-blue-600 text-blue-400 hover:bg-blue-900/30" onClick={() => abrirEdicao(r)}>
+                            <Button size="sm" variant="outline" className="h-5 px-1.5 text-[10px] border-blue-600 text-blue-400 hover:bg-blue-900/30" onClick={() => abrirEdicao(r)}>
                               Editar
                             </Button>
                             {user?.role === 'admin' && (
-                              <Button size="sm" variant="outline" className="h-6 px-2 text-xs border-red-700 text-red-400 hover:bg-red-900/30" onClick={() => { setDeletandoId(r.id); setSenhaCeo(''); }}>
-                                Apagar
+                              <Button size="sm" variant="outline" className="h-5 px-1.5 text-[10px] border-red-700 text-red-400 hover:bg-red-900/30" onClick={() => { setDeletandoId(r.id); setSenhaCeo(''); }}>
+                                Del
                               </Button>
                             )}
                           </div>
