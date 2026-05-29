@@ -183,7 +183,7 @@ export default function ExtratosBancarios() {
 
   return (
     <div className="min-h-screen bg-[#0a1628]">
-      <PageHeader title="Extratos Bancários" subtitle="Lançamentos e movimentações das contas bancárias" />
+      <PageHeader />
 
       {/* Abas */}
       <div className="px-4 pt-4">
@@ -239,7 +239,7 @@ export default function ExtratosBancarios() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todas">Todas</SelectItem>
-                    {contas.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.empresa} — {c.banco}</SelectItem>)}
+                    {(contas as any[]).map(c => <SelectItem key={c.id} value={String(c.id)}>{c.empresa} — {c.banco}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -434,7 +434,7 @@ export default function ExtratosBancarios() {
                   <SelectValue placeholder="Selecione..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {contas.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.empresa} — {c.banco}</SelectItem>)}
+                  {(contas as any[]).map(c => <SelectItem key={c.id} value={String(c.id)}>{c.empresa} — {c.banco}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
