@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router, adminProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { contratos, crm } from "../../drizzle/schema";
@@ -412,12 +413,56 @@ export const contratosRouter = router({
       return { total, comErro, elegiveis, taxaMedia };
     }),
 
-  // Deletar contrato (admin)
-  deletar: adminProcedure
-    .input(z.object({ id: z.number() }))
+  // Atualizar campos de um contrato (correção manual)
+  atualizar: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      empresa: z.string().optional(),
+      nomeCliente: z.string().optional(),
+      nomeConvenio: z.string().optional(),
+      nomeOperador: z.string().optional(),
+      chaveJOperador: z.string().optional(),
+      dataPrimeiraParcela: z.string().optional(),
+      dataUltimaParcela: z.string().optional(),
+      telefoneManuais: z.string().optional(), // telefones separados por vírgula
+    }))
     .mutation(async ({ input }) => {
       const db = await getDb();
       if (!db) throw new Error('Banco de dados indisponível');
+      const { id, ...campos } = input;
+      await db.update(contratos).set(campos).where(eq(contratos.id, id));
+      return { ok: true };
+    }),
+
+  // Deletar contrato — requer senha CEO
+  deletar: protectedProcedure
+    .input(z.object({ id: z.number(), senhaCeo: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Banco de dados indisponível');
+
+      // Verificar se o usuário é CEO/admin
+      if (ctx.user.role !== 'admin') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Apenas o CEO pode excluir contratos.' });
+      }
+
+      // Verificar senha do CEO contra a senha de login
+      const { agentes } = await import('../../drizzle/schema');
+      const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+      const [agente] = await db
+        .select({ senha: agentes.senha })
+        .from(agentes)
+        .where(eq(agentes.id, agenteId))
+        .limit(1);
+
+      if (!agente) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Agente não encontrado.' });
+      }
+
+      if (agente.senha !== input.senhaCeo) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Senha incorreta.' });
+      }
+
       await db.delete(contratos).where(eq(contratos.id, input.id));
       return { ok: true };
     }),

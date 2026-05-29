@@ -46,6 +46,60 @@ export default function ContratosPage() {
   const { data: stats } = trpc.contratos.estatisticas.useQuery();
 
   const uploadLoteMutation = trpc.contratos.uploadLote.useMutation();
+  const atualizarMutation = trpc.contratos.atualizar.useMutation();
+  const deletarMutation = trpc.contratos.deletar.useMutation();
+  const utils = trpc.useUtils();
+
+  // Estado de edição
+  const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState<{
+    empresa: string; nomeCliente: string; nomeConvenio: string;
+    nomeOperador: string; chaveJOperador: string;
+    dataPrimeiraParcela: string; dataUltimaParcela: string; telefoneManuais: string;
+  }>({ empresa: '', nomeCliente: '', nomeConvenio: '', nomeOperador: '', chaveJOperador: '',
+       dataPrimeiraParcela: '', dataUltimaParcela: '', telefoneManuais: '' });
+
+  // Estado de exclusão com senha CEO
+  const [deletandoId, setDeletandoId] = useState<number | null>(null);
+  const [senhaCeo, setSenhaCeo] = useState('');
+
+  const abrirEdicao = (r: any) => {
+    setEditandoId(r.id);
+    setEditForm({
+      empresa: r.empresa ?? '',
+      nomeCliente: r.nomeCliente ?? '',
+      nomeConvenio: r.nomeConvenio ?? '',
+      nomeOperador: r.nomeOperador ?? '',
+      chaveJOperador: r.chaveJOperador ?? '',
+      dataPrimeiraParcela: r.dataPrimeiraParcela ?? '',
+      dataUltimaParcela: r.dataUltimaParcela ?? '',
+      telefoneManuais: r.telefoneManuais ?? '',
+    });
+  };
+
+  const salvarEdicao = async () => {
+    if (!editandoId) return;
+    try {
+      await atualizarMutation.mutateAsync({ id: editandoId, ...editForm });
+      toast.success('Contrato atualizado!');
+      setEditandoId(null);
+      utils.contratos.listar.invalidate();
+    } catch { toast.error('Erro ao salvar'); }
+  };
+
+  const confirmarExclusao = async () => {
+    if (!deletandoId) return;
+    try {
+      await deletarMutation.mutateAsync({ id: deletandoId, senhaCeo });
+      toast.success('Contrato excluído.');
+      setDeletandoId(null);
+      setSenhaCeo('');
+      utils.contratos.listar.invalidate();
+      utils.contratos.estatisticas.invalidate();
+    } catch (e: any) {
+      toast.error(e?.message ?? 'Erro ao excluir');
+    }
+  };
 
   const fileParaBase64 = async (file: File): Promise<string> => {
     const buffer = await file.arrayBuffer();
@@ -322,6 +376,7 @@ export default function ContratosPage() {
                       <th className="px-3 py-3 text-left">Cidade</th>
                       <th className="px-3 py-3 text-left">Telefones</th>
                       <th className="px-3 py-3 text-center">Refin</th>
+                      <th className="px-3 py-3 text-center">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -367,6 +422,18 @@ export default function ContratosPage() {
                           ) : (
                             <Badge variant="outline" className="border-slate-600 text-slate-500 text-xs">Aguardar</Badge>
                           )}
+                        </td>
+                        <td className="px-3 py-2 text-center">
+                          <div className="flex gap-1 justify-center">
+                            <Button size="sm" variant="outline" className="h-6 px-2 text-xs border-blue-600 text-blue-400 hover:bg-blue-900/30" onClick={() => abrirEdicao(r)}>
+                              Editar
+                            </Button>
+                            {user?.role === 'admin' && (
+                              <Button size="sm" variant="outline" className="h-6 px-2 text-xs border-red-700 text-red-400 hover:bg-red-900/30" onClick={() => { setDeletandoId(r.id); setSenhaCeo(''); }}>
+                                Apagar
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -484,6 +551,68 @@ export default function ContratosPage() {
           </div>
         )}
       </div>
+
+      {/* MODAL EDITAR CONTRATO */}
+      {editandoId !== null && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-lg">
+            <h2 className="text-white font-bold text-lg mb-4">Editar Contrato</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {([
+                ['empresa', 'Empresa/Correspondente'],
+                ['nomeCliente', 'Nome do Cliente'],
+                ['nomeConvenio', 'Convênio'],
+                ['nomeOperador', 'Nome do Operador'],
+                ['chaveJOperador', 'ChaveJ do Operador'],
+                ['dataPrimeiraParcela', '1ª Parcela'],
+                ['dataUltimaParcela', 'Última Parcela'],
+                ['telefoneManuais', 'Telefones (vírgula)'],
+              ] as [keyof typeof editForm, string][]).map(([campo, label]) => (
+                <div key={campo} className={campo === 'telefoneManuais' ? 'col-span-2' : ''}>
+                  <label className="text-slate-400 text-xs mb-1 block">{label}</label>
+                  <Input
+                    value={editForm[campo]}
+                    onChange={e => setEditForm(f => ({ ...f, [campo]: e.target.value }))}
+                    className="bg-slate-800 border-slate-600 text-white text-sm"
+                    placeholder={label}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3 mt-5 justify-end">
+              <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => setEditandoId(null)}>Cancelar</Button>
+              <Button className="bg-blue-600 hover:bg-blue-700" onClick={salvarEdicao} disabled={atualizarMutation.isPending}>
+                {atualizarMutation.isPending ? 'Salvando...' : 'Salvar'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL APAGAR COM SENHA CEO */}
+      {deletandoId !== null && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-red-800 rounded-2xl p-6 w-full max-w-sm">
+            <h2 className="text-red-400 font-bold text-lg mb-2">Confirmar Exclusão</h2>
+            <p className="text-slate-400 text-sm mb-4">Esta ação é irreversível. Digite sua senha para confirmar.</p>
+            <label className="text-slate-400 text-xs mb-1 block">Senha CEO</label>
+            <Input
+              type="password"
+              value={senhaCeo}
+              onChange={e => setSenhaCeo(e.target.value)}
+              className="bg-slate-800 border-slate-600 text-white mb-4"
+              placeholder="Sua senha de acesso"
+              onKeyDown={e => e.key === 'Enter' && confirmarExclusao()}
+            />
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => { setDeletandoId(null); setSenhaCeo(''); }}>Cancelar</Button>
+              <Button className="bg-red-700 hover:bg-red-800" onClick={confirmarExclusao} disabled={!senhaCeo || deletarMutation.isPending}>
+                {deletarMutation.isPending ? 'Excluindo...' : 'Excluir'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
