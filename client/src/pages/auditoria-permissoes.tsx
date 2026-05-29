@@ -524,10 +524,26 @@ function AgentePermissaoRow({ agente, templatesCargo, onSalvar }: {
         <div className="flex flex-wrap gap-1">
           {resumo.map(m => {
             const n = nivelColor(m.nivel);
+            const CICLO: NivelPermissao[] = ['sem_acesso', 'leitura', 'editar', 'admin'];
+            const handleClickBadge = () => {
+              const idx = CICLO.indexOf(m.nivel);
+              const novoNivel = CICLO[(idx + 1) % CICLO.length];
+              const moduloDef = MODULOS_PERMISSOES.find(md => md.modulo === m.modulo);
+              const subabas = moduloDef ? moduloDef.subabas.map(s => s.key) : [];
+              const novoMapa = { ...mapa, [m.modulo]: Object.fromEntries(subabas.map(k => [k, novoNivel])) };
+              setMapa(novoMapa);
+              setAlterado(true);
+            };
             return (
-              <span key={m.modulo} className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${n.bg} ${n.color}`}>
+              <button
+                key={m.modulo}
+                type="button"
+                title={`${m.label}: ${n.label} — clique para alterar`}
+                onClick={handleClickBadge}
+                className={`text-[10px] px-1.5 py-0.5 rounded border font-medium cursor-pointer hover:opacity-75 active:scale-95 transition-all select-none ${n.bg} ${n.color}`}
+              >
                 {m.label}
-              </span>
+              </button>
             );
           })}
         </div>
