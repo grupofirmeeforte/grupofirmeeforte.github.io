@@ -55,7 +55,22 @@ function extrairDadosContrato(texto: string) {
   // Operador
   const nomeOperador = campo(/\bOperador\b\s*\n([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÀÈÌÒÙÄËÏÖÜ][^\n]+)/i);
   const chaveJOperador = campo(/\bChave\b\s*\n([A-Z]\d+)/i);
-  const empresa = campo(/\bCorrespondente\b\s*\n([^\n]+)/i);
+  // Nome do correspondente: fica na linha logo após "Correspondente"
+  // Estrutura real (pdf-parse): Correspondente -> BRASIL MAIS FORTE LTDA -> Loja -> MAISBB...
+  let empresa: string | null = null;
+  {
+    const linhas = texto.split('\n');
+    const idxCorr = linhas.findIndex(l => l.trim() === 'Correspondente');
+    if (idxCorr >= 0) {
+      for (let j = idxCorr + 1; j < linhas.length; j++) {
+        const val = linhas[j].trim();
+        if (val && val !== 'Loja') {
+          empresa = val;
+          break;
+        }
+      }
+    }
+  }
 
   return {
     numeroProposta,
@@ -172,17 +187,18 @@ export const contratosRouter = router({
         fileBase64: z.string(),
         nomeArquivo: z.string(),
       })).max(50),
+      substituirDuplicatas: z.boolean().default(false),
     }))
     .mutation(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new Error('Banco de dados indisponível');
 
+      let duplicatas = 0;
       const resultados = await Promise.allSettled(
         input.arquivos.map(async (arq) => {
           const buffer = Buffer.from(arq.fileBase64, 'base64');
-          const fileKey = `contratos/${Date.now()}_${Math.random().toString(36).slice(2)}_${arq.nomeArquivo.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-          const { key, url } = await storagePut(fileKey, buffer, 'application/pdf');
 
+          // Extrair dados primeiro para verificar duplicata
           let dados: ReturnType<typeof extrairDadosContrato> | null = null;
           let statusExtracao = 'ok';
           let erroExtracao: string | null = null;
@@ -195,6 +211,42 @@ export const contratosRouter = router({
             statusExtracao = 'erro';
             erroExtracao = e instanceof Error ? e.message : 'Erro ao processar PDF';
           }
+
+          // Regras de duplicata:
+          // - Mesmo CPF + mesma linha + mesma proposta = duplicata (substitui se solicitado)
+          // - Mesmo CPF + mesma linha + proposta diferente = bloqueia (contrato diferente, não entra)
+          // - Mesmo CPF + linha diferente = permite (produto diferente)
+          if (dados?.cpfCliente && dados?.linhaCredito) {
+            const [existente] = await db
+              .select({ id: contratos.id, numeroProposta: contratos.numeroProposta })
+              .from(contratos)
+              .where(
+                and(
+                  eq(contratos.cpfCliente, dados.cpfCliente),
+                  eq(contratos.linhaCredito, dados.linhaCredito)
+                )
+              )
+              .limit(1);
+
+            if (existente) {
+              const mesmaPropoosta = existente.numeroProposta === dados.numeroProposta;
+              if (mesmaPropoosta) {
+                // Duplicata exata: substitui se solicitado, senão ignora
+                if (!input.substituirDuplicatas) {
+                  duplicatas++;
+                  return { nome: arq.nomeArquivo, status: 'duplicata' };
+                }
+                await db.delete(contratos).where(eq(contratos.id, existente.id));
+              } else {
+                // Mesmo CPF + mesma linha mas proposta diferente: bloqueia sempre
+                duplicatas++;
+                return { nome: arq.nomeArquivo, status: 'duplicata' };
+              }
+            }
+          }
+
+          const fileKey = `contratos/${Date.now()}_${Math.random().toString(36).slice(2)}_${arq.nomeArquivo.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+          const { key, url } = await storagePut(fileKey, buffer, 'application/pdf');
 
           await db.insert(contratos).values({
             fileKey: key,
@@ -226,9 +278,9 @@ export const contratosRouter = router({
         })
       );
 
-      const ok = resultados.filter(r => r.status === 'fulfilled').length;
+      const ok = resultados.filter(r => r.status === 'fulfilled' && (r.value as {status:string}).status !== 'duplicata').length;
       const erros = resultados.filter(r => r.status === 'rejected').length;
-      return { ok, erros, total: input.arquivos.length };
+      return { ok, erros, duplicatas, total: input.arquivos.length };
     }),
 
   // Listar contratos com cruzamento de mailing
@@ -237,6 +289,10 @@ export const contratosRouter = router({
       chaveJ: z.string().optional(),
       nomeCliente: z.string().optional(),
       numeroProposta: z.string().optional(),
+      nomeOperador: z.string().optional(),
+      empresa: z.string().optional(),
+      linhaCredito: z.string().optional(),
+      cidade: z.string().optional(),
       apenasElegiveis: z.boolean().optional(),
       page: z.number().default(1),
       pageSize: z.number().default(50),
@@ -254,6 +310,9 @@ export const contratosRouter = router({
             input.chaveJ ? eq(contratos.chaveJOperador, input.chaveJ) : undefined,
             input.nomeCliente ? like(contratos.nomeCliente, `%${input.nomeCliente}%`) : undefined,
             input.numeroProposta ? like(contratos.numeroProposta, `%${input.numeroProposta}%`) : undefined,
+            input.nomeOperador ? like(contratos.nomeOperador, `%${input.nomeOperador}%`) : undefined,
+            input.empresa ? like(contratos.empresa, `%${input.empresa}%`) : undefined,
+            input.linhaCredito ? like(contratos.linhaCredito, `%${input.linhaCredito}%`) : undefined,
           )
         )
         .orderBy(desc(contratos.createdAt))
@@ -292,9 +351,17 @@ export const contratosRouter = router({
         };
       });
 
-      const filtrados = input.apenasElegiveis
+      let filtrados = input.apenasElegiveis
         ? resultado.filter(r => r.elegivelRefin)
         : resultado;
+
+      // Filtro por cidade (vem do mailing, após cruzamento)
+      if (input.cidade) {
+        const cidadeLower = input.cidade.toLowerCase();
+        filtrados = filtrados.filter(r =>
+          r.cidade?.toLowerCase().includes(cidadeLower)
+        );
+      }
 
       return { rows: filtrados, total: filtrados.length };
     }),

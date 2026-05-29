@@ -24,11 +24,20 @@ export default function ContratosPage() {
 
   // Filtros
   const [busca, setBusca] = useState('');
+  const [filtroAgente, setFiltroAgente] = useState('');
+  const [filtroCidade, setFiltroCidade] = useState('');
+  const [filtroEmpresa, setFiltroEmpresa] = useState('');
+  const [filtroLinha, setFiltroLinha] = useState('');
   const [apenasElegiveis, setApenasElegiveis] = useState(false);
+  const [substituirDuplicatas, setSubstituirDuplicatas] = useState(false);
   const [page, setPage] = useState(1);
 
   const { data, isLoading, refetch } = trpc.contratos.listar.useQuery({
     nomeCliente: busca || undefined,
+    nomeOperador: filtroAgente || undefined,
+    cidade: filtroCidade || undefined,
+    empresa: filtroEmpresa || undefined,
+    linhaCredito: filtroLinha || undefined,
     apenasElegiveis,
     page,
     pageSize: 50,
@@ -68,7 +77,7 @@ export default function ContratosPage() {
             nomeArquivo: f.name,
           }))
         );
-        const res = await uploadLoteMutation.mutateAsync({ arquivos });
+        const res = await uploadLoteMutation.mutateAsync({ arquivos, substituirDuplicatas });
         ok += res.ok;
         erros += res.erros;
       } catch {
@@ -198,6 +207,23 @@ export default function ContratosPage() {
                 />
               </div>
 
+              <div className="mt-4 flex items-center gap-3">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={substituirDuplicatas}
+                    onChange={e => setSubstituirDuplicatas(e.target.checked)}
+                    className="w-4 h-4 accent-emerald-500"
+                  />
+                  <span className="text-slate-300 text-sm">
+                    Substituir contratos duplicados (mesmo CPF + mesma linha de crédito + mesma proposta)
+                  </span>
+                </label>
+              </div>
+              <p className="text-slate-500 text-xs mt-1 ml-6">
+                Sem esta opção, contratos já existentes são ignorados automaticamente.
+              </p>
+
               {uploading && (
                 <div className="mt-6">
                   <div className="flex items-center justify-between mb-2">
@@ -219,27 +245,53 @@ export default function ContratosPage() {
         {/* ABA RELATÓRIO */}
         {aba === 'relatorio' && (
           <div>
-            <div className="flex gap-3 mb-4 flex-wrap">
-              <div className="relative flex-1 min-w-48">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+              <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
-                  placeholder="Buscar por nome do cliente..."
+                  placeholder="Nome do cliente..."
                   value={busca}
                   onChange={e => { setBusca(e.target.value); setPage(1); }}
                   className="pl-9 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
                 />
               </div>
-              <Button
-                variant={apenasElegiveis ? 'default' : 'outline'}
-                onClick={() => { setApenasElegiveis(!apenasElegiveis); setPage(1); }}
-                className={apenasElegiveis ? 'bg-emerald-600 hover:bg-emerald-700' : 'border-slate-600 text-slate-300'}
-              >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                {apenasElegiveis ? 'Apenas elegíveis' : 'Todos os contratos'}
-              </Button>
-              <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-300">
-                <RefreshCw className="w-4 h-4" />
-              </Button>
+              <Input
+                placeholder="Nome do agente..."
+                value={filtroAgente}
+                onChange={e => { setFiltroAgente(e.target.value); setPage(1); }}
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
+              />
+              <Input
+                placeholder="Cidade..."
+                value={filtroCidade}
+                onChange={e => { setFiltroCidade(e.target.value); setPage(1); }}
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
+              />
+              <Input
+                placeholder="Empresa..."
+                value={filtroEmpresa}
+                onChange={e => { setFiltroEmpresa(e.target.value); setPage(1); }}
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
+              />
+              <Input
+                placeholder="Linha de crédito..."
+                value={filtroLinha}
+                onChange={e => { setFiltroLinha(e.target.value); setPage(1); }}
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
+              />
+              <div className="flex gap-2">
+                <Button
+                  variant={apenasElegiveis ? 'default' : 'outline'}
+                  onClick={() => { setApenasElegiveis(!apenasElegiveis); setPage(1); }}
+                  className={`flex-1 text-xs ${apenasElegiveis ? 'bg-emerald-600 hover:bg-emerald-700' : 'border-slate-600 text-slate-300'}`}
+                >
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  {apenasElegiveis ? 'Elegíveis' : 'Todos'}
+                </Button>
+                <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-300 px-3">
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
 
             {isLoading ? (
