@@ -39,8 +39,11 @@ export async function createContext(
     // Para agentes customizados (login com ChaveJ), o JWT já é suficiente para autenticação.
     // Não verificar sessão ativa para evitar problemas com múltiplos dispositivos.
     if (user && !user.openId?.startsWith('agente_')) {
-      // Apenas para login OAuth puro: verificar sessão pelo nome
-      if (user.name) {
+      // CEO (dono do sistema) nunca é desconectado pela verificação de sessão
+      const ownerOpenId = process.env.OWNER_OPEN_ID;
+      const isCeo = ownerOpenId && user.openId === ownerOpenId;
+      if (!isCeo && user.name) {
+        // Apenas para agentes OAuth que não são o CEO: verificar sessão pelo nome
         const db = await getDb();
         if (db) {
           const result = await db.select().from(sessoes)
