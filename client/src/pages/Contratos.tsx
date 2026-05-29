@@ -8,9 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
   Upload, Search, Phone, MapPin, FileText, CheckCircle,
-  AlertCircle, Clock, RefreshCw, TrendingUp, Users, Percent, ChevronLeft
+  AlertCircle, Clock, RefreshCw, TrendingUp, Users, Percent
 } from "lucide-react";
 import { useLocation } from "wouter";
+import PageHeader from "@/components/PageHeader";
 
 type Aba = 'upload' | 'relatorio' | 'crm';
 
@@ -157,21 +158,7 @@ export default function ContratosPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white">
-      {/* Header */}
-      <div className="bg-slate-900/80 border-b border-slate-700 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="text-slate-300 hover:text-white">
-            <ChevronLeft className="w-4 h-4 mr-1" /> Início
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold text-white flex items-center gap-2">
-              <FileText className="w-5 h-5 text-emerald-400" />
-              Contratos PDF — BB Consignado
-            </h1>
-            <p className="text-slate-400 text-sm">Upload, extração automática e CRM de refinanciamento</p>
-          </div>
-        </div>
-      </div>
+      <PageHeader />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Cards de estatísticas */}
