@@ -47,7 +47,7 @@ export default function ContratosPage() {
   const { data: stats } = trpc.contratos.estatisticas.useQuery();
   // Verificar telefones na lista Não Perturbe
   const todosTelefones = (data?.rows ?? []).flatMap((r: any) => r.telefones ?? []);
-  const { data: naoPerturbeData } = trpc.naoPerturbe.verificarLote.useQuery(
+  const { data: naoPerturbeData } = trpc.naoPerturbe.verificar.useQuery(
     { telefones: todosTelefones },
     { enabled: todosTelefones.length > 0, staleTime: 60000 }
   );
