@@ -427,7 +427,7 @@ export default function ContratosPage() {
                                 const bloqueado = telefonesNaoPerturbe.has(t);
                                 return (
                                   <span key={ti} className={`flex items-center gap-1 truncate ${bloqueado ? 'text-red-400' : 'text-green-300'}`}>
-                                    {bloqueado && <PhoneOff className="w-3 h-3 shrink-0" title="Não Perturbe" />}
+                                    {bloqueado && <PhoneOff className="w-3 h-3 shrink-0" aria-label="Não Perturbe" />}
                                     {t}
                                   </span>
                                 );
