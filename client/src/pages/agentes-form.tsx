@@ -57,7 +57,9 @@ const MODULOS_PERMISSOES = [
   { modulo: 'crm', label: 'CRM', subabas: [
     { key: 'atendimentos', label: 'Atendimentos' },
     { key: 'clientes', label: 'Clientes' },
+    { key: 'contratos-pdf', label: 'Contratos PDF' },
     { key: 'mailing', label: 'Mailing' },
+    { key: 'nao-perturbe', label: 'Não Perturbe' },
     { key: 'oportunidades', label: 'Oportunidades' },
     { key: 'relatorios-crm', label: 'Relatórios CRM' },
     { key: 'tarefas', label: 'Tarefas / Follow-up' },
