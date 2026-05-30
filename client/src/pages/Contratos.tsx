@@ -352,7 +352,7 @@ export default function ContratosPage() {
                     {/* Linha de grupos */}
                     <tr className="bg-slate-950 text-[9px] uppercase font-bold">
                       <th colSpan={2} className="px-2 py-1 text-left text-blue-400 border-b border-blue-800/40">Proposta</th>
-                      <th colSpan={2} className="px-2 py-1 text-left text-purple-400 border-b border-purple-800/40 border-l border-slate-700">Operador</th>
+                      <th colSpan={3} className="px-2 py-1 text-left text-purple-400 border-b border-purple-800/40 border-l border-slate-700">Operador</th>
                       <th colSpan={5} className="px-2 py-1 text-left text-emerald-400 border-b border-emerald-800/40 border-l border-slate-700">Cliente</th>
                       <th colSpan={4} className="px-2 py-1 text-left text-yellow-400 border-b border-yellow-800/40 border-l border-slate-700">Contrato</th>
                       <th colSpan={2} className="px-2 py-1 text-left text-cyan-400 border-b border-cyan-800/40 border-l border-slate-700">Mailing</th>
@@ -366,6 +366,7 @@ export default function ContratosPage() {
                       {/* Operador */}
                       <th className="px-2 py-1.5 text-left w-[110px] border-l border-slate-700">Operador</th>
                       <th className="px-2 py-1.5 text-left w-[80px]">Convênio</th>
+                      <th className="px-2 py-1.5 text-left w-[120px]">Linha Créd.</th>
                       {/* Cliente */}
                       <th className="px-2 py-1.5 text-left w-[130px] border-l border-slate-700">Nome</th>
                       <th className="px-2 py-1.5 text-left w-[95px]">CPF</th>
@@ -394,6 +395,7 @@ export default function ContratosPage() {
                         {/* Grupo: Operador */}
                         <td className="px-2 py-1.5 text-purple-300 truncate border-l border-slate-700" title={`${r.nomeOperador ?? ''} (${r.chaveJOperador ?? ''})`.trim()}>{r.nomeOperador ?? r.chaveJOperador ?? '—'}</td>
                         <td className="px-2 py-1.5 text-slate-300 truncate" title={r.nomeConvenio ?? ''}>{r.nomeConvenio ?? '—'}</td>
+                        <td className="px-2 py-1.5 text-purple-200 truncate text-[10px]" title={r.linhaCredito ?? ''}>{r.linhaCredito ?? '—'}</td>
                         {/* Grupo: Cliente */}
                         <td className="px-2 py-1.5 text-white font-medium truncate border-l border-slate-700" title={r.nomeCliente ?? ''}>{r.nomeCliente ?? '—'}</td>
                         <td className="px-2 py-1.5 text-slate-300 truncate font-mono text-[10px]" title={r.cpfCliente ?? ''}>{r.cpfCliente ?? '—'}</td>
