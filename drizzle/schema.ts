@@ -1543,3 +1543,19 @@ export const contratos = mysqlTable("contratos", {
 
 export type Contrato = typeof contratos.$inferSelect;
 export type InsertContrato = typeof contratos.$inferInsert;
+
+// ─── Lista Não Perturbe ───────────────────────────────────────────────────────
+export const listaNaoPerturbe = mysqlTable("lista_nao_perturbe", {
+  id: int("id").autoincrement().primaryKey(),
+  telefone: varchar("telefone", { length: 20 }).notNull(),
+  telefoneFormatado: varchar("telefoneFormatado", { length: 25 }),
+  motivo: varchar("motivo", { length: 255 }),
+  origem: varchar("origem", { length: 50 }).default("manual"),
+  adicionadoPorId: int("adicionadoPorId"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  telefoneIdx: index("idx_nao_perturbe_telefone").on(table.telefone),
+}));
+export type ListaNaoPerturbe = typeof listaNaoPerturbe.$inferSelect;
+export type InsertListaNaoPerturbe = typeof listaNaoPerturbe.$inferInsert;
+

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
   Upload, Search, Phone, MapPin, FileText, CheckCircle,
-  AlertCircle, Clock, RefreshCw, TrendingUp, Users, Percent
+  AlertCircle, Clock, RefreshCw, TrendingUp, Users, Percent, PhoneOff
 } from "lucide-react";
 import { useLocation } from "wouter";
 import PageHeader from "@/components/PageHeader";
@@ -45,6 +45,13 @@ export default function ContratosPage() {
   });
 
   const { data: stats } = trpc.contratos.estatisticas.useQuery();
+  // Verificar telefones na lista Não Perturbe
+  const todosTelefones = (data?.rows ?? []).flatMap((r: any) => r.telefones ?? []);
+  const { data: naoPerturbeData } = trpc.naoPerturbe.verificarLote.useQuery(
+    { telefones: todosTelefones },
+    { enabled: todosTelefones.length > 0, staleTime: 60000 }
+  );
+  const telefonesNaoPerturbe = new Set(naoPerturbeData?.bloqueados ?? []);
 
   const uploadLoteMutation = trpc.contratos.uploadLote.useMutation();
   const atualizarMutation = trpc.contratos.atualizar.useMutation();
@@ -416,11 +423,17 @@ export default function ContratosPage() {
                         <td className="px-2 py-1.5">
                           {(r as any).telefones?.length > 0 ? (
                             <div className="flex flex-col gap-0.5">
-                              {((r as any).telefones as string[]).slice(0, 1).map((t: string, ti: number) => (
-                                <span key={ti} className="text-green-300 truncate">{t}</span>
-                              ))}
-                              {(r as any).telefones.length > 1 && (
-                                <span className="text-slate-400">+{(r as any).telefones.length - 1}</span>
+                              {((r as any).telefones as string[]).slice(0, 2).map((t: string, ti: number) => {
+                                const bloqueado = telefonesNaoPerturbe.has(t);
+                                return (
+                                  <span key={ti} className={`flex items-center gap-1 truncate ${bloqueado ? 'text-red-400' : 'text-green-300'}`}>
+                                    {bloqueado && <PhoneOff className="w-3 h-3 shrink-0" title="Não Perturbe" />}
+                                    {t}
+                                  </span>
+                                );
+                              })}
+                              {(r as any).telefones.length > 2 && (
+                                <span className="text-slate-400">+{(r as any).telefones.length - 2}</span>
                               )}
                             </div>
                           ) : <span className="text-slate-500">—</span>}
