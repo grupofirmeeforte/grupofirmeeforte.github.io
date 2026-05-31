@@ -43,7 +43,42 @@ export const calculosRouter = router({
         .limit(input.limit)
         .offset(offset);
 
-      return result;
+      // A partir de 05/2026: buscar adiantamento automaticamente da tabela pagamentos
+      const isMesNovo = (mes: string) => {
+        if (!mes) return false;
+        const parts = mes.split('/');
+        if (parts.length !== 2) return false;
+        const mm = parseInt(parts[0], 10);
+        const aaaa = parseInt(parts[1], 10);
+        return aaaa > 2026 || (aaaa === 2026 && mm >= 5);
+      };
+
+      const resultComAdto = await Promise.all(result.map(async (reg) => {
+        if (!isMesNovo(reg.mesRef ?? '') || !reg.chaveJ) return reg;
+        const adtoRows = await db.execute(
+          sql`SELECT COALESCE(SUM(valor), 0) as total FROM pagamentos WHERE tipoPagto = 'Adto' AND chaveJ = ${reg.chaveJ} AND mesAno = ${reg.mesRef}`
+        ) as any;
+        const adtoArr = Array.isArray(adtoRows) ? adtoRows[0] : adtoRows;
+        const adtoList = Array.isArray(adtoArr) ? adtoArr : [adtoArr];
+        const adiantamento = parseFloat(String(adtoList[0]?.total ?? 0)) || 0;
+        const toN = (v: any) => parseFloat(String(v ?? 0)) || 0;
+        const novaComissaoTotal =
+          toN(reg.comissaoConsig) +
+          toN(reg.comissaoConsorcio) +
+          toN(reg.comissaoOurocap) +
+          toN(reg.comissaoCc) +
+          toN(reg.comissaoSeguros) +
+          toN(reg.ajudaCusto) +
+          toN(reg.creditosDebitos) -
+          adiantamento;
+        // Atualizar no banco silenciosamente
+        await db.update(calculos)
+          .set({ comissaoTotal: String(novaComissaoTotal), adiantamento: String(adiantamento) })
+          .where(eq(calculos.id, reg.id));
+        return { ...reg, adiantamento: String(adiantamento), comissaoTotal: String(novaComissaoTotal) };
+      }));
+
+      return resultComAdto;
     }),
 
   // Contar total de registros
