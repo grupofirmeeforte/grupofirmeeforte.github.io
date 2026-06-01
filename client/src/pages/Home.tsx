@@ -115,6 +115,7 @@ export default function Home() {
         { title: 'Certificações', description: 'Controlar certificações e alertas de vencimento', icon: FileCheck, color: 'bg-green-500', path: '/certificacoes', subKey: 'certificacoes' },
         { title: 'Tabela Comissão', description: 'Faixas e percentuais de comissão por convênio', icon: TableProperties, color: 'bg-indigo-500', path: '/tabela-comissao', subKey: 'tabela-comissao' },
         { title: 'Documentação Agentes', description: 'Cópias de documentos: Contrato, RG, CPF, CNH e mais', icon: FolderOpen, color: 'bg-amber-600', path: '/cadastro/documentacao-agentes', subKey: 'documentacao-agentes' },
+        { title: 'Agências BB', description: 'Consulta de agências do Banco do Brasil por prefixo ou nome', icon: Building2, color: 'bg-yellow-600', path: '/agencias-bb', subKey: 'agencias-bb' },
       ],
     },
 
@@ -213,7 +214,6 @@ export default function Home() {
         { title: 'Mailing / Leads', description: 'Gestão de mailing e leads do banco', icon: Users, color: 'bg-cyan-600', path: '/mailing-crm', subKey: 'mailing-crm' },
         { title: 'Contratos PDF', description: 'Upload e análise de contratos BB Consignado + CRM Refinanciamento', icon: FileText, color: 'bg-emerald-600', path: '/contratos', subKey: 'contratos' },
         { title: 'Não Perturbe', description: 'Lista de telefones bloqueados para contato', icon: PhoneOff, color: 'bg-red-700', path: '/nao-perturbe', subKey: 'nao-perturbe' },
-        { title: 'Agências BB', description: 'Consulta de agências do Banco do Brasil por prefixo ou nome', icon: Building2, color: 'bg-yellow-600', path: '/agencias-bb', subKey: 'agencias-bb' },
       ],
     },
 
