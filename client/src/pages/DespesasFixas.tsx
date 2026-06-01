@@ -416,11 +416,11 @@ export default function DespesasFixasPage() {
                   {TIPOS_PAGTO.map(t => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
-              <FormField label="Cidade/UF" value={modal.dados.cidadeUF ?? ""} onChange={v => setField("cidadeUF", v)} />
+              <FormField label="Cidade/UF" value={modal.dados.cidadeUF ?? ""} onChange={v => { setField("cidadeUF", v); if (v) setField("chaveResp", v); }} />
               <FormField label="Empresa" value={modal.dados.empresa ?? ""} onChange={v => setField("empresa", v)} />
               <div className="flex flex-col gap-0.5">
                 <label className="text-[10px] text-gray-400 font-medium">Cidade Resp.</label>
-                <CidadeRespSelect value={modal.dados.chaveResp ?? ""} onChange={v => setField("chaveResp", v)} />
+                <CidadeRespSelect value={modal.dados.chaveResp ?? ""} onChange={v => { setField("chaveResp", v); if (v) setField("cidadeUF", v); }} />
               </div>
               <FormField label="Nome" value={modal.dados.nome ?? ""} onChange={v => setField("nome", v)} />
               <div className="col-span-1">
