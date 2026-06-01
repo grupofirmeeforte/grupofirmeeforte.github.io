@@ -425,6 +425,21 @@ export const contratosRouter = router({
       return { total, comErro, elegiveis, taxaMedia };
     }),
 
+  // Atualizar anotação CRM e data do contato (CRM Refinanciamento)
+  atualizarCrm: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      anotacaoCrm: z.string().nullable().optional(),
+      dataContatoCrm: z.string().nullable().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Banco de dados indisponível');
+      const { id, ...campos } = input;
+      await db.update(contratos).set(campos).where(eq(contratos.id, id));
+      return { ok: true };
+    }),
+
   // Atualizar campos de um contrato (correção manual)
   atualizar: protectedProcedure
     .input(z.object({

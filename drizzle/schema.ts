@@ -1531,16 +1531,18 @@ export const contratos = mysqlTable("contratos", {
   chaveJOperador: varchar("chaveJOperador", { length: 50 }),    // ChaveJ do operador
   nomeOperador: varchar("nomeOperador", { length: 255 }),
   empresa: varchar("empresa", { length: 100 }),
-  statusExtracao: varchar("statusExtracao", { length: 20 }).default("pendente"), // pendente | ok | erro
+    statusExtracao: varchar("statusExtracao", { length: 20 }).default("pendente"), // pendente | ok | erro
   erroExtracao: text("erroExtracao"),
   uploadPorId: int("uploadPorId"),                              // FK users.id
+  // CRM Refinanciamento
+  anotacaoCrm: text("anotacaoCrm"),                            // Anotação do contato de refinanciamento
+  dataContatoCrm: varchar("dataContatoCrm", { length: 20 }),   // Data do contato
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
   propostaIdx: index("idx_contratos_proposta").on(table.numeroProposta),
   chaveJIdx: index("idx_contratos_chaveJ").on(table.chaveJOperador),
 }));
-
 export type Contrato = typeof contratos.$inferSelect;
 export type InsertContrato = typeof contratos.$inferInsert;
 

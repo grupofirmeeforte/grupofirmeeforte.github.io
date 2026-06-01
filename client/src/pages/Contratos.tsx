@@ -55,8 +55,37 @@ export default function ContratosPage() {
 
   const uploadLoteMutation = trpc.contratos.uploadLote.useMutation();
   const atualizarMutation = trpc.contratos.atualizar.useMutation();
+  const atualizarCrmMutation = trpc.contratos.atualizarCrm.useMutation();
   const deletarMutation = trpc.contratos.deletar.useMutation();
   const utils = trpc.useUtils();
+
+  // Estado de edição CRM (anotação + data contato)
+  const [editandoCrmId, setEditandoCrmId] = useState<number | null>(null);
+  const [crmForm, setCrmForm] = useState({ anotacaoCrm: '', dataContatoCrm: '' });
+
+  const abrirEdicaoCrm = (r: any) => {
+    setEditandoCrmId(r.id);
+    setCrmForm({
+      anotacaoCrm: r.anotacaoCrm ?? '',
+      dataContatoCrm: r.dataContatoCrm ?? '',
+    });
+  };
+
+  const salvarCrm = async () => {
+    if (editandoCrmId === null) return;
+    try {
+      await atualizarCrmMutation.mutateAsync({
+        id: editandoCrmId,
+        anotacaoCrm: crmForm.anotacaoCrm || null,
+        dataContatoCrm: crmForm.dataContatoCrm || null,
+      });
+      utils.contratos.listar.invalidate();
+      setEditandoCrmId(null);
+      toast.success('Anotação salva!');
+    } catch {
+      toast.error('Erro ao salvar anotação.');
+    }
+  };
 
   // Estado de edição
   const [editandoId, setEditandoId] = useState<number | null>(null);
@@ -603,6 +632,25 @@ export default function ContratosPage() {
                             )}
                           </div>
                         </div>
+
+                        {/* Anotação CRM — clicando abre o mini-modal */}
+                        <div
+                          className="mt-3 pt-3 border-t border-slate-700/50 cursor-pointer group"
+                          onClick={() => abrirEdicaoCrm(r)}
+                        >
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-slate-400 text-xs">Resultado do contato</span>
+                            {r.dataContatoCrm && (
+                              <span className="text-slate-500 text-xs">· {r.dataContatoCrm}</span>
+                            )}
+                            <span className="text-slate-600 text-xs group-hover:text-slate-400 transition-colors ml-auto">✏️ clique para anotar</span>
+                          </div>
+                          {r.anotacaoCrm ? (
+                            <p className="text-emerald-300 text-sm">{r.anotacaoCrm}</p>
+                          ) : (
+                            <p className="text-slate-600 text-sm italic">Sem anotação ainda...</p>
+                          )}
+                        </div>
                       </CardContent>
                     </Card>
                   ))
@@ -644,6 +692,41 @@ export default function ContratosPage() {
               <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => setEditandoId(null)}>Cancelar</Button>
               <Button className="bg-blue-600 hover:bg-blue-700" onClick={salvarEdicao} disabled={atualizarMutation.isPending}>
                 {atualizarMutation.isPending ? 'Salvando...' : 'Salvar'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL ANOTAR CRM */}
+      {editandoCrmId !== null && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-emerald-700 rounded-2xl p-6 w-full max-w-md">
+            <h2 className="text-white font-bold text-lg mb-4">Resultado do Contato</h2>
+            <div className="space-y-3">
+              <div>
+                <label className="text-slate-400 text-xs mb-1 block">Data do contato</label>
+                <Input
+                  type="date"
+                  value={crmForm.dataContatoCrm}
+                  onChange={e => setCrmForm(f => ({ ...f, dataContatoCrm: e.target.value }))}
+                  className="bg-slate-800 border-slate-600 text-white text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-slate-400 text-xs mb-1 block">Anotação / Resultado</label>
+                <textarea
+                  value={crmForm.anotacaoCrm}
+                  onChange={e => setCrmForm(f => ({ ...f, anotacaoCrm: e.target.value }))}
+                  className="w-full bg-slate-800 border border-slate-600 text-white text-sm rounded-md p-2 min-h-[100px] resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="Ex: Interessado, ligar novamente na sexta. Não atendeu. Recusou..."
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-5 justify-end">
+              <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => setEditandoCrmId(null)}>Cancelar</Button>
+              <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={salvarCrm} disabled={atualizarCrmMutation.isPending}>
+                {atualizarCrmMutation.isPending ? 'Salvando...' : 'Salvar'}
               </Button>
             </div>
           </div>
