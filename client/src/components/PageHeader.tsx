@@ -24,9 +24,9 @@ export default function PageHeader({ onBack, compact }: PageHeaderProps) {
       <div
         className="relative flex items-center justify-center px-4 py-3"
         style={{
-          background: 'linear-gradient(135deg, #d4a017 0%, #f5c842 50%, #d4a017 100%)',
-          borderBottom: '2px solid #a07010',
-          boxShadow: '0 4px 20px 0 rgba(212,160,23,0.5)',
+          background: 'linear-gradient(135deg, #2d3748 0%, #3d4f66 50%, #2d3748 100%)',
+          borderBottom: '2px solid #d4a017',
+          boxShadow: '0 4px 20px 0 rgba(0,0,0,0.4)',
         }}
       >
         {/* Botão Voltar — lado esquerdo */}
@@ -58,7 +58,7 @@ export default function PageHeader({ onBack, compact }: PageHeaderProps) {
           <img
             src={`data:image/png;base64,${LOGO_B64}`}
             alt="Grupo Firme & Forte"
-            style={{ height: '64px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.35))', display: 'block' }}
+            style={{ height: '80px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 0 12px rgba(212,160,23,0.7))', display: 'block' }}
           />
         </button>
       </div>
