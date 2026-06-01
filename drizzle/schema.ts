@@ -9,8 +9,10 @@ import {
   date,
   boolean,
   tinyint,
-  index
+  index,
+  bigint
 } from "drizzle-orm/mysql-core";
+import { sql } from "drizzle-orm";
 
 /**
  * Core user table backing auth flow.
@@ -1561,3 +1563,16 @@ export const listaNaoPerturbe = mysqlTable("lista_nao_perturbe", {
 export type ListaNaoPerturbe = typeof listaNaoPerturbe.$inferSelect;
 export type InsertListaNaoPerturbe = typeof listaNaoPerturbe.$inferInsert;
 
+
+// ─── Agências Banco do Brasil ─────────────────────────────────────────────────
+export const agenciasBb = mysqlTable("agencias_bb", {
+  id: int("id").autoincrement().primaryKey(),
+  prefixo: int("prefixo").notNull(),
+  nome: varchar("nome", { length: 200 }).notNull(),
+  createdAt: bigint("createdAt", { mode: "number" }).notNull().default(sql`(UNIX_TIMESTAMP() * 1000)`),
+}, (table) => ({
+  prefixoIdx: index("idx_agencias_prefixo").on(table.prefixo),
+  nomeIdx: index("idx_agencias_nome").on(table.nome),
+}));
+export type AgenciaBb = typeof agenciasBb.$inferSelect;
+export type InsertAgenciaBb = typeof agenciasBb.$inferInsert;

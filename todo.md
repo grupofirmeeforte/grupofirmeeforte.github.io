@@ -640,3 +640,13 @@
 - [x] Criar página ExtratosBancarios.tsx com gestão de contas e lançamentos
 - [x] Registrar rota /extratos-bancarios no App.tsx
 - [x] Auditoria: corrigir bug de sessões "em andamento" — registrar horárioSaida no logout
+
+## FASE X: CONSULTA DE AGÊNCIAS BB
+- [x] Importar 3.983 agências do Banco do Brasil do arquivo Excel (tabela `agencias_bb`)
+- [x] Criar router tRPC `agenciasBb` com procedures: buscar (por prefixo/nome) e total
+- [x] Registrar router no appRouter (server/routers.ts)
+- [x] Criar página `/agencias-bb` com filtro por número (prefixo) e por nome
+- [x] Registrar rota no App.tsx
+- [x] Adicionar link "Agências BB" no menu Home.tsx (seção CRM)
+- [x] Hook use-debounce criado para filtro em tempo real (300ms)
+- [x] TypeScript sem erros

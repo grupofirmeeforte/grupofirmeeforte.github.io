@@ -213,6 +213,7 @@ export default function Home() {
         { title: 'Mailing / Leads', description: 'Gestão de mailing e leads do banco', icon: Users, color: 'bg-cyan-600', path: '/mailing-crm', subKey: 'mailing-crm' },
         { title: 'Contratos PDF', description: 'Upload e análise de contratos BB Consignado + CRM Refinanciamento', icon: FileText, color: 'bg-emerald-600', path: '/contratos', subKey: 'contratos' },
         { title: 'Não Perturbe', description: 'Lista de telefones bloqueados para contato', icon: PhoneOff, color: 'bg-red-700', path: '/nao-perturbe', subKey: 'nao-perturbe' },
+        { title: 'Agências BB', description: 'Consulta de agências do Banco do Brasil por prefixo ou nome', icon: Building2, color: 'bg-yellow-600', path: '/agencias-bb', subKey: 'agencias-bb' },
       ],
     },
 

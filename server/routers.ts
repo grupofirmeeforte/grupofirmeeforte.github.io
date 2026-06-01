@@ -38,6 +38,7 @@ import { reconhecimentoFacialRouter } from "./routers/reconhecimentoFacial";
 import { extratosBancariosRouter } from "./routers/extratosBancarios";
 import { contratosRouter } from "./routers/contratos";
 import { naoPerturbeRouter } from "./routers/naoPerturbe";
+import { agenciasBbRouter } from "./routers/agenciasBb";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago, updateAuditLogSaidaPorChaveJ } from "./db";
 import { users, agentes, despesasFixas, pagamentos } from "../drizzle/schema";
@@ -2003,6 +2004,7 @@ export const appRouter = router({
   backup: backupRouter,
   contratos: contratosRouter,
   naoPerturbe: naoPerturbeRouter,
+  agenciasBb: agenciasBbRouter,
   despesasInternas: router({
     // Verifica se o agente logado tem acesso (cargo CEO)
     verificarAcesso: protectedProcedure

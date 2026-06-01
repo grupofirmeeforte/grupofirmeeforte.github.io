@@ -49,6 +49,7 @@ import RelatorioRBMDespesas from './pages/RelatorioRBMDespesas';
 import ExtratosBancarios from './pages/ExtratosBancarios';
 import ContratosPage from './pages/Contratos';
 import NaoPerturbe from './pages/NaoPerturbe';
+import AgenciasBb from './pages/AgenciasBb';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -137,6 +138,7 @@ function RouterWithInactivity() {
       <Route path={"/mailing-crm"} component={MailingCrmPage} />
       <Route path={"/contratos"} component={ContratosPage} />
       <Route path={"/nao-perturbe"} component={NaoPerturbe} />
+      <Route path={"/agencias-bb"} component={AgenciasBb} />
       <Route path={"/febraban/relatorio-chavej"} component={RelatorioChaveJ} />
       <Route path={"/relatorio-rbm-despesas"} component={RelatorioRBMDespesas} />
       <Route path={"/extratos"} component={ExtratosPage} />
