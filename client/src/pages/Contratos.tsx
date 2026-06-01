@@ -30,6 +30,7 @@ export default function ContratosPage() {
   const [filtroEmpresa, setFiltroEmpresa] = useState('');
   const [filtroLinha, setFiltroLinha] = useState('');
   const [filtroAgencia, setFiltroAgencia] = useState('');
+  const [showContatosDetalhe, setShowContatosDetalhe] = useState(false);
   const [apenasElegiveis, setApenasElegiveis] = useState(false);
   const [substituirDuplicatas, setSubstituirDuplicatas] = useState(false);
   const [page, setPage] = useState(1);
@@ -240,15 +241,28 @@ export default function ContratosPage() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-slate-800 border-slate-700">
-            <CardContent className="p-4 flex items-center gap-3">
-              <Percent className="w-8 h-8 text-yellow-400" />
-              <div>
-                <p className="text-slate-400 text-xs">Taxa Média</p>
-                <p className="text-2xl font-bold text-yellow-400">
-                  {stats?.taxaMedia ? `${Number(stats.taxaMedia).toFixed(2)}%` : '—'}
-                </p>
+          <Card className="bg-slate-800 border-slate-700 cursor-pointer hover:bg-slate-750 transition-colors" onClick={() => setShowContatosDetalhe(v => !v)}>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3 mb-1">
+                <Phone className="w-8 h-8 text-yellow-400 shrink-0" />
+                <div>
+                  <p className="text-slate-400 text-xs">Contatos Realizados</p>
+                  <p className="text-2xl font-bold text-yellow-400">{stats?.totalContatos ?? 0}</p>
+                </div>
               </div>
+              {showContatosDetalhe && stats?.contatosPorOperador && stats.contatosPorOperador.length > 0 && (
+                <div className="mt-2 border-t border-slate-700 pt-2 space-y-1 max-h-40 overflow-y-auto">
+                  {stats.contatosPorOperador.map((op: { nome: string; qtd: number }) => (
+                    <div key={op.nome} className="flex justify-between items-center text-xs">
+                      <span className="text-slate-300 truncate max-w-[160px]" title={op.nome}>{op.nome}</span>
+                      <span className="text-yellow-300 font-bold ml-2 shrink-0">{op.qtd}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {showContatosDetalhe && (!stats?.contatosPorOperador || stats.contatosPorOperador.length === 0) && (
+                <p className="text-slate-500 text-xs mt-2">Nenhum contato registrado ainda.</p>
+              )}
             </CardContent>
           </Card>
           <Card className="bg-slate-800 border-slate-700">

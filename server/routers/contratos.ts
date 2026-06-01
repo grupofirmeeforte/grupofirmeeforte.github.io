@@ -422,7 +422,20 @@ export const contratosRouter = router({
         ? comTaxa.reduce((acc, r) => acc + parseFloat(String(r.taxaMensalJuros ?? 0)), 0) / comTaxa.length
         : 0;
 
-      return { total, comErro, elegiveis, taxaMedia };
+      // Contatos realizados: registros com anotacaoCrm preenchida
+      const comContato = rows.filter(r => r.anotacaoCrm && r.anotacaoCrm.trim() !== '');
+      const totalContatos = comContato.length;
+      // Agrupar por operador
+      const porOperador: Record<string, number> = {};
+      for (const r of comContato) {
+        const op = r.nomeOperador || r.chaveJOperador || 'Desconhecido';
+        porOperador[op] = (porOperador[op] ?? 0) + 1;
+      }
+      const contatosPorOperador = Object.entries(porOperador)
+        .map(([nome, qtd]) => ({ nome, qtd }))
+        .sort((a, b) => b.qtd - a.qtd);
+
+      return { total, comErro, elegiveis, taxaMedia, totalContatos, contatosPorOperador };
     }),
 
   // Atualizar anotação CRM e data do contato (CRM Refinanciamento)
