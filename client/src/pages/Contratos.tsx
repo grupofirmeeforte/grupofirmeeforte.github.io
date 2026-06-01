@@ -482,6 +482,45 @@ export default function ContratosPage() {
         {/* ABA CRM REFINANCIAMENTO */}
         {aba === 'crm' && (
           <div>
+            {/* Filtros CRM — mesmos do Relatório */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Input
+                  placeholder="Nome do cliente..."
+                  value={busca}
+                  onChange={e => { setBusca(e.target.value); setPage(1); }}
+                  className="pl-9 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
+                />
+              </div>
+              <Input
+                placeholder="Nome do agente..."
+                value={filtroAgente}
+                onChange={e => { setFiltroAgente(e.target.value); setPage(1); }}
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
+              />
+              <Input
+                placeholder="Cidade..."
+                value={filtroCidade}
+                onChange={e => { setFiltroCidade(e.target.value); setPage(1); }}
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
+              />
+              <Input
+                placeholder="Empresa..."
+                value={filtroEmpresa}
+                onChange={e => { setFiltroEmpresa(e.target.value); setPage(1); }}
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
+              />
+              <Input
+                placeholder="Linha de crédito..."
+                value={filtroLinha}
+                onChange={e => { setFiltroLinha(e.target.value); setPage(1); }}
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
+              />
+              <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-300">
+                <RefreshCw className="w-4 h-4 mr-1" /> Atualizar
+              </Button>
+            </div>
             <div className="mb-4 p-4 bg-emerald-900/30 border border-emerald-700 rounded-xl">
               <p className="text-emerald-300 text-sm flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
