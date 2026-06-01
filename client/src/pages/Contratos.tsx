@@ -29,9 +29,24 @@ export default function ContratosPage() {
   const [filtroCidade, setFiltroCidade] = useState('');
   const [filtroEmpresa, setFiltroEmpresa] = useState('');
   const [filtroLinha, setFiltroLinha] = useState('');
+  const [filtroAgencia, setFiltroAgencia] = useState('');
   const [apenasElegiveis, setApenasElegiveis] = useState(false);
   const [substituirDuplicatas, setSubstituirDuplicatas] = useState(false);
   const [page, setPage] = useState(1);
+
+  // Buscar nomes de agências BB para exibir tooltip no filtro
+  const { data: agenciasBbData } = trpc.agenciasBb.buscar.useQuery(
+    { busca: filtroAgencia, limit: 1 },
+    { enabled: filtroAgencia.length >= 3 }
+  );
+  // Mapa prefixo -> nome para lookup rápido nas células
+  const { data: todasAgencias } = trpc.agenciasBb.buscar.useQuery(
+    { busca: '', limit: 5000 },
+    { staleTime: 3600000 }
+  );
+  const agenciaNomeMap = new Map<string, string>(
+    (todasAgencias?.agencias ?? []).map((a: any) => [String(a.prefixo).padStart(4, '0'), a.nome])
+  );
 
   const { data, isLoading, refetch } = trpc.contratos.listar.useQuery({
     nomeCliente: busca || undefined,
@@ -43,6 +58,14 @@ export default function ContratosPage() {
     page,
     pageSize: 50,
   });
+
+  // Filtro de agência aplicado no frontend (após cruzamento)
+  const rowsFiltrados = filtroAgencia
+    ? (data?.rows ?? []).filter((r: any) => {
+        const ag = String(r.agencia ?? '').padStart(4, '0');
+        return ag.includes(filtroAgencia.padStart(filtroAgencia.length, '0'));
+      })
+    : (data?.rows ?? []);
 
   const { data: stats } = trpc.contratos.estatisticas.useQuery();
   // Verificar telefones na lista Não Perturbe
@@ -190,7 +213,7 @@ export default function ContratosPage() {
     return isNaN(n) ? '—' : n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
-  const rows = data?.rows ?? [];
+  const rows = rowsFiltrados;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white">
@@ -322,7 +345,7 @@ export default function ContratosPage() {
         {/* ABA RELATÓRIO */}
         {aba === 'relatorio' && (
           <div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 mb-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
@@ -356,6 +379,20 @@ export default function ContratosPage() {
                 onChange={e => { setFiltroLinha(e.target.value); setPage(1); }}
                 className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
+              <div className="relative">
+                <Input
+                  placeholder="Nº Agência BB..."
+                  value={filtroAgencia}
+                  onChange={e => { setFiltroAgencia(e.target.value.replace(/\D/g, '')); setPage(1); }}
+                  className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 font-mono"
+                  maxLength={4}
+                />
+                {filtroAgencia && agenciasBbData?.agencias?.[0] && (
+                  <div className="absolute top-full left-0 mt-1 bg-slate-700 border border-slate-600 rounded px-2 py-1 text-[10px] text-cyan-300 z-10 whitespace-nowrap">
+                    {agenciasBbData.agencias[0].nome}
+                  </div>
+                )}
+              </div>
               <div className="flex gap-2">
                 <Button
                   variant={apenasElegiveis ? 'default' : 'outline'}
@@ -385,109 +422,101 @@ export default function ContratosPage() {
               <div className="rounded-xl border border-slate-700">
                 <table className="w-full text-xs">
                   <thead>
-                    {/* Linha de grupos */}
                     <tr className="bg-slate-950 text-[9px] uppercase font-bold">
-                      <th colSpan={2} className="px-2 py-1 text-left text-blue-400 border-b border-blue-800/40">Proposta</th>
-                      <th colSpan={3} className="px-2 py-1 text-left text-purple-400 border-b border-purple-800/40 border-l border-slate-700">Operador</th>
-                      <th colSpan={5} className="px-2 py-1 text-left text-emerald-400 border-b border-emerald-800/40 border-l border-slate-700">Cliente</th>
-                      <th colSpan={4} className="px-2 py-1 text-left text-yellow-400 border-b border-yellow-800/40 border-l border-slate-700">Contrato</th>
-                      <th colSpan={2} className="px-2 py-1 text-left text-cyan-400 border-b border-cyan-800/40 border-l border-slate-700">Mailing</th>
-                      <th colSpan={2} className="px-2 py-1 text-center text-slate-400 border-b border-slate-700 border-l border-slate-700">&nbsp;</th>
+                      <th className="px-2 py-1 text-left text-blue-400 border-b border-blue-800/40">Proposta / Empresa</th>
+                      <th className="px-2 py-1 text-left text-purple-400 border-b border-purple-800/40 border-l border-slate-700">Operador / Convênio / Linha</th>
+                      <th className="px-2 py-1 text-left text-emerald-400 border-b border-emerald-800/40 border-l border-slate-700">Cliente / CPF / Nasc.</th>
+                      <th className="px-2 py-1 text-left text-cyan-400 border-b border-cyan-800/40 border-l border-slate-700">Ag. / Conta</th>
+                      <th className="px-2 py-1 text-left text-yellow-400 border-b border-yellow-800/40 border-l border-slate-700">Contrato</th>
+                      <th className="px-2 py-1 text-left text-cyan-400 border-b border-cyan-800/40 border-l border-slate-700">Mailing</th>
+                      <th className="px-2 py-1 text-center text-slate-400 border-b border-slate-700 border-l border-slate-700">&nbsp;</th>
                     </tr>
-                    {/* Linha de colunas */}
                     <tr className="bg-slate-900 text-slate-400 text-[10px] uppercase">
-                      {/* Proposta */}
-                      <th className="px-2 py-1.5 text-left w-[90px]">Nº</th>
-                      <th className="px-2 py-1.5 text-left w-[110px]">Empresa</th>
-                      {/* Operador */}
-                      <th className="px-2 py-1.5 text-left w-[110px] border-l border-slate-700">Operador</th>
-                      <th className="px-2 py-1.5 text-left w-[80px]">Convênio</th>
-                      <th className="px-2 py-1.5 text-left w-[120px]">Linha Créd.</th>
-                      {/* Cliente */}
-                      <th className="px-2 py-1.5 text-left w-[130px] border-l border-slate-700">Nome</th>
-                      <th className="px-2 py-1.5 text-left w-[95px]">CPF</th>
-                      <th className="px-2 py-1.5 text-left w-[75px]">Nasc.</th>
-                      <th className="px-2 py-1.5 text-left w-[60px]">Agência</th>
-                      <th className="px-2 py-1.5 text-left w-[65px]">Conta</th>
-                      {/* Contrato */}
-                      <th className="px-2 py-1.5 text-right w-[50px] border-l border-slate-700">Taxa</th>
-                      <th className="px-2 py-1.5 text-right w-[40px]">Prazo</th>
-                      <th className="px-2 py-1.5 text-right w-[70px]">Parcela</th>
-                      <th className="px-2 py-1.5 text-left w-[75px]">1ª Parc.</th>
-                      {/* Mailing */}
-                      <th className="px-2 py-1.5 text-left w-[80px] border-l border-slate-700">Cidade</th>
-                      <th className="px-2 py-1.5 text-left w-[90px]">Telefones</th>
-                      {/* Status / Ações */}
-                      <th className="px-2 py-1.5 text-center w-[45px] border-l border-slate-700">Refin</th>
-                      <th className="px-2 py-1.5 text-center w-[80px]">Ações</th>
+                      <th className="px-2 py-1.5 text-left w-[160px]">Nº / Empresa</th>
+                      <th className="px-2 py-1.5 text-left w-[180px] border-l border-slate-700">Operador / Convênio</th>
+                      <th className="px-2 py-1.5 text-left w-[180px] border-l border-slate-700">Nome / CPF / Nasc.</th>
+                      <th className="px-2 py-1.5 text-left w-[100px] border-l border-slate-700">Agência / Conta</th>
+                      <th className="px-2 py-1.5 text-left w-[160px] border-l border-slate-700">Taxa · Prazo · Parcela · 1ª Parc.</th>
+                      <th className="px-2 py-1.5 text-left w-[130px] border-l border-slate-700">Cidade / Telefones</th>
+                      <th className="px-2 py-1.5 text-center w-[80px] border-l border-slate-700">Refin / Ações</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((r, i) => (
+                    {rows.map((r, i) => {
+                      const agNome = agenciaNomeMap.get(String((r as any).agencia ?? '').padStart(4, '0'));
+                      const dtaNascFmt = (() => {
+                        const d = (r as any).dtaNasc as string | null;
+                        if (!d) return null;
+                        if (d.includes('-')) { const [y, m, day] = d.split('-'); return `${day}/${m}/${y}`; }
+                        return d;
+                      })();
+                      return (
                       <tr key={r.id} className={`border-t border-slate-700 transition-colors hover:bg-blue-900/20 ${i % 2 === 0 ? 'bg-slate-800/40' : 'bg-slate-900/60'}`}>
-                        {/* Grupo: Proposta */}
-                        <td className="px-2 py-1.5 font-mono text-blue-300 truncate">{r.numeroProposta ?? '—'}</td>
-                        <td className="px-2 py-1.5 text-emerald-300 truncate" title={r.empresa ?? ''}>{r.empresa ?? '—'}</td>
-                        {/* Grupo: Operador */}
-                        <td className="px-2 py-1.5 text-purple-300 truncate border-l border-slate-700" title={`${r.nomeOperador ?? ''} (${r.chaveJOperador ?? ''})`.trim()}>{r.nomeOperador ?? r.chaveJOperador ?? '—'}</td>
-                        <td className="px-2 py-1.5 text-slate-300 truncate" title={r.nomeConvenio ?? ''}>{r.nomeConvenio ?? '—'}</td>
-                        <td className="px-2 py-1.5 text-purple-200 truncate text-[10px]" title={r.linhaCredito ?? ''}>{r.linhaCredito ?? '—'}</td>
-                        {/* Grupo: Cliente */}
-                        <td className="px-2 py-1.5 text-white font-medium truncate border-l border-slate-700" title={r.nomeCliente ?? ''}>{r.nomeCliente ?? '—'}</td>
-                        <td className="px-2 py-1.5 text-slate-300 truncate font-mono text-[10px]" title={r.cpfCliente ?? ''}>{r.cpfCliente ?? '—'}</td>
-                        <td className="px-2 py-1.5 text-slate-400 truncate text-[10px]" title={(r as any).dtaNasc ?? ''}>{(r as any).dtaNasc ?? '—'}</td>
-                        <td className="px-2 py-1.5 text-cyan-300 truncate font-mono text-[10px]">{(r as any).agencia ?? '—'}</td>
-                        <td className="px-2 py-1.5 text-cyan-300 truncate font-mono text-[10px]">{(r as any).conta ?? '—'}</td>
-                        {/* Grupo: Contrato */}
-                        <td className="px-2 py-1.5 text-right text-yellow-300 font-medium border-l border-slate-700">
-                          {r.taxaMensalJuros ? `${parseFloat(String(r.taxaMensalJuros)).toFixed(2)}%` : '—'}
+                        {/* Proposta + Empresa */}
+                        <td className="px-2 py-1.5 border-r border-slate-700/50">
+                          <div className="font-mono text-blue-300 text-[11px] truncate">{r.numeroProposta ?? '—'}</div>
+                          <div className="text-emerald-300 text-[10px] truncate" title={r.empresa ?? ''}>{r.empresa ?? '—'}</div>
                         </td>
-                        <td className="px-2 py-1.5 text-right text-slate-300">{r.prazoMeses ? `${r.prazoMeses}m` : '—'}</td>
-                        <td className="px-2 py-1.5 text-right text-slate-300">{formatarMoeda(r.valorParcela)}</td>
-                        <td className="px-2 py-1.5 text-slate-300">{r.dataPrimeiraParcela ?? '—'}</td>
-                        {/* Grupo: Mailing */}
-                        <td className="px-2 py-1.5 text-slate-300 truncate border-l border-slate-700" title={(r as any).cidade ?? ''}>
-                          {(r as any).cidade ?? '—'}
+                        {/* Operador + Convênio + Linha */}
+                        <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
+                          <div className="text-purple-300 text-[11px] truncate" title={r.nomeOperador ?? ''}>{r.nomeOperador ?? r.chaveJOperador ?? '—'}</div>
+                          <div className="text-slate-400 text-[10px] truncate" title={r.nomeConvenio ?? ''}>{r.nomeConvenio ?? '—'}</div>
+                          <div className="text-purple-200 text-[9px] truncate" title={r.linhaCredito ?? ''}>{r.linhaCredito ?? '—'}</div>
                         </td>
-                        <td className="px-2 py-1.5">
+                        {/* Cliente + CPF + Nasc */}
+                        <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
+                          <div className="text-white font-medium text-[11px] truncate" title={r.nomeCliente ?? ''}>{r.nomeCliente ?? '—'}</div>
+                          <div className="text-slate-400 font-mono text-[10px] truncate">{r.cpfCliente ?? '—'}</div>
+                          {dtaNascFmt && <div className="text-slate-500 text-[9px]">{dtaNascFmt}</div>}
+                        </td>
+                        {/* Agência + Conta */}
+                        <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
+                          <div className="text-cyan-300 font-mono text-[11px]" title={agNome ?? ''}>
+                            {(r as any).agencia ? String((r as any).agencia).padStart(4, '0') : '—'}
+                          </div>
+                          {agNome && <div className="text-slate-500 text-[9px] truncate max-w-[90px]">{agNome.split(' ')[0]}</div>}
+                          <div className="text-cyan-200 font-mono text-[10px]">{(r as any).conta ?? '—'}</div>
+                        </td>
+                        {/* Contrato: Taxa · Prazo · Parcela · 1ª Parc */}
+                        <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
+                          <div className="flex gap-2 items-baseline">
+                            <span className="text-yellow-300 font-bold text-[12px]">{r.taxaMensalJuros ? `${parseFloat(String(r.taxaMensalJuros)).toFixed(2)}%` : '—'}</span>
+                            <span className="text-slate-400 text-[10px]">{r.prazoMeses ? `${r.prazoMeses}m` : ''}</span>
+                          </div>
+                          <div className="text-slate-300 text-[10px]">{formatarMoeda(r.valorParcela)}</div>
+                          <div className="text-slate-500 text-[9px]">{r.dataPrimeiraParcela ?? '—'}</div>
+                        </td>
+                        {/* Mailing: Cidade + Telefones */}
+                        <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
+                          {(r as any).cidade && <div className="text-slate-300 text-[10px] truncate" title={(r as any).cidade}>{(r as any).cidade}</div>}
                           {(r as any).telefones?.length > 0 ? (
                             <div className="flex flex-col gap-0.5">
                               {((r as any).telefones as string[]).slice(0, 2).map((t: string, ti: number) => {
                                 const bloqueado = telefonesNaoPerturbe.has(t);
                                 return (
-                                  <span key={ti} className={`flex items-center gap-1 truncate ${bloqueado ? 'text-red-400' : 'text-green-300'}`}>
-                                    {bloqueado && <PhoneOff className="w-3 h-3 shrink-0" aria-label="Não Perturbe" />}
+                                  <span key={ti} className={`flex items-center gap-1 truncate text-[10px] ${bloqueado ? 'text-red-400' : 'text-green-300'}`}>
+                                    {bloqueado && <PhoneOff className="w-3 h-3 shrink-0" />}
                                     {t}
                                   </span>
                                 );
                               })}
-                              {(r as any).telefones.length > 2 && (
-                                <span className="text-slate-400">+{(r as any).telefones.length - 2}</span>
-                              )}
+                              {(r as any).telefones.length > 2 && <span className="text-slate-500 text-[9px]">+{(r as any).telefones.length - 2}</span>}
                             </div>
-                          ) : <span className="text-slate-500">—</span>}
+                          ) : <span className="text-slate-600 text-[10px]">—</span>}
                         </td>
-                        <td className="px-2 py-1.5 text-center">
-                          {(r as any).elegivelRefin ? (
-                            <span className="text-emerald-400 font-bold">✓</span>
-                          ) : (
-                            <span className="text-slate-600">—</span>
-                          )}
-                        </td>
-                        <td className="px-2 py-1.5 text-center">
+                        {/* Refin + Ações */}
+                        <td className="px-2 py-1.5 text-center border-l border-slate-700">
+                          <div className="mb-1">{(r as any).elegivelRefin ? <span className="text-emerald-400 font-bold">✓</span> : <span className="text-slate-600">—</span>}</div>
                           <div className="flex gap-1 justify-center">
-                            <Button size="sm" variant="outline" className="h-5 px-1.5 text-[10px] border-blue-600 text-blue-400 hover:bg-blue-900/30" onClick={() => abrirEdicao(r)}>
-                              Editar
-                            </Button>
+                            <Button size="sm" variant="outline" className="h-5 px-1.5 text-[10px] border-blue-600 text-blue-400 hover:bg-blue-900/30" onClick={() => abrirEdicao(r)}>Editar</Button>
                             {user?.role === 'admin' && (
-                              <Button size="sm" variant="outline" className="h-5 px-1.5 text-[10px] border-red-700 text-red-400 hover:bg-red-900/30" onClick={() => { setDeletandoId(r.id); setSenhaCeo(''); }}>
-                                Del
-                              </Button>
+                              <Button size="sm" variant="outline" className="h-5 px-1.5 text-[10px] border-red-700 text-red-400 hover:bg-red-900/30" onClick={() => { setDeletandoId(r.id); setSenhaCeo(''); }}>Del</Button>
                             )}
                           </div>
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
