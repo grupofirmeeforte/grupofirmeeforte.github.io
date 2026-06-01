@@ -19,9 +19,55 @@ export default function PageHeader({ onBack, compact }: PageHeaderProps) {
     }
   };
 
+  if (compact) {
+    return (
+      <div
+        className="relative flex items-center justify-center px-4 py-3"
+        style={{
+          background: 'linear-gradient(135deg, #d4a017 0%, #f5c842 50%, #d4a017 100%)',
+          borderBottom: '2px solid #a07010',
+          boxShadow: '0 4px 20px 0 rgba(212,160,23,0.5)',
+        }}
+      >
+        {/* Botão Voltar — lado esquerdo */}
+        <button
+          onClick={handleBack}
+          className="absolute left-4 flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-sm"
+          style={{
+            background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
+            color: '#ffffff',
+            border: '1.5px solid #3b82f6',
+            boxShadow: '0 2px 12px rgba(59,130,246,0.4)',
+            cursor: 'pointer',
+            transition: 'background 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)'; }}
+        >
+          ← Voltar
+        </button>
+
+        {/* Logo centralizada e maior */}
+        <button
+          onClick={handleBack}
+          title="Voltar ao menu principal"
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, transition: 'transform 0.15s' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.07)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+        >
+          <img
+            src={`data:image/png;base64,${LOGO_B64}`}
+            alt="Grupo Firme & Forte"
+            style={{ height: '64px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.35))', display: 'block' }}
+          />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
-      className={`flex flex-col items-center px-4 ${compact ? 'py-2' : 'py-5'}`}
+      className="flex flex-col items-center py-5 px-4"
       style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)',
         borderBottom: '2px solid #d4a017',
@@ -32,27 +78,15 @@ export default function PageHeader({ onBack, compact }: PageHeaderProps) {
       <button
         onClick={handleBack}
         title="Voltar ao menu principal"
-        className={compact ? 'mb-1.5' : 'mb-3'}
-        style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          padding: 0,
-          transition: 'transform 0.15s',
-        }}
+        className="mb-3"
+        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, transition: 'transform 0.15s' }}
         onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.07)'; }}
         onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
       >
         <img
           src={`data:image/png;base64,${LOGO_B64}`}
           alt="Grupo Firme & Forte — voltar ao menu"
-          style={{
-            height: compact ? '44px' : '88px',
-            width: 'auto',
-            objectFit: 'contain',
-            filter: 'drop-shadow(0 0 14px rgba(212,160,23,0.8))',
-            display: 'block',
-          }}
+          style={{ height: '88px', width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 0 14px rgba(212,160,23,0.8))', display: 'block' }}
         />
       </button>
 
