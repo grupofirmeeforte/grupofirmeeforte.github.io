@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
   Upload, Search, Phone, MapPin, FileText, CheckCircle,
-  AlertCircle, Clock, RefreshCw, TrendingUp, Users, Percent, PhoneOff
+  AlertCircle, Clock, RefreshCw, TrendingUp, Users, Percent, PhoneOff, Copy
 } from "lucide-react";
 import { useLocation } from "wouter";
 import PageHeader from "@/components/PageHeader";
@@ -466,7 +466,18 @@ export default function ContratosPage() {
                         {/* Cliente + CPF + Nasc */}
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
                           <div className="text-white font-medium text-[11px] truncate" title={r.nomeCliente ?? ''}>{r.nomeCliente ?? '—'}</div>
-                          <div className="text-slate-400 font-mono text-[10px] truncate">{r.cpfCliente ?? '—'}</div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-slate-400 font-mono text-[10px] truncate">{r.cpfCliente ?? '—'}</span>
+                            {r.cpfCliente && (
+                              <button
+                                title="Copiar CPF"
+                                className="shrink-0 text-slate-500 hover:text-cyan-400 transition-colors"
+                                onClick={() => { navigator.clipboard.writeText(r.cpfCliente!); }}
+                              >
+                                <Copy className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
                           {dtaNascFmt && <div className="text-slate-500 text-[9px]">{dtaNascFmt}</div>}
                         </td>
                         {/* Agência + Conta */}
@@ -606,8 +617,17 @@ export default function ContratosPage() {
                               <span className="text-slate-400 text-xs font-mono">#{r.numeroProposta}</span>
                             </div>
                             <h3 className="text-white font-bold text-lg">{r.nomeCliente ?? '—'}</h3>
-                            <p className="text-slate-400 text-sm">
+                            <p className="text-slate-400 text-sm flex items-center gap-1.5">
                               CPF: {r.cpfCliente ? r.cpfCliente.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '—'}
+                              {r.cpfCliente && (
+                                <button
+                                  title="Copiar CPF"
+                                  className="text-slate-500 hover:text-cyan-400 transition-colors"
+                                  onClick={() => { navigator.clipboard.writeText(r.cpfCliente!); }}
+                                >
+                                  <Copy className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                             </p>
                             {r.cidade && (
                               <p className="text-slate-400 text-sm flex items-center gap-1">
