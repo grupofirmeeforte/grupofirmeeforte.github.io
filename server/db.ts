@@ -449,15 +449,15 @@ export async function calcularPercPago(
     if (!rbm || rbm === 0) return { perc: 0, ativoUsado: null };
 
     // 2. Determinar nível do agente
-    // Se situação é Ativo01-Ativo10, usar direto (sem calcular faixa)
+    // Aceita: Ativo03, Ativo3, Ativo 03, Ativo 3, ativo3 etc. — sempre normaliza para o número
     let nivelNum: number | null = null;
-    const nivelMatch = situacao.match(/^Ativo(\d{1,2})$/i);
+    const nivelMatch = situacao.trim().match(/^Ativo\s*(\d{1,2})$/i);
     if (nivelMatch) {
       nivelNum = parseInt(nivelMatch[1]);
     }
 
-    // Se situação é "Ativo" simples, calcular pela soma do VrLíquido no mês
-    if (!nivelNum && situacao.toLowerCase() === 'ativo') {
+    // Se situação é "Ativo" simples (sem número), calcular pela soma do VrLíquido no mês
+    if (!nivelNum && situacao.trim().toLowerCase() === 'ativo') {
       // Buscar faixas de nível na tabela valoresCalculo
       const valoresResult = await db.select().from(valoresCalculo).where(eq(valoresCalculo.id, 1)).limit(1);
       const valores = valoresResult.length > 0 ? valoresResult[0] : null;
