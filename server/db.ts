@@ -513,7 +513,9 @@ export async function calcularPercPago(
     // 3. Buscar percentual na Tabela de Comissão
     // Filtrar por: empresa + convênio (match com descricaoProduto) + parcela + juros
     const parcelaNum = typeof parcela === 'string' ? parseInt(parcela) || 0 : parcela;
-    const jurosNum = typeof juros === 'string' ? parseFloat(juros.replace(',', '.')) || 0 : juros;
+    // Normalizar juros: se > 1 está em formato percentual (ex: 4.75%) — converter para decimal (0.0475)
+    const jurosRaw = typeof juros === 'string' ? parseFloat(juros.replace(',', '.')) || 0 : juros;
+    const jurosNum = jurosRaw > 1 ? jurosRaw / 100 : jurosRaw;
 
     // Buscar todas as linhas da tabela para a empresa
     const todasLinhas = await db.select().from(tabelasComissao)
