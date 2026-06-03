@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { febraban, consignados, feriados, tabelasComissao, agentes } from "../../drizzle/schema";
+import { febraban, consignados, feriados, tabelasComissao, agentes, contratos } from "../../drizzle/schema";
 import { eq, and, like, or, desc, asc, sql, isNotNull, isNull, ne } from "drizzle-orm";
 
 // Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
@@ -719,28 +719,59 @@ export const febrabanRouter = {
       // ── Buscar todas as linhas da tabela de comissões ──────────────────────
       const todasTabelas = await db.select().from(tabelasComissao);
 
-      // ── Buscar dados de consignados para cruzar juros/produto/prazo ────────
+      // ── Buscar dados dos contratos PDF para cruzar juros/produto/prazo ─────
       const propostas = rows.map(r => r.proposta).filter(Boolean) as string[];
+      // Mapa: numeroProposta → dados do contrato PDF
+      const contratoMap = new Map<string, { juros: number; produto: string; parcela: number; valorLiquido: number }>();
+      // Mapa fallback: consignados (caso não haja contrato PDF)
       const consigMap = new Map<string, { juros: number; produto: string; parcela: number; valorLiquido: number }>();
       if (propostas.length > 0) {
-        const consigRows = await db
+        // 1. Buscar nos contratos PDF
+        const contratoRows = await db
           .select({
-            nrOperacao: consignados.nrOperacao,
-            juros: consignados.juros,
-            produto: consignados.produto,
-            parcela: consignados.parcela,
-            valorLiquido: consignados.valorLiquido,
+            numeroProposta: contratos.numeroProposta,
+            taxaMensalJuros: contratos.taxaMensalJuros,
+            linhaCredito: contratos.linhaCredito,
+            prazoMeses: contratos.prazoMeses,
+            valorSolicitado: contratos.valorSolicitado,
           })
-          .from(consignados)
-          .where(sql`${consignados.nrOperacao} IN (${sql.join(propostas.map(p => sql`${p}`), sql`, `)})`);
-        for (const c of consigRows) {
-          if (c.nrOperacao) {
-            consigMap.set(c.nrOperacao, {
-              juros: parseFloat(String(c.juros ?? 0)),
-              produto: c.produto ?? '',
-              parcela: c.parcela ?? 0,
-              valorLiquido: parseFloat(String(c.valorLiquido ?? 0)),
+          .from(contratos)
+          .where(sql`${contratos.numeroProposta} IN (${sql.join(propostas.map(p => sql`${p}`), sql`, `)})`);
+        for (const c of contratoRows) {
+          if (c.numeroProposta) {
+            contratoMap.set(c.numeroProposta, {
+              juros: parseFloat(String(c.taxaMensalJuros ?? 0)),
+              produto: c.linhaCredito ?? '',
+              parcela: c.prazoMeses ?? 0,
+              valorLiquido: parseFloat(String(c.valorSolicitado ?? 0)),
             });
+          }
+        }
+        // 2. Buscar nos consignados como fallback para propostas sem contrato PDF
+        const semContrato = propostas.filter(p => !contratoMap.has(p));
+        if (semContrato.length > 0) {
+          const consigRows = await db
+            .select({
+              nrOperacao: consignados.nrOperacao,
+              juros: consignados.juros,
+              produto: consignados.produto,
+              parcela: consignados.parcela,
+              valorLiquido: consignados.valorLiquido,
+            })
+            .from(consignados)
+            .where(sql`${consignados.nrOperacao} IN (${sql.join(semContrato.map(p => sql`${p}`), sql`, `)})`);
+          for (const c of consigRows) {
+            if (c.nrOperacao) {
+              // Normalizar juros: se > 1 já é percentual (ex: 4.75), senão é decimal (ex: 0.0475)
+              const jurosRaw = parseFloat(String(c.juros ?? 0));
+              const juros = jurosRaw > 1 ? jurosRaw / 100 : jurosRaw;
+              consigMap.set(c.nrOperacao, {
+                juros,
+                produto: c.produto ?? '',
+                parcela: c.parcela ?? 0,
+                valorLiquido: parseFloat(String(c.valorLiquido ?? 0)),
+              });
+            }
           }
         }
       }
@@ -777,19 +808,24 @@ export const febrabanRouter = {
         const isContratada = (r.situacao ?? '').trim().toLowerCase() === 'contratada';
         if (!isContratada) return { ...r, ativoCol, perspectivaComissao: 0, percentualUsado: null, produtoConsig: null };
 
+        // Prioridade: contrato PDF > consignado
+        const contrato = contratoMap.get(r.proposta ?? '');
         const consig = consigMap.get(r.proposta ?? '');
+        const fonte = contrato ?? consig;
         let perspectivaComissao: number | null = null;
         let percentualUsado: number | null = null;
         let produtoConsig: string | null = null;
 
-        if (consig && consig.valorLiquido > 0) {
-          // Usar dados do consignado: valorLiquido × percentual da tabela
-          const pct = buscarPercentual(consig.produto, consig.juros, consig.parcela);
+        if (fonte && fonte.valorLiquido > 0) {
+          // Juros do contrato PDF já estão em percentual (ex: 4.75 = 4.75%)
+          // Normalizar para decimal para comparar com a tabela (que usa 0.0475)
+          const jurosNorm = fonte.juros > 1 ? fonte.juros / 100 : fonte.juros;
+          const pct = buscarPercentual(fonte.produto, jurosNorm, fonte.parcela);
           percentualUsado = pct;
-          produtoConsig = consig.produto;
-          perspectivaComissao = pct != null ? +(consig.valorLiquido * pct / 100).toFixed(2) : null;
-        } else {
-          // Fallback: sem dados de consignado — comissão indeterminada
+          produtoConsig = fonte.produto;
+          perspectivaComissao = pct != null ? +(fonte.valorLiquido * pct / 100).toFixed(2) : null;
+        } else if (r.troco) {
+          // Fallback final: usar troco/financiado da Febraban sem juros → sem cálculo
           perspectivaComissao = null;
         }
 

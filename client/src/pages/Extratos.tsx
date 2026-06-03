@@ -354,17 +354,18 @@ function PerspectivadeGanho() {
                   <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-right">Troco</TableHead>
                   <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-right">Financiado</TableHead>
                   <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Tipo</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Produto</TableHead>
                   <TableHead className="font-semibold text-amber-600 uppercase text-xs tracking-wide text-right bg-amber-50">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center py-10 text-gray-400">Carregando...</TableCell>
+                    <TableCell colSpan={11} className="text-center py-10 text-gray-400">Carregando...</TableCell>
                   </TableRow>
                 ) : rows.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center py-10 text-gray-400">
+                    <TableCell colSpan={11} className="text-center py-10 text-gray-400">
                       Nenhuma operação encontrada para {mesAtualStr}
                     </TableCell>
                   </TableRow>
@@ -391,6 +392,12 @@ function PerspectivadeGanho() {
                         {fmt(parseFloat(String(row.financiado ?? 0)))}
                       </TableCell>
                       <TableCell className="text-gray-700 text-sm">{row.empresa || '—'}</TableCell>
+                      <TableCell className="text-xs text-gray-600 max-w-[120px] truncate" title={row.produtoConsig ?? ''}>
+                        {row.produtoConsig
+                          ? <span className="text-blue-600 font-medium">{row.produtoConsig}</span>
+                          : <span className="text-orange-400 italic">sem PDF</span>
+                        }
+                      </TableCell>
                       <TableCell className="text-right font-bold text-amber-700 bg-amber-50">
                         {row.perspectivaComissao != null
                           ? fmt(row.perspectivaComissao)
