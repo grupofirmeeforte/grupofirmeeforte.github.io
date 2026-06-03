@@ -5,8 +5,9 @@ import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProper
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { usePermissao } from "@/hooks/usePermissao";
+import { trpc } from "@/lib/trpc";
 
 type SubModule = {
   title: string;
@@ -36,6 +37,34 @@ export default function Home() {
   const [grupoAberto, setGrupoAberto] = useState<string | null>(null);
   const { podeVer, isAdminOuCeo, cargo } = usePermissao();
   const isCEO = cargo === 'CEO';
+
+  // ─── Quick Stats: dados reais do backend ─────────────────────────────────────
+  const { data: totalAgentesData } = trpc.agentes.count.useQuery({}, { enabled: isAdminOuCeo });
+  const { data: certData } = trpc.agentes.statusCertificacoes.useQuery(undefined, { enabled: isAdminOuCeo });
+  const { data: febData } = trpc.febraban.resumo.useQuery({}, { enabled: isAdminOuCeo });
+  const { data: pagPendData } = trpc.pagamentos.list.useQuery({ pago: 'nao', limit: 1000 }, { enabled: isAdminOuCeo });
+
+  const totalAgentes = totalAgentesData ?? null;
+  const certVencendo = useMemo(() => {
+    if (!certData) return null;
+    let cnt = 0;
+    for (const v of Object.values(certData as Record<string, any>)) {
+      const d1 = (v as any)?.consig?.dias;
+      const d2 = (v as any)?.lgpd?.dias;
+      if ((d1 !== null && d1 !== undefined && d1 >= 0 && d1 <= 30) ||
+          (d2 !== null && d2 !== undefined && d2 >= 0 && d2 <= 30)) cnt++;
+    }
+    return cnt;
+  }, [certData]);
+  const producaoMes = useMemo(() => {
+    if (!(febData as any)?.empresas) return null;
+    return ((febData as any).empresas as any[]).reduce((acc: number, e: any) => acc + (e.contratado ?? 0), 0);
+  }, [febData]);
+  const comissoesPendentes = useMemo(() => {
+    if (!pagPendData) return null;
+    return (pagPendData as any[]).reduce((acc: number, p: any) => acc + parseFloat(String(p.valor ?? 0)), 0);
+  }, [pagPendData]);
+  const fmtBRL = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
 
   const handleLogout = async () => {
     await logout();
@@ -370,8 +399,10 @@ export default function Home() {
               <CardTitle className="text-sm font-medium text-slate-600">Total de Agentes</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">--</div>
-              <p className="text-xs text-slate-500 mt-1">Carregando...</p>
+              <div className="text-2xl font-bold text-slate-900">
+                {totalAgentes === null ? '--' : totalAgentes}
+              </div>
+              <p className="text-xs text-slate-500 mt-1">Cadastrados no sistema</p>
             </CardContent>
           </Card>
           <Card>
@@ -379,7 +410,9 @@ export default function Home() {
               <CardTitle className="text-sm font-medium text-slate-600">Certificações Vencendo</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">--</div>
+              <div className={`text-2xl font-bold ${certVencendo !== null && certVencendo > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
+                {certVencendo === null ? '--' : certVencendo}
+              </div>
               <p className="text-xs text-slate-500 mt-1">Próximos 30 dias</p>
             </CardContent>
           </Card>
@@ -388,8 +421,10 @@ export default function Home() {
               <CardTitle className="text-sm font-medium text-slate-600">Produção Mês</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">R$ --</div>
-              <p className="text-xs text-slate-500 mt-1">Mês atual</p>
+              <div className="text-2xl font-bold text-green-700">
+                {producaoMes === null ? 'R$ --' : fmtBRL(producaoMes)}
+              </div>
+              <p className="text-xs text-slate-500 mt-1">Mês atual (contratado)</p>
             </CardContent>
           </Card>
           <Card>
@@ -397,7 +432,9 @@ export default function Home() {
               <CardTitle className="text-sm font-medium text-slate-600">Comissões Pendentes</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">R$ --</div>
+              <div className={`text-2xl font-bold ${comissoesPendentes !== null && comissoesPendentes > 0 ? 'text-red-600' : 'text-slate-900'}`}>
+                {comissoesPendentes === null ? 'R$ --' : fmtBRL(comissoesPendentes)}
+              </div>
               <p className="text-xs text-slate-500 mt-1">A pagar</p>
             </CardContent>
           </Card>
