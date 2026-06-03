@@ -272,7 +272,7 @@ function PerspectivadeGanho() {
   );
 
   const rows = data?.rows ?? [];
-  const percentualAgente = data?.percentualAgente ?? null;
+  const ativoCol = data?.ativoCol ?? null;
 
   // Totais para o demonstrativo
   const totalLiquido = useMemo(

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
-import { febraban, consignados, feriados } from "../../drizzle/schema";
+import { febraban, consignados, feriados, tabelasComissao, agentes } from "../../drizzle/schema";
 import { eq, and, like, or, desc, asc, sql, isNotNull, isNull, ne } from "drizzle-orm";
 
 // Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
@@ -657,7 +657,6 @@ export const febrabanRouter = {
     .query(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new Error('Database not available');
-      const { calculos } = await import('../../drizzle/schema');
 
       // ChaveJ do usuário logado
       let chaveJLogado: string | null = null;
@@ -672,10 +671,7 @@ export const febrabanRouter = {
       const ano = input.ano ?? agora.getFullYear();
 
       const conditions: any[] = [];
-      // Filtrar por operador: usa o ChaveJ real do agente (código J, ex: J1234568)
-      // Match exato case-insensitive
       if (chaveJ) conditions.push(sql`UPPER(TRIM(${febraban.operador})) = ${chaveJ.toUpperCase().trim()}`);
-      // Filtrar por data de solicitação no mês/ano atual (campo DD/MM/AAAA)
       conditions.push(
         sql`MONTH(STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y')) = ${mes} AND YEAR(STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y')) = ${ano}`
       );
@@ -701,37 +697,109 @@ export const febrabanRouter = {
           asc(febraban.proposta)
         );
 
-      // Buscar percentual do agente na tabela calculos (último registro disponível)
-      let percentualAgente: number | null = null;
+      // ── Buscar ativo do agente ──────────────────────────────────────────────
+      // situacao do agente contém o nível ex: "Ativo03", "Ativo 3", "A03"
+      let ativoCol: string = 'ativo03'; // padrão Ativo 3
       if (chaveJ) {
-        const calcRow = await db
-          .select({ percentual: calculos.percentual })
-          .from(calculos)
-          .where(sql`UPPER(TRIM(${calculos.chaveJ})) = ${chaveJ.toUpperCase().trim()}`)
-          .orderBy(desc(calculos.mesRef))
+        const agenteRow = await db
+          .select({ situacao: agentes.situacao })
+          .from(agentes)
+          .where(sql`UPPER(TRIM(${agentes.chaveJ})) = ${chaveJ.toUpperCase().trim()}`)
           .limit(1);
-        if (calcRow.length > 0 && calcRow[0].percentual != null) {
-          percentualAgente = parseFloat(String(calcRow[0].percentual));
+        if (agenteRow.length > 0 && agenteRow[0].situacao) {
+          const sit = agenteRow[0].situacao;
+          const m = sit.match(/(\d{1,2})/);
+          if (m) {
+            const num = parseInt(m[1]);
+            ativoCol = `ativo${String(num).padStart(2, '0')}`;
+          }
         }
       }
 
-      // Calcular PerspectivaComissão = Líquido (troco) × percentual / 100
-      // Canceladas e Pendentes sempre têm comissão = R$0,00
+      // ── Buscar todas as linhas da tabela de comissões ──────────────────────
+      const todasTabelas = await db.select().from(tabelasComissao);
+
+      // ── Buscar dados de consignados para cruzar juros/produto/prazo ────────
+      const propostas = rows.map(r => r.proposta).filter(Boolean) as string[];
+      const consigMap = new Map<string, { juros: number; produto: string; parcela: number; valorLiquido: number }>();
+      if (propostas.length > 0) {
+        const consigRows = await db
+          .select({
+            nrOperacao: consignados.nrOperacao,
+            juros: consignados.juros,
+            produto: consignados.produto,
+            parcela: consignados.parcela,
+            valorLiquido: consignados.valorLiquido,
+          })
+          .from(consignados)
+          .where(sql`${consignados.nrOperacao} IN (${sql.join(propostas.map(p => sql`${p}`), sql`, `)})`);
+        for (const c of consigRows) {
+          if (c.nrOperacao) {
+            consigMap.set(c.nrOperacao, {
+              juros: parseFloat(String(c.juros ?? 0)),
+              produto: c.produto ?? '',
+              parcela: c.parcela ?? 0,
+              valorLiquido: parseFloat(String(c.valorLiquido ?? 0)),
+            });
+          }
+        }
+      }
+
+      // ── Função para buscar percentual na tabela de comissões ────────────────
+      function parsePct(v: any): number {
+        if (v == null) return 0;
+        const s = String(v).replace(',', '.').replace('%', '').trim();
+        return parseFloat(s) || 0;
+      }
+      function buscarPercentual(produto: string, juros: number, parcela: number): number | null {
+        const prodNorm = produto.toUpperCase().trim();
+        for (const tab of todasTabelas) {
+          const conv = (tab.convenio ?? '').toUpperCase().trim();
+          // Verifica se o convênio bate com o produto (ou vice-versa)
+          if (conv !== '' && !prodNorm.includes(conv) && !conv.includes(prodNorm)) continue;
+          // Verifica faixa de juros
+          const jDe = parsePct(tab.txJurosDe);
+          const jAte = parsePct(tab.txJurosAte);
+          if (jAte > 0 && (juros < jDe || juros > jAte)) continue;
+          // Verifica faixa de prazo
+          const mDe = parseInt(String(tab.mesesDe ?? 0)) || 0;
+          const mAte = parseInt(String(tab.mesesAte ?? 999)) || 999;
+          if (parcela < mDe || parcela > mAte) continue;
+          // Encontrou a linha — pegar percentual do ativo
+          const pct = parsePct((tab as any)[ativoCol]);
+          return pct;
+        }
+        return null;
+      }
+
+      // ── Calcular comissão por operação ─────────────────────────────────────
       const result = rows.map(r => {
         const isContratada = (r.situacao ?? '').trim().toLowerCase() === 'contratada';
-        const liquido = (isContratada && r.troco != null) ? parseFloat(String(r.troco)) : 0;
-        const perspectivaComissao = !isContratada
-          ? 0
-          : percentualAgente != null
-            ? (liquido * percentualAgente) / 100
-            : null;
-        return { ...r, percentualAgente, perspectivaComissao };
+        if (!isContratada) return { ...r, ativoCol, perspectivaComissao: 0, percentualUsado: null, produtoConsig: null };
+
+        const consig = consigMap.get(r.proposta ?? '');
+        let perspectivaComissao: number | null = null;
+        let percentualUsado: number | null = null;
+        let produtoConsig: string | null = null;
+
+        if (consig && consig.valorLiquido > 0) {
+          // Usar dados do consignado: valorLiquido × percentual da tabela
+          const pct = buscarPercentual(consig.produto, consig.juros, consig.parcela);
+          percentualUsado = pct;
+          produtoConsig = consig.produto;
+          perspectivaComissao = pct != null ? +(consig.valorLiquido * pct / 100).toFixed(2) : null;
+        } else {
+          // Fallback: sem dados de consignado — comissão indeterminada
+          perspectivaComissao = null;
+        }
+
+        return { ...r, ativoCol, perspectivaComissao, percentualUsado, produtoConsig };
       });
 
-      return { rows: result, chaveJ: chaveJ ?? '', percentualAgente };
+      return { rows: result, chaveJ: chaveJ ?? '', ativoCol };
     }),
 
-  // Acompanhamento Diário: produção por agente por dia no mês selecionado
+    // Acompanhamento Diário: produção por agente por dia no mês selecionado
   acompanhamentoDiario: protectedProcedure
     .input(z.object({
       empresa: z.enum(['BMF', 'FLEX', 'TODAS']),
