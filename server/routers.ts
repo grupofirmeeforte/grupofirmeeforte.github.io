@@ -1699,13 +1699,13 @@ export const appRouter = router({
       }),
   }),
   minhaTabela: router({
-    // Retorna o total Liq. sem SRCC do mês atual + tabela de comissão + nível ativo do agente
+    // Retorna o total Liq. sem SRCC do mês atual e anterior + tabela de comissão + nível ativo dos dois meses
     obter: protectedProcedure.query(async ({ ctx }) => {
       const dbConn = await getDb();
       if (!dbConn) throw new Error('Database connection not available');
       const db = dbConn;
-      const { consignados, tabelasComissao, valoresCalculo: valCalc } = await import('../drizzle/schema');
-      const { and, eq, like, sql } = await import('drizzle-orm');
+      const { tabelasComissao, valoresCalculo: valCalc } = await import('../drizzle/schema');
+      const { and, eq, like } = await import('drizzle-orm');
       // ChaveJ, empresa e situacao do agente logado
       let chaveJLogado: string | null = null;
       let empresaAgente: string | null = null;
@@ -1718,18 +1718,23 @@ export const appRouter = router({
         empresaAgente = agenteRow?.empresa ?? null;
         situacaoAgente = agenteRow?.situacao ?? null;
       }
-      // Mês atual no formato do banco (ex: '526' para 05/2026)
+      // Datas: mês atual e mês anterior
       const agora = new Date();
       const mesAtual = agora.getMonth() + 1;
       const anoAtual = agora.getFullYear();
       const anoShort = String(anoAtual).slice(2);
-      const mesBanco = `${mesAtual}${anoShort}`;
       const mesRef = `${String(mesAtual).padStart(2, '0')}/${anoAtual}`;
-      // Buscar total de troco do Febraban (apenas Contratadas) para o mês atual
-      let totalLiquidoSemSRCC = 0;
-      if (chaveJLogado) {
+      // Mês anterior
+      const mesAntNum = mesAtual === 1 ? 12 : mesAtual - 1;
+      const anoAntNum = mesAtual === 1 ? anoAtual - 1 : anoAtual;
+      const anoAntShort = String(anoAntNum).slice(2);
+      const mesAntRef = `${String(mesAntNum).padStart(2, '0')}/${anoAntNum}`;
+
+      // Função auxiliar: busca produção Febraban de um mês específico
+      const buscarProducao = async (mes: number, anoShortStr: string): Promise<number> => {
+        if (!chaveJLogado) return 0;
         const { febraban: febTable } = await import('../drizzle/schema');
-        const mesanoNum = parseInt(`${mesAtual}${anoShort}`);
+        const mesanoNum = parseInt(`${mes}${anoShortStr}`);
         const rows = await db
           .select({ troco: febTable.troco })
           .from(febTable)
@@ -1738,8 +1743,13 @@ export const appRouter = router({
             eq(febTable.mesano, mesanoNum),
             eq(febTable.situacao, 'Contratada')
           ));
-        totalLiquidoSemSRCC = rows.reduce((s, r) => s + (parseFloat(String(r.troco ?? '0')) || 0), 0);
-      }
+        return rows.reduce((s, r) => s + (parseFloat(String(r.troco ?? '0')) || 0), 0);
+      };
+
+      // Produção dos dois meses
+      const totalVigente = await buscarProducao(mesAtual, anoShort);
+      const totalAnterior = await buscarProducao(mesAntNum, anoAntShort);
+
       // Buscar valores de meta dos ativos
       const [valRow] = await db.select().from(valCalc).where(eq(valCalc.id, 1)).limit(1);
       const metas: Record<string, number> = {};
@@ -1756,42 +1766,65 @@ export const appRouter = router({
           metasAte[`ativo${pad}`] = parseFloat(String(valRow[keyAte] ?? '0')) || 0;
         }
       }
-      // Determinar nível ativo:
-      // 1. Usar o campo 'situacao' do cadastro do agente (ex: 'Ativo03' → 'ativo03')
-      // 2. Fallback: calcular pela produção Febraban vs metas
-      let nivelAtivo: string | null = null;
+
       const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
-      if (situacaoAgente) {
-        // Converte 'Ativo03' → 'ativo03', 'Ativo3' → 'ativo03'
+
+      // Função: determina o nível pelo campo situacao do agente (para o mês anterior = cadastro atual)
+      const nivelPorSituacao = (): string | null => {
+        if (!situacaoAgente) return null;
         const match = situacaoAgente.match(/[Aa]tivo\s*(\d+)/i);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          const key = `ativo${String(num).padStart(2, '0')}`;
-          if (ativoKeys.includes(key)) nivelAtivo = key;
-        }
-      }
-      // Se não encontrou pelo cadastro, calcula pela produção
-      if (!nivelAtivo) {
+        if (!match) return null;
+        const num = parseInt(match[1], 10);
+        const key = `ativo${String(num).padStart(2, '0')}`;
+        return ativoKeys.includes(key) ? key : null;
+      };
+
+      // Função: determina o nível pela produção vs metas
+      const nivelPorProducao = (total: number): string | null => {
         for (let i = ativoKeys.length - 1; i >= 0; i--) {
           const meta = metas[ativoKeys[i]] ?? 0;
-          if (meta > 0 && totalLiquidoSemSRCC >= meta) {
-            nivelAtivo = ativoKeys[i];
-            break;
-          }
+          if (meta > 0 && total >= meta) return ativoKeys[i];
         }
-      }
-      // Buscar tabela de comissão: FLEX e BMF compartilham a mesma tabela (BMF)
-      // Mapear empresa do agente para a empresa da tabela
+        return null;
+      };
+
+      // Nível conquistado no mês anterior:
+      // Usa o campo situacao do cadastro (que o CEO atualiza após fechar o mês)
+      // Fallback: calcula pela produção do mês anterior
+      const nivelAnterior = nivelPorSituacao() ?? nivelPorProducao(totalAnterior);
+
+      // Nível sendo construído no mês vigente: sempre pela produção atual
+      const nivelVigente = nivelPorProducao(totalVigente);
+
+      // Próximo nível após o vigente (para mostrar quanto falta)
+      const idxVigente = nivelVigente ? ativoKeys.indexOf(nivelVigente) : -1;
+      const proximoNivel = idxVigente >= 0 && idxVigente < ativoKeys.length - 1
+        ? ativoKeys[idxVigente + 1]
+        : null;
+      const faltaProximo = proximoNivel
+        ? Math.max(0, (metas[proximoNivel] ?? 0) - totalVigente)
+        : 0;
+
+      // Buscar tabela de comissão
       const empresaTabela = (empresaAgente === 'FLEX' || empresaAgente === 'BMF') ? 'BMF' : (empresaAgente ?? 'BMF');
       const tabela = await db.select().from(tabelasComissao).where(eq(tabelasComissao.empresa, empresaTabela));
+
       return {
-        totalLiquidoSemSRCC,
-        nivelAtivo,
+        // Mês vigente
+        totalLiquidoSemSRCC: totalVigente,
+        nivelAtivo: nivelVigente,
+        proximoNivel,
+        faltaProximo,
+        mesRef,
+        // Mês anterior
+        totalAnterior,
+        nivelAnterior,
+        mesAntRef,
+        // Comuns
         metas,
         metasDe,
         metasAte,
         tabela,
-        mesRef,
         chaveJ: chaveJLogado ?? '',
         empresa: empresaAgente ?? '',
       };

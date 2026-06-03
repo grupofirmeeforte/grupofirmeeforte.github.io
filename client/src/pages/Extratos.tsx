@@ -265,16 +265,27 @@ function PerspectivadeGanho() {
   const { data: meData } = trpc.auth.me.useQuery();
   const chaveJReal = (meData as any)?.chaveJ ?? '';
   const nomeAgente = (meData as any)?.nomeAgente ?? '';
+  const cargo = (meData as any)?.cargo ?? '';
+  const permissoes = (meData as any)?.permissoes ?? '';
+  const isCeoOuAdmin = cargo === 'CEO' || permissoes === 'admin';
+
+  // Campo ChaveJ para CEO/Admin pesquisar qualquer agente
+  const [chaveJBusca, setChaveJBusca] = useState('');
+  const [chaveJQuery, setChaveJQuery] = useState('');
+
+  // ChaveJ efetiva para a query
+  const chaveJEfetiva = isCeoOuAdmin && chaveJQuery ? chaveJQuery.toUpperCase().trim() : (chaveJReal || undefined);
 
   const { data, isLoading } = trpc.febraban.perspectiva.useQuery(
-    { chaveJ: chaveJReal || undefined, mes: mesAtual, ano: anoAtual },
-    { enabled: !!chaveJReal }
+    { chaveJ: chaveJEfetiva, mes: mesAtual, ano: anoAtual },
+    { enabled: isCeoOuAdmin ? true : !!chaveJReal }
   );
 
   const rows = data?.rows ?? [];
   const ativoCol = data?.ativoCol ?? null;
+  const chaveJExibida = isCeoOuAdmin && chaveJQuery ? chaveJQuery.toUpperCase().trim() : chaveJReal;
 
-  // Totais para o demonstrativo
+  // Totais
   const totalLiquido = useMemo(
     () => rows.reduce((acc, r: any) => acc + parseFloat(String(r.troco ?? 0)), 0),
     [rows]
@@ -290,24 +301,42 @@ function PerspectivadeGanho() {
 
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  // Mapeamento de código de linha para nome de produto
-  const nomeProduto = (linha: number | null) => {
-    if (!linha) return '—';
-    return String(linha);
-  };
-
   return (
     <div>
-      <PainelIdentificacao chaveJ={chaveJReal} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
+      <PainelIdentificacao chaveJ={chaveJExibida} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
 
-      {/* ─── BANNER EM CONSTRUÇÃO ─────────────────────────────────── */}
-      <div className="mb-6 flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 py-10">
-        <div className="w-16 h-16 rounded-full bg-amber-500 flex items-center justify-center shadow-md">
-          <Construction className="w-9 h-9 text-white" />
+      {/* Campo de busca por ChaveJ — apenas CEO/Admin */}
+      {isCeoOuAdmin && (
+        <div className="mb-4 flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <Search className="w-4 h-4 text-blue-500 shrink-0" />
+          <Input
+            placeholder="Digite a ChaveJ do agente (ex: J1234567)"
+            value={chaveJBusca}
+            onChange={e => setChaveJBusca(e.target.value.toUpperCase())}
+            onKeyDown={e => { if (e.key === 'Enter') setChaveJQuery(chaveJBusca); }}
+            className="max-w-xs h-8 text-sm bg-white"
+          />
+          <Button
+            size="sm"
+            variant="default"
+            className="h-8 text-xs"
+            onClick={() => setChaveJQuery(chaveJBusca)}
+          >
+            Buscar
+          </Button>
+          {chaveJQuery && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs"
+              onClick={() => { setChaveJBusca(''); setChaveJQuery(''); }}
+            >
+              Limpar
+            </Button>
+          )}
+          <span className="text-xs text-blue-500 ml-1">CEO/Admin: consulte qualquer agente</span>
         </div>
-        <h3 className="text-2xl font-bold text-amber-700 tracking-wide">Em Construção</h3>
-        <p className="text-sm text-amber-500">Este módulo estará disponível em breve.</p>
-      </div>
+      )}
 
       {/* ─── TABELA DETALHADA──────────────────────────────────────── */}
       <Card>
@@ -363,7 +392,10 @@ function PerspectivadeGanho() {
                       </TableCell>
                       <TableCell className="text-gray-700 text-sm">{row.empresa || '—'}</TableCell>
                       <TableCell className="text-right font-bold text-amber-700 bg-amber-50">
-                        {fmt(0)}
+                        {row.perspectivaComissao != null
+                          ? fmt(row.perspectivaComissao)
+                          : <span className="text-gray-400 text-xs">—</span>
+                        }
                       </TableCell>
                     </TableRow>
                   ))
@@ -385,7 +417,7 @@ function PerspectivadeGanho() {
               </div>
               <div className="text-right">
                 <p className="text-xs text-gray-400">Total Comissão</p>
-                <p className="font-bold text-amber-700">{fmt(0)}</p>
+                <p className="font-bold text-amber-700">{fmt(totalPerspectiva)}</p>
               </div>
             </div>
           </div>
@@ -394,7 +426,6 @@ function PerspectivadeGanho() {
     </div>
   );
 }
-
 // ─── EXTRATO C/C ────────────────────────────────────────────────────────────
 function ExtratoCC() {
   const [filtroChaveJ, setFiltroChaveJ] = useState('');
@@ -802,12 +833,24 @@ function MinhaTabela() {
   const agora = new Date();
   const mesAtualStr = `${String(agora.getMonth() + 1).padStart(2, '0')}/${agora.getFullYear()}`;
   const { data, isLoading } = trpc.minhaTabela.obter.useQuery();
-  const nivelAtivo = data?.nivelAtivo ?? null;
+
   const tabela = (data?.tabela ?? []) as any[];
-  const totalLiquido = data?.totalLiquidoSemSRCC ?? 0;
   const metas = (data?.metas ?? {}) as Record<string, number>;
   const metasDe = (data?.metasDe ?? {}) as Record<string, number>;
   const metasAte = (data?.metasAte ?? {}) as Record<string, number>;
+
+  // Mês vigente
+  const nivelVigente = data?.nivelAtivo ?? null;
+  const totalVigente = data?.totalLiquidoSemSRCC ?? 0;
+  const mesVigenteRef = data?.mesRef ?? mesAtualStr;
+  const proximoNivelVigente = data?.proximoNivel ?? null;
+  const faltaProximoVigente = data?.faltaProximo ?? 0;
+
+  // Mês anterior
+  const nivelAnterior = data?.nivelAnterior ?? null;
+  const totalAnterior = data?.totalAnterior ?? 0;
+  const mesAntRef = data?.mesAntRef ?? '';
+
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const fmtPct = (v: string | null | undefined) => {
     if (!v) return '—';
@@ -818,41 +861,68 @@ function MinhaTabela() {
     return pctVal.toFixed(2).replace('.', ',') + '%';
   };
   const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
-  const colunasComValor = ativoKeys.filter(k => tabela.some(r => r[k] != null && r[k] !== ''));
-  const colunaExibida = nivelAtivo && colunasComValor.includes(nivelAtivo) ? nivelAtivo : null;
   const labelAtivo = (k: string) => `Ativo ${parseInt(k.replace('ativo', ''), 10).toString().padStart(2, '0')}`;
-  // Níveis que têm faixa configurada (De ou Ate preenchido)
   const niveisConfigurados = ativoKeys.filter(k => (metasDe[k] ?? 0) > 0 || (metasAte[k] ?? 0) > 0 || (metas[k] ?? 0) > 0).slice(0, 4);
-  // Índice do nível atual
-  const idxAtual = nivelAtivo ? niveisConfigurados.indexOf(nivelAtivo) : -1;
-  // Próximo nível
-  const proximoNivel = idxAtual >= 0 && idxAtual < niveisConfigurados.length - 1 ? niveisConfigurados[idxAtual + 1] : null;
-  const metaProximo = proximoNivel ? (metasDe[proximoNivel] ?? metas[proximoNivel] ?? 0) : 0;
-  const faltaProximo = metaProximo > 0 ? Math.max(0, metaProximo - totalLiquido) : 0;
+
+  // Coluna da tabela de comissão a destacar
+  const colunasComValor = ativoKeys.filter(k => tabela.some(r => r[k] != null && r[k] !== ''));
+  const colunaAnterior = nivelAnterior && colunasComValor.includes(nivelAnterior) ? nivelAnterior : null;
+  const colunaVigente = nivelVigente && colunasComValor.includes(nivelVigente) ? nivelVigente : null;
+
+  // Índices para a régua
+  const idxVigente = nivelVigente ? niveisConfigurados.indexOf(nivelVigente) : -1;
+  const idxAnterior = nivelAnterior ? niveisConfigurados.indexOf(nivelAnterior) : -1;
+
   return (
     <div>
       <PainelIdentificacao chaveJ={chaveJ} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
 
-      {/* Card de Produção + Nível Atingido */}
-      <div className="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-wrap items-center gap-6">
-        <div>
-          <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">Produção Líquida ({mesAtualStr})</p>
-          <p className="text-xl font-bold text-blue-800">{fmt(totalLiquido)}</p>
+      {/* Dois blocos lado a lado: Mês Anterior e Mês Vigente */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+        {/* Bloco 1: Tabela conquistada no mês anterior */}
+        <div className="px-4 py-3 bg-amber-50 border-2 border-amber-300 rounded-lg">
+          <p className="text-xs text-amber-700 font-bold uppercase tracking-wide mb-1">
+            Tabela conquistada no mês anterior ({mesAntRef})
+          </p>
+          <p className="text-[11px] text-amber-600 mb-2">Este é o nível que vale para sua comissão no mês atual</p>
+          {isLoading ? (
+            <p className="text-sm text-gray-400">Carregando...</p>
+          ) : nivelAnterior ? (
+            <div className="flex items-center gap-3">
+              <span className="text-2xl font-extrabold text-amber-700">{labelAtivo(nivelAnterior)}</span>
+              <span className="text-sm text-amber-600">{fmt(totalAnterior)} produzidos</span>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400">Nenhuma faixa atingida no mês anterior.</p>
+          )}
         </div>
-        {nivelAtivo ? (
-          <div>
-            <p className="text-xs text-green-600 font-semibold uppercase tracking-wide">Nível atingido</p>
-            <p className="text-xl font-bold text-green-700">{labelAtivo(nivelAtivo)}</p>
-          </div>
-        ) : (
-          <p className="text-sm text-gray-400">Nenhuma faixa de meta atingida ainda neste mês.</p>
-        )}
-        {proximoNivel && faltaProximo > 0 && (
-          <div className="ml-auto text-right">
-            <p className="text-xs text-orange-500 font-semibold uppercase tracking-wide">Falta para {labelAtivo(proximoNivel)}</p>
-            <p className="text-lg font-bold text-orange-600">{fmt(faltaProximo)}</p>
-          </div>
-        )}
+
+        {/* Bloco 2: Tabela sendo construída no mês vigente */}
+        <div className="px-4 py-3 bg-blue-50 border-2 border-blue-300 rounded-lg">
+          <p className="text-xs text-blue-700 font-bold uppercase tracking-wide mb-1">
+            Tabela sendo construída em {mesVigenteRef}
+          </p>
+          <p className="text-[11px] text-blue-600 mb-2">Produza mais para conquistar um nível maior no próximo mês</p>
+          {isLoading ? (
+            <p className="text-sm text-gray-400">Carregando...</p>
+          ) : (
+            <div className="flex flex-wrap items-center gap-3">
+              {nivelVigente ? (
+                <span className="text-2xl font-extrabold text-blue-700">{labelAtivo(nivelVigente)}</span>
+              ) : (
+                <span className="text-sm text-gray-400">Nenhuma faixa atingida ainda</span>
+              )}
+              <span className="text-sm text-blue-600">{fmt(totalVigente)} produzidos</span>
+              {proximoNivelVigente && faltaProximoVigente > 0 && (
+                <span className="ml-auto text-right">
+                  <span className="text-xs text-orange-500 font-semibold block">Falta para {labelAtivo(proximoNivelVigente)}</span>
+                  <span className="text-base font-bold text-orange-600">{fmt(faltaProximoVigente)}</span>
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Régua de Níveis */}
@@ -861,28 +931,33 @@ function MinhaTabela() {
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Faixas de Nível — Produza mais para ganhar mais!</p>
           <div className="grid gap-2" style={{gridTemplateColumns: `repeat(${niveisConfigurados.length}, 1fr)`}}>
             {niveisConfigurados.map((k, idx) => {
-              const isAtual = k === nivelAtivo;
-              const isAlcancado = idxAtual >= 0 && idx <= idxAtual;
+              const isAtualVig = k === nivelVigente;
+              const isAtualAnt = k === nivelAnterior;
+              const isAlcancadoVig = idxVigente >= 0 && idx <= idxVigente;
               const de = metasDe[k] ?? 0;
               const ate = metasAte[k] ?? 0;
               return (
                 <div
                   key={k}
                   className={`rounded-lg border-2 px-3 py-2.5 text-center transition-all ${
-                    isAtual
+                    isAtualAnt
+                      ? 'border-amber-500 bg-amber-50 shadow-md'
+                      : isAtualVig
                       ? 'border-green-500 bg-green-50 shadow-md'
-                      : isAlcancado
+                      : isAlcancadoVig
                       ? 'border-blue-300 bg-blue-50'
                       : 'border-gray-200 bg-white'
                   }`}
                 >
-                  <div className={`text-xs font-bold uppercase mb-1 ${
-                    isAtual ? 'text-green-700' : isAlcancado ? 'text-blue-600' : 'text-gray-400'
+                  <div className={`text-xs font-bold uppercase mb-0.5 ${
+                    isAtualAnt ? 'text-amber-700' : isAtualVig ? 'text-green-700' : isAlcancadoVig ? 'text-blue-600' : 'text-gray-400'
                   }`}>
-                    {isAtual ? '✓ ' : ''}{labelAtivo(k)}
+                    {isAtualAnt ? '★ ' : isAtualVig ? '✓ ' : ''}{labelAtivo(k)}
                   </div>
+                  {isAtualAnt && <div className="text-[9px] text-amber-600 font-semibold mb-0.5">tabela atual</div>}
+                  {isAtualVig && !isAtualAnt && <div className="text-[9px] text-green-600 font-semibold mb-0.5">mês vigente</div>}
                   <div className={`text-[11px] font-medium ${
-                    isAtual ? 'text-green-800' : isAlcancado ? 'text-blue-700' : 'text-gray-500'
+                    isAtualAnt ? 'text-amber-800' : isAtualVig ? 'text-green-800' : isAlcancadoVig ? 'text-blue-700' : 'text-gray-500'
                   }`}>
                     {de > 0 ? fmt(de) : '—'}
                     {ate > 0 ? <><br/><span className="text-[10px] text-gray-400">até</span><br/>{fmt(ate)}</> : ''}
@@ -893,6 +968,8 @@ function MinhaTabela() {
           </div>
         </div>
       )}
+
+      {/* Tabela de comissões: coluna do nível anterior (que vale agora) e vigente */}
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
@@ -908,8 +985,15 @@ function MinhaTabela() {
                     <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3 text-center min-w-[130px]">Tx Juros (De → Até)</TableHead>
                     <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3 text-center min-w-[110px]">Meses (De → Até)</TableHead>
                     <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3 text-center min-w-[90px]">Valor Mín.</TableHead>
-                    {colunaExibida && (
-                      <TableHead className="text-amber-300 font-bold text-xs uppercase bg-amber-900 py-2 px-3 text-center min-w-[80px]">{labelAtivo(colunaExibida)}</TableHead>
+                    {colunaAnterior && (
+                      <TableHead className="text-amber-300 font-bold text-xs uppercase bg-amber-900 py-2 px-3 text-center min-w-[100px]">
+                        {labelAtivo(colunaAnterior)}<br/><span className="text-[9px] font-normal text-amber-200">tabela atual</span>
+                      </TableHead>
+                    )}
+                    {colunaVigente && colunaVigente !== colunaAnterior && (
+                      <TableHead className="text-green-300 font-bold text-xs uppercase bg-green-900 py-2 px-3 text-center min-w-[100px]">
+                        {labelAtivo(colunaVigente)}<br/><span className="text-[9px] font-normal text-green-200">mês vigente</span>
+                      </TableHead>
                     )}
                   </TableRow>
                 </TableHeader>
@@ -928,9 +1012,14 @@ function MinhaTabela() {
                         <span className="font-semibold text-blue-700">{row.mesesAte ?? '—'}</span>
                       </TableCell>
                       <TableCell className="text-xs py-1 px-3 text-center whitespace-nowrap">{row.valorMinimo ?? '—'}</TableCell>
-                      {colunaExibida && (
+                      {colunaAnterior && (
                         <TableCell className="font-bold text-amber-700 bg-amber-50 text-xs py-1 px-3 text-center whitespace-nowrap">
-                          {fmtPct(row[colunaExibida])}
+                          {fmtPct(row[colunaAnterior])}
+                        </TableCell>
+                      )}
+                      {colunaVigente && colunaVigente !== colunaAnterior && (
+                        <TableCell className="font-bold text-green-700 bg-green-50 text-xs py-1 px-3 text-center whitespace-nowrap">
+                          {fmtPct(row[colunaVigente])}
                         </TableCell>
                       )}
                     </TableRow>
@@ -944,7 +1033,6 @@ function MinhaTabela() {
     </div>
   );
 }
-
 // ─── COMPONENTE PRINCIPAL ────────────────────────────────────────────────────
 export default function ExtratosPage() {
   const [, navigate] = useLocation();
