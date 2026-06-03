@@ -786,26 +786,59 @@ export const febrabanRouter = {
       const todasTabelas = await db.select().from(tabelasComissao);
 
       // ── 5. Funções de cálculo ───────────────────────────────────────────────
-      function parsePct(v: any): number {
+      const parsePct = (v: any): number => {
         if (v == null) return 0;
         const s = String(v).replace(',', '.').replace('%', '').trim();
         return parseFloat(s) || 0;
-      }
-      function buscarPercentual(produto: string, juros: number, parcela: number): number | null {
+      };
+
+      // Tokeniza produto para match flexivel (ex: "CONSIGNADO INSS BB" -> ["CONSIGNADO","INSS","BB"])
+      const tokenizar = (s: string): string[] =>
+        s.toUpperCase().trim().split(/[\s\-\/,]+/).filter((p: string) => p.length > 2);
+
+      const buscarPercentual = (produto: string, juros: number, parcela: number): number | null => {
         const prodNorm = produto.toUpperCase().trim();
+
+        // Tentativa 1: match completo (convenio + juros + prazo)
         for (const tab of todasTabelas) {
           const conv = (tab.convenio ?? '').toUpperCase().trim();
-          if (conv !== '' && !prodNorm.includes(conv) && !conv.includes(prodNorm)) continue;
+          if (conv !== '') {
+            const convTokens = tokenizar(conv);
+            const prodTokens = tokenizar(produto);
+            const match = convTokens.some((ct: string) => prodNorm.includes(ct)) ||
+                          prodTokens.some((pt: string) => conv.includes(pt));
+            if (!match) continue;
+          }
           const jDe = parsePct(tab.txJurosDe);
           const jAte = parsePct(tab.txJurosAte);
-          if (jAte > 0 && (juros < jDe || juros > jAte)) continue;
+          if (jAte > 0 && juros > 0 && (juros < jDe - 0.0001 || juros > jAte + 0.0001)) continue;
           const mDe = parseInt(String(tab.mesesDe ?? 0)) || 0;
           const mAte = parseInt(String(tab.mesesAte ?? 999)) || 999;
-          if (parcela < mDe || parcela > mAte) continue;
-          return parsePct((tab as any)[ativoCol]);
+          if (parcela > 0 && (parcela < mDe || parcela > mAte)) continue;
+          const pct = parsePct((tab as any)[ativoCol]);
+          if (pct > 0) return pct;
         }
+
+        // Tentativa 2: apenas prazo (ignora convenio e juros)
+        if (parcela > 0) {
+          for (const tab of todasTabelas) {
+            const mDe = parseInt(String(tab.mesesDe ?? 0)) || 0;
+            const mAte = parseInt(String(tab.mesesAte ?? 999)) || 999;
+            if (parcela >= mDe && parcela <= mAte) {
+              const pct = parsePct((tab as any)[ativoCol]);
+              if (pct > 0) return pct;
+            }
+          }
+        }
+
+        // Tentativa 3: primeira linha da tabela (fallback)
+        if (todasTabelas.length > 0) {
+          const pct = parsePct((todasTabelas[0] as any)[ativoCol]);
+          if (pct > 0) return pct;
+        }
+
         return null;
-      }
+      };
 
       // ── 6. Calcular comissão por contrato ──────────────────────────────────
       const result = contratoRows.map(r => {
@@ -826,10 +859,11 @@ export const febrabanRouter = {
         let perspectivaComissao: number | null = null;
         let percentualUsado: number | null = null;
 
-        if (isContratada && valorLiquido > 0 && jurosNorm > 0) {
+        if (isContratada && valorLiquido > 0) {
           const pct = buscarPercentual(produto, jurosNorm, parcela);
           percentualUsado = pct;
-          perspectivaComissao = pct != null ? +(valorLiquido * pct / 100).toFixed(2) : null;
+          // pct já é decimal (ex: 0.0082 = 0,82%), multiplicar direto pelo valor líquido
+          perspectivaComissao = pct != null ? +(valorLiquido * pct).toFixed(2) : null;
         }
 
         return {
