@@ -256,12 +256,6 @@ function ExtratoConsignado() {
 
 // ─── PERSPECTIVA DE GANHO ────────────────────────────────────────────────────
 function PerspectivadeGanho() {
-  // Mês atual
-  const agora = new Date();
-  const mesAtual = agora.getMonth() + 1;
-  const anoAtual = agora.getFullYear();
-  const mesAtualStr = `${String(mesAtual).padStart(2, '0')}/${anoAtual}`;
-
   const { data: meData } = trpc.auth.me.useQuery();
   const chaveJReal = (meData as any)?.chaveJ ?? '';
   const nomeAgente = (meData as any)?.nomeAgente ?? '';
@@ -273,17 +267,37 @@ function PerspectivadeGanho() {
   const [chaveJBusca, setChaveJBusca] = useState('');
   const [chaveJQuery, setChaveJQuery] = useState('');
 
-  // ChaveJ efetiva para a query
+  // ChaveJ efetiva para a query (sem mes/ano — o backend calcula o período vigente automaticamente)
   const chaveJEfetiva = isCeoOuAdmin && chaveJQuery ? chaveJQuery.toUpperCase().trim() : (chaveJReal || undefined);
 
+  const utils = trpc.useUtils();
   const { data, isLoading } = trpc.febraban.perspectiva.useQuery(
-    { chaveJ: chaveJEfetiva, mes: mesAtual, ano: anoAtual },
+    { chaveJ: chaveJEfetiva },
     { enabled: isCeoOuAdmin ? true : !!chaveJReal }
   );
 
+  // Mutation para salvar situação manual no contrato
+  const atualizarMutation = trpc.contratos.atualizar.useMutation({
+    onSuccess: () => utils.febraban.perspectiva.invalidate(),
+  });
+
+  // Estado de edição inline de situação
+  const [editandoSituacaoId, setEditandoSituacaoId] = useState<number | null>(null);
+  const [situacaoEditando, setSituacaoEditando] = useState('');
+
+  const salvarSituacao = async (id: number) => {
+    await atualizarMutation.mutateAsync({ id, situacao: situacaoEditando });
+    setEditandoSituacaoId(null);
+  };
+
   const rows = data?.rows ?? [];
   const ativoCol = data?.ativoCol ?? null;
+  const periodoInicio = (data as any)?.periodoInicio ?? '';
+  const periodoFim = (data as any)?.periodoFim ?? '';
   const chaveJExibida = isCeoOuAdmin && chaveJQuery ? chaveJQuery.toUpperCase().trim() : chaveJReal;
+  const mesRef = (data as any)?.mesRef;
+  const anoRef = (data as any)?.anoRef;
+  const mesAtualStr = mesRef && anoRef ? `${String(mesRef).padStart(2,'0')}/${anoRef}` : '';
 
   // Totais
   const totalValorSolicitado = useMemo(
@@ -306,6 +320,17 @@ function PerspectivadeGanho() {
     <div>
       <PainelIdentificacao chaveJ={chaveJExibida} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
 
+      {/* Período vigente */}
+      {periodoInicio && periodoFim && (
+        <div className="mb-3 flex items-center gap-2 p-2.5 bg-indigo-50 border border-indigo-200 rounded-lg">
+          <Calendar className="w-4 h-4 text-indigo-500 shrink-0" />
+          <span className="text-xs text-indigo-700 font-medium">
+            Período vigente: <strong>{periodoInicio}</strong> a <strong>{periodoFim}</strong>
+          </span>
+          <span className="text-xs text-indigo-400 ml-1">(do último dia útil do mês anterior ao penúltimo dia útil do mês atual)</span>
+        </div>
+      )}
+
       {/* Campo de busca por ChaveJ — apenas CEO/Admin */}
       {isCeoOuAdmin && (
         <div className="mb-4 flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -317,29 +342,21 @@ function PerspectivadeGanho() {
             onKeyDown={e => { if (e.key === 'Enter') setChaveJQuery(chaveJBusca); }}
             className="max-w-xs h-8 text-sm bg-white"
           />
-          <Button
-            size="sm"
-            variant="default"
-            className="h-8 text-xs"
-            onClick={() => setChaveJQuery(chaveJBusca)}
-          >
-            Buscar
-          </Button>
+          <Button size="sm" variant="default" className="h-8 text-xs" onClick={() => setChaveJQuery(chaveJBusca)}>Buscar</Button>
           {chaveJQuery && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-8 text-xs"
-              onClick={() => { setChaveJBusca(''); setChaveJQuery(''); }}
-            >
-              Limpar
-            </Button>
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => { setChaveJBusca(''); setChaveJQuery(''); }}>Limpar</Button>
           )}
           <span className="text-xs text-blue-500 ml-1">CEO/Admin: consulte qualquer agente</span>
         </div>
       )}
 
-      {/* ─── TABELA DETALHADA ─────────────────────────────────────────────── */}
+      {/* Nota de edição */}
+      <div className="mb-3 text-xs text-gray-500 flex items-center gap-1">
+        <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" />
+        Clique no badge de situação de qualquer contrato para alterar manualmente.
+      </div>
+
+      {/* ─── TABELA DETALHADA ──────────────────────────────────────────────────────── */}
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -365,7 +382,9 @@ function PerspectivadeGanho() {
                 ) : rows.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={9} className="text-center py-10 text-gray-400">
-                      Nenhum contrato PDF encontrado para {mesAtualStr}
+                      {periodoInicio && periodoFim
+                        ? `Nenhum contrato PDF no período vigente (${periodoInicio} a ${periodoFim})`
+                        : 'Nenhum contrato PDF encontrado'}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -377,13 +396,47 @@ function PerspectivadeGanho() {
                         {row.cpfCliente && <div className="text-xs text-gray-500 font-mono">{row.cpfCliente}</div>}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                            (row.situacao ?? '').toLowerCase() === 'contratada' ? 'bg-green-100 text-green-700' :
-                            (row.situacao ?? '').toLowerCase() === 'cancelada'  ? 'bg-red-100 text-red-700' :
-                            'bg-yellow-100 text-yellow-700'
-                          }`}>{row.situacao || 'Pendente'}</span>
-                        </div>
+                        {/* Edição inline de situação */}
+                        {editandoSituacaoId === row.id ? (
+                          <div className="flex items-center gap-1">
+                            <select
+                              autoFocus
+                              value={situacaoEditando}
+                              onChange={e => setSituacaoEditando(e.target.value)}
+                              className="text-xs border border-blue-400 rounded px-1.5 py-0.5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            >
+                              <option value="">-- Selecione --</option>
+                              <option value="Contratada">Contratada</option>
+                              <option value="Cancelada">Cancelada</option>
+                              <option value="Pendente">Pendente</option>
+                            </select>
+                            <button
+                              onClick={() => salvarSituacao(row.id)}
+                              disabled={atualizarMutation.isPending}
+                              className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded hover:bg-green-700 disabled:opacity-50"
+                            >OK</button>
+                            <button
+                              onClick={() => setEditandoSituacaoId(null)}
+                              className="text-xs bg-gray-400 text-white px-1.5 py-0.5 rounded hover:bg-gray-500"
+                            >X</button>
+                          </div>
+                        ) : (
+                          <button
+                            title="Clique para editar a situação"
+                            onClick={() => {
+                              setEditandoSituacaoId(row.id);
+                              setSituacaoEditando(row.situacao || '');
+                            }}
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity border border-transparent hover:border-current ${
+                              (row.situacao ?? '').toLowerCase() === 'contratada' ? 'bg-green-100 text-green-700' :
+                              (row.situacao ?? '').toLowerCase() === 'cancelada'  ? 'bg-red-100 text-red-700' :
+                              'bg-yellow-100 text-yellow-700'
+                            }`}
+                          >
+                            {row.situacao || 'Pendente'}
+                            <span className="ml-1 text-[9px] opacity-60">✎</span>
+                          </button>
+                        )}
                       </TableCell>
                       <TableCell className="text-xs text-gray-600 max-w-[130px] truncate" title={row.produtoConsig ?? row.linha ?? ''}>
                         <span className="text-blue-600 font-medium">{row.produtoConsig || row.linha || '—'}</span>
@@ -428,7 +481,8 @@ function PerspectivadeGanho() {
           {/* Rodapé com totais */}
           <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-500">{rows.length} contrato(s) — {mesAtualStr}</span>
+              <span className="text-sm text-gray-500">{rows.length} contrato(s)</span>
+              {periodoInicio && <span className="text-xs text-indigo-600">{periodoInicio} → {periodoFim}</span>}
               <span className="text-xs text-green-600 font-medium">{totalContratadas} contratada(s)</span>
               {ativoCol && <span className="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-medium">{ativoCol.replace('ativo', 'Ativo ')}</span>}
             </div>

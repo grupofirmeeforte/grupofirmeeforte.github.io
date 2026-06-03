@@ -664,18 +664,56 @@ export const febrabanRouter = {
       }
       const chaveJ = input.chaveJ ?? chaveJLogado;
 
-      // Mês e ano para filtro — padrão: mês atual
-      const agora = new Date();
-      const mes = input.mes ?? (agora.getMonth() + 1);
-      const ano = input.ano ?? agora.getFullYear();
+      // ── Calcular mês vigente: último dia útil do mês anterior → penúltimo dia útil do mês atual ──
+      let dataInicio: Date;
+      let dataFim: Date;
 
-      // ── 1. Buscar contratos PDF do agente no mês ────────────────────────────
-      // Fonte principal: tabela contratos (PDFs enviados)
+      // Determinar mês/ano de referência
+      const agora = new Date();
+      const mesRef = input.mes ?? (agora.getMonth() + 1);
+      const anoRef = input.ano ?? agora.getFullYear();
+      const mesAnteriorRef = mesRef === 1 ? 12 : mesRef - 1;
+      const anoAnteriorRef = mesRef === 1 ? anoRef - 1 : anoRef;
+
+      // Buscar feriados dos dois anos envolvidos
+      const feriadosRows = await db
+        .select({ data: feriados.data })
+        .from(feriados)
+        .where(sql`ano IN (${anoAnteriorRef}, ${anoRef})`);
+      const feriadosSet = new Set(feriadosRows.map(f => f.data)); // formato DD/MM/AAAA
+
+      const isUtilDate = (d: Date): boolean => {
+        const dow = d.getDay();
+        if (dow === 0 || dow === 6) return false;
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return !feriadosSet.has(`${dd}/${mm}/${yyyy}`);
+      };
+
+      // Último dia útil do mês anterior
+      const ultimoDiaMesAnterior = new Date(anoAnteriorRef, mesAnteriorRef, 0);
+      let cursor = new Date(ultimoDiaMesAnterior);
+      while (!isUtilDate(cursor)) { cursor.setDate(cursor.getDate() - 1); }
+      dataInicio = new Date(cursor);
+      dataInicio.setHours(0, 0, 0, 0);
+
+      // Penúltimo dia útil do mês atual (mesRef)
+      const ultimoDiaMesAtual = new Date(anoRef, mesRef, 0);
+      cursor = new Date(ultimoDiaMesAtual);
+      while (!isUtilDate(cursor)) { cursor.setDate(cursor.getDate() - 1); } // último dia útil
+      cursor.setDate(cursor.getDate() - 1);
+      while (!isUtilDate(cursor)) { cursor.setDate(cursor.getDate() - 1); } // penúltimo dia útil
+      dataFim = new Date(cursor);
+      dataFim.setHours(23, 59, 59, 999);
+
+      // ── 1. Buscar contratos PDF do agente no período vigente ────────────────
+      // Fonte principal: tabela contratos (PDFs enviados) — todos têm PDF (fileKey NOT NULL)
       const contratoConditions: any[] = [];
       if (chaveJ) contratoConditions.push(sql`UPPER(TRIM(${contratos.chaveJOperador})) = ${chaveJ.toUpperCase().trim()}`);
-      // Filtrar pelo mês/ano de criação do contrato
+      // Filtrar pelo período vigente (último dia útil mês anterior → penúltimo dia útil mês atual)
       contratoConditions.push(
-        sql`MONTH(${contratos.createdAt}) = ${mes} AND YEAR(${contratos.createdAt}) = ${ano}`
+        sql`${contratos.createdAt} >= ${dataInicio} AND ${contratos.createdAt} <= ${dataFim}`
       );
 
       const contratoRows = await db
@@ -820,7 +858,17 @@ export const febrabanRouter = {
         };
       });
 
-      return { rows: result, chaveJ: chaveJ ?? '', ativoCol };
+      // Formatar datas do período vigente para exibição
+      const fmtData = (d: Date) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+      return {
+        rows: result,
+        chaveJ: chaveJ ?? '',
+        ativoCol,
+        periodoInicio: fmtData(dataInicio),
+        periodoFim: fmtData(dataFim),
+        mesRef,
+        anoRef,
+      };
     }),
 
     // Acompanhamento Diário: produção por agente por dia no mês selecionado

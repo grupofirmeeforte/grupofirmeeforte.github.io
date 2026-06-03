@@ -662,3 +662,11 @@
 - [x] Adicionar campo situacao na mutation atualizar do router contratos
 - [x] Adicionar select de Situação Manual no formulário de edição de contratos (Contratada/Cancelada/Pendente)
 - [x] Restrição de menu para promotores: mostrar apenas Meu Painel, CRM e Extratos
+
+## PERSPECTIVA DE GANHO — CORREÇÕES (sessão atual)
+- [x] Corrigir filtro de período: usar último dia útil do mês anterior → penúltimo dia útil do mês atual (usando tabela feriados)
+- [x] Remover filtro por mes/ano fixo — backend calcula período vigente automaticamente
+- [x] Exibir período vigente no frontend (banner informativo com datas início/fim)
+- [x] Permitir editar situação inline clicando no badge (qualquer situação: Pendente, Contratada, Cancelada)
+- [x] Salvar situação manual via mutation contratos.atualizar e recarregar perspectiva
+- [x] Confirmar que todos os contratos já têm PDF (fileKey NOT NULL — não precisa filtrar)
