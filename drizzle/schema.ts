@@ -1535,6 +1535,7 @@ export const contratos = mysqlTable("contratos", {
   nomeOperador: varchar("nomeOperador", { length: 255 }),
   empresa: varchar("empresa", { length: 100 }),
     statusExtracao: varchar("statusExtracao", { length: 20 }).default("pendente"), // pendente | ok | erro
+  situacao: varchar("situacao", { length: 50 }),                                  // Situação manual: Contratada, Cancelada, Pendente
   erroExtracao: text("erroExtracao"),
   uploadPorId: int("uploadPorId"),                              // FK users.id
   // CRM Refinanciamento

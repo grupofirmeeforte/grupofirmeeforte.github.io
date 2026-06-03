@@ -117,8 +117,9 @@ export default function ContratosPage() {
     empresa: string; nomeCliente: string; nomeConvenio: string;
     nomeOperador: string; chaveJOperador: string;
     dataPrimeiraParcela: string; dataUltimaParcela: string; telefoneManuais: string;
+    situacao: string;
   }>({ empresa: '', nomeCliente: '', nomeConvenio: '', nomeOperador: '', chaveJOperador: '',
-       dataPrimeiraParcela: '', dataUltimaParcela: '', telefoneManuais: '' });
+       dataPrimeiraParcela: '', dataUltimaParcela: '', telefoneManuais: '', situacao: '' });
 
   // Estado de exclusão com senha CEO
   const [deletandoId, setDeletandoId] = useState<number | null>(null);
@@ -155,6 +156,7 @@ export default function ContratosPage() {
       dataPrimeiraParcela: r.dataPrimeiraParcela ?? '',
       dataUltimaParcela: r.dataUltimaParcela ?? '',
       telefoneManuais: r.telefoneManuais ?? '',
+      situacao: (r as any).situacao ?? '',
     });
   };
 
@@ -801,6 +803,21 @@ export default function ContratosPage() {
                   />
                 </div>
               ))}
+              {/* Campo Situação manual */}
+              <div className="col-span-2">
+                <label className="text-slate-400 text-xs mb-1 block">Situação Manual</label>
+                <select
+                  value={editForm.situacao}
+                  onChange={e => setEditForm(f => ({ ...f, situacao: e.target.value }))}
+                  className="w-full bg-slate-800 border border-slate-600 text-white text-sm rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">-- Não definida --</option>
+                  <option value="Contratada">Contratada</option>
+                  <option value="Cancelada">Cancelada</option>
+                  <option value="Pendente">Pendente</option>
+                </select>
+                <p className="text-slate-500 text-[10px] mt-1">Usada na Perspectiva de Ganho quando não há correspondência na Febraban</p>
+              </div>
             </div>
             <div className="flex gap-3 mt-5 justify-end">
               <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => setEditandoId(null)}>Cancelar</Button>

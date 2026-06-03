@@ -279,7 +279,14 @@ export default function Home() {
       ],
     },
   ];
-  const grupoAtual = grupos.find(g => g.key === grupoAberto);
+  // Grupos permitidos para promotores (cargo 'Promotor')
+  const isPromotor = cargo === 'Promotor';
+  const GRUPOS_PROMOTOR = ['painel', 'crm', 'extratos'];
+  const gruposVisiveis = isPromotor
+    ? grupos.filter(g => GRUPOS_PROMOTOR.includes(g.key))
+    : grupos;
+
+  const grupoAtual = gruposVisiveis.find(g => g.key === grupoAberto);
 
   return (
     <div
@@ -327,7 +334,7 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3">
             <div className="flex flex-col gap-4">
-              {grupos.map((grupo) => {
+              {gruposVisiveis.map((grupo) => {
                 const Icon = grupo.icon;
                 const visibleSubs = (isAdminOuCeo
                   ? grupo.subModules

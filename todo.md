@@ -650,3 +650,15 @@
 - [x] Adicionar link "Agências BB" no menu Home.tsx (seção CRM)
 - [x] Hook use-debounce criado para filtro em tempo real (300ms)
 - [x] TypeScript sem erros
+
+## SESSÃO ATUAL — CONTINUAÇÃO DA PERSPECTIVA DE GANHO
+- [x] Corrigir erro TypeScript linha 720 em febraban.ts (campos decimal troco/financiado → String())
+- [x] Reescrever procedimento perspectiva para usar APENAS contratos PDF como fonte principal
+- [x] Cruzar situação do contrato com Febraban (prioridade) + campo manual (fallback) + 'Pendente'
+- [x] Retornar novos campos: nomeCliente, cpfCliente, taxaJuros, prazoMeses, valorSolicitado, temPdf, temFebraban
+- [x] Atualizar frontend PerspectivadeGanho para exibir novos campos (Cliente/CPF, Taxa, Prazo, Valor, badges PDF/FEB)
+- [x] Adicionar campo situacao (VARCHAR 50) na tabela contratos via ALTER TABLE
+- [x] Atualizar schema Drizzle com campo situacao na tabela contratos
+- [x] Adicionar campo situacao na mutation atualizar do router contratos
+- [x] Adicionar select de Situação Manual no formulário de edição de contratos (Contratada/Cancelada/Pendente)
+- [x] Restrição de menu para promotores: mostrar apenas Meu Painel, CRM e Extratos

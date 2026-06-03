@@ -477,6 +477,7 @@ export const contratosRouter = router({
       dataPrimeiraParcela: z.string().optional(),
       dataUltimaParcela: z.string().optional(),
       telefoneManuais: z.string().optional(), // telefones separados por vírgula
+      situacao: z.string().optional(),        // Contratada | Cancelada | Pendente
     }))
     .mutation(async ({ input }) => {
       const db = await getDb();

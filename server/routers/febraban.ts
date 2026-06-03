@@ -650,7 +650,6 @@ export const febrabanRouter = {
   perspectiva: protectedProcedure
     .input(z.object({
       chaveJ: z.string().optional(),
-      // mes e ano para filtro por data (padrão: mês atual)
       mes: z.number().optional(),
       ano: z.number().optional(),
     }))
@@ -670,36 +669,65 @@ export const febrabanRouter = {
       const mes = input.mes ?? (agora.getMonth() + 1);
       const ano = input.ano ?? agora.getFullYear();
 
-      const conditions: any[] = [];
-      if (chaveJ) conditions.push(sql`UPPER(TRIM(${febraban.operador})) = ${chaveJ.toUpperCase().trim()}`);
-      conditions.push(
-        sql`MONTH(STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y')) = ${mes} AND YEAR(STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y')) = ${ano}`
+      // ── 1. Buscar contratos PDF do agente no mês ────────────────────────────
+      // Fonte principal: tabela contratos (PDFs enviados)
+      const contratoConditions: any[] = [];
+      if (chaveJ) contratoConditions.push(sql`UPPER(TRIM(${contratos.chaveJOperador})) = ${chaveJ.toUpperCase().trim()}`);
+      // Filtrar pelo mês/ano de criação do contrato
+      contratoConditions.push(
+        sql`MONTH(${contratos.createdAt}) = ${mes} AND YEAR(${contratos.createdAt}) = ${ano}`
       );
 
-      const rows = await db
+      const contratoRows = await db
         .select({
-          id: febraban.id,
-          proposta: febraban.proposta,
-          linha: febraban.linha,
-          situacao: febraban.situacao,
-          operador: febraban.operador,
-          solicitacao: febraban.solicitacao,
-          prazo: febraban.prazo,
-          troco: febraban.troco,
-          financiado: febraban.financiado,
-          empresa: febraban.empresa,
-          mesano: febraban.mesano,
+          id: contratos.id,
+          numeroProposta: contratos.numeroProposta,
+          linhaCredito: contratos.linhaCredito,
+          taxaMensalJuros: contratos.taxaMensalJuros,
+          prazoMeses: contratos.prazoMeses,
+          valorSolicitado: contratos.valorSolicitado,
+          nomeCliente: contratos.nomeCliente,
+          cpfCliente: contratos.cpfCliente,
+          empresa: contratos.empresa,
+          chaveJOperador: contratos.chaveJOperador,
+          nomeOperador: contratos.nomeOperador,
+          situacaoManual: contratos.situacao,
+          createdAt: contratos.createdAt,
         })
-        .from(febraban)
-        .where(conditions.length ? and(...conditions) : undefined)
-        .orderBy(
-          sql`STR_TO_DATE(${febraban.solicitacao}, '%d/%m/%Y') DESC`,
-          asc(febraban.proposta)
-        );
+        .from(contratos)
+        .where(and(...contratoConditions))
+        .orderBy(desc(contratos.createdAt));
 
-      // ── Buscar ativo do agente ──────────────────────────────────────────────
-      // situacao do agente contém o nível ex: "Ativo03", "Ativo 3", "A03"
-      let ativoCol: string = 'ativo03'; // padrão Ativo 3
+      // ── 2. Cruzar com Febraban para obter situação ──────────────────────────
+      const propostas = contratoRows.map(r => r.numeroProposta).filter(Boolean) as string[];
+      const febMap = new Map<string, { situacao: string; linha: string; prazo: string; troco: string; financiado: string; solicitacao: string }>();
+      if (propostas.length > 0) {
+        const febRows = await db
+          .select({
+            proposta: febraban.proposta,
+            situacao: febraban.situacao,
+            linha: febraban.linha,
+            prazo: febraban.prazo,
+            troco: febraban.troco,
+            financiado: febraban.financiado,
+            solicitacao: febraban.solicitacao,
+          })
+          .from(febraban)
+          .where(sql`${febraban.proposta} IN (${sql.join(propostas.map(p => sql`${p}`), sql`, `)})`);
+        for (const f of febRows) {
+          if (f.proposta) febMap.set(f.proposta, {
+            situacao: f.situacao ?? '',
+            linha: String(f.linha ?? ''),
+            prazo: f.prazo ?? '',
+            troco: String(f.troco ?? ''),
+            financiado: String(f.financiado ?? ''),
+            solicitacao: f.solicitacao ?? '',
+          });
+        }
+      }
+
+      // ── 3. Buscar ativo do agente ───────────────────────────────────────────
+      let ativoCol: string = 'ativo03';
       if (chaveJ) {
         const agenteRow = await db
           .select({ situacao: agentes.situacao })
@@ -716,67 +744,10 @@ export const febrabanRouter = {
         }
       }
 
-      // ── Buscar todas as linhas da tabela de comissões ──────────────────────
+      // ── 4. Buscar todas as linhas da tabela de comissões ───────────────────
       const todasTabelas = await db.select().from(tabelasComissao);
 
-      // ── Buscar dados dos contratos PDF para cruzar juros/produto/prazo ─────
-      const propostas = rows.map(r => r.proposta).filter(Boolean) as string[];
-      // Mapa: numeroProposta → dados do contrato PDF
-      const contratoMap = new Map<string, { juros: number; produto: string; parcela: number; valorLiquido: number }>();
-      // Mapa fallback: consignados (caso não haja contrato PDF)
-      const consigMap = new Map<string, { juros: number; produto: string; parcela: number; valorLiquido: number }>();
-      if (propostas.length > 0) {
-        // 1. Buscar nos contratos PDF
-        const contratoRows = await db
-          .select({
-            numeroProposta: contratos.numeroProposta,
-            taxaMensalJuros: contratos.taxaMensalJuros,
-            linhaCredito: contratos.linhaCredito,
-            prazoMeses: contratos.prazoMeses,
-            valorSolicitado: contratos.valorSolicitado,
-          })
-          .from(contratos)
-          .where(sql`${contratos.numeroProposta} IN (${sql.join(propostas.map(p => sql`${p}`), sql`, `)})`);
-        for (const c of contratoRows) {
-          if (c.numeroProposta) {
-            contratoMap.set(c.numeroProposta, {
-              juros: parseFloat(String(c.taxaMensalJuros ?? 0)),
-              produto: c.linhaCredito ?? '',
-              parcela: c.prazoMeses ?? 0,
-              valorLiquido: parseFloat(String(c.valorSolicitado ?? 0)),
-            });
-          }
-        }
-        // 2. Buscar nos consignados como fallback para propostas sem contrato PDF
-        const semContrato = propostas.filter(p => !contratoMap.has(p));
-        if (semContrato.length > 0) {
-          const consigRows = await db
-            .select({
-              nrOperacao: consignados.nrOperacao,
-              juros: consignados.juros,
-              produto: consignados.produto,
-              parcela: consignados.parcela,
-              valorLiquido: consignados.valorLiquido,
-            })
-            .from(consignados)
-            .where(sql`${consignados.nrOperacao} IN (${sql.join(semContrato.map(p => sql`${p}`), sql`, `)})`);
-          for (const c of consigRows) {
-            if (c.nrOperacao) {
-              // Normalizar juros: se > 1 já é percentual (ex: 4.75), senão é decimal (ex: 0.0475)
-              const jurosRaw = parseFloat(String(c.juros ?? 0));
-              const juros = jurosRaw > 1 ? jurosRaw / 100 : jurosRaw;
-              consigMap.set(c.nrOperacao, {
-                juros,
-                produto: c.produto ?? '',
-                parcela: c.parcela ?? 0,
-                valorLiquido: parseFloat(String(c.valorLiquido ?? 0)),
-              });
-            }
-          }
-        }
-      }
-
-      // ── Função para buscar percentual na tabela de comissões ────────────────
+      // ── 5. Funções de cálculo ───────────────────────────────────────────────
       function parsePct(v: any): number {
         if (v == null) return 0;
         const s = String(v).replace(',', '.').replace('%', '').trim();
@@ -786,50 +757,67 @@ export const febrabanRouter = {
         const prodNorm = produto.toUpperCase().trim();
         for (const tab of todasTabelas) {
           const conv = (tab.convenio ?? '').toUpperCase().trim();
-          // Verifica se o convênio bate com o produto (ou vice-versa)
           if (conv !== '' && !prodNorm.includes(conv) && !conv.includes(prodNorm)) continue;
-          // Verifica faixa de juros
           const jDe = parsePct(tab.txJurosDe);
           const jAte = parsePct(tab.txJurosAte);
           if (jAte > 0 && (juros < jDe || juros > jAte)) continue;
-          // Verifica faixa de prazo
           const mDe = parseInt(String(tab.mesesDe ?? 0)) || 0;
           const mAte = parseInt(String(tab.mesesAte ?? 999)) || 999;
           if (parcela < mDe || parcela > mAte) continue;
-          // Encontrou a linha — pegar percentual do ativo
-          const pct = parsePct((tab as any)[ativoCol]);
-          return pct;
+          return parsePct((tab as any)[ativoCol]);
         }
         return null;
       }
 
-      // ── Calcular comissão por operação ─────────────────────────────────────
-      const result = rows.map(r => {
-        const isContratada = (r.situacao ?? '').trim().toLowerCase() === 'contratada';
-        if (!isContratada) return { ...r, ativoCol, perspectivaComissao: 0, percentualUsado: null, produtoConsig: null };
+      // ── 6. Calcular comissão por contrato ──────────────────────────────────
+      const result = contratoRows.map(r => {
+        const febData = febMap.get(r.numeroProposta ?? '');
+        // Situação: prioridade Febraban > manual no contrato > 'Pendente'
+        const situacao = febData?.situacao || r.situacaoManual || 'Pendente';
 
-        // Prioridade: contrato PDF > consignado
-        const contrato = contratoMap.get(r.proposta ?? '');
-        const consig = consigMap.get(r.proposta ?? '');
-        const fonte = contrato ?? consig;
+        // Ignorar cancelados e pendentes
+        const isContratada = situacao.trim().toLowerCase() === 'contratada';
+
+        const jurosRaw = parseFloat(String(r.taxaMensalJuros ?? 0));
+        // taxaMensalJuros já está em % (ex: 1.85), normalizar para decimal
+        const jurosNorm = jurosRaw > 1 ? jurosRaw / 100 : jurosRaw;
+        const parcela = r.prazoMeses ?? 0;
+        const produto = r.linhaCredito ?? '';
+        const valorLiquido = parseFloat(String(r.valorSolicitado ?? 0));
+
         let perspectivaComissao: number | null = null;
         let percentualUsado: number | null = null;
-        let produtoConsig: string | null = null;
 
-        if (fonte && fonte.valorLiquido > 0) {
-          // Juros do contrato PDF já estão em percentual (ex: 4.75 = 4.75%)
-          // Normalizar para decimal para comparar com a tabela (que usa 0.0475)
-          const jurosNorm = fonte.juros > 1 ? fonte.juros / 100 : fonte.juros;
-          const pct = buscarPercentual(fonte.produto, jurosNorm, fonte.parcela);
+        if (isContratada && valorLiquido > 0 && jurosNorm > 0) {
+          const pct = buscarPercentual(produto, jurosNorm, parcela);
           percentualUsado = pct;
-          produtoConsig = fonte.produto;
-          perspectivaComissao = pct != null ? +(fonte.valorLiquido * pct / 100).toFixed(2) : null;
-        } else if (r.troco) {
-          // Fallback final: usar troco/financiado da Febraban sem juros → sem cálculo
-          perspectivaComissao = null;
+          perspectivaComissao = pct != null ? +(valorLiquido * pct / 100).toFixed(2) : null;
         }
 
-        return { ...r, ativoCol, perspectivaComissao, percentualUsado, produtoConsig };
+        return {
+          id: r.id,
+          proposta: r.numeroProposta ?? '',
+          linha: febData?.linha ?? r.linhaCredito ?? '',
+          situacao,
+          operador: r.chaveJOperador ?? '',
+          nomeOperador: r.nomeOperador ?? '',
+          nomeCliente: r.nomeCliente ?? '',
+          cpfCliente: r.cpfCliente ?? '',
+          solicitacao: febData?.solicitacao ?? (r.createdAt ? new Date(r.createdAt).toLocaleDateString('pt-BR') : ''),
+          prazo: febData?.prazo ?? (parcela ? `${parcela} meses` : ''),
+          troco: febData?.troco ?? String(valorLiquido),
+          financiado: febData?.financiado ?? String(valorLiquido),
+          empresa: r.empresa ?? '',
+          produtoConsig: produto,
+          taxaJuros: jurosRaw,
+          prazoMeses: parcela,
+          valorSolicitado: valorLiquido,
+          ativoCol,
+          perspectivaComissao,
+          percentualUsado,
+          temPdf: true,
+          temFebraban: !!febData,
+        };
       });
 
       return { rows: result, chaveJ: chaveJ ?? '', ativoCol };
