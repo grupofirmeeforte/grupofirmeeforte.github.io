@@ -355,10 +355,16 @@ export const contratosRouter = router({
 
       const resultado = rows.map(r => {
         const mailing = r.cpfCliente ? mailingMap.get(r.cpfCliente) : undefined;
+        // Combinar telefones do mailing com telefones manuais (sem duplicatas)
+        const telsMailing = mailing?.telefones ?? [];
+        const telsManuais = r.telefoneManuais
+          ? r.telefoneManuais.split(',').map((t: string) => t.trim()).filter(Boolean)
+          : [];
+        const todosTs = [...telsMailing, ...telsManuais.filter((t: string) => !telsMailing.includes(t))];
         return {
           ...r,
           elegivelRefin: calcularElegibilidadeRefin(r.dataPrimeiraParcela),
-          telefones: mailing?.telefones ?? [],
+          telefones: todosTs,
           cidade: mailing?.cidade ?? null,
           dtaNasc: mailing?.dtaNasc ?? null,
         };
@@ -400,10 +406,16 @@ export const contratosRouter = router({
         }
       }
 
+      // Combinar com telefones manuais
+      const telsManuais = row.telefoneManuais
+        ? row.telefoneManuais.split(',').map((t: string) => t.trim()).filter(Boolean)
+        : [];
+      const todosTs = [...telefones, ...telsManuais.filter((t: string) => !telefones.includes(t))];
+
       return {
         ...row,
         elegivelRefin: calcularElegibilidadeRefin(row.dataPrimeiraParcela),
-        telefones,
+        telefones: todosTs,
       };
     }),
 

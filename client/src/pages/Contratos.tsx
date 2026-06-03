@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
   Upload, Search, Phone, MapPin, FileText, CheckCircle,
-  AlertCircle, Clock, RefreshCw, TrendingUp, Users, Percent, PhoneOff, Copy
+  AlertCircle, Clock, RefreshCw, TrendingUp, Users, Percent, PhoneOff, Copy, Pencil, Check, X
 } from "lucide-react";
 import { useLocation } from "wouter";
 import PageHeader from "@/components/PageHeader";
@@ -123,6 +123,26 @@ export default function ContratosPage() {
   // Estado de exclusão com senha CEO
   const [deletandoId, setDeletandoId] = useState<number | null>(null);
   const [senhaCeo, setSenhaCeo] = useState('');
+
+  // Estado de edição inline de telefone
+  const [editTelId, setEditTelId] = useState<number | null>(null);
+  const [editTelVal, setEditTelVal] = useState('');
+
+  const abrirEditTel = (r: any) => {
+    setEditTelId(r.id);
+    setEditTelVal(r.telefoneManuais ?? '');
+  };
+
+  const salvarTelInline = async (id: number) => {
+    try {
+      await atualizarMutation.mutateAsync({ id, telefoneManuais: editTelVal });
+      toast.success('Telefone salvo!');
+      setEditTelId(null);
+      utils.contratos.listar.invalidate();
+    } catch {
+      toast.error('Erro ao salvar telefone.');
+    }
+  };
 
   const abrirEdicao = (r: any) => {
     setEditandoId(r.id);
@@ -511,23 +531,54 @@ export default function ContratosPage() {
                           <div className="text-slate-300 text-[10px]">{formatarMoeda(r.valorParcela)}</div>
                           <div className="text-slate-500 text-[9px]">{r.dataPrimeiraParcela ?? '—'}</div>
                         </td>
-                        {/* Mailing: Cidade + Telefones */}
+                        {/* Mailing: Cidade + Telefones (com edição inline) */}
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
                           {(r as any).cidade && <div className="text-slate-300 text-[10px] truncate" title={(r as any).cidade}>{(r as any).cidade}</div>}
-                          {(r as any).telefones?.length > 0 ? (
-                            <div className="flex flex-col gap-0.5">
-                              {((r as any).telefones as string[]).slice(0, 2).map((t: string, ti: number) => {
-                                const bloqueado = telefonesNaoPerturbe.has(t);
-                                return (
-                                  <span key={ti} className={`flex items-center gap-1 truncate text-[10px] ${bloqueado ? 'text-red-400' : 'text-green-300'}`}>
-                                    {bloqueado && <PhoneOff className="w-3 h-3 shrink-0" />}
-                                    {t}
-                                  </span>
-                                );
-                              })}
-                              {(r as any).telefones.length > 2 && <span className="text-slate-500 text-[9px]">+{(r as any).telefones.length - 2}</span>}
+                          {editTelId === r.id ? (
+                            <div className="flex flex-col gap-1 mt-0.5">
+                              <Input
+                                autoFocus
+                                value={editTelVal}
+                                onChange={e => setEditTelVal(e.target.value)}
+                                placeholder="(DD) 9XXXX-XXXX, ..."
+                                className="h-6 text-[10px] bg-slate-700 border-slate-500 text-white px-1.5 py-0"
+                                onKeyDown={e => {
+                                  if (e.key === 'Enter') salvarTelInline(r.id);
+                                  if (e.key === 'Escape') setEditTelId(null);
+                                }}
+                              />
+                              <div className="flex gap-1">
+                                <button onClick={() => salvarTelInline(r.id)} className="text-emerald-400 hover:text-emerald-300"><Check className="w-3 h-3" /></button>
+                                <button onClick={() => setEditTelId(null)} className="text-slate-500 hover:text-slate-300"><X className="w-3 h-3" /></button>
+                              </div>
                             </div>
-                          ) : <span className="text-slate-600 text-[10px]">—</span>}
+                          ) : (
+                            <div
+                              className="cursor-pointer group/tel"
+                              onClick={() => abrirEditTel(r)}
+                              title="Clique para adicionar/editar telefone"
+                            >
+                              {(r as any).telefones?.length > 0 ? (
+                                <div className="flex flex-col gap-0.5">
+                                  {((r as any).telefones as string[]).slice(0, 2).map((t: string, ti: number) => {
+                                    const bloqueado = telefonesNaoPerturbe.has(t);
+                                    return (
+                                      <span key={ti} className={`flex items-center gap-1 truncate text-[10px] ${bloqueado ? 'text-red-400' : 'text-green-300'}`}>
+                                        {bloqueado && <PhoneOff className="w-3 h-3 shrink-0" />}
+                                        {t}
+                                      </span>
+                                    );
+                                  })}
+                                  {(r as any).telefones.length > 2 && <span className="text-slate-500 text-[9px]">+{(r as any).telefones.length - 2}</span>}
+                                  <span className="text-slate-600 text-[9px] group-hover/tel:text-slate-400 flex items-center gap-0.5"><Pencil className="w-2.5 h-2.5" /> editar</span>
+                                </div>
+                              ) : (
+                                <span className="text-slate-600 text-[10px] flex items-center gap-1 group-hover/tel:text-cyan-400">
+                                  <Phone className="w-3 h-3" /> adicionar
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </td>
                         {/* Refin + Ações */}
                         <td className="px-2 py-1.5 text-center border-l border-slate-700">

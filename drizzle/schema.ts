@@ -1527,6 +1527,7 @@ export const contratos = mysqlTable("contratos", {
   nomeConvenio: varchar("nomeConvenio", { length: 150 }),
   dataPrimeiraParcela: varchar("dataPrimeiraParcela", { length: 20 }),
   dataUltimaParcela: varchar("dataUltimaParcela", { length: 20 }),
+  telefoneManuais: text("telefoneManuais"),                     // Telefones adicionados manualmente (separados por vírgula)
   agencia: varchar("agencia", { length: 20 }),                   // Agência bancária do cliente
   conta: varchar("conta", { length: 30 }),                       // Conta bancária do cliente
   // Rastreabilidade
