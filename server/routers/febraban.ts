@@ -709,16 +709,34 @@ export const febrabanRouter = {
 
       // ── 1. Buscar contratos PDF do agente no período vigente ────────────────
       // Fonte principal: tabela contratos (PDFs enviados) — todos têm PDF (fileKey NOT NULL)
-      // Filtrar apenas contratos do mês de referência (mesRef/anoRef) — não do período vigente completo
-      const inicioMesRef = new Date(anoRef, mesRef - 1, 1, 0, 0, 0, 0);
-      const fimMesRef = new Date(anoRef, mesRef, 0, 23, 59, 59, 999);
+      // Filtrar pelo período vigente usando dataContrato (data real do contrato extraída do PDF)
+      // Fallback: createdAt (data de importação) se dataContrato não estiver preenchido
+      // Período vigente: dataInicio (último dia útil mês anterior) → dataFim (penúltimo dia útil mês atual)
+
+      // Formatar dataInicio e dataFim como strings DD.MM.AAAA e DD/MM/AAAA para comparar com dataContrato (varchar)
+      const fmtDot = (d: Date) =>
+        `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
+      const fmtSlash = (d: Date) =>
+        `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
 
       const contratoConditions: any[] = [];
       if (chaveJ) contratoConditions.push(sql`UPPER(TRIM(${contratos.chaveJOperador})) = ${chaveJ.toUpperCase().trim()}`);
-      // Filtrar apenas contratos do mês atual de referência
-      contratoConditions.push(
-        sql`${contratos.createdAt} >= ${inicioMesRef} AND ${contratos.createdAt} <= ${fimMesRef}`
-      );
+
+      // Filtrar pelo período vigente:
+      // Se dataContrato preenchido: usar dataContrato (varchar DD.MM.AAAA ou DD/MM/AAAA)
+      // Se dataContrato nulo: usar createdAt como fallback, filtrado pelo período vigente
+      contratoConditions.push(sql`(
+        (
+          ${contratos.dataContrato} IS NOT NULL AND ${contratos.dataContrato} != '' AND (
+            STR_TO_DATE(${contratos.dataContrato}, '%d.%m.%Y') BETWEEN ${dataInicio} AND ${dataFim}
+            OR STR_TO_DATE(${contratos.dataContrato}, '%d/%m/%Y') BETWEEN ${dataInicio} AND ${dataFim}
+          )
+        )
+        OR (
+          (${contratos.dataContrato} IS NULL OR ${contratos.dataContrato} = '') AND
+          ${contratos.createdAt} BETWEEN ${dataInicio} AND ${dataFim}
+        )
+      )`);
 
       const contratoRows = await db
         .select({
@@ -734,6 +752,7 @@ export const febrabanRouter = {
           chaveJOperador: contratos.chaveJOperador,
           nomeOperador: contratos.nomeOperador,
           situacaoManual: contratos.situacao,
+          dataContrato: contratos.dataContrato,
           createdAt: contratos.createdAt,
         })
         .from(contratos)

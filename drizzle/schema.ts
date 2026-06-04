@@ -1525,6 +1525,7 @@ export const contratos = mysqlTable("contratos", {
   cpfCliente: varchar("cpfCliente", { length: 20 }),
   nrConvenio: varchar("nrConvenio", { length: 50 }),
   nomeConvenio: varchar("nomeConvenio", { length: 150 }),
+  dataContrato: varchar("dataContrato", { length: 20 }),               // Data do contrato extraída do PDF (DD.MM.AAAA ou DD/MM/AAAA)
   dataPrimeiraParcela: varchar("dataPrimeiraParcela", { length: 20 }),
   dataUltimaParcela: varchar("dataUltimaParcela", { length: 20 }),
   telefoneManuais: text("telefoneManuais"),                     // Telefones adicionados manualmente (separados por vírgula)

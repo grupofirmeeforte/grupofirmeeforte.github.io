@@ -49,6 +49,12 @@ function extrairDadosContrato(texto: string) {
   const nomeConvenio = campo(/Nome do convênio\s*\n([^\n]+)/i);
   const nrConvenio = campo(/Número do Convênio\s*\n(\d+)/i);
 
+  // Data do contrato (data de emissão/assinatura)
+  const dataContrato = campo(/Data de Emiss[aã]o:\s*([\d./]+)/i)
+    ?? campo(/Data do Contrato:\s*([\d./]+)/i)
+    ?? campo(/Data:\s*([\d]{2}[./][\d]{2}[./][\d]{4})/i)
+    ?? campo(/Emitido em:\s*([\d./]+)/i);
+
   // Datas das parcelas
   const dataPrimeiraParcela = campo(/Data do Débito da Primeira Parcela:\s*([\d.]+)/i);
   const dataUltimaParcela = campo(/Data do Débito Da Última Parcela:\s*([\d.]+)/i);
@@ -91,6 +97,7 @@ function extrairDadosContrato(texto: string) {
     cpfCliente,
     nrConvenio,
     nomeConvenio: nomeConvenio?.trim() ?? null,
+    dataContrato: dataContrato?.trim() ?? null,
     dataPrimeiraParcela,
     dataUltimaParcela,
     chaveJOperador,
@@ -179,6 +186,7 @@ export const contratosRouter = router({
         cpfCliente: dados?.cpfCliente ?? null,
         nrConvenio: dados?.nrConvenio ?? null,
         nomeConvenio: dados?.nomeConvenio ?? null,
+        dataContrato: dados?.dataContrato ?? null,
         dataPrimeiraParcela: dados?.dataPrimeiraParcela ?? null,
         dataUltimaParcela: dados?.dataUltimaParcela ?? null,
         chaveJOperador: dados?.chaveJOperador ?? null,
@@ -279,9 +287,10 @@ export const contratosRouter = router({
             cpfCliente: dados?.cpfCliente ?? null,
             nrConvenio: dados?.nrConvenio ?? null,
             nomeConvenio: dados?.nomeConvenio ?? null,
+            dataContrato: dados?.dataContrato ?? null,
             dataPrimeiraParcela: dados?.dataPrimeiraParcela ?? null,
             dataUltimaParcela: dados?.dataUltimaParcela ?? null,
-                        chaveJOperador: dados?.chaveJOperador ?? null,
+            chaveJOperador: dados?.chaveJOperador ?? null,
             nomeOperador: dados?.nomeOperador ?? null,
             empresa: dados?.empresa ?? null,
             agencia: dados?.agencia ?? null,
