@@ -1070,9 +1070,9 @@ export const appRouter = router({
                   .limit(1);
                 
                 if (agente) {
-                  // Preencher campos que vêm do agente (empresa SEMPRE do cadastro)
+                  // Preencher campos que vêm do agente (empresa e nomeAgente SEMPRE do cadastro)
                   processed.empresa = agente.empresa || undefined;
-                  if (!processed.nomeAgente) processed.nomeAgente = agente.nomeAgente || undefined;
+                  processed.nomeAgente = agente.nomeAgente || undefined;
                   if (!processed.supervisor) processed.supervisor = agente.supervisor || undefined;
                   
                   // Regra 1: Se RBM é zero ou vazio, Perc. Pago = 0%
