@@ -796,36 +796,31 @@ export const febrabanRouter = {
         return parseFloat(s) || 0;
       };
 
-      // Mapeamento de produto (linhaCredito) para convenio da tabela de comissao
-      // Baseado nos convenios cadastrados: 13 SALARIO, CONSIGNADO INSS, CONVENIOS BANCO DO BRASIL,
-      // CREDITO PESSOAL, FGTS, INSS, NAO CONSIGNADO, Portabilidade, TRABALHADOR, FEDERAL, etc.
-      const mapearConvenio = (produto: string): string => {
-        const p = produto.toUpperCase().trim();
-        if (p.includes('13') && (p.includes('SALARIO') || p.includes('SALÁRIO'))) return '13 SALARIO';
-        if (p.includes('FGTS') || p.includes('SAQUE ANIVERSARIO')) return 'FGTS';
-        if (p.includes('PORTABILIDADE') || p.includes('PORT')) return 'Portabilidade';
-        if (p.includes('CONSIG') || p.includes('CONSIGNACAO') || p.includes('CONSIGNAÇÃO') ||
-            p.includes('RENOVACAO') || p.includes('RENOVAÇÃO')) return 'CONSIGNADO INSS';
-        if (p.includes('CONVENIO') || p.includes('CONVÊNIO')) return 'CONVENIOS BANCO DO BRASIL';
-        if (p.includes('BENEFICIO') || p.includes('BENEFÍCIO') ||
-            p.includes('SALARIO') || p.includes('SALÁRIO') ||
-            p.includes('AUTOMATICO') || p.includes('AUTOMÁTICO') ||
-            p.includes('CREDITO') || p.includes('CRÉDITO')) return 'CONSIGNADO INSS';
-        return '';
+      // Normaliza string removendo acentos para comparacao
+      const normStr = (s: string): string =>
+        s.toUpperCase().trim()
+         .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+      // Verifica se o produto bate com o convenio da tabela.
+      // O campo convenio pode conter multiplos nomes separados por "/" ou ","
+      // Ex: "CONSIGNADO INSS / BB CREDITO CONSIGNACAO / BB RENOVACAO CONSIGNACAO"
+      const produtoBateConvenio = (produto: string, convenio: string): boolean => {
+        const prodNorm = normStr(produto);
+        // Separar convenio por "/" ou ","
+        const partes = convenio.split(/[/,]/).map(p => normStr(p)).filter(p => p.length > 0);
+        return partes.some(parte => {
+          // Match exato ou produto contem o nome do convenio
+          return prodNorm === parte || prodNorm.includes(parte) || parte.includes(prodNorm);
+        });
       };
 
       const buscarPercentual = (produto: string, juros: number, parcela: number): number | null => {
-        const convenioMapeado = mapearConvenio(produto);
-
         for (const tab of todasTabelas) {
-          const conv = (tab.convenio ?? '').toUpperCase().trim();
+          const conv = (tab.convenio ?? '').trim();
 
-          // Verificar match de convenio
-          if (conv !== '' && convenioMapeado !== '') {
-            if (conv !== convenioMapeado.toUpperCase()) continue;
-          } else if (conv !== '' && convenioMapeado === '') {
-            // Produto sem mapeamento: nao calcular (retornar null)
-            continue;
+          // Se o convenio esta definido, verificar se o produto bate
+          if (conv !== '') {
+            if (!produtoBateConvenio(produto, conv)) continue;
           }
 
           // Verificar taxa de juros (tabela em decimal, ex: 0.0185)
