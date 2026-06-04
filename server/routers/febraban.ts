@@ -665,7 +665,8 @@ export const febrabanRouter = {
       const chaveJ = input.chaveJ ?? chaveJLogado;
 
       // ── Calcular mês vigente: último dia útil do mês anterior → penúltimo dia útil do mês atual ──
-      // "Dia útil" = qualquer dia de segunda a sexta (feriados NÃO são considerados)
+      // "Dia útil" = segunda a sexta que NÃO seja feriado NACIONAL
+      // Feriados municipais/estaduais são ignorados
       let dataInicio: Date;
       let dataFim: Date;
 
@@ -676,10 +677,21 @@ export const febrabanRouter = {
       const mesAnteriorRef = mesRef === 1 ? 12 : mesRef - 1;
       const anoAnteriorRef = mesRef === 1 ? anoRef - 1 : anoRef;
 
-      // Dia útil = seg a sex (sem considerar feriados)
+      // Buscar apenas feriados NACIONAIS dos dois anos envolvidos
+      const feriadosRows = await db
+        .select({ data: feriados.data })
+        .from(feriados)
+        .where(sql`ano IN (${anoAnteriorRef}, ${anoRef}) AND tipo = 'nacional'`);
+      const feriadosSet = new Set(feriadosRows.map(f => f.data)); // formato DD/MM/AAAA
+
+      // Dia útil = seg a sex que não seja feriado nacional
       const isUtilDate = (d: Date): boolean => {
         const dow = d.getDay();
-        return dow !== 0 && dow !== 6;
+        if (dow === 0 || dow === 6) return false;
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return !feriadosSet.has(`${dd}/${mm}/${yyyy}`);
       };
 
       // Último dia útil do mês anterior
