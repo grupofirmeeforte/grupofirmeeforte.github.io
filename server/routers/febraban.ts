@@ -709,11 +709,15 @@ export const febrabanRouter = {
 
       // ── 1. Buscar contratos PDF do agente no período vigente ────────────────
       // Fonte principal: tabela contratos (PDFs enviados) — todos têm PDF (fileKey NOT NULL)
+      // Filtrar apenas contratos do mês de referência (mesRef/anoRef) — não do período vigente completo
+      const inicioMesRef = new Date(anoRef, mesRef - 1, 1, 0, 0, 0, 0);
+      const fimMesRef = new Date(anoRef, mesRef, 0, 23, 59, 59, 999);
+
       const contratoConditions: any[] = [];
       if (chaveJ) contratoConditions.push(sql`UPPER(TRIM(${contratos.chaveJOperador})) = ${chaveJ.toUpperCase().trim()}`);
-      // Filtrar pelo período vigente (último dia útil mês anterior → penúltimo dia útil mês atual)
+      // Filtrar apenas contratos do mês atual de referência
       contratoConditions.push(
-        sql`${contratos.createdAt} >= ${dataInicio} AND ${contratos.createdAt} <= ${dataFim}`
+        sql`${contratos.createdAt} >= ${inicioMesRef} AND ${contratos.createdAt} <= ${fimMesRef}`
       );
 
       const contratoRows = await db
@@ -792,51 +796,53 @@ export const febrabanRouter = {
         return parseFloat(s) || 0;
       };
 
-      // Tokeniza produto para match flexivel (ex: "CONSIGNADO INSS BB" -> ["CONSIGNADO","INSS","BB"])
-      const tokenizar = (s: string): string[] =>
-        s.toUpperCase().trim().split(/[\s\-\/,]+/).filter((p: string) => p.length > 2);
+      // Mapeamento de produto (linhaCredito) para convenio da tabela de comissao
+      // Baseado nos convenios cadastrados: 13 SALARIO, CONSIGNADO INSS, CONVENIOS BANCO DO BRASIL,
+      // CREDITO PESSOAL, FGTS, INSS, NAO CONSIGNADO, Portabilidade, TRABALHADOR, FEDERAL, etc.
+      const mapearConvenio = (produto: string): string => {
+        const p = produto.toUpperCase().trim();
+        if (p.includes('13') && (p.includes('SALARIO') || p.includes('SALÁRIO'))) return '13 SALARIO';
+        if (p.includes('FGTS') || p.includes('SAQUE ANIVERSARIO')) return 'FGTS';
+        if (p.includes('PORTABILIDADE') || p.includes('PORT')) return 'Portabilidade';
+        if (p.includes('CONSIG') || p.includes('CONSIGNACAO') || p.includes('CONSIGNAÇÃO') ||
+            p.includes('RENOVACAO') || p.includes('RENOVAÇÃO')) return 'CONSIGNADO INSS';
+        if (p.includes('CONVENIO') || p.includes('CONVÊNIO')) return 'CONVENIOS BANCO DO BRASIL';
+        if (p.includes('BENEFICIO') || p.includes('BENEFÍCIO') ||
+            p.includes('SALARIO') || p.includes('SALÁRIO') ||
+            p.includes('AUTOMATICO') || p.includes('AUTOMÁTICO') ||
+            p.includes('CREDITO') || p.includes('CRÉDITO')) return 'CONSIGNADO INSS';
+        return '';
+      };
 
       const buscarPercentual = (produto: string, juros: number, parcela: number): number | null => {
-        const prodNorm = produto.toUpperCase().trim();
+        const convenioMapeado = mapearConvenio(produto);
 
-        // Tentativa 1: match completo (convenio + juros + prazo)
         for (const tab of todasTabelas) {
           const conv = (tab.convenio ?? '').toUpperCase().trim();
-          if (conv !== '') {
-            const convTokens = tokenizar(conv);
-            const prodTokens = tokenizar(produto);
-            const match = convTokens.some((ct: string) => prodNorm.includes(ct)) ||
-                          prodTokens.some((pt: string) => conv.includes(pt));
-            if (!match) continue;
+
+          // Verificar match de convenio
+          if (conv !== '' && convenioMapeado !== '') {
+            if (conv !== convenioMapeado.toUpperCase()) continue;
+          } else if (conv !== '' && convenioMapeado === '') {
+            // Produto sem mapeamento: nao calcular (retornar null)
+            continue;
           }
+
+          // Verificar taxa de juros (tabela em decimal, ex: 0.0185)
           const jDe = parsePct(tab.txJurosDe);
           const jAte = parsePct(tab.txJurosAte);
           if (jAte > 0 && juros > 0 && (juros < jDe - 0.0001 || juros > jAte + 0.0001)) continue;
+
+          // Verificar prazo — OBRIGATORIO respeitar mesesDe e mesesAte
           const mDe = parseInt(String(tab.mesesDe ?? 0)) || 0;
-          const mAte = parseInt(String(tab.mesesAte ?? 999)) || 999;
-          if (parcela > 0 && (parcela < mDe || parcela > mAte)) continue;
+          const mAte = parseInt(String(tab.mesesAte ?? '999')) || 999;
+          if (parcela < mDe || parcela > mAte) continue;
+
           const pct = parsePct((tab as any)[ativoCol]);
           if (pct > 0) return pct;
         }
 
-        // Tentativa 2: apenas prazo (ignora convenio e juros)
-        if (parcela > 0) {
-          for (const tab of todasTabelas) {
-            const mDe = parseInt(String(tab.mesesDe ?? 0)) || 0;
-            const mAte = parseInt(String(tab.mesesAte ?? 999)) || 999;
-            if (parcela >= mDe && parcela <= mAte) {
-              const pct = parsePct((tab as any)[ativoCol]);
-              if (pct > 0) return pct;
-            }
-          }
-        }
-
-        // Tentativa 3: primeira linha da tabela (fallback)
-        if (todasTabelas.length > 0) {
-          const pct = parsePct((todasTabelas[0] as any)[ativoCol]);
-          if (pct > 0) return pct;
-        }
-
+        // Nenhuma linha da tabela bateu — sem comissao para este produto/prazo
         return null;
       };
 
