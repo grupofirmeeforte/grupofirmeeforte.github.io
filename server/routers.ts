@@ -1070,8 +1070,8 @@ export const appRouter = router({
                   .limit(1);
                 
                 if (agente) {
-                  // Preencher campos que vêm do agente
-                  if (!processed.empresa) processed.empresa = agente.empresa || undefined;
+                  // Preencher campos que vêm do agente (empresa SEMPRE do cadastro)
+                  processed.empresa = agente.empresa || undefined;
                   if (!processed.nomeAgente) processed.nomeAgente = agente.nomeAgente || undefined;
                   if (!processed.supervisor) processed.supervisor = agente.supervisor || undefined;
                   
