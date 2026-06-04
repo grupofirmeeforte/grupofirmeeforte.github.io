@@ -820,26 +820,29 @@ export const febrabanRouter = {
         s.toUpperCase().trim()
          .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-      // Verifica se o produto bate com o convenio da tabela.
-      // O campo convenio pode conter multiplos nomes separados por "/" ou ","
-      // Ex: "CONSIGNADO INSS / BB CREDITO CONSIGNACAO / BB RENOVACAO CONSIGNACAO"
-      const produtoBateConvenio = (produto: string, convenio: string): boolean => {
-        const prodNorm = normStr(produto);
-        // Separar convenio por "/" ou ","
-        const partes = convenio.split(/[/,]/).map(p => normStr(p)).filter(p => p.length > 0);
+      // Verifica se um valor bate com um campo que pode ter multiplos nomes separados por "/" ou ","
+      // Ex: empresa "BMF / FLEX" bate com "BRASIL MAIS FORTE LTDA" (contém BMF)
+      const bateMultiNome = (valor: string, campo: string): boolean => {
+        const valorNorm = normStr(valor);
+        const partes = campo.split(/[/,]/).map(p => normStr(p)).filter(p => p.length > 0);
         return partes.some(parte => {
-          // Match exato ou produto contem o nome do convenio
-          return prodNorm === parte || prodNorm.includes(parte) || parte.includes(prodNorm);
+          return valorNorm === parte || valorNorm.includes(parte) || parte.includes(valorNorm);
         });
       };
 
-      const buscarPercentual = (produto: string, juros: number, parcela: number): number | null => {
+      const buscarPercentual = (produto: string, juros: number, parcela: number, empresaContrato: string): number | null => {
         for (const tab of todasTabelas) {
           const conv = (tab.convenio ?? '').trim();
+          const tabEmpresa = (tab.empresa ?? '').trim();
+
+          // Se a empresa da tabela esta definida, verificar se bate com a empresa do contrato
+          if (tabEmpresa !== '' && empresaContrato !== '') {
+            if (!bateMultiNome(empresaContrato, tabEmpresa)) continue;
+          }
 
           // Se o convenio esta definido, verificar se o produto bate
           if (conv !== '') {
-            if (!produtoBateConvenio(produto, conv)) continue;
+            if (!bateMultiNome(produto, conv)) continue;
           }
 
           // Verificar taxa de juros (tabela em decimal, ex: 0.0185)
@@ -879,8 +882,9 @@ export const febrabanRouter = {
         let perspectivaComissao: number | null = null;
         let percentualUsado: number | null = null;
 
+        const empresaContrato = r.empresa ?? '';
         if (isContratada && valorLiquido > 0) {
-          const pct = buscarPercentual(produto, jurosNorm, parcela);
+          const pct = buscarPercentual(produto, jurosNorm, parcela, empresaContrato);
           percentualUsado = pct;
           // pct já é decimal (ex: 0.0082 = 0,82%), multiplicar direto pelo valor líquido
           perspectivaComissao = pct != null ? +(valorLiquido * pct).toFixed(2) : null;
