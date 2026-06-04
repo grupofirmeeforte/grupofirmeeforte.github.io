@@ -528,4 +528,61 @@ export const contratosRouter = router({
       await db.delete(contratos).where(eq(contratos.id, input.id));
       return { ok: true };
     }),
+
+  // Salvar telefone na Perspectiva de Ganho (com validação anti-duplicata por CPF)
+  salvarTelefone: protectedProcedure
+    .input(z.object({
+      contratoId: z.number(),
+      telefone: z.string().min(1),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Banco de dados indisponível');
+
+      // Normalizar telefone (apenas dígitos)
+      const telNorm = input.telefone.replace(/\D/g, '');
+      if (telNorm.length < 8) throw new TRPCError({ code: 'BAD_REQUEST', message: 'Telefone inválido.' });
+
+      // Buscar o contrato atual para obter o CPF
+      const [contratoAtual] = await db
+        .select({ id: contratos.id, cpfCliente: contratos.cpfCliente, telefoneManuais: contratos.telefoneManuais })
+        .from(contratos)
+        .where(eq(contratos.id, input.contratoId))
+        .limit(1);
+
+      if (!contratoAtual) throw new TRPCError({ code: 'NOT_FOUND', message: 'Contrato não encontrado.' });
+
+      const cpfAtual = contratoAtual.cpfCliente?.replace(/\D/g, '') || '';
+
+      // Verificar se o telefone já está em uso em outro CPF
+      if (telNorm) {
+        const todosContratos = await db
+          .select({ id: contratos.id, cpfCliente: contratos.cpfCliente, telefoneManuais: contratos.telefoneManuais })
+          .from(contratos)
+          .where(sql`${contratos.telefoneManuais} IS NOT NULL AND ${contratos.telefoneManuais} != ''`);
+
+        for (const c of todosContratos) {
+          if (c.id === input.contratoId) continue;
+          const cpfOutro = c.cpfCliente?.replace(/\D/g, '') || '';
+          if (cpfOutro === cpfAtual) continue; // mesmo CPF: permitido
+          const tels = (c.telefoneManuais || '').split(',').map(t => t.replace(/\D/g, '').trim()).filter(Boolean);
+          if (tels.includes(telNorm)) {
+            throw new TRPCError({ code: 'CONFLICT', message: 'Este telefone já está cadastrado para outro cliente.' });
+          }
+        }
+      }
+
+      // Adicionar telefone à lista (evitar duplicata no mesmo contrato)
+      const telsAtuais = (contratoAtual.telefoneManuais || '').split(',').map(t => t.trim()).filter(Boolean);
+      if (!telsAtuais.includes(input.telefone)) {
+        telsAtuais.push(input.telefone);
+      }
+
+      await db
+        .update(contratos)
+        .set({ telefoneManuais: telsAtuais.join(',') })
+        .where(eq(contratos.id, input.contratoId));
+
+      return { ok: true, telefones: telsAtuais };
+    }),
 });

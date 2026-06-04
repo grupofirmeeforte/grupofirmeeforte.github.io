@@ -758,10 +758,25 @@ export const febrabanRouter = {
           situacaoManual: contratos.situacao,
           dataContrato: contratos.dataContrato,
           createdAt: contratos.createdAt,
+          telefoneManuais: contratos.telefoneManuais,
         })
         .from(contratos)
         .where(and(...contratoConditions))
         .orderBy(desc(contratos.createdAt));
+
+      // ── 1b. Buscar propostas que já estão na Produção Consignado (já foram pagas) ──
+      // Se o nrOperacao do consignado bate com o numeroProposta do contrato, excluir da perspectiva
+      const propostasContratos = contratoRows.map(r => r.numeroProposta).filter(Boolean) as string[];
+      const propostasNoProdConsig = new Set<string>();
+      if (propostasContratos.length > 0) {
+        const consigRows = await db
+          .select({ nrOperacao: consignados.nrOperacao })
+          .from(consignados)
+          .where(sql`TRIM(${consignados.nrOperacao}) IN (${sql.join(propostasContratos.map(p => sql`${p.trim()}`), sql`, `)})`);
+        for (const c of consigRows) {
+          if (c.nrOperacao) propostasNoProdConsig.add(c.nrOperacao.trim());
+        }
+      }
 
       // ── 2. Cruzar com Febraban para obter situação ──────────────────────────
       const propostas = contratoRows.map(r => r.numeroProposta).filter(Boolean) as string[];
@@ -868,7 +883,13 @@ export const febrabanRouter = {
       };
 
       // ── 6. Calcular comissão por contrato ──────────────────────────────────
-      const result = contratoRows.map(r => {
+      // Filtrar contratos que já estão na Produção Consignado (já foram pagos)
+      const contratoRowsFiltrados = contratoRows.filter(r => {
+        const proposta = (r.numeroProposta ?? '').trim();
+        return !propostasNoProdConsig.has(proposta);
+      });
+
+      const result = contratoRowsFiltrados.map(r => {
         const febData = febMap.get(r.numeroProposta ?? '');
         // Situação: prioridade Febraban > manual no contrato > 'Pendente'
         const situacao = febData?.situacao || r.situacaoManual || 'Pendente';
@@ -882,12 +903,14 @@ export const febrabanRouter = {
         const parcela = r.prazoMeses ?? 0;
         const produto = r.linhaCredito ?? '';
         const valorLiquido = parseFloat(String(r.valorSolicitado ?? 0));
+        const temTelefone = !!(r.telefoneManuais && r.telefoneManuais.trim());
 
         let perspectivaComissao: number | null = null;
         let percentualUsado: number | null = null;
 
         const empresaContrato = r.empresa ?? '';
-        if (isContratada && valorLiquido > 0) {
+        // Comissão só é calculada se: contratada E tem telefone preenchido
+        if (isContratada && valorLiquido > 0 && temTelefone) {
           const pct = buscarPercentual(produto, jurosNorm, parcela, empresaContrato);
           percentualUsado = pct;
           // pct já é decimal (ex: 0.0082 = 0,82%), multiplicar direto pelo valor líquido
@@ -917,6 +940,8 @@ export const febrabanRouter = {
           percentualUsado,
           temPdf: true,
           temFebraban: !!febData,
+          telefoneManuais: r.telefoneManuais ?? '',
+          temTelefone,
         };
       });
 

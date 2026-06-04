@@ -281,13 +281,28 @@ function PerspectivadeGanho() {
     onSuccess: () => utils.febraban.perspectiva.invalidate(),
   });
 
+  // Mutation para salvar telefone
+  const salvarTelefoneMutation = trpc.contratos.salvarTelefone.useMutation({
+    onSuccess: () => { setEditandoTelefoneId(null); utils.febraban.perspectiva.invalidate(); },
+    onError: (err) => alert(err.message),
+  });
+
   // Estado de edição inline de situação
   const [editandoSituacaoId, setEditandoSituacaoId] = useState<number | null>(null);
   const [situacaoEditando, setSituacaoEditando] = useState('');
 
+  // Estado de edição inline de telefone
+  const [editandoTelefoneId, setEditandoTelefoneId] = useState<number | null>(null);
+  const [telefoneEditando, setTelefoneEditando] = useState('');
+
   const salvarSituacao = async (id: number) => {
     await atualizarMutation.mutateAsync({ id, situacao: situacaoEditando });
     setEditandoSituacaoId(null);
+  };
+
+  const salvarTelefone = async (id: number) => {
+    if (!telefoneEditando.trim()) return;
+    await salvarTelefoneMutation.mutateAsync({ contratoId: id, telefone: telefoneEditando.trim() });
   };
 
   const rows = data?.rows ?? [];
@@ -371,17 +386,18 @@ function PerspectivadeGanho() {
                   <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-right">Prazo</TableHead>
                   <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-right">Valor</TableHead>
                   <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-center">Fontes</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Telefone</TableHead>
                   <TableHead className="font-semibold text-amber-600 uppercase text-xs tracking-wide text-right bg-amber-50">% / Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-10 text-gray-400">Carregando...</TableCell>
+                    <TableCell colSpan={10} className="text-center py-10 text-gray-400">Carregando...</TableCell>
                   </TableRow>
                 ) : rows.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="text-center py-10 text-gray-400">
+                    <TableCell colSpan={10} className="text-center py-10 text-gray-400">
                       {periodoInicio && periodoFim
                         ? `Nenhum contrato PDF no período vigente (${periodoInicio} a ${periodoFim})`
                         : 'Nenhum contrato PDF encontrado'}
@@ -458,6 +474,43 @@ function PerspectivadeGanho() {
                           )}
                         </div>
                       </TableCell>
+                      {/* Célula de Telefone editável inline */}
+                      <TableCell>
+                        {editandoTelefoneId === row.id ? (
+                          <div className="flex items-center gap-1">
+                            <input
+                              autoFocus
+                              type="tel"
+                              value={telefoneEditando}
+                              onChange={e => setTelefoneEditando(e.target.value)}
+                              onKeyDown={e => { if (e.key === 'Enter') salvarTelefone(row.id); if (e.key === 'Escape') setEditandoTelefoneId(null); }}
+                              placeholder="(99) 99999-9999"
+                              className="text-xs border border-blue-400 rounded px-1.5 py-0.5 w-32 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                            <button
+                              onClick={() => salvarTelefone(row.id)}
+                              disabled={salvarTelefoneMutation.isPending}
+                              className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded hover:bg-green-700 disabled:opacity-50"
+                            >OK</button>
+                            <button
+                              onClick={() => setEditandoTelefoneId(null)}
+                              className="text-xs bg-gray-400 text-white px-1.5 py-0.5 rounded hover:bg-gray-500"
+                            >X</button>
+                          </div>
+                        ) : (
+                          <button
+                            title="Clique para adicionar telefone"
+                            onClick={() => { setEditandoTelefoneId(row.id); setTelefoneEditando(''); }}
+                            className="text-xs text-left hover:opacity-80 transition-opacity"
+                          >
+                            {row.telefoneManuais ? (
+                              <span className="text-green-700 font-medium">{row.telefoneManuais.split(',')[0]}</span>
+                            ) : (
+                              <span className="text-gray-400 italic">+ telefone</span>
+                            )}
+                          </button>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right font-bold text-amber-700 bg-amber-50">
                         {row.perspectivaComissao != null ? (
                           <div>
@@ -468,7 +521,9 @@ function PerspectivadeGanho() {
                           </div>
                         ) : (
                           <span className="text-gray-400 text-xs">
-                            {(row.situacao ?? '').toLowerCase() === 'contratada' ? 'sem tabela' : '—'}
+                            {(row.situacao ?? '').toLowerCase() === 'contratada'
+                              ? (row.telefoneManuais ? 'sem tabela' : 'aguard. telefone')
+                              : '—'}
                           </span>
                         )}
                       </TableCell>
