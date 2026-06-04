@@ -426,7 +426,7 @@ export default function Consignado() {
         const headers: string[] = data[headerRow].map(normalizeHeader);
 
         const colMap: Record<string, keyof FormData> = {
-          'empresa': 'empresa',
+          // 'empresa' removida: sempre preenchida automaticamente do cadastro de agentes pela chave J
           'mes': 'mes',
           'chave j': 'chaveJ', 'chave_j': 'chaveJ', 'chavej': 'chaveJ',
           'nome agente': 'nomeAgente', 'nomeagente': 'nomeAgente',
