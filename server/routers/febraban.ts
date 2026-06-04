@@ -665,6 +665,7 @@ export const febrabanRouter = {
       const chaveJ = input.chaveJ ?? chaveJLogado;
 
       // ── Calcular mês vigente: último dia útil do mês anterior → penúltimo dia útil do mês atual ──
+      // "Dia útil" = qualquer dia de segunda a sexta (feriados NÃO são considerados)
       let dataInicio: Date;
       let dataFim: Date;
 
@@ -675,20 +676,10 @@ export const febrabanRouter = {
       const mesAnteriorRef = mesRef === 1 ? 12 : mesRef - 1;
       const anoAnteriorRef = mesRef === 1 ? anoRef - 1 : anoRef;
 
-      // Buscar feriados dos dois anos envolvidos
-      const feriadosRows = await db
-        .select({ data: feriados.data })
-        .from(feriados)
-        .where(sql`ano IN (${anoAnteriorRef}, ${anoRef})`);
-      const feriadosSet = new Set(feriadosRows.map(f => f.data)); // formato DD/MM/AAAA
-
+      // Dia útil = seg a sex (sem considerar feriados)
       const isUtilDate = (d: Date): boolean => {
         const dow = d.getDay();
-        if (dow === 0 || dow === 6) return false;
-        const dd = String(d.getDate()).padStart(2, '0');
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const yyyy = d.getFullYear();
-        return !feriadosSet.has(`${dd}/${mm}/${yyyy}`);
+        return dow !== 0 && dow !== 6;
       };
 
       // Último dia útil do mês anterior
@@ -699,10 +690,11 @@ export const febrabanRouter = {
       dataInicio.setHours(0, 0, 0, 0);
 
       // Penúltimo dia útil do mês atual (mesRef)
+      // Algoritmo: achar o último dia útil (seg-sex), depois recuar exatamente 1 dia útil
       const ultimoDiaMesAtual = new Date(anoRef, mesRef, 0);
       cursor = new Date(ultimoDiaMesAtual);
       while (!isUtilDate(cursor)) { cursor.setDate(cursor.getDate() - 1); } // último dia útil
-      cursor.setDate(cursor.getDate() - 1);
+      cursor.setDate(cursor.getDate() - 1); // recua 1 dia corrido
       while (!isUtilDate(cursor)) { cursor.setDate(cursor.getDate() - 1); } // penúltimo dia útil
       dataFim = new Date(cursor);
       dataFim.setHours(23, 59, 59, 999);
