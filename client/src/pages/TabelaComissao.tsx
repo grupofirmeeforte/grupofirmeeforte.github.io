@@ -77,11 +77,13 @@ function EditableCell({
   onSave,
   isSaving,
   format = 'text',
+  renderDisplay,
 }: {
   value: string | null;
   onSave: (newValue: string) => void;
   isSaving: boolean;
   format?: 'text' | 'number' | 'percent';
+  renderDisplay?: (val: string | null) => React.ReactNode;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [tempValue, setTempValue] = useState(value || '');
@@ -147,6 +149,14 @@ function EditableCell({
   }
 
   const displayValue = format === 'percent' ? pct(value) : (value || '-');
+
+  if (renderDisplay) {
+    return (
+      <div onClick={handleStartEdit} className="cursor-pointer">
+        {renderDisplay(value)}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -798,18 +808,20 @@ export default function TabelaComissao() {
                         <td className="px-3 py-2 whitespace-nowrap">
                           <div className="flex items-center gap-1 text-xs mb-0.5">
                             {isAdminOuCeo ? (
+                              // Admin/CEO: sempre usa EditableCell para permitir digitar ex: "BMF / FLEX"
                               (() => {
                                 const eStyle = getEmpresaStyle(row.empresa);
-                                return eStyle ? (
-                                  <span
-                                    className={`inline-block px-2 py-0.5 rounded font-bold text-xs cursor-pointer ${eStyle.bg} ${eStyle.text} border ${eStyle.border}`}
-                                    onClick={() => handleCellSave(row.id, 'empresa', row.empresa || '')}
-                                    title="Clique para editar"
-                                  >
-                                    {row.empresa}
-                                  </span>
-                                ) : (
-                                  <EditableCell value={row.empresa} onSave={(v) => handleCellSave(row.id, 'empresa', v)} isSaving={savingCell === `${row.id}-empresa`} />
+                                return (
+                                  <EditableCell
+                                    value={row.empresa}
+                                    onSave={(v) => handleCellSave(row.id, 'empresa', v)}
+                                    isSaving={savingCell === `${row.id}-empresa`}
+                                    renderDisplay={(val) => eStyle ? (
+                                      <span className={`inline-block px-2 py-0.5 rounded font-bold text-xs cursor-pointer ${eStyle.bg} ${eStyle.text} border ${eStyle.border}`} title="Clique para editar">{val || '-'}</span>
+                                    ) : (
+                                      <span className="font-medium text-gray-800 cursor-pointer hover:underline" title="Clique para editar">{val || '-'}</span>
+                                    )}
+                                  />
                                 );
                               })()
                             ) : (
