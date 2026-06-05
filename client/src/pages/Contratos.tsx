@@ -343,22 +343,7 @@ export default function ContratosPage() {
                 />
               </div>
 
-              <div className="mt-4 flex items-center gap-3">
-                <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={substituirDuplicatas}
-                    onChange={e => setSubstituirDuplicatas(e.target.checked)}
-                    className="w-4 h-4 accent-emerald-500"
-                  />
-                  <span className="text-slate-300 text-sm">
-                    Substituir contratos duplicados (mesmo número de proposta)
-                  </span>
-                </label>
-              </div>
-              <p className="text-slate-500 text-xs mt-1 ml-6">
-                Marcado: reimporta e atualiza contratos já existentes. Desmarcado: contratos existentes são ignorados.
-              </p>
+
 
               {uploading && (
                 <div className="mt-6">
@@ -469,7 +454,7 @@ export default function ContratosPage() {
                     </tr>
                     <tr className="bg-slate-900 text-slate-400 text-[10px] uppercase">
                       <th className="px-2 py-1.5 text-left w-[160px]">Nº / Empresa</th>
-                      <th className="px-2 py-1.5 text-left w-[180px] border-l border-slate-700">Operador / Convênio</th>
+                      <th className="px-2 py-1.5 text-left w-[240px] border-l border-slate-700">Operador / Convênio</th>
                       <th className="px-2 py-1.5 text-left w-[180px] border-l border-slate-700">Nome / CPF / Nasc.</th>
                       <th className="px-2 py-1.5 text-left w-[100px] border-l border-slate-700">Agência / Conta</th>
                       <th className="px-2 py-1.5 text-left w-[160px] border-l border-slate-700">Taxa · Prazo · Parcela · 1ª Parc.</th>
@@ -497,7 +482,7 @@ export default function ContratosPage() {
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
                           <div className="text-purple-300 text-[11px] truncate" title={r.nomeOperador ?? ''}>{r.nomeOperador ?? r.chaveJOperador ?? '—'}</div>
                           <div className="text-slate-400 text-[10px] truncate" title={r.nomeConvenio ?? ''}>{r.nomeConvenio ?? '—'}</div>
-                          <div className="text-purple-200 text-[9px] truncate" title={r.linhaCredito ?? ''}>{r.linhaCredito ?? '—'}</div>
+                          <div className="text-purple-200 text-[9px] whitespace-normal break-words" title={r.linhaCredito ?? ''}>{r.linhaCredito ?? '—'}</div>
                         </td>
                         {/* Cliente + CPF + Nasc */}
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
