@@ -395,6 +395,21 @@ export const febrabanRouter = {
         if (row.proposta) existingMap.set(row.proposta.trim(), { id: row.id, pago: row.pago ?? 0 });
       }
 
+      // 3. Buscar empresa de cada operador no cadastro de agentes (em batch)
+      const operadoresUnicos = Array.from(new Set(validos.map(({ reg }) => reg.operador?.trim().toUpperCase()).filter(Boolean))) as string[];
+      const agentesEmpresaMap = new Map<string, string>();
+      if (operadoresUnicos.length > 0) {
+        const agentesRows = await db
+          .select({ chaveJ: agentes.chaveJ, empresa: agentes.empresa })
+          .from(agentes)
+          .where(sql`UPPER(TRIM(${agentes.chaveJ})) IN (${sql.join(operadoresUnicos.map(o => sql`${o}`), sql`, `)})`)
+        for (const a of agentesRows) {
+          if (a.chaveJ && a.empresa) {
+            agentesEmpresaMap.set(a.chaveJ.trim().toUpperCase(), a.empresa);
+          }
+        }
+      }
+
       // 3. Separar em inserts e updates
       const toInsert: any[] = [];
       const toUpdate: Array<{ proposta: string; values: any }> = [];
@@ -404,8 +419,10 @@ export const febrabanRouter = {
         const consigInfo = consignadosMap.get(reg.proposta!.trim());
         const pagoAuto = consigInfo ? (consigInfo.srcc ? 2 : 1) : 0;
 
+        // Empresa: sempre buscar do cadastro de agentes pela chave J; fallback para o que veio na planilha
+        const empresaCadastro = reg.operador ? agentesEmpresaMap.get(reg.operador.trim().toUpperCase()) : undefined;
         const values = {
-          empresa: reg.empresa,
+          empresa: empresaCadastro ?? reg.empresa,
           mesano: reg.mesano,
           linha: reg.linha,
           situacao: reg.situacao,
