@@ -620,9 +620,10 @@ export default function FebrabanPage() {
           let prazo: string | undefined;
 
           if (isNovoFormato) {
-            // Novo formato: Empresa, Mês/Ano, Operação, Produto, Situação, ChaveJ, Data, Prazo, Liquido, Bruto
+            // Novo formato: Mês/Ano, Operação, Produto, Situação, ChaveJ, Data, Prazo, Liquido, Bruto
+            // Empresa é sempre buscada automaticamente do cadastro de agentes pela chave J no backend
             propostaRaw = col(row, "OPERACAO") ?? col(row, "OPERAÇÃO");
-            empresa   = col(row, "EMPRESA") ? String(col(row, "EMPRESA")).trim() : undefined;
+            empresa   = undefined; // ignorar — backend busca pelo cadastro
             mesano    = toMesano(col(row, "MES/ANO") ?? col(row, "MÊS/ANO") ?? col(row, "MES/ANO"));
             linha     = col(row, "PRODUTO") ? (parseInt(String(col(row, "PRODUTO"))) || undefined) : undefined;
             situacao  = (() => { const v = col(row, "SITUACAO") ?? col(row, "SITUAÇÃO"); return v != null && v !== "" ? String(v).trim() : undefined; })();
@@ -634,9 +635,10 @@ export default function FebrabanPage() {
             // Liquido=0 significa FINANC NOVO → troco = financiado (mesmo valor)
             troco = (!liquidoRaw || liquidoRaw === 0) ? financiado : liquidoRaw;
           } else {
-            // Formato antigo: EMPRESA, MESANO, PROPOSTA, LINHA, SITUACAO, OPERADOR, SOLICITACAO, PRAZO, TROCO, FINANCIADO
+            // Formato antigo: MESANO, PROPOSTA, LINHA, SITUACAO, OPERADOR, SOLICITACAO, PRAZO, TROCO, FINANCIADO
+            // Empresa é sempre buscada automaticamente do cadastro de agentes pela chave J no backend
             propostaRaw = col(row, "PROPOSTA");
-            empresa   = col(row, "EMPRESA") ? String(col(row, "EMPRESA")).trim() : undefined;
+            empresa   = undefined; // ignorar — backend busca pelo cadastro
             const mesanoRaw = col(row, "MESANO");
             mesano    = mesanoRaw !== undefined && mesanoRaw !== "" ? (parseInt(String(mesanoRaw)) || undefined) : undefined;
             linha     = col(row, "LINHA") ? (parseInt(String(col(row, "LINHA"))) || undefined) : undefined;
