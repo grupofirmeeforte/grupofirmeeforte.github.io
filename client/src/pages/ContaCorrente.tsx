@@ -266,12 +266,26 @@ export default function ContaCorrente() {
         const contaVal = iContaCorrente !== -1 ? String(row[iContaCorrente] ?? "").trim() : "";
         if (!chaveJVal && !contaVal) continue;
 
-        // Empresa: se 0 ou vazio, usar "Não informado"
+        // Empresa: se 0 ou vazio, usar "NÃO INFORMADO"
         let empresaVal = iEmpresa !== -1 ? String(row[iEmpresa] ?? "").trim().toUpperCase() : "";
         if (!empresaVal || empresaVal === "0") empresaVal = "NÃO INFORMADO";
 
-        const mesAnoVal = toMesAno(iMesAno !== -1 ? row[iMesAno] : null);
-        const dataVal = toDate(iData !== -1 ? row[iData] : null);
+        // Data da operação para calcular mesAno automaticamente
+        const dataVal2 = toDate(iData !== -1 ? row[iData] : null);
+        // Calcular mesAno automaticamente pela data da operação usando regra do período vigente
+        let mesAnoVal = toMesAno(iMesAno !== -1 ? row[iMesAno] : null);
+        if (dataVal2 && dataVal2.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+          const [dd, mm, yyyy] = dataVal2.split("/").map(Number);
+          // Simplificado: dia >= 27 → próximo mês (penúltimo dia útil)
+          let mesRef = mm;
+          let anoRef = yyyy;
+          if (dd >= 27) {
+            mesRef = mm === 12 ? 1 : mm + 1;
+            anoRef = mm === 12 ? yyyy + 1 : yyyy;
+          }
+          mesAnoVal = String(mesRef).padStart(2, "0") + "/" + anoRef;
+        }
+        const dataVal = dataVal2 || toDate(iData !== -1 ? row[iData] : null);
 
         rows.push({
           empresa: empresaVal,
@@ -352,6 +366,17 @@ export default function ContaCorrente() {
           >
             <Calculator className={`w-4 h-4 ${calcularMutation.isPending ? "animate-pulse" : ""}`} />
             {calcularMutation.isPending ? "Calculando..." : "Calcular"}
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet([
+              ["Agência", "Conta Corrente", "Chave J", "Tipo Serv", "Data", "Produto", "Modalidade", "Ag Relacionamento", "RBM", "Comissão", "Supervisor"],
+              ["1091", "47707", "J9661460", "109", "15.06.2026", "1900", "1", "231", "25", "", "LUANA"],
+            ]);
+            XLSX.utils.book_append_sheet(wb, ws, "Conta Corrente");
+            XLSX.writeFile(wb, "MODELO_IMPORTACAO_CONTA_CORRENTE.xlsx");
+          }} className="gap-1 border-gray-400">
+            <Upload className="w-4 h-4" /> Baixar Template
           </Button>
           <Button size="sm" onClick={() => setImportModal(true)} className="gap-1">
             <Upload className="w-4 h-4" /> Importar Excel
@@ -650,7 +675,8 @@ export default function ContaCorrente() {
             </div>
             <div className="bg-blue-50 rounded-lg p-3 text-xs text-blue-700">
               <p className="font-semibold mb-1">Colunas esperadas na planilha:</p>
-              <p>Empresa | Mês Ano | Agência | Conta Corrente | Chave J | Agente | Tipo Serv | Data | Produto | Modalidade | RBM | Comissão | Supervisor</p>
+              <p>Agência | Conta Corrente | Chave J | Tipo Serv | Data | Produto | Modalidade | Ag Relacionamento | RBM | Comissão | Supervisor</p>
+              <p className="mt-1 text-blue-600">✓ Empresa, Mês/Ano e Agente são preenchidos automaticamente</p>
             </div>
             {importing && (
               <div>
