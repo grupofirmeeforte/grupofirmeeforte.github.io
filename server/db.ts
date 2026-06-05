@@ -517,16 +517,30 @@ export async function calcularPercPago(
     const jurosRaw = typeof juros === 'string' ? parseFloat(juros.replace(',', '.')) || 0 : juros;
     const jurosNum = jurosRaw > 1 ? jurosRaw / 100 : jurosRaw;
 
-    // Buscar todas as linhas da tabela para a empresa
-    const todasLinhas = await db.select().from(tabelasComissao)
-      .where(eq(tabelasComissao.empresa, empresa));
+    // Buscar todas as linhas da tabela — filtrar empresa em JS para suportar múltiplas empresas
+    // Ex: tabela cadastrada como "BMF / FLEX" deve bater com agente empresa "BMF" ou "FLEX"
+    const normStr = (s: string) =>
+      s.toUpperCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const bateEmpresa = (empresaAgente: string, empresaTabela: string): boolean => {
+      if (!empresaTabela || !empresaAgente) return true; // se tabela sem empresa, vale para todos
+      const agNorm = normStr(empresaAgente);
+      const partes = empresaTabela.split(/[\/,]/).map(p => normStr(p)).filter(p => p.length > 0);
+      return partes.some(parte => agNorm === parte || agNorm.includes(parte) || parte.includes(agNorm));
+    };
+    const todasLinhas = (await db.select().from(tabelasComissao))
+      .filter(t => bateEmpresa(empresa, t.empresa ?? ''));
 
-    // Filtrar por convênio: match exato ou descricaoProduto contém convenio ou vice-versa
+    // Filtrar por convênio: suporta múltiplos convênios separados por "/" ou ","
+    // Ex: tabela "CONSIGNADO INSS / CONSIGNADO PÚBLICO" deve bater com produto "CONSIGNADO INSS"
+    const bateConvenio = (descProduto: string, convenioTabela: string): boolean => {
+      if (!convenioTabela) return true; // sem convênio na tabela = vale para todos
+      const descNorm = normStr(descProduto);
+      const partes = convenioTabela.split(/[\/,]/).map(p => normStr(p)).filter(p => p.length > 0);
+      return partes.some(parte => descNorm === parte || descNorm.includes(parte) || parte.includes(descNorm));
+    };
     const linhasFiltradas = todasLinhas.filter(t => {
       if (!t.convenio) return false;
-      const conv = t.convenio.toUpperCase().trim();
-      const desc = (descricao || '').toUpperCase().trim();
-      return conv === desc || desc.includes(conv) || conv.includes(desc);
+      return bateConvenio(descricao || '', t.convenio);
     });
 
     // Filtrar por parcela e juros — ordenar por especificidade:
