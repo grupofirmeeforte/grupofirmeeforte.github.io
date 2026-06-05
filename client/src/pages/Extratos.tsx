@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,7 +7,8 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key, Calendar, TrendingUp, Construction, CheckCircle2, Clock, AlertTriangle, Search, Filter } from 'lucide-react';
+import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key, Calendar, TrendingUp, Construction, CheckCircle2, Clock, AlertTriangle, Search, Filter, Upload } from 'lucide-react';
+import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
 import PageHeader from "@/components/PageHeader";
 
@@ -271,6 +272,36 @@ function PerspectivadeGanho() {
   const chaveJEfetiva = isCeoOuAdmin && chaveJQuery ? chaveJQuery.toUpperCase().trim() : (chaveJReal || undefined);
 
   const utils = trpc.useUtils();
+  const uploadLoteMutation = trpc.contratos.uploadLote.useMutation();
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const fileParaBase64 = async (file: File): Promise<string> => {
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let bin = '';
+    for (let j = 0; j < bytes.byteLength; j++) bin += String.fromCharCode(bytes[j]);
+    return btoa(bin);
+  };
+
+  const handleUploadPdf = async (files: FileList) => {
+    const pdfs = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.pdf'));
+    if (pdfs.length === 0) { toast.error('Nenhum PDF selecionado'); return; }
+    setUploadingPdf(true);
+    try {
+      const arquivos = await Promise.all(pdfs.map(async (f) => ({ fileBase64: await fileParaBase64(f), nomeArquivo: f.name })));
+      const res = await uploadLoteMutation.mutateAsync({ arquivos, substituirDuplicatas: true });
+      if (res.erros > 0) toast.error(`Upload: ${res.ok} OK, ${res.erros} com erro`);
+      else toast.success(`${res.ok} contrato(s) importado(s) com sucesso!`);
+      utils.febraban.perspectiva.invalidate();
+    } catch (e: any) {
+      toast.error('Erro ao importar PDF: ' + (e?.message ?? 'desconhecido'));
+    } finally {
+      setUploadingPdf(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const { data, isLoading } = trpc.febraban.perspectiva.useQuery(
     { chaveJ: chaveJEfetiva },
     { enabled: isCeoOuAdmin ? true : !!chaveJReal }
@@ -364,6 +395,29 @@ function PerspectivadeGanho() {
           <span className="text-xs text-blue-500 ml-1">CEO/Admin: consulte qualquer agente</span>
         </div>
       )}
+
+      {/* Botão de upload de PDF */}
+      <div className="mb-3 flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+        <Upload className="w-4 h-4 text-emerald-600 shrink-0" />
+        <span className="text-xs text-emerald-700 font-medium">Importar contratos PDF do período:</span>
+        <Button
+          size="sm"
+          className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+          disabled={uploadingPdf}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {uploadingPdf ? 'Importando...' : '📄 Selecionar PDFs'}
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf"
+          multiple
+          className="hidden"
+          onChange={e => e.target.files && handleUploadPdf(e.target.files)}
+        />
+        <span className="text-xs text-emerald-500">Suporta múltiplos arquivos — substitui automaticamente duplicatas</span>
+      </div>
 
       {/* Nota de edição */}
       <div className="mb-3 text-xs text-gray-500 flex items-center gap-1">

@@ -743,21 +743,9 @@ export const febrabanRouter = {
       const contratoConditions: any[] = [];
       if (chaveJ) contratoConditions.push(sql`UPPER(TRIM(${contratos.chaveJOperador})) = ${chaveJ.toUpperCase().trim()}`);
 
-      // Filtrar pelo período vigente:
-      // Se dataContrato preenchido: usar dataContrato (varchar DD.MM.AAAA ou DD/MM/AAAA)
-      // Se dataContrato nulo: usar createdAt como fallback, filtrado pelo período vigente
-      contratoConditions.push(sql`(
-        (
-          ${contratos.dataContrato} IS NOT NULL AND ${contratos.dataContrato} != '' AND (
-            STR_TO_DATE(${contratos.dataContrato}, '%d.%m.%Y') BETWEEN ${dataInicio} AND ${dataFim}
-            OR STR_TO_DATE(${contratos.dataContrato}, '%d/%m/%Y') BETWEEN ${dataInicio} AND ${dataFim}
-          )
-        )
-        OR (
-          (${contratos.dataContrato} IS NULL OR ${contratos.dataContrato} = '') AND
-          ${contratos.createdAt} BETWEEN ${dataInicio} AND ${dataFim}
-        )
-      )`);
+      // Filtrar pelo período vigente usando createdAt (data de importação do PDF).
+      // Isso representa a produção do período: contratos importados dentro do período vigente.
+      contratoConditions.push(sql`${contratos.createdAt} BETWEEN ${dataInicio} AND ${dataFim}`);
 
       const contratoRows = await db
         .select({
