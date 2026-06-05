@@ -368,6 +368,71 @@ export const febrabanRouter = {
 
       const todasPropostas = validos.map(({ reg }) => reg.proposta!.trim());
 
+      // ── Calcular mesano automaticamente pela data de solicitação ──────────
+      // Regra: dado uma data DD/MM/AAAA, determinar a qual mês de referência ela pertence
+      // usando a lógica: último dia útil do mês anterior → penúltimo dia útil do mês atual
+      const anosEnvolvidos = new Set<number>();
+      for (const { reg } of validos) {
+        if (reg.solicitacao) {
+          const parts = reg.solicitacao.split('/');
+          if (parts.length === 3) {
+            const ano = parseInt(parts[2]);
+            if (!isNaN(ano)) { anosEnvolvidos.add(ano); anosEnvolvidos.add(ano - 1); }
+          }
+        }
+      }
+      const feriadosImport = anosEnvolvidos.size > 0
+        ? await db.select({ data: feriados.data }).from(feriados)
+            .where(sql`ano IN (${sql.join(Array.from(anosEnvolvidos).map(a => sql`${a}`), sql`, `)}) AND tipo = 'nacional'`)
+        : [];
+      const feriadosSetImport = new Set(feriadosImport.map(f => f.data));
+
+      const isUtilImport = (d: Date): boolean => {
+        const dow = d.getDay();
+        if (dow === 0 || dow === 6) return false;
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return !feriadosSetImport.has(`${dd}/${mm}/${yyyy}`);
+      };
+
+      // Dado uma data DD/MM/AAAA, retorna o mesano (ex: 626) do período vigente ao qual pertence
+      const calcMesano = (solicitacaoStr: string): number | undefined => {
+        const parts = solicitacaoStr.split('/');
+        if (parts.length !== 3) return undefined;
+        const dia = parseInt(parts[0]), mes = parseInt(parts[1]), ano = parseInt(parts[2]);
+        if (isNaN(dia) || isNaN(mes) || isNaN(ano)) return undefined;
+        const dataSolic = new Date(ano, mes - 1, dia);
+
+        for (let delta = -1; delta <= 2; delta++) {
+          let mesRef = mes + delta;
+          let anoRef = ano;
+          if (mesRef > 12) { mesRef -= 12; anoRef++; }
+          if (mesRef < 1) { mesRef += 12; anoRef--; }
+
+          const mesAnt = mesRef === 1 ? 12 : mesRef - 1;
+          const anoAnt = mesRef === 1 ? anoRef - 1 : anoRef;
+
+          // Último dia útil do mês anterior
+          let cursor = new Date(anoAnt, mesAnt, 0);
+          while (!isUtilImport(cursor)) cursor.setDate(cursor.getDate() - 1);
+          const inicio = new Date(cursor); inicio.setHours(0, 0, 0, 0);
+
+          // Penúltimo dia útil do mês atual
+          cursor = new Date(anoRef, mesRef, 0);
+          while (!isUtilImport(cursor)) cursor.setDate(cursor.getDate() - 1);
+          cursor.setDate(cursor.getDate() - 1);
+          while (!isUtilImport(cursor)) cursor.setDate(cursor.getDate() - 1);
+          const fim = new Date(cursor); fim.setHours(23, 59, 59, 999);
+
+          if (dataSolic >= inicio && dataSolic <= fim) {
+            const anoSuffix = String(anoRef).slice(-2);
+            return parseInt(`${mesRef}${anoSuffix}`);
+          }
+        }
+        return undefined;
+      };
+
       // 1. Buscar consignados em batch (1 query)
       const consignadosMap = new Map<string, { srcc: boolean }>();
       const consignadosRows = await db
@@ -423,7 +488,7 @@ export const febrabanRouter = {
         const empresaCadastro = reg.operador ? agentesEmpresaMap.get(reg.operador.trim().toUpperCase()) : undefined;
         const values = {
           empresa: empresaCadastro ?? reg.empresa,
-          mesano: reg.mesano,
+          mesano: reg.solicitacao ? (calcMesano(reg.solicitacao) ?? reg.mesano) : reg.mesano,
           linha: reg.linha,
           situacao: reg.situacao,
           operador: reg.operador,
