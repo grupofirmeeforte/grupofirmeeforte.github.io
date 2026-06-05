@@ -338,8 +338,8 @@ export default function Home() {
                 const Icon = grupo.icon;
                 const visibleSubs = (isAdminOuCeo
                   ? grupo.subModules
-                  : (isPromotor && grupo.key === 'painel')
-                    ? grupo.subModules  // Promotores sempre veem o Painel completo
+                  : (isPromotor && GRUPOS_PROMOTOR.includes(grupo.key))
+                    ? grupo.subModules  // Promotores sempre veem todos os módulos permitidos completos
                     : grupo.subModules.filter(m => !m.subKey || podeVer(grupo.key, m.subKey)))
                   .filter(m => !m.ceoOnly || isCEO)
                   .slice()
@@ -481,8 +481,8 @@ export default function Home() {
             {(() => {
               const subsVisiveis = (isAdminOuCeo
                 ? grupoAtual.subModules
-                : (isPromotor && grupoAtual.key === 'painel')
-                  ? grupoAtual.subModules  // Promotores sempre veem o Painel completo
+                : (isPromotor && GRUPOS_PROMOTOR.includes(grupoAtual.key))
+                  ? grupoAtual.subModules  // Promotores sempre veem todos os módulos permitidos completos
                   : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
                 .filter(m => !m.ceoOnly || isCEO);
               if (subsVisiveis.length === 0) return (
