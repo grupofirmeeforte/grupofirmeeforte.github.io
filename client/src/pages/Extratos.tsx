@@ -396,18 +396,15 @@ function PerspectivadeGanho() {
         </div>
       )}
 
-      {/* Botão de upload de PDF */}
-      <div className="mb-3 flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-        <Upload className="w-4 h-4 text-emerald-600 shrink-0" />
-        <span className="text-xs text-emerald-700 font-medium">Importar contratos PDF do período:</span>
-        <Button
-          size="sm"
-          className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-          disabled={uploadingPdf}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {uploadingPdf ? 'Importando...' : '📄 Selecionar PDFs'}
-        </Button>
+      {/* Área drag & drop de upload de PDF */}
+      <div
+        className={`mb-3 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+          uploadingPdf ? 'border-emerald-300 bg-emerald-50' : 'border-emerald-400 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-500'
+        }`}
+        onClick={() => !uploadingPdf && fileInputRef.current?.click()}
+        onDragOver={e => { e.preventDefault(); }}
+        onDrop={e => { e.preventDefault(); if (!uploadingPdf && e.dataTransfer.files) handleUploadPdf(e.dataTransfer.files); }}
+      >
         <input
           ref={fileInputRef}
           type="file"
@@ -416,7 +413,18 @@ function PerspectivadeGanho() {
           className="hidden"
           onChange={e => e.target.files && handleUploadPdf(e.target.files)}
         />
-        <span className="text-xs text-emerald-500">Suporta múltiplos arquivos — substitui automaticamente duplicatas</span>
+        {uploadingPdf ? (
+          <div className="flex items-center justify-center gap-2 text-emerald-600">
+            <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm font-medium">Importando contratos...</span>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-1">
+            <Upload className="w-7 h-7 text-emerald-500 mb-1" />
+            <span className="text-sm font-semibold text-emerald-700">Arraste os PDFs aqui ou clique para selecionar</span>
+            <span className="text-xs text-emerald-500">Suporta múltiplos arquivos — substitui automaticamente duplicatas</span>
+          </div>
+        )}
       </div>
 
       {/* Nota de edição */}
