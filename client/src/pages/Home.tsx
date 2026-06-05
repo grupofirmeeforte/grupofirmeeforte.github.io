@@ -338,7 +338,9 @@ export default function Home() {
                 const Icon = grupo.icon;
                 const visibleSubs = (isAdminOuCeo
                   ? grupo.subModules
-                  : grupo.subModules.filter(m => !m.subKey || podeVer(grupo.key, m.subKey)))
+                  : (isPromotor && grupo.key === 'painel')
+                    ? grupo.subModules  // Promotores sempre veem o Painel completo
+                    : grupo.subModules.filter(m => !m.subKey || podeVer(grupo.key, m.subKey)))
                   .filter(m => !m.ceoOnly || isCEO)
                   .slice()
                   .sort((a, b) => a.title.localeCompare(b.title, 'pt-BR'));
@@ -479,7 +481,9 @@ export default function Home() {
             {(() => {
               const subsVisiveis = (isAdminOuCeo
                 ? grupoAtual.subModules
-                : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
+                : (isPromotor && grupoAtual.key === 'painel')
+                  ? grupoAtual.subModules  // Promotores sempre veem o Painel completo
+                  : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
                 .filter(m => !m.ceoOnly || isCEO);
               if (subsVisiveis.length === 0) return (
                 <div className="text-center py-8 text-slate-400">
