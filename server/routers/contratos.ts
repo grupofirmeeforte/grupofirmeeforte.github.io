@@ -23,9 +23,33 @@ function extrairDadosContrato(texto: string) {
   // Formato real: campos na mesma linha separados por espaço
   const numeroProposta = campo(/Número da proposta:\s*(\d+)/i);
 
-  const linhaCreditoRaw = campo(/Linha de crédito:\s*([^\n]+)/i);
-  // Remove o texto após "Mês(Meses)" se vier na mesma linha
-  const linhaCredito = linhaCreditoRaw?.replace(/\s*Mês\(Meses\).*$/i, '').trim() ?? null;
+  // Linha de crédito: no PDF com layout em colunas, o valor pode estar
+  // na linha ANTERIOR ao label (coluna esquerda) e continuar na linha POSTERIOR (coluna direita)
+  // Exemplo: "BB CRED CONSIG NÃO\nLinha de crédito: [espaços] Mês(Meses)...\n[espaços]CORRENTISTA"
+  let linhaCredito: string | null = null;
+  {
+    const linhas = texto.split('\n');
+    const idxLabel = linhas.findIndex(l => /Linha de crédito:/i.test(l));
+    if (idxLabel >= 0) {
+      // Parte 1: linha anterior ao label (texto antes do label na coluna esquerda)
+      const linhaBefore = idxLabel > 0 ? linhas[idxLabel - 1].trim() : '';
+      // Parte 2: linha posterior ao label (continuação na coluna direita)
+      const linhaAfter = idxLabel < linhas.length - 1 ? linhas[idxLabel + 1].trim() : '';
+      // Parte 3: mesmo label pode ter valor na mesma linha (formato simples)
+      const mesmLinha = linhas[idxLabel].replace(/Linha de crédito:/i, '').replace(/Mês\(Meses\).*/i, '').trim();
+      // Montar: prioriza parte antes + depois; se não houver, usa mesma linha
+      const partes: string[] = [];
+      if (linhaBefore && !/^\d+$/.test(linhaBefore) && !/Proposta|CPF|Operador|Chave|Correspondente|Loja|Agência|Conta/i.test(linhaBefore)) {
+        partes.push(linhaBefore);
+      }
+      if (mesmLinha) partes.push(mesmLinha);
+      if (linhaAfter && !/^\d+$/.test(linhaAfter) && !/Valor|Taxa|Prazo|IOF|Parcela|Data|Quantidade|Mês/i.test(linhaAfter)) {
+        partes.push(linhaAfter);
+      }
+      const combined = partes.join(' ').trim();
+      linhaCredito = combined || null;
+    }
+  }
 
   const taxaMensalStr = campo(/Taxa Mensal de Juros\s*\(%\):\s*([\d,]+)%?/i);
   const taxaMensalJuros = num(taxaMensalStr);
