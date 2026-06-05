@@ -116,6 +116,7 @@ export default function Consignado() {
   const [filtroMes, setFiltroMes] = useState('');
   const [filtroEmpresa, setFiltroEmpresa] = useState('');
   const [filtroBusca, setFiltroBusca] = useState('');
+  const [filtroZerado, setFiltroZerado] = useState<'todos' | 'rbm_zerado' | 'comissao_zerada' | 'ambos_zerados'>('todos');
   const [mostrarTotalizador, setMostrarTotalizador] = useState(true);
   const [mesAnoTotalizador, setMesAnoTotalizador] = useState('');
   const [empresaTotalizador, setEmpresaTotalizador] = useState('');
@@ -498,12 +499,25 @@ export default function Consignado() {
   }
 
   const registrosFiltrados = registros.filter(r => {
-    if (!filtroBusca) return true;
-    const b = filtroBusca.toLowerCase();
-    return (r.nomeAgente || '').toLowerCase().includes(b)
-      || (r.chaveJ || '').toLowerCase().includes(b)
-      || (r.convenio || '').toLowerCase().includes(b)
-      || (r.nrOperacao || '').toLowerCase().includes(b);
+    if (filtroBusca) {
+      const b = filtroBusca.toLowerCase();
+      if (!((r.nomeAgente || '').toLowerCase().includes(b)
+        || (r.chaveJ || '').toLowerCase().includes(b)
+        || (r.convenio || '').toLowerCase().includes(b)
+        || (r.nrOperacao || '').toLowerCase().includes(b))) return false;
+    }
+    if (filtroZerado === 'rbm_zerado') {
+      const rbm = parseFloat(r.rbm || '0') || 0;
+      if (rbm !== 0) return false;
+    } else if (filtroZerado === 'comissao_zerada') {
+      const com = parseFloat(r.totalComissao || '0') || 0;
+      if (com !== 0) return false;
+    } else if (filtroZerado === 'ambos_zerados') {
+      const rbm = parseFloat(r.rbm || '0') || 0;
+      const com = parseFloat(r.totalComissao || '0') || 0;
+      if (rbm !== 0 || com !== 0) return false;
+    }
+    return true;
   });
 
   // Totalizadores
@@ -685,8 +699,20 @@ export default function Consignado() {
             />
           </div>
 
-          {(filtroMes || filtroEmpresa || filtroBusca) && (
-            <Button variant="ghost" size="sm" onClick={() => { setFiltroMes(''); setFiltroEmpresa(''); setFiltroBusca(''); }}>
+          <Select value={filtroZerado} onValueChange={v => setFiltroZerado(v as any)}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Comissões" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="rbm_zerado">RBM zerado</SelectItem>
+              <SelectItem value="comissao_zerada">Comissão zerada</SelectItem>
+              <SelectItem value="ambos_zerados">RBM e Comissão zerados</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {(filtroMes || filtroEmpresa || filtroBusca || filtroZerado !== 'todos') && (
+            <Button variant="ghost" size="sm" onClick={() => { setFiltroMes(''); setFiltroEmpresa(''); setFiltroBusca(''); setFiltroZerado('todos'); }}>
               <X className="w-4 h-4 mr-1" /> Limpar
             </Button>
           )}
