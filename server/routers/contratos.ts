@@ -271,10 +271,25 @@ export const contratosRouter = router({
           }
 
           // Regras de duplicata:
-          // - Mesmo CPF + mesma linha + mesma proposta = duplicata (substitui se solicitado)
-          // - Mesmo CPF + mesma linha + proposta diferente = bloqueia (contrato diferente, não entra)
-          // - Mesmo CPF + linha diferente = permite (produto diferente)
-          if (dados?.cpfCliente && dados?.linhaCredito) {
+          // - Mesmo número de proposta = duplicata (substitui se solicitado, senão ignora)
+          // - Mesmo CPF + mesma linha de crédito (mas proposta diferente) = bloqueia
+          if (dados?.numeroProposta) {
+            const [existenteProposta] = await db
+              .select({ id: contratos.id, numeroProposta: contratos.numeroProposta })
+              .from(contratos)
+              .where(eq(contratos.numeroProposta, dados.numeroProposta))
+              .limit(1);
+
+            if (existenteProposta) {
+              // Mesma proposta: substitui se solicitado, senão ignora
+              if (!input.substituirDuplicatas) {
+                duplicatas++;
+                return { nome: arq.nomeArquivo, status: 'duplicata' };
+              }
+              await db.delete(contratos).where(eq(contratos.id, existenteProposta.id));
+            }
+          } else if (dados?.cpfCliente && dados?.linhaCredito) {
+            // Sem número de proposta: usa CPF + linha de crédito como chave
             const [existente] = await db
               .select({ id: contratos.id, numeroProposta: contratos.numeroProposta })
               .from(contratos)
@@ -287,19 +302,11 @@ export const contratosRouter = router({
               .limit(1);
 
             if (existente) {
-              const mesmaPropoosta = existente.numeroProposta === dados.numeroProposta;
-              if (mesmaPropoosta) {
-                // Duplicata exata: substitui se solicitado, senão ignora
-                if (!input.substituirDuplicatas) {
-                  duplicatas++;
-                  return { nome: arq.nomeArquivo, status: 'duplicata' };
-                }
-                await db.delete(contratos).where(eq(contratos.id, existente.id));
-              } else {
-                // Mesmo CPF + mesma linha mas proposta diferente: bloqueia sempre
+              if (!input.substituirDuplicatas) {
                 duplicatas++;
                 return { nome: arq.nomeArquivo, status: 'duplicata' };
               }
+              await db.delete(contratos).where(eq(contratos.id, existente.id));
             }
           }
 
