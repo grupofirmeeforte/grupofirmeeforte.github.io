@@ -23,31 +23,45 @@ function extrairDadosContrato(texto: string) {
   // Formato real: campos na mesma linha separados por espaço
   const numeroProposta = campo(/Número da proposta:\s*(\d+)/i);
 
-  // Linha de crédito: no PDF com layout em colunas, o valor pode estar
-  // na linha ANTERIOR ao label (coluna esquerda) e continuar na linha POSTERIOR (coluna direita)
-  // Exemplo: "BB CRED CONSIG NÃO\nLinha de crédito: [espaços] Mês(Meses)...\n[espaços]CORRENTISTA"
+  // Linha de crédito: o PDF pode ter o valor em múltiplas linhas após o label
+  // Formato 1 (sem layout): "Linha de crédito:\n\nBB CRED CONSIG NÃO\nCORRENTISTA\n\nMês(Meses)..."
+  // Formato 2 (com layout em colunas): "BB CRED CONSIG NÃO\nLinha de crédito: [espaços] Mês(Meses)...\n[espaços]CORRENTISTA"
   let linhaCredito: string | null = null;
   {
     const linhas = texto.split('\n');
-    const idxLabel = linhas.findIndex(l => /Linha de crédito:/i.test(l));
+    const idxLabel = linhas.findIndex(l => /Linha de cr[eé]dito:/i.test(l));
     if (idxLabel >= 0) {
-      // Parte 1: linha anterior ao label (texto antes do label na coluna esquerda)
-      const linhaBefore = idxLabel > 0 ? linhas[idxLabel - 1].trim() : '';
-      // Parte 2: linha posterior ao label (continuação na coluna direita)
-      const linhaAfter = idxLabel < linhas.length - 1 ? linhas[idxLabel + 1].trim() : '';
-      // Parte 3: mesmo label pode ter valor na mesma linha (formato simples)
-      const mesmLinha = linhas[idxLabel].replace(/Linha de crédito:/i, '').replace(/Mês\(Meses\).*/i, '').trim();
-      // Montar: prioriza parte antes + depois; se não houver, usa mesma linha
-      const partes: string[] = [];
-      if (linhaBefore && !/^\d+$/.test(linhaBefore) && !/Proposta|CPF|Operador|Chave|Correspondente|Loja|Agência|Conta/i.test(linhaBefore)) {
-        partes.push(linhaBefore);
+      // Verificar se o valor está na mesma linha do label
+      const mesmLinha = linhas[idxLabel].replace(/Linha de cr[eé]dito:/i, '').replace(/M[eê]s\(Meses\).*/i, '').trim();
+      
+      if (mesmLinha) {
+        // Formato simples: valor na mesma linha
+        linhaCredito = mesmLinha;
+      } else {
+        // Formato multi-linha: coletar linhas não-vazias após o label até encontrar campo conhecido
+        const stopWords = /M[eê]s\(Meses\)|Valor solicitado|Taxa Mensal|Prazo em Meses|IOF|Parcela|Data do D[eé]bito|Quantidade/i;
+        const partes: string[] = [];
+        for (let j = idxLabel + 1; j < Math.min(idxLabel + 6, linhas.length); j++) {
+          const linha = linhas[j].trim();
+          if (stopWords.test(linha)) break;
+          if (linha) partes.push(linha);
+        }
+        // Também verificar linha ANTES do label (layout em colunas)
+        if (partes.length === 0 && idxLabel > 0) {
+          const linhaBefore = linhas[idxLabel - 1].trim();
+          if (linhaBefore && !/^\d+$/.test(linhaBefore) && !/Proposta|CPF|Operador|Chave|Correspondente|Loja|Ag[eê]ncia|Conta/i.test(linhaBefore)) {
+            partes.unshift(linhaBefore);
+          }
+          // Linha após (continuação na coluna direita)
+          if (idxLabel < linhas.length - 1) {
+            const linhaAfter = linhas[idxLabel + 1].trim();
+            if (linhaAfter && !stopWords.test(linhaAfter) && !/^\d+$/.test(linhaAfter)) {
+              partes.push(linhaAfter);
+            }
+          }
+        }
+        linhaCredito = partes.join(' ').trim() || null;
       }
-      if (mesmLinha) partes.push(mesmLinha);
-      if (linhaAfter && !/^\d+$/.test(linhaAfter) && !/Valor|Taxa|Prazo|IOF|Parcela|Data|Quantidade|Mês/i.test(linhaAfter)) {
-        partes.push(linhaAfter);
-      }
-      const combined = partes.join(' ').trim();
-      linhaCredito = combined || null;
     }
   }
 
