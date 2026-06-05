@@ -734,17 +734,8 @@ export const febrabanRouter = {
       // Fallback: createdAt (data de importação) se dataContrato não estiver preenchido
       // Período vigente: dataInicio (último dia útil mês anterior) → dataFim (penúltimo dia útil mês atual)
 
-      // Formatar dataInicio e dataFim como strings DD.MM.AAAA e DD/MM/AAAA para comparar com dataContrato (varchar)
-      const fmtDot = (d: Date) =>
-        `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;
-      const fmtSlash = (d: Date) =>
-        `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-
       const contratoConditions: any[] = [];
       if (chaveJ) contratoConditions.push(sql`UPPER(TRIM(${contratos.chaveJOperador})) = ${chaveJ.toUpperCase().trim()}`);
-
-      // Filtrar pelo período vigente usando createdAt (data de importação do PDF).
-      // Isso representa a produção do período: contratos importados dentro do período vigente.
       contratoConditions.push(sql`${contratos.createdAt} BETWEEN ${dataInicio} AND ${dataFim}`);
 
       const contratoRows = await db
