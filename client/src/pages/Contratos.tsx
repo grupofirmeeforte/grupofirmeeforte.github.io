@@ -327,8 +327,30 @@ export default function ContratosPage() {
               <div
                 className="border-2 border-dashed border-slate-600 rounded-xl p-12 text-center cursor-pointer hover:border-emerald-500 transition-colors"
                 onClick={() => fileInputRef.current?.click()}
-                onDragOver={e => e.preventDefault()}
-                onDrop={e => { e.preventDefault(); if (e.dataTransfer.files) handleUpload(e.dataTransfer.files); }}
+                onDragOver={e => { e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = 'copy'; }}
+                onDragEnter={e => { e.preventDefault(); e.stopPropagation(); }}
+                onDrop={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const files = e.dataTransfer.files;
+                  if (files && files.length > 0) {
+                    handleUpload(files);
+                  } else {
+                    // Tentar via items API
+                    const items = e.dataTransfer.items;
+                    if (items && items.length > 0) {
+                      const dt = new DataTransfer();
+                      for (let i = 0; i < items.length; i++) {
+                        const file = items[i].getAsFile();
+                        if (file) dt.items.add(file);
+                      }
+                      if (dt.files.length > 0) handleUpload(dt.files);
+                      else toast.error('Nenhum PDF selecionado');
+                    } else {
+                      toast.error('Nenhum PDF selecionado');
+                    }
+                  }
+                }}
               >
                 <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
                 <p className="text-white font-medium text-lg mb-1">Arraste os PDFs aqui ou clique para selecionar</p>

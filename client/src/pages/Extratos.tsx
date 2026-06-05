@@ -402,8 +402,27 @@ function PerspectivadeGanho() {
           uploadingPdf ? 'border-emerald-300 bg-emerald-50' : 'border-emerald-400 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-500'
         }`}
         onClick={() => !uploadingPdf && fileInputRef.current?.click()}
-        onDragOver={e => { e.preventDefault(); }}
-        onDrop={e => { e.preventDefault(); if (!uploadingPdf && e.dataTransfer.files) handleUploadPdf(e.dataTransfer.files); }}
+        onDragOver={e => { e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = 'copy'; }}
+        onDragEnter={e => { e.preventDefault(); e.stopPropagation(); }}
+        onDrop={e => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (uploadingPdf) return;
+          const files = e.dataTransfer.files;
+          if (files && files.length > 0) {
+            handleUploadPdf(files);
+          } else {
+            const items = e.dataTransfer.items;
+            if (items && items.length > 0) {
+              const dt = new DataTransfer();
+              for (let i = 0; i < items.length; i++) {
+                const file = items[i].getAsFile();
+                if (file) dt.items.add(file);
+              }
+              if (dt.files.length > 0) handleUploadPdf(dt.files);
+            }
+          }
+        }}
       >
         <input
           ref={fileInputRef}
