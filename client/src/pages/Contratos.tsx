@@ -32,7 +32,7 @@ export default function ContratosPage() {
   const [filtroAgencia, setFiltroAgencia] = useState('');
   const [showContatosDetalhe, setShowContatosDetalhe] = useState(false);
   const [apenasElegiveis, setApenasElegiveis] = useState(false);
-  const [substituirDuplicatas, setSubstituirDuplicatas] = useState(false);
+  const [substituirDuplicatas, setSubstituirDuplicatas] = useState(true);
   const [page, setPage] = useState(1);
 
   // Buscar nomes de agências BB para exibir tooltip no filtro
@@ -352,12 +352,12 @@ export default function ContratosPage() {
                     className="w-4 h-4 accent-emerald-500"
                   />
                   <span className="text-slate-300 text-sm">
-                    Substituir contratos duplicados (mesmo CPF + mesma linha de crédito + mesma proposta)
+                    Substituir contratos duplicados (mesmo número de proposta)
                   </span>
                 </label>
               </div>
               <p className="text-slate-500 text-xs mt-1 ml-6">
-                Sem esta opção, contratos já existentes são ignorados automaticamente.
+                Marcado: reimporta e atualiza contratos já existentes. Desmarcado: contratos existentes são ignorados.
               </p>
 
               {uploading && (
