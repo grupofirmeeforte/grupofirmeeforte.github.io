@@ -401,7 +401,7 @@ function PerspectivadeGanho() {
   );
 
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const fmtPct = (v: number) => `${v.toFixed(3).replace('.', ',')}%`;
+  const fmtPct = (v: number) => `${parseFloat(v.toFixed(2)).toString().replace('.', ',')}%`;
 
   return (
     <div>
