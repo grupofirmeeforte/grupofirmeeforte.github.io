@@ -799,9 +799,9 @@ export const febrabanRouter = {
       // Fallback: createdAt (data de importação) se dataContrato não estiver preenchido
       // Período vigente: dataInicio (último dia útil mês anterior) → dataFim (penúltimo dia útil mês atual)
 
+      // Buscar contratos do agente sem filtro de data (filtro de período será aplicado após cruzar com Febraban)
       const contratoConditions: any[] = [];
       if (chaveJ) contratoConditions.push(sql`UPPER(TRIM(${contratos.chaveJOperador})) = ${chaveJ.toUpperCase().trim()}`);
-      contratoConditions.push(sql`${contratos.createdAt} BETWEEN ${dataInicio} AND ${dataFim}`);
 
       const contratoRows = await db
         .select({
@@ -822,7 +822,7 @@ export const febrabanRouter = {
           telefoneManuais: contratos.telefoneManuais,
         })
         .from(contratos)
-        .where(and(...contratoConditions))
+        .where(contratoConditions.length > 0 ? and(...contratoConditions) : undefined)
         .orderBy(desc(contratos.createdAt));
 
       // ── 1b. Buscar propostas que já estão na Produção Consignado (já foram pagas) ──
@@ -943,11 +943,44 @@ export const febrabanRouter = {
         return null;
       };
 
-      // ── 6. Calcular comissão por contrato ──────────────────────────────────
-      // Filtrar contratos que já estão na Produção Consignado (já foram pagos)
+      // ── 6. Filtrar contratos pelo período vigente usando data do Febraban ou dataContrato ──
+      // Prioridade: data de solicitação do Febraban > dataContrato do PDF > createdAt (importação)
+      const parseDateBR = (s: string): Date | null => {
+        if (!s) return null;
+        const parts = s.split('/');
+        if (parts.length === 3) {
+          const d = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+          if (!isNaN(d.getTime())) return d;
+        }
+        return null;
+      };
+
       const contratoRowsFiltrados = contratoRows.filter(r => {
         const proposta = (r.numeroProposta ?? '').trim();
-        return !propostasNoProdConsig.has(proposta);
+        // Excluir contratos já na Produção Consignado
+        if (propostasNoProdConsig.has(proposta)) return false;
+
+        // Determinar a data de referência do contrato
+        const febData = febMap.get(proposta);
+        let dataRef: Date | null = null;
+
+        if (febData?.solicitacao) {
+          // 1ª prioridade: data de solicitação do Febraban
+          dataRef = parseDateBR(febData.solicitacao);
+        }
+        if (!dataRef && r.dataContrato) {
+          // 2ª prioridade: data do contrato extraída do PDF
+          dataRef = parseDateBR(String(r.dataContrato));
+          if (!dataRef) dataRef = new Date(r.dataContrato as any);
+        }
+        if (!dataRef && r.createdAt) {
+          // 3ª prioridade: data de importação
+          dataRef = new Date(r.createdAt as any);
+        }
+
+        if (!dataRef) return false;
+        dataRef.setHours(12, 0, 0, 0); // normalizar para meio-dia para evitar problemas de timezone
+        return dataRef >= dataInicio && dataRef <= dataFim;
       });
 
       const result = contratoRowsFiltrados.map(r => {
