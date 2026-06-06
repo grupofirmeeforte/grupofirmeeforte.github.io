@@ -460,6 +460,7 @@ function PerspectivadeGanho() {
               <TableHeader>
                 <TableRow className="bg-gray-50">
                   <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Data</TableHead>
                   <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Cliente / CPF</TableHead>
                   <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Situação</TableHead>
                   <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Produto</TableHead>
@@ -474,11 +475,11 @@ function PerspectivadeGanho() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center py-10 text-gray-400">Carregando...</TableCell>
+                    <TableCell colSpan={11} className="text-center py-10 text-gray-400">Carregando...</TableCell>
                   </TableRow>
                 ) : rows.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center py-10 text-gray-400">
+                    <TableCell colSpan={11} className="text-center py-10 text-gray-400">
                       {periodoInicio && periodoFim
                         ? `Nenhum contrato PDF no período vigente (${periodoInicio} a ${periodoFim})`
                         : 'Nenhum contrato PDF encontrado'}
@@ -488,6 +489,9 @@ function PerspectivadeGanho() {
                   (rows as any[]).map((row: any, rowIdx: number) => (
                     <TableRow key={row.id} className={rowIdx % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-blue-50/30 hover:bg-blue-100/40'}>
                       <TableCell className="font-mono text-sm font-medium text-gray-800">{row.proposta || '—'}</TableCell>
+                      <TableCell className="text-xs text-gray-600 whitespace-nowrap">
+                        {row.solicitacao || '—'}
+                      </TableCell>
                       <TableCell className="text-sm">
                         <div className="font-medium text-gray-800">{row.nomeCliente || '—'}</div>
                         {row.cpfCliente && <div className="text-xs text-gray-500 font-mono">{row.cpfCliente}</div>}
