@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Download } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import { usePermissao } from "@/hooks/usePermissao";
 
 const moeda = (v: number) =>
   v === 0 ? <span className="text-gray-300">R$ -</span> :
@@ -33,6 +34,8 @@ const ANOS = [2026, 2027, 2028, 2029, 2030];
 export default function RelatorioChaveJ() {
   const [ano, setAno] = useState<number>(2026);
   const [empresa, setEmpresa] = useState<string>("");
+  const { cargo } = usePermissao();
+  const isPromotor = cargo === 'Promotor';
 
   const { data, isLoading } = trpc.febraban.relatorioChaveJ.useQuery(
     { ano, empresa: empresa || undefined },
@@ -125,9 +128,11 @@ export default function RelatorioChaveJ() {
             </SelectContent>
           </Select>
 
-          <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5 border-green-500 text-green-600 hover:bg-green-50 h-8">
-            <Download className="w-3.5 h-3.5" /> Exportar Excel
-          </Button>
+          {!isPromotor && (
+            <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5 border-green-500 text-green-600 hover:bg-green-50 h-8">
+              <Download className="w-3.5 h-3.5" /> Exportar Excel
+            </Button>
+          )}
         </div>
       </div>
 

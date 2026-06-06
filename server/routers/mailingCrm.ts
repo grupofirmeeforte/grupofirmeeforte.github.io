@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
+import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { crm } from "../../drizzle/schema";
 import { and, asc, like, or, eq, sql } from "drizzle-orm";
@@ -147,7 +148,7 @@ export const mailingCrmRouter = router({
     return { ok: true };
   }),
 
-  // Exportar todos (sem paginação)
+  // Exportar todos (sem paginação) — bloqueado para promotores
   exportarTodos: protectedProcedure
     .input(z.object({
       search: z.string().optional(),
@@ -157,7 +158,10 @@ export const mailingCrmRouter = router({
       resultado: z.string().optional(),
       campanha: z.string().optional(),
     }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
+      if ((ctx.user as any)?.cargo === 'Promotor') {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Promotores não têm permissão para exportar dados.' });
+      }
       const db = await getDb();
       if (!db) throw new Error("Database not available");
       const conds = [];

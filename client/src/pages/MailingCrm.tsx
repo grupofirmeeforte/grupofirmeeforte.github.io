@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Pencil, Trash2, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import { usePermissao } from "@/hooks/usePermissao";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 type Row = {
@@ -131,6 +132,8 @@ function resultadoBadge(resultado?: string | null) {
 export default function MailingCrm() {
   const utils = trpc.useUtils();
   const fileRef = useRef<HTMLInputElement>(null);
+  const { cargo } = usePermissao();
+  const isPromotor = cargo === 'Promotor';
 
   // Filtros
   const [search, setSearch] = useState("");
@@ -392,9 +395,11 @@ export default function MailingCrm() {
             <Upload className="w-3.5 h-3.5" /> {importando ? importProgress || "Importando..." : "Importar Excel"}
           </Button>
           <input ref={fileRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImport} />
-          <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5 border-green-500 text-green-600 hover:bg-green-50">
-            <Download className="w-3.5 h-3.5" /> Exportar Excel
-          </Button>
+          {!isPromotor && (
+            <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5 border-green-500 text-green-600 hover:bg-green-50">
+              <Download className="w-3.5 h-3.5" /> Exportar Excel
+            </Button>
+          )}
           <Button
             variant="outline" size="sm"
             onClick={() => setConfirmLimpeza('falecidos')}
