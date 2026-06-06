@@ -116,7 +116,7 @@ export default function Consignado() {
   const [filtroMes, setFiltroMes] = useState('');
   const [filtroEmpresa, setFiltroEmpresa] = useState('');
   const [filtroBusca, setFiltroBusca] = useState('');
-  const [filtroZerado, setFiltroZerado] = useState<'todos' | 'rbm_zerado' | 'comissao_zerada' | 'ambos_zerados'>('todos');
+  const [filtroZerado, setFiltroZerado] = useState<'todos' | 'rbm_zerado' | 'comissao_zerada' | 'ambos_zerados' | 'vl_zerado'>('todos');
   const [mostrarTotalizador, setMostrarTotalizador] = useState(true);
   const [mesAnoTotalizador, setMesAnoTotalizador] = useState('');
   const [empresaTotalizador, setEmpresaTotalizador] = useState('');
@@ -516,6 +516,9 @@ export default function Consignado() {
       const rbm = parseFloat(r.rbm || '0') || 0;
       const com = parseFloat(r.totalComissao || '0') || 0;
       if (rbm !== 0 || com !== 0) return false;
+    } else if (filtroZerado === 'vl_zerado') {
+      const vl = parseFloat(r.valorLiquido || '0') || 0;
+      if (vl !== 0) return false;
     }
     return true;
   });
@@ -708,6 +711,7 @@ export default function Consignado() {
               <SelectItem value="rbm_zerado">RBM zerado</SelectItem>
               <SelectItem value="comissao_zerada">Comissão zerada</SelectItem>
               <SelectItem value="ambos_zerados">RBM e Comissão zerados</SelectItem>
+              <SelectItem value="vl_zerado">Valor Líquido zerado</SelectItem>
             </SelectContent>
           </Select>
 
