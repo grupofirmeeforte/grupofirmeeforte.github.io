@@ -356,7 +356,7 @@ export const appRouter = router({
         }
 
         // Verificar se o agente tem acesso irrestrito (sem bloqueio de horário)
-        const AGENTES_ACESSO_IRRESTRITO = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare'];
+        const AGENTES_ACESSO_IRRESTRITO = ['Sidnei Honorato Ultramare', 'Thiago Viana Ultramare', 'AAA TESTE'];
         const acessoIrrestrito = AGENTES_ACESSO_IRRESTRITO.some(
           nome => agente.nomeAgente?.toLowerCase().trim() === nome.toLowerCase().trim()
         );
