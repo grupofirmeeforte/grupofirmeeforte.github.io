@@ -614,15 +614,16 @@ export const appRouter = router({
         const db = await getDb();
         if (!db) return [];
         const { tabelasComissao } = await import('../drizzle/schema');
-        const { and, eq, like } = await import('drizzle-orm');
+        const { and, eq, like, asc } = await import('drizzle-orm');
         let query = db.select().from(tabelasComissao);
         const conditions = [];
         if (input?.empresa) conditions.push(eq(tabelasComissao.empresa, input.empresa));
         if (input?.convenio) conditions.push(like(tabelasComissao.convenio, `%${input.convenio}%`));
+        const ordering = [asc(tabelasComissao.empresa), asc(tabelasComissao.convenio), asc(tabelasComissao.txJurosDe), asc(tabelasComissao.mesesDe)];
         if (conditions.length > 0) {
-          return await query.where(and(...conditions)).orderBy(tabelasComissao.empresa, tabelasComissao.convenio);
+          return await query.where(and(...conditions)).orderBy(...ordering);
         }
-        return await query.orderBy(tabelasComissao.empresa, tabelasComissao.convenio);
+        return await query.orderBy(...ordering);
       }),
 
     criar: publicProcedure
