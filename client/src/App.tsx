@@ -66,6 +66,7 @@ import { PopupComunicado } from "./components/PopupComunicado";
 import { Paperclip } from "lucide-react";
 import { useLocation } from "wouter";
 import { ChatWidget } from "./components/ChatWidget";
+import { useLicenseGuard } from "./hooks/useLicenseGuard";
 
 function BotaoComunicadoGlobal() {
   const [aberto, setAberto] = useState(false);
@@ -239,6 +240,9 @@ function GeoGate() {
 }
 
 function App() {
+  // Proteção de licenciamento — monitora e reinsere o aviso se removido
+  useLicenseGuard();
+
   return (
     <ErrorBoundary>
       <ThemeProvider
