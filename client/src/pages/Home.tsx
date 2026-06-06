@@ -362,15 +362,10 @@ export default function Home() {
                     {/* Sub-abas à direita em ordem alfabética — cores da bandeira do Brasil */}
                     <div className="flex flex-wrap gap-2 items-center px-4 py-3 flex-1">
                       {visibleSubs.length > 0 ? (
-                        visibleSubs.map((sub, idx) => {
+                        visibleSubs.map((sub) => {
                           const SubIcon = sub.icon;
-                          // Azul e Amarelo Canário alternados
-                          type BrasilColor = { bg: string; text: string; border: string; hover: string };
-                          const brasilColors: BrasilColor[] = [
-                            { bg: '#1d4ed8', text: '#ffffff', border: '#1e40af', hover: '#1e40af' }, // azul
-                            { bg: '#fde047', text: '#1e293b', border: '#facc15', hover: '#facc15' }, // amarelo canário
-                          ];
-                          const c = brasilColors[idx % 2];
+                          // Todos azuis
+                          const c = { bg: '#1d4ed8', text: '#ffffff', border: '#1e40af', hover: '#1e40af' };
                           return (
                             <button
                               key={sub.path}
