@@ -445,6 +445,13 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Rodapé de licenciamento */}
+      <footer className="text-center py-4 mt-2">
+        <p className="text-xs text-white/40">
+          🔒 Este sistema é licenciado para <span className="font-semibold text-white/60">Grupo Firme &amp; Forte</span>
+        </p>
+      </footer>
+
       {/* Modal de grupo */}
       {grupoAberto && grupoAtual && (
         <div

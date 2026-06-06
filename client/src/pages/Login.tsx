@@ -483,6 +483,9 @@ export default function Login() {
           <p className="text-center text-xs text-gray-500 mt-6">
             Sistema seguro · Autenticação por ChaveJ · Acesso rápido disponível
           </p>
+          <p className="text-center text-xs text-gray-400 mt-2 border-t border-gray-100 pt-2">
+            🔒 Este sistema é licenciado para <span className="font-semibold text-gray-500">Grupo Firme &amp; Forte</span>
+          </p>
         </div>
       </Card>
     </div>
