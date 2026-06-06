@@ -67,6 +67,7 @@ import { Paperclip } from "lucide-react";
 import { useLocation } from "wouter";
 import { ChatWidget } from "./components/ChatWidget";
 import { useLicenseGuard } from "./hooks/useLicenseGuard";
+import AlertaCertificacao from "./components/AlertaCertificacao";
 
 function BotaoComunicadoGlobal() {
   const [aberto, setAberto] = useState(false);
@@ -215,6 +216,7 @@ function LGPDGate() {
       <RouterWithInactivity />
       <BotaoComunicadoGlobal />
       {isAuthenticated && currentLocation !== "/login" && <ChatWidget />}
+      {isAuthenticated && currentLocation !== "/login" && <AlertaCertificacao />}
     </>
   );
 }

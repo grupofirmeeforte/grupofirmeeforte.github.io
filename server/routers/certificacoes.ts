@@ -265,6 +265,37 @@ export const certificacoesRouter = router({
       return { atualizados };
     }),
 
+  // Buscar certificação do agente logado (para alerta de vencimento)
+  minhasCertificacoes: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return null;
+      // openId para agentes é 'agente_{id}'
+      const openId = ctx.user?.openId;
+      if (!openId?.startsWith('agente_')) return null;
+      const agenteId = parseInt(openId.replace('agente_', ''), 10);
+      if (isNaN(agenteId)) return null;
+      // Buscar chaveJ do agente
+      const agRow = await db.select({ chaveJ: agentes.chaveJ })
+        .from(agentes).where(eq(agentes.id, agenteId)).limit(1);
+      if (!agRow.length || !agRow[0].chaveJ) return null;
+      const chaveJ = agRow[0].chaveJ;
+      const rows = await db.select().from(certificacoes)
+        .where(eq(certificacoes.chaveJ, chaveJ))
+        .limit(1);
+      if (rows.length === 0) return null;
+      const r = rows[0];
+      const dias1 = calcDiasFaltando(r.ventoCertif);
+      const dias2 = calcDiasFaltando(r.ventoCertif3);
+      return {
+        ...r,
+        diasFaltando: dias1,
+        situacaoCertif: calcSituacaoCertif(dias1),
+        diasFaltando2: dias2,
+        situacaoCertif3: calcSituacaoCertif(dias2),
+      };
+    }),
+
   importar: protectedProcedure
     .input(z.array(z.object({
       empresa: z.string().optional(),
