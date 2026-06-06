@@ -12,6 +12,44 @@ import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
 import PageHeader from "@/components/PageHeader";
 
+// ─── COMPONENTE DE BUSCA DE AGENTES COM AUTOCOMPLETE ────────────────────────
+function BuscaAgentesSugestoes({ termo, onSelect }: {
+  termo: string;
+  onSelect: (chaveJ: string, nome: string) => void;
+}) {
+  const { data, isLoading } = trpc.agentes.list.useQuery(
+    { search: termo, limit: 8, offset: 0 },
+    { enabled: termo.length >= 2 }
+  );
+
+  if (isLoading) {
+    return (
+      <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-md shadow-lg mt-1 p-2 text-xs text-gray-500">
+        Buscando...
+      </div>
+    );
+  }
+
+  if (!data || data.length === 0) return null;
+
+  return (
+    <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
+      {data.map((ag: any) => (
+        <button
+          key={ag.id}
+          type="button"
+          className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100 last:border-0"
+          onMouseDown={e => { e.preventDefault(); onSelect(ag.chaveJ ?? '', ag.nomeAgente ?? ''); }}
+        >
+          <span className="font-medium text-blue-700 shrink-0">{ag.chaveJ}</span>
+          <span className="text-gray-700 truncate">{ag.nomeAgente}</span>
+          {ag.empresa && <span className="text-xs text-gray-400 ml-auto shrink-0">{ag.empresa}</span>}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 // ─── TIPOS DE SUBABAS ────────────────────────────────────────────────────────
 type Aba = 'consignado' | 'cc' | 'consorcio' | 'ourocap' | 'seguros' | 'bbdental' | 'perspectiva' | 'minha-tabela';
 
@@ -264,9 +302,12 @@ function PerspectivadeGanho() {
   const permissoes = (meData as any)?.permissoes ?? '';
   const isCeoOuAdmin = cargo === 'CEO' || permissoes === 'admin';
 
-  // Campo ChaveJ para CEO/Admin pesquisar qualquer agente
+  // Campo de busca por nome ou ChaveJ para CEO/Admin
   const [chaveJBusca, setChaveJBusca] = useState('');
   const [chaveJQuery, setChaveJQuery] = useState('');
+  const [nomeBusca, setNomeBusca] = useState('');
+  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
+  const nomeBuscaRef = useRef<HTMLInputElement>(null);
 
   // ChaveJ efetiva para a query (sem mes/ano — o backend calcula o período vigente automaticamente)
   const chaveJEfetiva = isCeoOuAdmin && chaveJQuery ? chaveJQuery.toUpperCase().trim() : (chaveJReal || undefined);
@@ -377,22 +418,53 @@ function PerspectivadeGanho() {
         </div>
       )}
 
-      {/* Campo de busca por ChaveJ — apenas CEO/Admin */}
+      {/* Campo de busca por nome ou ChaveJ — apenas CEO/Admin */}
       {isCeoOuAdmin && (
-        <div className="mb-4 flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <Search className="w-4 h-4 text-blue-500 shrink-0" />
-          <Input
-            placeholder="Digite a ChaveJ do agente (ex: J1234567)"
-            value={chaveJBusca}
-            onChange={e => setChaveJBusca(e.target.value.toUpperCase())}
-            onKeyDown={e => { if (e.key === 'Enter') setChaveJQuery(chaveJBusca); }}
-            className="max-w-xs h-8 text-sm bg-white"
-          />
-          <Button size="sm" variant="default" className="h-8 text-xs" onClick={() => setChaveJQuery(chaveJBusca)}>Buscar</Button>
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center gap-2">
+            <Search className="w-4 h-4 text-blue-500 shrink-0" />
+            <div className="relative flex-1 max-w-sm">
+              <Input
+                ref={nomeBuscaRef}
+                placeholder="Buscar por nome ou ChaveJ..."
+                value={nomeBusca}
+                onChange={e => { setNomeBusca(e.target.value); setMostrarSugestoes(true); }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    // Se parecer ChaveJ (começa com J), buscar direto
+                    if (/^J\d/i.test(nomeBusca.trim())) {
+                      setChaveJQuery(nomeBusca.trim().toUpperCase());
+                      setChaveJBusca(nomeBusca.trim().toUpperCase());
+                    }
+                    setMostrarSugestoes(false);
+                  }
+                  if (e.key === 'Escape') setMostrarSugestoes(false);
+                }}
+                onFocus={() => nomeBusca.length >= 2 && setMostrarSugestoes(true)}
+                onBlur={() => setTimeout(() => setMostrarSugestoes(false), 200)}
+                className="h-8 text-sm bg-white"
+              />
+              {/* Sugestões de autocomplete */}
+              {mostrarSugestoes && nomeBusca.length >= 2 && (
+                <BuscaAgentesSugestoes
+                  termo={nomeBusca}
+                  onSelect={(chaveJ, nome) => {
+                    setChaveJQuery(chaveJ);
+                    setChaveJBusca(chaveJ);
+                    setNomeBusca(`${nome} (${chaveJ})`);
+                    setMostrarSugestoes(false);
+                  }}
+                />
+              )}
+            </div>
+            {chaveJQuery && (
+              <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => { setNomeBusca(''); setChaveJBusca(''); setChaveJQuery(''); }}>Limpar</Button>
+            )}
+            <span className="text-xs text-blue-500">CEO/Admin: consulte qualquer agente</span>
+          </div>
           {chaveJQuery && (
-            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => { setChaveJBusca(''); setChaveJQuery(''); }}>Limpar</Button>
+            <p className="text-xs text-blue-700 mt-1 ml-6">Exibindo: <strong>{chaveJQuery}</strong></p>
           )}
-          <span className="text-xs text-blue-500 ml-1">CEO/Admin: consulte qualquer agente</span>
         </div>
       )}
 
