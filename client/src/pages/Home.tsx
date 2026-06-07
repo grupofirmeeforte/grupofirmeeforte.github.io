@@ -353,9 +353,9 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6">
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <div className="lg:col-span-3">
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               {gruposVisiveis.map((grupo) => {
                 const Icon = grupo.icon;
                 const visibleSubs = (isAdminOuCeo
@@ -373,20 +373,19 @@ export default function Home() {
                     key={grupo.key}
                     className={`flex items-stretch rounded-xl border-2 ${grupo.borderColor} bg-gradient-to-br ${grupo.bgColor} overflow-hidden shadow-sm hover:shadow-md transition-shadow`}
                   >
-                    {/* Bloco esquerdo: ícone + nome do módulo */}
-                    <div className="flex flex-col items-center justify-center gap-2 px-5 py-4 min-w-[110px] max-w-[130px] border-r border-slate-200/60">
-                      <div className={`${grupo.color} w-12 h-12 rounded-xl flex items-center justify-center`}>
-                        <Icon className="w-6 h-6 text-white" />
+                    {/* Bloco esquerdo: ícone + nome do módulo — compacto */}
+                    <div className="flex flex-col items-center justify-center gap-1 px-3 py-2 min-w-[90px] max-w-[100px] border-r border-slate-200/60">
+                      <div className={`${grupo.color} w-8 h-8 rounded-lg flex items-center justify-center`}>
+                        <Icon className="w-4 h-4 text-white" />
                       </div>
-                      <span className="text-sm font-bold text-slate-800 text-center leading-tight">{grupo.title}</span>
+                      <span className="text-xs font-bold text-slate-800 text-center leading-tight">{grupo.title}</span>
                     </div>
 
-                    {/* Sub-abas à direita em ordem alfabética — cores da bandeira do Brasil */}
-                    <div className="flex flex-wrap gap-2 items-center px-4 py-3 flex-1">
+                    {/* Sub-abas compactas */}
+                    <div className="flex flex-wrap gap-1.5 items-center px-3 py-2 flex-1">
                       {visibleSubs.length > 0 ? (
                         visibleSubs.map((sub) => {
                           const SubIcon = sub.icon;
-                          // Todos azuis
                           const c = { bg: '#1d4ed8', text: '#ffffff', border: '#1e40af', hover: '#1e40af' };
                           return (
                             <button
@@ -395,9 +394,9 @@ export default function Home() {
                               style={{ backgroundColor: c.bg, color: c.text, borderColor: c.border }}
                               onMouseEnter={e => (e.currentTarget.style.backgroundColor = c.hover)}
                               onMouseLeave={e => (e.currentTarget.style.backgroundColor = c.bg)}
-                              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-semibold text-sm shadow-sm hover:shadow-md transition-all"
+                              className="flex items-center gap-1 px-2 py-1 rounded-md border font-semibold text-xs shadow-sm hover:shadow-md transition-all"
                             >
-                              <SubIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                              <SubIcon className="w-3 h-3 flex-shrink-0" />
                               {sub.title}
                             </button>
                           );
@@ -412,89 +411,89 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Widget de Usuários Conectados */}
-          <div className="lg:col-span-1">
+          {/* Coluna direita: cards de resumo + usuários conectados */}
+          <div className="lg:col-span-1 flex flex-col gap-3">
+            {isAdminOuCeo && (
+              <>
+                <Card>
+                  <CardHeader className="pb-1 pt-3 px-3">
+                    <CardTitle className="text-xs font-medium text-slate-600">Total de Agentes</CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-3 pb-3">
+                    <div className="text-xl font-bold text-slate-900">
+                      {totalAgentes === null ? '--' : totalAgentes}
+                    </div>
+                    <p className="text-xs text-slate-500">Cadastrados no sistema</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-1 pt-3 px-3">
+                    <CardTitle className="text-xs font-medium text-slate-600">Certificações Vencendo</CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-3 pb-3 space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xl font-bold ${certVencendo !== null && certVencendo > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
+                        {certVencendo === null ? '--' : certVencendo}
+                      </span>
+                      <span className="text-xs text-slate-500">próx. 30 dias</span>
+                    </div>
+                    {certListas.vencidas.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-red-600 mb-0.5">🔴 Vencidas ({certListas.vencidas.length})</p>
+                        <div className="space-y-0.5 max-h-20 overflow-y-auto">
+                          {certListas.vencidas.map((a, i) => (
+                            <div key={i} className="flex items-center justify-between text-xs">
+                              <span className="text-slate-700 truncate max-w-[100px]">{a.nome}</span>
+                              <span className="text-red-500 font-medium ml-1 shrink-0">{a.tipo}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {certListas.aVencer.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-amber-600 mb-0.5">🟡 A vencer ({certListas.aVencer.length})</p>
+                        <div className="space-y-0.5 max-h-20 overflow-y-auto">
+                          {certListas.aVencer.map((a, i) => (
+                            <div key={i} className="flex items-center justify-between text-xs">
+                              <span className="text-slate-700 truncate max-w-[90px]">{a.nome}</span>
+                              <span className="text-amber-600 font-medium ml-1 shrink-0">{a.tipo}·{a.dias}d</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {certVencendo === 0 && (
+                      <p className="text-xs text-green-600 font-medium">✅ Todas em dia</p>
+                    )}
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-1 pt-3 px-3">
+                    <CardTitle className="text-xs font-medium text-slate-600">Produção Mês</CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-3 pb-3">
+                    <div className="text-xl font-bold text-green-700">
+                      {producaoMes === null ? 'R$ --' : fmtBRL(producaoMes)}
+                    </div>
+                    <p className="text-xs text-slate-500">Mês atual (contratado)</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-1 pt-3 px-3">
+                    <CardTitle className="text-xs font-medium text-slate-600">Comissões Pendentes</CardTitle>
+                  </CardHeader>
+                  <CardContent className="px-3 pb-3">
+                    <div className={`text-xl font-bold ${comissoesPendentes !== null && comissoesPendentes > 0 ? 'text-red-600' : 'text-slate-900'}`}>
+                      {comissoesPendentes === null ? 'R$ --' : fmtBRL(comissoesPendentes)}
+                    </div>
+                    <p className="text-xs text-slate-500">A pagar</p>
+                  </CardContent>
+                </Card>
+              </>
+            )}
             <UsuariosConectados />
           </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-slate-600">Total de Agentes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">
-                {totalAgentes === null ? '--' : totalAgentes}
-              </div>
-              <p className="text-xs text-slate-500 mt-1">Cadastrados no sistema</p>
-            </CardContent>
-          </Card>
-          <Card className="col-span-1">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Certificações Vencendo</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className={`text-2xl font-bold ${certVencendo !== null && certVencendo > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
-                  {certVencendo === null ? '--' : certVencendo}
-                </span>
-                <span className="text-xs text-slate-500">nos próximos 30 dias</span>
-              </div>
-              {certListas.vencidas.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-red-600 mb-1">🔴 Vencidas ({certListas.vencidas.length})</p>
-                  <div className="space-y-0.5 max-h-24 overflow-y-auto">
-                    {certListas.vencidas.map((a, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs">
-                        <span className="text-slate-700 truncate max-w-[140px]">{a.nome}</span>
-                        <span className="text-red-500 font-medium ml-1 shrink-0">{a.tipo}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {certListas.aVencer.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-amber-600 mb-1">🟡 A vencer ({certListas.aVencer.length})</p>
-                  <div className="space-y-0.5 max-h-24 overflow-y-auto">
-                    {certListas.aVencer.map((a, i) => (
-                      <div key={i} className="flex items-center justify-between text-xs">
-                        <span className="text-slate-700 truncate max-w-[120px]">{a.nome}</span>
-                        <span className="text-amber-600 font-medium ml-1 shrink-0">{a.tipo} · {a.dias}d</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {certVencendo === 0 && (
-                <p className="text-xs text-green-600 font-medium">✅ Todas em dia</p>
-              )}
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-slate-600">Produção Mês</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-700">
-                {producaoMes === null ? 'R$ --' : fmtBRL(producaoMes)}
-              </div>
-              <p className="text-xs text-slate-500 mt-1">Mês atual (contratado)</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-slate-600">Comissões Pendentes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${comissoesPendentes !== null && comissoesPendentes > 0 ? 'text-red-600' : 'text-slate-900'}`}>
-                {comissoesPendentes === null ? 'R$ --' : fmtBRL(comissoesPendentes)}
-              </div>
-              <p className="text-xs text-slate-500 mt-1">A pagar</p>
-            </CardContent>
-          </Card>
         </div>
       </main>
 
