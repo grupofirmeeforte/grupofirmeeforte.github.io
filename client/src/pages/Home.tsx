@@ -330,6 +330,10 @@ export default function Home() {
             <h1 className="text-2xl font-bold text-white tracking-wide">Grupo Firme &amp; Forte</h1>
             <p className="text-xs text-yellow-300 mt-0.5 font-medium tracking-widest uppercase">Coban — Banco do Brasil &nbsp;|&nbsp; Bem-vindo, {user?.name || "Usuário"}</p>
           </div>
+          <div className="hidden md:flex flex-col items-center">
+            <span className="text-lg font-bold text-white tracking-wide">Módulo do Sistema</span>
+            <span className="text-xs text-yellow-300 mt-0.5 font-medium">Selecione um módulo para começar</span>
+          </div>
           <div className="flex flex-col items-end gap-1.5">
             <Button
               variant="outline"
@@ -347,11 +351,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-12">
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Módulos do Sistema</h2>
-          <p className="text-slate-600">Selecione um módulo para começar</p>
-        </div>
+      <main className="max-w-7xl mx-auto px-4 py-6">
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-3">
