@@ -56,6 +56,28 @@ export default function Home() {
     }
     return cnt;
   }, [certData]);
+
+  // Listas de agentes com certif vencida e prestes a vencer
+  const certListas = useMemo(() => {
+    if (!certData) return { vencidas: [], aVencer: [] };
+    const vencidas: { nome: string; tipo: string }[] = [];
+    const aVencer: { nome: string; tipo: string; dias: number }[] = [];
+    for (const v of Object.values(certData as Record<string, any>)) {
+      const nome = (v as any)?.nome || (v as any)?.nomeAgente || '?';
+      const d1 = (v as any)?.consig?.dias;
+      const d2 = (v as any)?.lgpd?.dias;
+      if (d1 !== null && d1 !== undefined) {
+        if (d1 < 0) vencidas.push({ nome, tipo: 'Consig' });
+        else if (d1 <= 30) aVencer.push({ nome, tipo: 'Consig', dias: d1 });
+      }
+      if (d2 !== null && d2 !== undefined) {
+        if (d2 < 0) vencidas.push({ nome, tipo: 'PLDFT' });
+        else if (d2 <= 30) aVencer.push({ nome, tipo: 'PLDFT', dias: d2 });
+      }
+    }
+    aVencer.sort((a, b) => a.dias - b.dias);
+    return { vencidas, aVencer };
+  }, [certData]);
   const producaoMes = useMemo(() => {
     if (!(febData as any)?.empresas) return null;
     return ((febData as any).empresas as any[]).reduce((acc: number, e: any) => acc + (e.contratado ?? 0), 0);
@@ -409,15 +431,46 @@ export default function Home() {
               <p className="text-xs text-slate-500 mt-1">Cadastrados no sistema</p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-3">
+          <Card className="col-span-1">
+            <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-slate-600">Certificações Vencendo</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className={`text-2xl font-bold ${certVencendo !== null && certVencendo > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
-                {certVencendo === null ? '--' : certVencendo}
+            <CardContent className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className={`text-2xl font-bold ${certVencendo !== null && certVencendo > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
+                  {certVencendo === null ? '--' : certVencendo}
+                </span>
+                <span className="text-xs text-slate-500">nos próximos 30 dias</span>
               </div>
-              <p className="text-xs text-slate-500 mt-1">Próximos 30 dias</p>
+              {certListas.vencidas.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-red-600 mb-1">🔴 Vencidas ({certListas.vencidas.length})</p>
+                  <div className="space-y-0.5 max-h-24 overflow-y-auto">
+                    {certListas.vencidas.map((a, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs">
+                        <span className="text-slate-700 truncate max-w-[140px]">{a.nome}</span>
+                        <span className="text-red-500 font-medium ml-1 shrink-0">{a.tipo}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {certListas.aVencer.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-amber-600 mb-1">🟡 A vencer ({certListas.aVencer.length})</p>
+                  <div className="space-y-0.5 max-h-24 overflow-y-auto">
+                    {certListas.aVencer.map((a, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs">
+                        <span className="text-slate-700 truncate max-w-[120px]">{a.nome}</span>
+                        <span className="text-amber-600 font-medium ml-1 shrink-0">{a.tipo} · {a.dias}d</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {certVencendo === 0 && (
+                <p className="text-xs text-green-600 font-medium">✅ Todas em dia</p>
+              )}
             </CardContent>
           </Card>
           <Card>

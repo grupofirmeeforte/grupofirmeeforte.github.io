@@ -401,8 +401,17 @@ export const agentesRouter = router({
     const db = await getDb();
     if (!db) throw new Error("Database not available");
 
+    // Buscar situação dos agentes para filtrar cancelados
+    const agentesAtivos = await db.select({ chaveJ: agentes.chaveJ, situacao: agentes.situacao })
+      .from(agentes);
+    const situacaoMap: Record<string, string> = {};
+    for (const a of agentesAtivos) {
+      if (a.chaveJ) situacaoMap[a.chaveJ.trim().toUpperCase()] = (a.situacao ?? '').toUpperCase();
+    }
+
     const certs = await db.select({
       chaveJ: certificacoes.chaveJ,
+      nomeAgente: certificacoes.nomeAgente,
       ventoCertif: certificacoes.ventoCertif,
       ventoCertif3: certificacoes.ventoCertif3,
     }).from(certificacoes);
@@ -437,12 +446,16 @@ export const agentesRouter = router({
       if (dias <= 15) return { status: 'CRITICO', dias };
       return { status: 'A_VENCER', dias };
     }
-    const map: Record<string, { consig: CertStatus; lgpd: CertStatus }> = {};
+    const map: Record<string, { nome: string; consig: CertStatus; lgpd: CertStatus }> = {};
     for (const c of certs) {
       if (!c.chaveJ || c.chaveJ === 'chaveJ') continue;
+      const chaveKey = c.chaveJ.trim().toUpperCase();
+      // Ignorar agentes cancelados/inativos
+      const sit = situacaoMap[chaveKey] ?? '';
+      if (sit === 'CANCELADO' || sit === 'INATIVO' || sit === 'DESLIGADO') continue;
       const dias1 = calcDias(c.ventoCertif);
       const dias2 = calcDias(c.ventoCertif3);
-      map[c.chaveJ.trim().toUpperCase()] = { consig: toStatus(dias1), lgpd: toStatus(dias2) };
+      map[chaveKey] = { nome: c.nomeAgente ?? c.chaveJ, consig: toStatus(dias1), lgpd: toStatus(dias2) };
     }
     return map;
   }),
