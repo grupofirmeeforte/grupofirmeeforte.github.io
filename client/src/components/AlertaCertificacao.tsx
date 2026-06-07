@@ -115,12 +115,26 @@ export default function AlertaCertificacao() {
           </div>
 
           {/* Orientação */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 space-y-2">
+            <p className="text-blue-800 text-sm font-semibold">📋 O que fazer:</p>
             <p className="text-blue-800 text-sm leading-relaxed">
-              📋 <strong>O que fazer:</strong> Acesse o portal de certificações do BB
-              e renove sua certificação <strong>antes do vencimento</strong> para evitar
-              o bloqueio da sua Chave J e a interrupção das suas atividades.
+              Acesse um dos <strong>sites autorizados para renovação de certificação</strong>,
+              ou se preferir, entre em contato com nosso time e peça ajuda à
+              <strong> Supervisora</strong> ou ao <strong>Suporte</strong>.
             </p>
+            <p className="text-blue-900 text-sm font-semibold">
+              🚫 Não perca negócios por falta de Chave J!
+            </p>
+            <p className="text-blue-800 text-sm leading-relaxed">
+              Lembre-se: a <strong>Chave J é de uso pessoal</strong> de cada agente.
+            </p>
+            <div className="bg-amber-50 border border-amber-300 rounded-lg p-3 mt-1">
+              <p className="text-amber-800 text-sm leading-relaxed">
+                💡 <strong>Dica importante:</strong> Não deixe para o último dia!
+                Após a aprovação, pode levar <strong>até 3 dias</strong> para a
+                sensibilização no sistema do Banco do Brasil.
+              </p>
+            </div>
           </div>
 
           {/* Botão fechar */}
