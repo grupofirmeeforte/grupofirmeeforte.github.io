@@ -136,23 +136,23 @@ export const supervisoresRouter = router({
         const pctSeguro    = parseFloat(sup.pctSeguro    ?? sup.pctseguro    ?? 0);
         const pctDental    = parseFloat(sup.pctDental    ?? sup.pctdental    ?? 0);
 
-        // RBM Consignado — busca em calculos (mesRef = MM/AAAA)
-        // JOIN: agentes.supervisor LIKE '%nomeSup%' (case insensitive)
+        // RBM Consignado — soma do campo rbm da tabela consignados dos agentes supervisionados
+        // Cada operação de consignado tem um RBM específico; a supervisora ganha % sobre cada RBM
         let rbmConsig = 0;
         {
           const r = mesRef
             ? await db!.execute(sql`
-                SELECT COALESCE(SUM(c.rbmCreditoC2), 0) as total
-                FROM calculos c
-                JOIN agentes a ON c.chaveJ = a.chaveJ
+                SELECT COALESCE(SUM(cs.rbm), 0) as total
+                FROM consignados cs
+                JOIN agentes a ON cs.chaveJ = a.chaveJ
                 WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
                   AND TRIM(a.supervisor) != ''
-                  AND c.mesRef = ${mesRef}
+                  AND cs.mes = ${mesRef}
               `) as any
             : await db!.execute(sql`
-                SELECT COALESCE(SUM(c.rbmCreditoC2), 0) as total
-                FROM calculos c
-                JOIN agentes a ON c.chaveJ = a.chaveJ
+                SELECT COALESCE(SUM(cs.rbm), 0) as total
+                FROM consignados cs
+                JOIN agentes a ON cs.chaveJ = a.chaveJ
                 WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
                   AND TRIM(a.supervisor) != ''
               `) as any;
