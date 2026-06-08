@@ -3,14 +3,12 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 import { listaNaoPerturbe } from "../../drizzle/schema";
-import { eq, like, inArray, desc, or, sql } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
-// Normaliza telefone: remove tudo que não é dígito
 function normalizarTelefone(tel: string): string {
   return tel.replace(/\D/g, "");
 }
 
-// Formata telefone para exibição
 function formatarTelefone(tel: string): string {
   const d = tel.replace(/\D/g, "");
   if (d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
@@ -18,12 +16,10 @@ function formatarTelefone(tel: string): string {
   return tel;
 }
 
-// Normaliza CPF: remove pontuação
 function normalizarCpf(cpf: string): string {
   return cpf.replace(/\D/g, "");
 }
 
-// Formata CPF para exibição: 000.000.000-00
 function formatarCpf(cpf: string): string {
   const d = cpf.replace(/\D/g, "");
   if (d.length === 11) return `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}`;
@@ -31,7 +27,6 @@ function formatarCpf(cpf: string): string {
 }
 
 export const naoPerturbeRouter = router({
-  // Listar todos os registros
   listar: protectedProcedure
     .input(z.object({
       busca: z.string().optional(),
@@ -59,7 +54,6 @@ export const naoPerturbeRouter = router({
       return { rows: rows.slice(offset, offset + input.porPagina), total };
     }),
 
-  // Verificar se um ou mais telefones estão na lista
   verificar: protectedProcedure
     .input(z.object({ telefones: z.array(z.string()) }))
     .query(async ({ input }) => {
@@ -73,10 +67,9 @@ export const naoPerturbeRouter = router({
       return { bloqueados: encontrados.map(r => r.telefone) };
     }),
 
-  // Adicionar telefone manualmente
   adicionar: protectedProcedure
     .input(z.object({
-      telefone: z.string().min(1).optional(),
+      telefone: z.string().optional(),
       motivo: z.string().optional(),
       nome: z.string().optional(),
       cpf: z.string().optional(),
@@ -89,12 +82,13 @@ export const naoPerturbeRouter = router({
       if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DB indisponível" });
       const tel = normalizarTelefone(input.telefone ?? "");
       const cpf = normalizarCpf(input.cpf ?? "");
-      if (tel.length < 8 && cpf.length < 11) throw new TRPCError({ code: "BAD_REQUEST", message: "Informe telefone ou CPF válido" });
-      // Verificar duplicata por CPF (se informado) ou telefone
+      if (tel.length < 8 && cpf.length < 11) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Informe telefone ou CPF válido" });
+      }
       if (cpf.length === 11) {
         const existente = await db.select({ id: listaNaoPerturbe.id })
           .from(listaNaoPerturbe)
-          .where(eq(listaNaoPerturbe.cpf, cpf));
+          .where(eq(listaNaoPerturbe.cpf, formatarCpf(cpf)));
         if (existente.length > 0) throw new TRPCError({ code: "CONFLICT", message: "CPF já está na lista" });
       } else if (tel.length >= 8) {
         const existente = await db.select({ id: listaNaoPerturbe.id })
@@ -117,7 +111,6 @@ export const naoPerturbeRouter = router({
       return { ok: true };
     }),
 
-  // Importar lista em lote (CSV/texto com um telefone por linha) — mantido para compatibilidade
   importarLote: protectedProcedure
     .input(z.object({
       telefones: z.array(z.string()),
@@ -145,8 +138,6 @@ export const naoPerturbeRouter = router({
       return { inseridos: novos.length, atualizados: 0, duplicatas: normalizados.length - novos.length };
     }),
 
-  // Importar planilha BB (XLSX) com upsert por CPF
-  // Colunas esperadas: NOME, CPF, Reclamação, INCLUSÃO, Município, UF, OCUPAÇÃO, NÃO PERTUBE
   importarPlanilhaBB: protectedProcedure
     .input(z.array(z.object({
       nome: z.string().optional(),
@@ -166,81 +157,101 @@ export const naoPerturbeRouter = router({
       let atualizados = 0;
       let ignorados = 0;
 
+      // Preparar registros válidos
+      const registros: Array<{
+        cpfNorm: string;
+        cpfFmt: string | null;
+        nome: string | null;
+        reclamacao: string | null;
+        dataInclusao: string | null;
+        municipio: string | null;
+        uf: string | null;
+        ocupacao: string | null;
+        motivo: string;
+        origem: string;
+        adicionadoPorId: number;
+        telefone: string;
+      }> = [];
+
       for (const rec of input) {
         const cpfNorm = normalizarCpf(rec.cpf ?? "");
-        const cpfFmt = cpfNorm.length === 11 ? formatarCpf(cpfNorm) : (rec.cpf ?? "");
-        const nome = (rec.nome ?? "").trim().toUpperCase();
-
+        const cpfFmt = cpfNorm.length === 11 ? formatarCpf(cpfNorm) : null;
+        const nome = (rec.nome ?? "").trim().toUpperCase() || null;
         if (!cpfNorm && !nome) { ignorados++; continue; }
-
-        const valores = {
-          nome: nome || null,
-          cpf: cpfFmt || null,
-          reclamacao: rec.reclamacao ?? null,
-          dataInclusao: rec.dataInclusao ?? null,
-          municipio: rec.municipio ?? null,
-          uf: rec.uf ?? null,
-          ocupacao: rec.ocupacao ?? null,
-          motivo: rec.naoPerturbe ?? "NÃO PERTUBE",
+        registros.push({
+          cpfNorm,
+          cpfFmt,
+          nome,
+          reclamacao: rec.reclamacao || null,
+          dataInclusao: rec.dataInclusao || null,
+          municipio: rec.municipio || null,
+          uf: rec.uf || null,
+          ocupacao: rec.ocupacao || null,
+          motivo: rec.naoPerturbe || "NÃO PERTUBE",
           origem: "planilha_bb",
           adicionadoPorId: ctx.user.id,
           telefone: '',
-        };
+        });
+      }
 
-        if (cpfNorm.length === 11) {
-          // Upsert por CPF
-          const existente = await db.select({ id: listaNaoPerturbe.id })
-            .from(listaNaoPerturbe)
-            .where(eq(listaNaoPerturbe.cpf, cpfFmt))
-            .limit(1);
+      if (registros.length === 0) {
+        return { inseridos: 0, atualizados: 0, ignorados, total: input.length };
+      }
 
-          if (existente.length > 0) {
-            await db.update(listaNaoPerturbe).set({
-              nome: valores.nome,
-              reclamacao: valores.reclamacao,
-              dataInclusao: valores.dataInclusao,
-              municipio: valores.municipio,
-              uf: valores.uf,
-              ocupacao: valores.ocupacao,
-              motivo: valores.motivo,
-              origem: valores.origem,
-            }).where(eq(listaNaoPerturbe.cpf, cpfFmt));
-            atualizados++;
-          } else {
-            await db.insert(listaNaoPerturbe).values(valores);
-            inseridos++;
-          }
-        } else {
-          // Sem CPF válido: inserir apenas se não existir por nome
-          if (nome) {
-            const existente = await db.select({ id: listaNaoPerturbe.id })
-              .from(listaNaoPerturbe)
-              .where(eq(listaNaoPerturbe.nome, nome))
-              .limit(1);
-            if (existente.length > 0) {
-              await db.update(listaNaoPerturbe).set({
-                reclamacao: valores.reclamacao,
-                dataInclusao: valores.dataInclusao,
-                municipio: valores.municipio,
-                uf: valores.uf,
-                ocupacao: valores.ocupacao,
-                motivo: valores.motivo,
-              }).where(eq(listaNaoPerturbe.nome, nome));
-              atualizados++;
-            } else {
-              await db.insert(listaNaoPerturbe).values(valores);
-              inseridos++;
-            }
-          } else {
-            ignorados++;
-          }
-        }
+      // Buscar CPFs já existentes de uma vez
+      const cpfsValidos = registros.filter(r => r.cpfNorm.length === 11).map(r => r.cpfFmt!);
+      const cpfsExistentes = new Set<string>();
+      if (cpfsValidos.length > 0) {
+        const existentes = await db.select({ cpf: listaNaoPerturbe.cpf })
+          .from(listaNaoPerturbe)
+          .where(inArray(listaNaoPerturbe.cpf, cpfsValidos));
+        existentes.forEach(r => { if (r.cpf) cpfsExistentes.add(r.cpf); });
+      }
+
+      // Separar: novos (com CPF válido não existente), para atualizar, sem CPF
+      const novosComCpf = registros.filter(r => r.cpfNorm.length === 11 && !cpfsExistentes.has(r.cpfFmt!));
+      const paraAtualizar = registros.filter(r => r.cpfNorm.length === 11 && cpfsExistentes.has(r.cpfFmt!));
+      const semCpf = registros.filter(r => r.cpfNorm.length !== 11);
+
+      // Inserir novos em lotes de 100
+      const todosNovos = [...novosComCpf, ...semCpf];
+      const BATCH = 100;
+      for (let i = 0; i < todosNovos.length; i += BATCH) {
+        const lote = todosNovos.slice(i, i + BATCH).map(r => ({
+          telefone: r.telefone,
+          nome: r.nome,
+          cpf: r.cpfFmt,
+          reclamacao: r.reclamacao,
+          dataInclusao: r.dataInclusao,
+          municipio: r.municipio,
+          uf: r.uf,
+          ocupacao: r.ocupacao,
+          motivo: r.motivo,
+          origem: r.origem,
+          adicionadoPorId: r.adicionadoPorId,
+        }));
+        await db.insert(listaNaoPerturbe).values(lote);
+        inseridos += lote.length;
+      }
+
+      // Atualizar existentes um a um (poucos casos)
+      for (const rec of paraAtualizar) {
+        await db.update(listaNaoPerturbe).set({
+          nome: rec.nome,
+          reclamacao: rec.reclamacao,
+          dataInclusao: rec.dataInclusao,
+          municipio: rec.municipio,
+          uf: rec.uf,
+          ocupacao: rec.ocupacao,
+          motivo: rec.motivo,
+          origem: rec.origem,
+        }).where(eq(listaNaoPerturbe.cpf, rec.cpfFmt!));
+        atualizados++;
       }
 
       return { inseridos, atualizados, ignorados, total: input.length };
     }),
 
-  // Remover registro
   remover: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {
@@ -250,7 +261,6 @@ export const naoPerturbeRouter = router({
       return { ok: true };
     }),
 
-  // Contar total
   contar: protectedProcedure
     .query(async () => {
       const db = await getDb();
