@@ -831,18 +831,16 @@ export default function Consignado() {
                   </td>
                   {/* Coluna Comissão */}
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
-                    {/* % comissão sobre valor líquido */}
+                    {/* % da tabela de comissão (percPago salvo no banco) */}
                     {(() => {
-                      const comissao = parseFloat(String(r.totalComissao || '0').replace(',', '.'));
-                      const vliq = parseFloat(String(r.valorLiquido || '0').replace(/[^0-9.,]/g, '').replace(',', '.'));
-                      if (vliq > 0 && comissao > 0) {
-                        const perc = (comissao / vliq) * 100;
-                        return <div className="text-[10px] font-semibold text-blue-600">{perc.toFixed(2)}% s/ líquido</div>;
+                      const pp = parseFloat(String(r.percPago || '0').replace(',', '.'));
+                      if (pp > 0) {
+                        const pct = pp >= 1 ? pp : pp * 100;
+                        return <div className="text-[10px] font-semibold text-blue-600">{pct.toFixed(2)}% tabela</div>;
                       }
                       return null;
                     })()}
                     <div className="font-bold text-green-700 text-[12px]">{moeda(r.totalComissao)}</div>
-                    <div className="text-[10px] text-gray-400">{pct(r.percPago)} pago</div>
                     {r.tabela && r.tabela !== 'NULL' && r.tabela !== '0' && (
                       <div className="text-[10px] text-gray-500">{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
                     )}

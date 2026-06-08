@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { trpc } from '@/lib/trpc';
-import { useAuth } from './useAuth';
+import { useAuth } from '@/_core/hooks/useAuth';
 
 /**
  * Hook que registra automaticamente o acesso a um módulo no log de auditoria.

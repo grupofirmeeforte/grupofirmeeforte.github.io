@@ -552,18 +552,22 @@ export async function calcularPercPago(
     });
 
     // Normalizar valor de juros: tratar vírgula como separador decimal
+    // parseJuros: converte valor da tabela para decimal (0.0238) para comparar com jurosNum
     const parseJuros = (v: string | null | undefined): number => {
       if (!v) return 0;
       const s = v.trim().toLowerCase();
-      if (s === 'acima') return 9999; // fallback para "acima" ainda existente
-      return parseFloat(s.replace(',', '.')) || 0;
+      if (s === 'acima') return 9999;
+      const raw = parseFloat(s.replace(',', '.')) || 0;
+      // Se o valor da tabela está em formato percentual (ex: 2.38), converter para decimal (0.0238)
+      return raw > 1 ? raw / 100 : raw;
     };
 
     // Filtrar por faixa de juros (prioridade: faixa mais específica = menor jAte)
     const linhasComJuros = linhasComParcela.filter(t => {
       const jDe = parseJuros(t.txJurosDe);
       const jAte = parseJuros(t.txJurosAte);
-      return jurosNum >= jDe && jurosNum <= jAte;
+      // Tolerância de 0.0001 para evitar problemas de arredondamento
+      return jurosNum >= (jDe - 0.0001) && jurosNum <= (jAte + 0.0001);
     });
 
     // Ordenar por especificidade: menor jAte primeiro (faixa mais restrita tem prioridade)
