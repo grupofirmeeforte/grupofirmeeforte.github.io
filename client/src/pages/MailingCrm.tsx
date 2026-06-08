@@ -142,6 +142,7 @@ export default function MailingCrm() {
   const [filtCidade, setFiltCidade] = useState("");
   const [filtResultado, setFiltResultado] = useState("");
   const [filtCampanha, setFiltCampanha] = useState("");
+  const [filtNaoPerturbe, setFiltNaoPerturbe] = useState<"todos" | "bloqueados" | "liberados">("todos");
   const [page, setPage] = useState(0);
 
   // Modal
@@ -234,6 +235,18 @@ export default function MailingCrm() {
     });
     return map;
   }, [naoPerturbeData]);
+
+  // Filtrar rows pelo status Não Pertube
+  const rowsFiltrados = useMemo(() => {
+    if (filtNaoPerturbe === "todos" || !naoPerturbeData) return rows;
+    return rows.filter(r => {
+      const cpfNorm = (r.cpf ?? "").replace(/\D/g, "");
+      const bloqueado = cpfNorm.length === 11 && cpfsBloqueados.has(cpfNorm);
+      if (filtNaoPerturbe === "bloqueados") return bloqueado;
+      if (filtNaoPerturbe === "liberados") return !bloqueado;
+      return true;
+    });
+  }, [rows, filtNaoPerturbe, cpfsBloqueados, naoPerturbeData]);
 
   const totalPages = Math.ceil(total / PER_PAGE);
 
@@ -489,6 +502,16 @@ export default function MailingCrm() {
             {filtros?.campanhas.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Select value={filtNaoPerturbe} onValueChange={v => { setFiltNaoPerturbe(v as "todos" | "bloqueados" | "liberados"); setPage(0); }}>
+          <SelectTrigger className="h-8 text-sm border-red-200">
+            <SelectValue placeholder="Não Pertube" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos (Não Pertube)</SelectItem>
+            <SelectItem value="bloqueados">⛔ Bloqueados</SelectItem>
+            <SelectItem value="liberados">✓ Liberados</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Tabela estilo Consignado — linhas largas */}
@@ -509,7 +532,7 @@ export default function MailingCrm() {
               <tr><td colSpan={7} className="text-center py-12 text-gray-400">Carregando...</td></tr>
             ) : rows.length === 0 ? (
               <tr><td colSpan={7} className="text-center py-12 text-gray-400">Nenhum registro encontrado.</td></tr>
-            ) : rows.map((r, i) => {
+            ) : rowsFiltrados.map((r, i) => {
               const tels = fones(r as Row);
               return (
                 <tr
