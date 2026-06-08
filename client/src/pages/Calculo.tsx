@@ -274,6 +274,67 @@ export default function Calculo() {
   const [modalEditar, setModalEditar] = useState<any | null>(null);
   const [formEditar, setFormEditar] = useState<Record<string, string>>({});
 
+  // Modal de adição manual de chave
+  const [modalManual, setModalManual] = useState(false);
+  const [formManual, setFormManual] = useState({
+    chaveJ: "", nomeAgente: "", mesRef: "",
+    comissaoConsig: "", comissaoConsorcio: "", comissaoOurocap: "",
+    comissaoCc: "", comissaoSeguros: "", ajudaCusto: "",
+    creditosDebitos: "", adiantamento: "", reajuste: "",
+  });
+  const [chaveJBuscaManual, setChaveJBuscaManual] = useState("");
+  const { data: agenteManual } = trpc.agentes.getByChaveJ.useQuery(
+    { chaveJ: chaveJBuscaManual },
+    { enabled: chaveJBuscaManual.length >= 3 }
+  );
+  useEffect(() => {
+    if (agenteManual?.nomeAgente && modalManual) {
+      setFormManual(p => ({ ...p, nomeAgente: agenteManual.nomeAgente ?? p.nomeAgente }));
+    }
+  }, [agenteManual, modalManual]);
+
+  const criarManualMut = trpc.calculosImportados.criar.useMutation({
+    onSuccess: () => {
+      utils.calculosImportados.listar.invalidate();
+      utils.calculosImportados.contar.invalidate();
+      setModalManual(false);
+      setFormManual({ chaveJ: "", nomeAgente: "", mesRef: "", comissaoConsig: "", comissaoConsorcio: "", comissaoOurocap: "", comissaoCc: "", comissaoSeguros: "", ajudaCusto: "", creditosDebitos: "", adiantamento: "", reajuste: "" });
+      setChaveJBuscaManual("");
+    },
+    onError: (err) => alert(`Erro: ${err.message}`),
+  });
+
+  const salvarManual = () => {
+    if (!formManual.chaveJ) { alert("Informe a Chave J."); return; }
+    if (!formManual.mesRef) { alert("Informe o Mês de Referência."); return; }
+    const toNum = (v: string) => v === "" ? undefined : parseFloat(v.replace(",", "."));
+    const consig = toNum(formManual.comissaoConsig) ?? 0;
+    const consorcio = toNum(formManual.comissaoConsorcio) ?? 0;
+    const ourocap = toNum(formManual.comissaoOurocap) ?? 0;
+    const cc = toNum(formManual.comissaoCc) ?? 0;
+    const seguros = toNum(formManual.comissaoSeguros) ?? 0;
+    const ajuda = toNum(formManual.ajudaCusto) ?? 0;
+    const cred = toNum(formManual.creditosDebitos) ?? 0;
+    const adiant = toNum(formManual.adiantamento) ?? 0;
+    const reaj = toNum(formManual.reajuste) ?? 0;
+    const total = consig + consorcio + ourocap + cc + seguros + ajuda + cred - adiant + reaj;
+    criarManualMut.mutate({
+      chaveJ: formManual.chaveJ,
+      nomeAgente: formManual.nomeAgente || undefined,
+      mesRef: formManual.mesRef,
+      comissaoConsig: consig,
+      comissaoConsorcio: consorcio,
+      comissaoOurocap: ourocap,
+      comissaoCc: cc,
+      comissaoSeguros: seguros,
+      ajudaCusto: ajuda,
+      creditosDebitos: cred,
+      adiantamento: adiant,
+      reajuste: reaj,
+      comissaoTotal: total,
+    });
+  };
+
   const abrirEditar = (r: any) => {
     setModalEditar(r);
     setFormEditar({
@@ -442,7 +503,17 @@ export default function Calculo() {
           >
             <Send className="w-3 h-3" /> Enviar Para Pagto
           </Button>
-          
+          <Button
+            onClick={() => {
+              setModalManual(true);
+              setFormManual({ chaveJ: "", nomeAgente: "", mesRef: mesRef || "", comissaoConsig: "", comissaoConsorcio: "", comissaoOurocap: "", comissaoCc: "", comissaoSeguros: "", ajudaCusto: "", creditosDebitos: "", adiantamento: "", reajuste: "" });
+              setChaveJBuscaManual("");
+            }}
+            size="sm"
+            className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-1 h-7 px-2 text-xs"
+          >
+            <Plus className="w-3 h-3" /> Adicionar Manual
+          </Button>
         </div>
       </div>
 
@@ -1074,6 +1145,83 @@ export default function Calculo() {
             className="bg-violet-600 hover:bg-violet-700 text-white"
           >
             {criarSupMut.isPending || editarSupMut.isPending ? "Salvando..." : "Salvar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+
+    {/* Modal Adicionar Manual */}
+    <Dialog open={modalManual} onOpenChange={(open) => !open && setModalManual(false)}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Adicionar Chave Manual ao Cálculo</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-3 py-2">
+          <div className="col-span-2">
+            <Label className="text-xs">Chave J *</Label>
+            <Input
+              className="h-7 text-xs mt-1"
+              placeholder="Ex: J1234567"
+              value={formManual.chaveJ}
+              onChange={e => {
+                const v = e.target.value.toUpperCase();
+                setFormManual(p => ({ ...p, chaveJ: v, nomeAgente: "" }));
+                setChaveJBuscaManual(v);
+              }}
+            />
+            {agenteManual?.nomeAgente && (
+              <p className="text-[10px] text-green-600 mt-0.5">✓ {agenteManual.nomeAgente}</p>
+            )}
+          </div>
+          <div className="col-span-2">
+            <Label className="text-xs">Nome do Agente</Label>
+            <Input className="h-7 text-xs mt-1" value={formManual.nomeAgente} onChange={e => setFormManual(p => ({ ...p, nomeAgente: e.target.value }))} />
+          </div>
+          <div className="col-span-2">
+            <Label className="text-xs">Mês de Referência * (MM/AAAA)</Label>
+            <Input className="h-7 text-xs mt-1" placeholder="Ex: 05/2026" value={formManual.mesRef} onChange={e => setFormManual(p => ({ ...p, mesRef: e.target.value }))} />
+          </div>
+          <div>
+            <Label className="text-xs">Comissão Consig (R$)</Label>
+            <Input className="h-7 text-xs mt-1" placeholder="0,00" value={formManual.comissaoConsig} onChange={e => setFormManual(p => ({ ...p, comissaoConsig: e.target.value }))} />
+          </div>
+          <div>
+            <Label className="text-xs">Comissão Consórcio (R$)</Label>
+            <Input className="h-7 text-xs mt-1" placeholder="0,00" value={formManual.comissaoConsorcio} onChange={e => setFormManual(p => ({ ...p, comissaoConsorcio: e.target.value }))} />
+          </div>
+          <div>
+            <Label className="text-xs">Comissão Ourocap (R$)</Label>
+            <Input className="h-7 text-xs mt-1" placeholder="0,00" value={formManual.comissaoOurocap} onChange={e => setFormManual(p => ({ ...p, comissaoOurocap: e.target.value }))} />
+          </div>
+          <div>
+            <Label className="text-xs">Comissão C/C (R$)</Label>
+            <Input className="h-7 text-xs mt-1" placeholder="0,00" value={formManual.comissaoCc} onChange={e => setFormManual(p => ({ ...p, comissaoCc: e.target.value }))} />
+          </div>
+          <div>
+            <Label className="text-xs">Comissão Seguros (R$)</Label>
+            <Input className="h-7 text-xs mt-1" placeholder="0,00" value={formManual.comissaoSeguros} onChange={e => setFormManual(p => ({ ...p, comissaoSeguros: e.target.value }))} />
+          </div>
+          <div>
+            <Label className="text-xs">Ajuda de Custo (R$)</Label>
+            <Input className="h-7 text-xs mt-1" placeholder="0,00" value={formManual.ajudaCusto} onChange={e => setFormManual(p => ({ ...p, ajudaCusto: e.target.value }))} />
+          </div>
+          <div>
+            <Label className="text-xs">Créditos/Débitos (R$)</Label>
+            <Input className="h-7 text-xs mt-1" placeholder="0,00" value={formManual.creditosDebitos} onChange={e => setFormManual(p => ({ ...p, creditosDebitos: e.target.value }))} />
+          </div>
+          <div>
+            <Label className="text-xs">Adiantamento (R$)</Label>
+            <Input className="h-7 text-xs mt-1" placeholder="0,00" value={formManual.adiantamento} onChange={e => setFormManual(p => ({ ...p, adiantamento: e.target.value }))} />
+          </div>
+          <div>
+            <Label className="text-xs">Reajuste (R$)</Label>
+            <Input className="h-7 text-xs mt-1" placeholder="0,00" value={formManual.reajuste} onChange={e => setFormManual(p => ({ ...p, reajuste: e.target.value }))} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" size="sm" onClick={() => setModalManual(false)}>Cancelar</Button>
+          <Button size="sm" className="bg-purple-600 hover:bg-purple-700 text-white" onClick={salvarManual} disabled={criarManualMut.isPending}>
+            {criarManualMut.isPending ? "Salvando..." : "Salvar"}
           </Button>
         </DialogFooter>
       </DialogContent>
