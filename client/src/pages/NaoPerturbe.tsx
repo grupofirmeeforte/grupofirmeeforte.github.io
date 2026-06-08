@@ -10,8 +10,10 @@ import { PhoneOff, Plus, Trash2, Upload, Search, ShieldAlert, FileSpreadsheet, A
 import * as XLSX from "xlsx";
 import PageHeader from "@/components/PageHeader";
 import { useLocation } from "wouter";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 export default function NaoPerturbe() {
+  useRegistrarModulo('Não Perturbe');
   const [, setLocation] = useLocation();
   const [busca, setBusca] = useState("");
   const [pagina, setPagina] = useState(1);

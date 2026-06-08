@@ -11,6 +11,7 @@ import { ArrowLeft, FileText, CreditCard, Users, Star, Shield, Smile, User, Key,
 import { toast } from 'sonner';
 import { trpc } from '@/lib/trpc';
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 // ─── COMPONENTE DE BUSCA DE AGENTES COM AUTOCOMPLETE ────────────────────────
 function BuscaAgentesSugestoes({ termo, onSelect }: {
@@ -1323,6 +1324,7 @@ function MinhaTabela() {
 }
 // ─── COMPONENTE PRINCIPAL ────────────────────────────────────────────────────
 export default function ExtratosPage() {
+  useRegistrarModulo('Extratos');
   const [, navigate] = useLocation();
   const params = new URLSearchParams(window.location.search);
   const abaParam = params.get('aba') as Aba | null;

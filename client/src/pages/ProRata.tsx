@@ -19,6 +19,7 @@ import {
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const PAGE_SIZE = 100;
 
@@ -53,6 +54,7 @@ function fmtDate(d: Date | string | null | undefined): string {
 
 // ─── COMPONENTE PRINCIPAL ────────────────────────────────────────────────────
 export default function ProRataPage() {
+  useRegistrarModulo('Pró-Rata');
   const [, navigate] = useLocation();
   const { user, loading: authLoading } = useAuth();
   const cargo = (user as any)?.cargo ?? '';

@@ -25,6 +25,7 @@ import {
 } from "recharts";
 import { ArrowLeft, BarChart2, TrendingUp, PieChart } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 // Paleta de cores para agentes
 const CORES_AGENTES = [
@@ -194,6 +195,7 @@ function GraficoPorTipo({ periodo, empresa }: { periodo: Periodo; empresa: strin
 
 // ─── PÁGINA PRINCIPAL ────────────────────────────────────────────────────────
 export default function GraficoProducaoBBPage() {
+  useRegistrarModulo('Gráfico Produção BB');
   const [, navigate] = useLocation();
   const [empresa, setEmpresa] = useState("__all__");
 

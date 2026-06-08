@@ -7,6 +7,7 @@ import { ArrowLeft, Download, Send, Trash2, Pencil, Settings, Plus, X, RefreshCw
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const fmtMoeda = (v: any) => {
   if (v === null || v === undefined || v === "" || v === "NULL") return "-";
@@ -34,6 +35,7 @@ const fmtMesRef = (v: string | null | undefined) => {
 };
 
 export default function Calculo() {
+  useRegistrarModulo('Cálculo');
   const [, navigate] = useLocation();
   const [mesRef, setMesRef] = useState("");
   const [chaveJ, setChaveJ] = useState("");

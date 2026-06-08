@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Plus, Pencil, Trash2, Upload, Search, X, Download, RefreshCw, Calculator } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 type Consignado = {
   id: number;
@@ -112,6 +113,7 @@ function mesNumParaStr(mes: string | null | undefined): string {
 }
 
 export default function Consignado() {
+  useRegistrarModulo('Consignado');
   const [, setLocation] = useLocation();
   const [filtroMes, setFiltroMes] = useState('');
   const [filtroEmpresa, setFiltroEmpresa] = useState('');

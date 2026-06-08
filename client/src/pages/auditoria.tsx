@@ -19,6 +19,7 @@ import AuditoriaPermissoes from './auditoria-permissoes';
 import { useLocation } from 'wouter';
 import { toast } from 'sonner';
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 // ─── TIPOS ────────────────────────────────────────────────────────────────────
 type Feriado = {
@@ -33,6 +34,7 @@ type Feriado = {
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 export default function AuditoriaPage() {
+  useRegistrarModulo('Auditoria');
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const abaParam = searchParams.get('aba');
@@ -196,14 +198,38 @@ export default function AuditoriaPage() {
   const moduloBadge = (modulo: string | null | undefined) => {
     const m = modulo || '-';
     const map: Record<string, string> = {
-      'Agentes': 'bg-blue-100 text-blue-800',
-      'Certificações': 'bg-purple-100 text-purple-800',
-      'Fornecedores': 'bg-yellow-100 text-yellow-800',
-      'Operações': 'bg-green-100 text-green-800',
-      'Financeiro': 'bg-emerald-100 text-emerald-800',
-      'Febraban': 'bg-indigo-100 text-indigo-800',
-      'Auditoria': 'bg-gray-100 text-gray-800',
       'Login': 'bg-orange-100 text-orange-800',
+      'Consignado': 'bg-blue-100 text-blue-800',
+      'Mailing/CRM': 'bg-pink-100 text-pink-800',
+      'Contratos': 'bg-cyan-100 text-cyan-800',
+      'Febraban': 'bg-indigo-100 text-indigo-800',
+      'Extratos': 'bg-teal-100 text-teal-800',
+      'Pagamentos': 'bg-emerald-100 text-emerald-800',
+      'Cálculo': 'bg-violet-100 text-violet-800',
+      'Certificações': 'bg-purple-100 text-purple-800',
+      'Agentes': 'bg-blue-100 text-blue-800',
+      'CRM': 'bg-rose-100 text-rose-800',
+      'Não Perturbe': 'bg-red-100 text-red-800',
+      'Ativo Imobilizado': 'bg-amber-100 text-amber-800',
+      'Relatórios': 'bg-lime-100 text-lime-800',
+      'Conta Corrente': 'bg-sky-100 text-sky-800',
+      'Consórcio': 'bg-fuchsia-100 text-fuchsia-800',
+      'Ourocap': 'bg-yellow-100 text-yellow-800',
+      'Seguros': 'bg-green-100 text-green-800',
+      'BB Dental': 'bg-blue-100 text-blue-800',
+      'Fornecedores': 'bg-orange-100 text-orange-800',
+      'Contas Lojas': 'bg-stone-100 text-stone-800',
+      'Gráfico Produção BB': 'bg-indigo-100 text-indigo-800',
+      'Acompanhamento Diário': 'bg-cyan-100 text-cyan-800',
+      'Relatório ChaveJ': 'bg-violet-100 text-violet-800',
+      'Relatório RBM Despesas': 'bg-emerald-100 text-emerald-800',
+      'Extratos Bancários': 'bg-teal-100 text-teal-800',
+      'Pró-Rata': 'bg-pink-100 text-pink-800',
+      'Tabela Comissão': 'bg-amber-100 text-amber-800',
+      'Uniformes e Crachás': 'bg-lime-100 text-lime-800',
+      'Documentação Agentes': 'bg-sky-100 text-sky-800',
+      'Agências BB': 'bg-blue-100 text-blue-800',
+      'Auditoria': 'bg-gray-100 text-gray-800',
       'dashboard': 'bg-slate-100 text-slate-700',
     };
     return map[m] ?? 'bg-gray-100 text-gray-600';
@@ -447,61 +473,61 @@ export default function AuditoriaPage() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-blue-800 text-white">
-                  <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Agente</th>
-                  <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Módulo / Ação</th>
-                  <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Horário</th>
-                  <th className="px-3 py-2 text-left font-semibold whitespace-nowrap">Duração</th>
-                  <th className="px-3 py-2 text-left font-semibold">Descrição</th>
+                  <th className="px-2 py-1.5 text-left font-semibold whitespace-nowrap text-[11px] w-[180px]">Agente</th>
+                  <th className="px-2 py-1.5 text-left font-semibold whitespace-nowrap text-[11px] w-[110px]">Módulo / Ação</th>
+                  <th className="px-2 py-1.5 text-left font-semibold whitespace-nowrap text-[11px] w-[90px]">Horário</th>
+                  <th className="px-2 py-1.5 text-left font-semibold whitespace-nowrap text-[11px] w-[70px]">Duração</th>
+                  <th className="px-2 py-1.5 text-left font-semibold text-[11px]">Descrição</th>
                 </tr>
               </thead>
               <tbody>
                 {loadingLogs ? (
-                  <tr><td colSpan={5} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                  <tr><td colSpan={5} className="text-center py-6 text-gray-400">Carregando...</td></tr>
                 ) : logs && logs.length > 0 ? (
                   logs.map((log: any, idx: number) => (
                     <tr key={log.id} className={idx % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-blue-50/30 hover:bg-blue-100/40'}>
                       {/* Coluna Agente */}
-                      <td className="px-3 py-1.5">
-                        <div className="font-mono text-[11px] text-blue-700 font-semibold">{log.chaveJ}</div>
-                        <div className="text-[11px] text-gray-700">{log.nomeAgente}</div>
-                        {log.ipAddress && <div className="text-[10px] text-gray-400">{log.ipAddress}</div>}
+                      <td className="px-2 py-1">
+                        <div className="font-mono text-[10px] text-blue-700 font-semibold leading-tight">{log.chaveJ}</div>
+                        <div className="text-[10px] text-gray-700 leading-tight truncate max-w-[170px]" title={log.nomeAgente}>{log.nomeAgente}</div>
+                        {log.ipAddress && <div className="text-[9px] text-gray-400 leading-tight">{log.ipAddress}</div>}
                       </td>
                       {/* Coluna Módulo/Ação */}
-                      <td className="px-3 py-1.5">
+                      <td className="px-2 py-1">
                         {log.modulo && (
-                          <span className={`inline-block text-[10px] px-1.5 py-0.5 rounded font-medium mb-0.5 ${moduloBadge(log.modulo)}`}>
+                          <span className={`inline-block text-[9px] px-1 py-0.5 rounded font-medium leading-tight mb-0.5 ${moduloBadge(log.modulo)}`}>
                             {log.modulo}
                           </span>
                         )}
                         {log.acao && (
                           <div>
-                            <span className={`inline-block text-[10px] px-1.5 py-0.5 rounded ${acaoBadge(log.acao)}`}>
+                            <span className={`inline-block text-[9px] px-1 py-0.5 rounded leading-tight ${acaoBadge(log.acao)}`}>
                               {log.acao}
                             </span>
                           </div>
                         )}
                       </td>
                       {/* Coluna Horário */}
-                      <td className="px-3 py-1.5 whitespace-nowrap">
-                        <div className="text-[11px] text-gray-800">{new Date(log.horarioEntrada).toLocaleDateString('pt-BR')}</div>
-                        <div className="text-[10px] text-gray-500">{new Date(log.horarioEntrada).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
+                      <td className="px-2 py-1 whitespace-nowrap">
+                        <div className="text-[10px] text-gray-800 leading-tight">{new Date(log.horarioEntrada).toLocaleDateString('pt-BR')}</div>
+                        <div className="text-[9px] text-gray-500 leading-tight">{new Date(log.horarioEntrada).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
                       </td>
                       {/* Coluna Duração */}
-                      <td className="px-3 py-1.5 whitespace-nowrap">
+                      <td className="px-2 py-1 whitespace-nowrap">
                         {fmtDuracao(log.horarioEntrada, log.horarioSaida)
-                          ? <span className="text-[11px] text-emerald-700 font-medium">{fmtDuracao(log.horarioEntrada, log.horarioSaida)}</span>
-                          : <span className="text-[10px] text-gray-400">em andamento</span>
+                          ? <span className="text-[10px] text-emerald-700 font-medium">{fmtDuracao(log.horarioEntrada, log.horarioSaida)}</span>
+                          : <span className="text-[9px] text-gray-400">andamento</span>
                         }
                       </td>
                       {/* Coluna Descrição */}
-                      <td className="px-3 py-1.5 max-w-xs">
-                        <div className="text-[11px] text-gray-600 truncate" title={log.descricao || ''}>{log.descricao || '-'}</div>
-                        <div className="text-[10px] text-gray-400 font-mono">{log.numeroEntrada}</div>
+                      <td className="px-2 py-1">
+                        <div className="text-[10px] text-gray-600 truncate max-w-[320px]" title={log.descricao || ''}>{log.descricao || '-'}</div>
+                        <div className="text-[9px] text-gray-400 font-mono leading-tight">{log.numeroEntrada}</div>
                       </td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={5} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
+                  <tr><td colSpan={5} className="text-center py-6 text-gray-400">Nenhum registro encontrado</td></tr>
                 )}
               </tbody>
             </table>

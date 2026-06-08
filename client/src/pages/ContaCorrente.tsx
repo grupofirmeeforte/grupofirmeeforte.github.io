@@ -10,6 +10,7 @@ import { ArrowLeft, Upload, Edit2, Trash2, Search, Calculator, Send, Settings } 
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 // ─── Formatadores ────────────────────────────────────────────────
 function fmtMoeda(v: string | number | null | undefined): string {
@@ -94,6 +95,7 @@ function toNum(v: any): number {
 
 // ─── Componente principal ─────────────────────────────────────────
 export default function ContaCorrente() {
+  useRegistrarModulo('Conta Corrente');
   const [, navigate] = useLocation();
 
   // Filtros

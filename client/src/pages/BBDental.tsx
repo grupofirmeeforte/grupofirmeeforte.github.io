@@ -8,6 +8,7 @@ import { Upload, Trash2, Search, RefreshCw } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 function fmtMoeda(v: string | number | null | undefined): string {
   if (v == null || v === "") return "-";
@@ -99,6 +100,7 @@ function mapearColunas(headers: string[]): Record<string, number> {
 }
 
 export default function BBDental() {
+  useRegistrarModulo('BB Dental');
   const [search, setSearch] = useState("");
   const [empresa, setEmpresa] = useState("__all__");
   const [mesAno, setMesAno] = useState("__all__");

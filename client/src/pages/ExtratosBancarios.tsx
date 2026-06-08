@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Pencil, Trash2, Building2, TrendingUp, TrendingDown, DollarSign, Search, RefreshCw } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const EMPRESAS = ["BMF", "FLEX"];
 const TIPOS = ["CRÉDITO", "DÉBITO"];
@@ -43,6 +44,7 @@ function mesAtual() {
 }
 
 export default function ExtratosBancarios() {
+  useRegistrarModulo('Extratos Bancários');
   const [, navigate] = useLocation();
   // Queriesltros
   const [empresa, setEmpresa] = useState<string>("Todas");

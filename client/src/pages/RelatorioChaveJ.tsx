@@ -6,6 +6,7 @@ import { Download } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { usePermissao } from "@/hooks/usePermissao";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const moeda = (v: number) =>
   v === 0 ? <span className="text-gray-300">R$ -</span> :
@@ -32,6 +33,7 @@ const TIPO_LABEL: Record<TipoOP, string> = {
 const ANOS = [2026, 2027, 2028, 2029, 2030];
 
 export default function RelatorioChaveJ() {
+  useRegistrarModulo('Relatório ChaveJ');
   const [ano, setAno] = useState<number>(2026);
   const [empresa, setEmpresa] = useState<string>("");
   const { cargo } = usePermissao();

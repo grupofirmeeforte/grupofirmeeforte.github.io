@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const TIPOS_COMUNS = ["Água", "Energia", "Aluguel", "Internet", "Telefone", "IPTU", "Condomínio", "Gás", "Outros"];
 
@@ -39,6 +40,7 @@ const emptyForm = {
 };
 
 export default function ContasLojas() {
+  useRegistrarModulo('Contas Lojas');
   const { user } = useAuth();
   const utils = trpc.useUtils();
 

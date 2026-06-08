@@ -178,6 +178,35 @@ export const auditoriaRouter = router({
     return rows.map(r => r.modulo).filter(Boolean) as string[];
   }),
 
+  // Registra acesso a um módulo específico (chamado pelo frontend ao navegar)
+  registrarAcessoModulo: publicProcedure
+    .input(z.object({
+      agenteId: z.number(),
+      chaveJ: z.string(),
+      nomeAgente: z.string(),
+      modulo: z.string(),
+      ipAddress: z.string().optional(),
+      userAgent: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return null;
+      const ts = Date.now();
+      const rand = Math.floor(Math.random() * 100000);
+      const numeroEntrada = `MOD-${input.chaveJ}-${ts}-${rand}`;
+      return await db.insert(auditoria).values({
+        agenteId: input.agenteId,
+        chaveJ: input.chaveJ,
+        nomeAgente: input.nomeAgente,
+        numeroEntrada,
+        modulo: input.modulo,
+        acao: 'Acesso',
+        descricao: `Agente ${input.nomeAgente} acessou o módulo ${input.modulo}`,
+        ipAddress: input.ipAddress,
+        userAgent: input.userAgent,
+      });
+    }),
+
   create: publicProcedure
     .input(z.object({
       agenteId: z.number(),

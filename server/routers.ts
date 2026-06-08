@@ -171,6 +171,15 @@ export const appRouter = router({
           });
         }
         
+        // Verificar se agente está cancelado ou inativo
+        const situacaoAgente = (agente.situacao || '').toLowerCase().trim();
+        if (situacaoAgente === 'cancelado' || situacaoAgente === 'inativo') {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: `Acesso bloqueado. Sua conta está ${agente.situacao}. Entre em contato com o administrador.`,
+          });
+        }
+
         // Verificar senha
         if (agente.senha !== input.senha) {
           await incrementLoginAttempts(input.chaveJ);

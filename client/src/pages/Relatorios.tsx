@@ -5,6 +5,7 @@ import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useState, useMemo } from "react";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 // Função para formatar número como moeda brasileira
 const formatarMoeda = (valor: any) => {
@@ -20,6 +21,7 @@ const formatarMoeda = (valor: any) => {
 };
 
 export default function Relatorios() {
+  useRegistrarModulo('Relatórios');
   const [, navigate] = useLocation();
 
   // Calcular mês anterior dinamicamente

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Plus, Pencil, Trash2, Camera, X, Eye, Shirt } from "lucide-react";
 import { toast } from "sonner";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const TIPOS_ITEM = ["Boné", "Crachá", "Calça", "Camisa", "Colete", "Uniforme", "Outros"];
 const TAMANHOS = ["PP", "P", "M", "G", "GG", "XGG", "Único"];
@@ -37,6 +38,7 @@ const emptyForm = {
 };
 
 export default function UniformesCrachas() {
+  useRegistrarModulo('Uniformes e Crachás');
   const [, navigate] = useLocation();
   const [filtros, setFiltros] = useState({ chaveJ: "", nomeAgente: "", tipoItem: "", situacao: "" });
   const [showForm, setShowForm] = useState(false);

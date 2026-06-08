@@ -7,6 +7,7 @@ import * as XLSX from "xlsx";
 import { BancoSelect } from "@/components/BancoSelect";
 import { ArrowLeft } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 type DespesaFixa = {
   id: number;
@@ -97,6 +98,7 @@ function CidadeRespSelect({ value, onChange }: { value: string; onChange: (v: st
 }
 
 export default function DespesasFixasPage() {
+  useRegistrarModulo('Fornecedores');
   const [, navigate] = useLocation();
 
   // Filtros

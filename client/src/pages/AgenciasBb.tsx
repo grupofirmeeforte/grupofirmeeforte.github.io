@@ -6,8 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Search, X, Building2, Hash } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 export default function AgenciasBb() {
+  useRegistrarModulo('Agências BB');
   const [busca, setBusca] = useState("");
   const buscaDebounced = useDebounce(busca, 300);
 

@@ -10,6 +10,7 @@ import { Pencil, Trash2, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { usePermissao } from "@/hooks/usePermissao";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 type Row = {
@@ -130,6 +131,7 @@ function resultadoBadge(resultado?: string | null) {
 }
 
 export default function MailingCrm() {
+  useRegistrarModulo('Mailing/CRM');
   const utils = trpc.useUtils();
   const fileRef = useRef<HTMLInputElement>(null);
   const { cargo } = usePermissao();

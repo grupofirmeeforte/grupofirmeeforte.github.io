@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ChevronLeft, ChevronRight, Trophy, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const MESES = [
   "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
@@ -54,6 +55,7 @@ function hasAcompanhamentoAccess(user: any): boolean {
 }
 
 export default function AcompanhamentoDiario() {
+  useRegistrarModulo('Acompanhamento Diário');
   const [, navigate] = useLocation();
   const { user, loading: authLoading } = useAuth();
   const hoje = new Date();

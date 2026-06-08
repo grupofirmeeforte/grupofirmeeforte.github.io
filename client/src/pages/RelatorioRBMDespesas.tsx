@@ -3,6 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Download, TrendingUp, TrendingDown } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 function fmtBRL(v: number) {
   if (v === 0) return "-";
@@ -13,6 +14,7 @@ function fmtPct(v: number) {
 }
 
 export default function RelatorioRBMDespesas() {
+  useRegistrarModulo('Relatório RBM Despesas');
   const [ano, setAno] = useState("2026");
   const [empresa, setEmpresa] = useState("Todas");
   const [mes, setMes] = useState("");

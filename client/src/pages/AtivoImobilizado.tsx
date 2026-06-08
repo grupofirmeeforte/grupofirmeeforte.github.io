@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Plus, Pencil, Trash2, Camera, X, Eye, Package, Copy } from "lucide-react";
 import { toast } from "sonner";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const formatarMoeda = (v: any) => {
   if (!v && v !== 0) return "-";
@@ -106,6 +107,7 @@ function FotoTooltip({ fotoUrl, fotoKey }: { fotoUrl: string; fotoKey?: string |
 }
 
 export default function AtivoImobilizado() {
+  useRegistrarModulo('Ativo Imobilizado');
   const [, navigate] = useLocation();
   const [filtros, setFiltros] = useState({ descricao: "", categoria: "", situacao: "", responsavel: "" });
   const [showForm, setShowForm] = useState(false);

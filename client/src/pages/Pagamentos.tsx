@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { ChaveJRespInput } from "@/components/ChaveJRespInput";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const TIPOS_PAGTO = [
   "Adto", "Agua", "Ajuda de Custo", "Aluguel", "Cancelado", "Comissão",
@@ -177,6 +178,7 @@ function CidadeRespSelectPag({ value, onChange }: { value: string; onChange: (v:
 }
 
 export default function PagamentosPage() {
+  useRegistrarModulo('Pagamentos');
   const [, navigate] = useLocation();
 
   const [filtroMesAno, setFiltroMesAno] = useState("");

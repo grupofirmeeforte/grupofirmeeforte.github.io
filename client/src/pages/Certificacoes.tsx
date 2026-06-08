@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Plus, Pencil, Trash2, Upload, ExternalLink } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 type Cert = {
   id: number;
@@ -70,6 +71,7 @@ function situacaoColor(s: string | null | undefined) {
 }
 
 export default function Certificacoes() {
+  useRegistrarModulo('Certificações');
   const [, setLocation] = useLocation();
   const [busca, setBusca] = useState('');
   const [modalAberto, setModalAberto] = useState(false);

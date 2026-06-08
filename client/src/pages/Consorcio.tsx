@@ -10,6 +10,7 @@ import { ArrowLeft, Upload, Edit2, Trash2, Search, Settings, RefreshCw, Calculat
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 // ─── Formatadores ────────────────────────────────────────────────
 function fmtMoeda(v: string | number | null | undefined): string {
@@ -68,6 +69,7 @@ function toNum(v: any): number {
 
 // ─── Componente principal ─────────────────────────────────────────
 export default function Consorcio() {
+  useRegistrarModulo('Consórcio');
   const [, navigate] = useLocation();
 
   // Filtros

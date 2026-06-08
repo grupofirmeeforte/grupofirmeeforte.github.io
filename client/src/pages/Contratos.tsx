@@ -13,10 +13,12 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 type Aba = 'upload' | 'relatorio' | 'crm';
 
 export default function ContratosPage() {
+  useRegistrarModulo('Contratos');
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const [aba, setAba] = useState<Aba>('relatorio');

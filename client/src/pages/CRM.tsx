@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 import {
   Users, TrendingUp, Phone, CheckSquare, Mail, BarChart2,
   Plus, Search, ArrowLeft, Trash2, Edit, Eye, RefreshCw,
@@ -826,6 +827,7 @@ const ABAS: { key: AbaType; label: string; icon: any }[] = [
 ];
 
 export default function CRMPage() {
+  useRegistrarModulo('CRM');
   const [, navigate] = useLocation();
   const [abaAtiva, setAbaAtiva] = useState<AbaType>("clientes");
 

@@ -19,6 +19,7 @@ import { ArrowLeft, Plus, Pencil, Trash2, Search, X, Upload, Download } from 'lu
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 type TabelaRow = {
   id: number;
@@ -232,6 +233,7 @@ function ReceboCelula({
 }
 
 export default function TabelaComissao() {
+  useRegistrarModulo('Tabela Comissão');
   const [, setLocation] = useLocation();
   const [filtroEmpresa, setFiltroEmpresa] = useState('');
   const [filtroConvenio, setFiltroConvenio] = useState('');

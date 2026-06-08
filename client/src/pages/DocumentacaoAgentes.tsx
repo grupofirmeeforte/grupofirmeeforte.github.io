@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { ArrowLeft, Upload, Trash2, Eye, Search, X, FileText, Image as ImageIcon, File, FolderOpen, ChevronRight } from 'lucide-react';
 import { useLocation } from 'wouter';
 import PageHeader from '@/components/PageHeader';
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const TIPOS_DOCUMENTO = [
   'Contrato',
@@ -45,6 +46,7 @@ function getFileIcon(tipo: string) {
 }
 
 export default function DocumentacaoAgentes() {
+  useRegistrarModulo('Documentação Agentes');
   const [, setLocation] = useLocation();
   const utils = trpc.useUtils();
 

@@ -22,6 +22,7 @@ import {
 import { Plus, Edit2, Trash2, Search, ExternalLink, GitMerge, Copy, Check, FileText } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
 import { useLocation } from "wouter";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 // Função para formatar data YYYY-MM-DD para DD/MM/YYYY
 const formatDateString = (dateStr: string): string => {
@@ -31,6 +32,7 @@ const formatDateString = (dateStr: string): string => {
 };
 
 export default function AgentesPage() {
+  useRegistrarModulo('Agentes');
   const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [empresa, setEmpresa] = useState<string>("");

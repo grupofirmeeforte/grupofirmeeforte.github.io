@@ -28,6 +28,7 @@ import {
 import * as XLSX from "xlsx";
 import { formatMesAno } from "@/lib/mesano";
 import PageHeader from "@/components/PageHeader";
+import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 // Alias para compatibilidade com código existente
 const mesanoToStr = formatMesAno;
@@ -364,6 +365,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
 }
 
 export default function FebrabanPage() {
+  useRegistrarModulo('Febraban');
   const [, navigate] = useLocation();
   const abaInicial = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('aba') === 'graficos' ? 'graficos' : 'producao';
   const [search, setSearch] = useState("");
