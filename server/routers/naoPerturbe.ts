@@ -252,6 +252,29 @@ export const naoPerturbeRouter = router({
       return { inseridos, atualizados, ignorados, total: input.length };
     }),
 
+  // Verificar se uma lista de CPFs está na lista Não Pertube
+  verificarCpfs: protectedProcedure
+    .input(z.object({ cpfs: z.array(z.string()) }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "DB indisponível" });
+      if (input.cpfs.length === 0) return { bloqueados: [] };
+      // Normalizar CPFs de entrada e formatar para comparação
+      const cpfsFormatados = input.cpfs
+        .map(c => {
+          const d = c.replace(/\D/g, "");
+          if (d.length === 11) return `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9)}`;
+          return c;
+        })
+        .filter(Boolean);
+      if (cpfsFormatados.length === 0) return { bloqueados: [] };
+      const encontrados = await db
+        .select({ cpf: listaNaoPerturbe.cpf, motivo: listaNaoPerturbe.motivo })
+        .from(listaNaoPerturbe)
+        .where(inArray(listaNaoPerturbe.cpf, cpfsFormatados));
+      return { bloqueados: encontrados.map(r => ({ cpf: r.cpf ?? "", motivo: r.motivo ?? "NÃO PERTUBE" })) };
+    }),
+
   remover: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ input }) => {

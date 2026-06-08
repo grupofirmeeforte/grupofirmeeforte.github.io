@@ -679,3 +679,9 @@
 - [x] Implementar importação com upsert por CPF (sobrescreve se já existir)
 - [x] Atualizar frontend da aba Não Pertube para mostrar novas colunas e botão de importar XLSX
 - [x] Criar e entregar template XLSX para importação
+
+## MAILING - VERIFICAÇÃO NÃO PERTUBE 08/06/2026
+- [x] Adicionar procedure verificarCpfs no router naoPerturbe (busca por lista de CPFs)
+- [x] No Mailing, ao carregar clientes, verificar automaticamente se CPF está na lista Não Pertube
+- [x] Clientes encontrados: exibir badge/ícone vermelho "NÃO PERTUBE" ao lado do nome
+- [x] Clientes não encontrados: exibir badge verde "OK" ou nenhum indicador

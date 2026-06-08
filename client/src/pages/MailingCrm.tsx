@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import PageHeader from "@/components/PageHeader";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -219,6 +219,21 @@ export default function MailingCrm() {
     },
     onError: (e) => toast.error('Erro: ' + e.message),
   });
+
+  // Verificar CPFs na lista Não Pertube
+  const cpfsDaPagina = useMemo(() => rows.map(r => r.cpf ?? "").filter(Boolean), [rows]);
+  const { data: naoPerturbeData } = trpc.naoPerturbe.verificarCpfs.useQuery(
+    { cpfs: cpfsDaPagina },
+    { enabled: cpfsDaPagina.length > 0, staleTime: 60_000 }
+  );
+  const cpfsBloqueados = useMemo(() => {
+    const map = new Map<string, string>();
+    naoPerturbeData?.bloqueados.forEach(b => {
+      const norm = b.cpf.replace(/\D/g, "");
+      map.set(norm, b.motivo);
+    });
+    return map;
+  }, [naoPerturbeData]);
 
   const totalPages = Math.ceil(total / PER_PAGE);
 
@@ -502,30 +517,51 @@ export default function MailingCrm() {
                   className={`border-b border-gray-100 hover:bg-blue-50/40 transition-colors ${i % 2 === 0 ? "bg-white" : "bg-blue-50/20"}`}
                 >
                   {/* Coluna 1: Cliente */}
-                  <td className="px-3 py-2.5 min-w-[180px]">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="font-semibold text-gray-800 text-[13px]">{r.nome ?? "—"}</span>
-                      {r.sexo && (
-                        <span className={`text-[9px] px-1 py-0.5 rounded font-bold ${r.sexo === "M" ? "bg-blue-100 text-blue-700" : "bg-pink-100 text-pink-700"}`}>
-                          {r.sexo}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-[11px] text-gray-500">
-                      {r.cpf && <span className="font-mono">{formatCpf(r.cpf)}</span>}
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      {r.dtaNasc && <span className="text-[10px] text-gray-400">Nasc: {r.dtaNasc}</span>}
-                      {r.idade != null && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-semibold">
-                          {r.idade} anos
-                        </span>
-                      )}
-                    </div>
-                    {r.naoPerturbe && r.naoPerturbe !== "SEM RESTRIÇÃO" && (
-                      <div className="text-[10px] text-red-500 mt-0.5">⛔ {r.naoPerturbe}</div>
-                    )}
-                  </td>
+                  {(() => {
+                    const cpfNorm = (r.cpf ?? "").replace(/\D/g, "");
+                    const bloqueadoPorLista = cpfNorm.length === 11 && cpfsBloqueados.has(cpfNorm);
+                    const motivoBloqueio = bloqueadoPorLista ? cpfsBloqueados.get(cpfNorm) : null;
+                    const bloqueadoLegado = r.naoPerturbe && r.naoPerturbe !== "SEM RESTRIÇÃO";
+                    return (
+                      <td className="px-3 py-2.5 min-w-[180px]">
+                        <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                          <span className="font-semibold text-gray-800 text-[13px]">{r.nome ?? "—"}</span>
+                          {r.sexo && (
+                            <span className={`text-[9px] px-1 py-0.5 rounded font-bold ${r.sexo === "M" ? "bg-blue-100 text-blue-700" : "bg-pink-100 text-pink-700"}`}>
+                              {r.sexo}
+                            </span>
+                          )}
+                          {bloqueadoPorLista && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-600 text-white font-bold">
+                              ⛔ NÃO PERTUBE
+                            </span>
+                          )}
+                          {!bloqueadoPorLista && cpfNorm.length === 11 && naoPerturbeData && (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">
+                              ✓ OK
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-gray-500">
+                          {r.cpf && <span className="font-mono">{formatCpf(r.cpf)}</span>}
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          {r.dtaNasc && <span className="text-[10px] text-gray-400">Nasc: {r.dtaNasc}</span>}
+                          {r.idade != null && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-semibold">
+                              {r.idade} anos
+                            </span>
+                          )}
+                        </div>
+                        {bloqueadoPorLista && motivoBloqueio && (
+                          <div className="text-[10px] text-red-500 mt-0.5">⛔ {motivoBloqueio}</div>
+                        )}
+                        {!bloqueadoPorLista && bloqueadoLegado && (
+                          <div className="text-[10px] text-red-500 mt-0.5">⛔ {r.naoPerturbe}</div>
+                        )}
+                      </td>
+                    );
+                  })()}
 
                   {/* Coluna 2: Telefones — oculto se NÃO PERTUBE */}
                   <td className="px-3 py-2.5 min-w-[180px]">
