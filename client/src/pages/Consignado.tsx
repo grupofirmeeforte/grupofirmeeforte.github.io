@@ -831,14 +831,13 @@ export default function Consignado() {
                   </td>
                   {/* Coluna Comissão */}
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
-                    {/* % consumido do RBM = comissão / RBM */}
+                    {/* % comissão sobre valor líquido */}
                     {(() => {
                       const comissao = parseFloat(String(r.totalComissao || '0').replace(',', '.'));
-                      const rbmVal = parseFloat(String(r.rbm || '0').replace(/[^0-9.,]/g, '').replace(',', '.'));
-                      if (rbmVal > 0 && comissao > 0) {
-                        const percRbm = (comissao / rbmVal) * 100;
-                        const cor = percRbm >= 100 ? 'text-red-600' : percRbm >= 80 ? 'text-orange-500' : 'text-blue-600';
-                        return <div className={`text-[10px] font-semibold ${cor}`}>{percRbm.toFixed(1)}% do RBM</div>;
+                      const vliq = parseFloat(String(r.valorLiquido || '0').replace(/[^0-9.,]/g, '').replace(',', '.'));
+                      if (vliq > 0 && comissao > 0) {
+                        const perc = (comissao / vliq) * 100;
+                        return <div className="text-[10px] font-semibold text-blue-600">{perc.toFixed(2)}% s/ líquido</div>;
                       }
                       return null;
                     })()}
