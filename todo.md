@@ -670,3 +670,6 @@
 - [x] Permitir editar situação inline clicando no badge (qualquer situação: Pendente, Contratada, Cancelada)
 - [x] Salvar situação manual via mutation contratos.atualizar e recarregar perspectiva
 - [x] Confirmar que todos os contratos já têm PDF (fileKey NOT NULL — não precisa filtrar)
+
+## CORREÇÕES 08/06/2026
+- [x] Corrigir totais do Consignado: tela inicializa com o mês mais recente selecionado automaticamente, evitando soma de todos os meses

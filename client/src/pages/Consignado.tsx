@@ -244,6 +244,14 @@ export default function Consignado() {
     onError: (e) => toast.error('Erro na importação: ' + e.message),
   });
 
+  // Inicializar filtroMes com o mês mais recente quando a lista de meses carregar
+  useEffect(() => {
+    if (meses.length > 0 && !filtroMes) {
+      // meses já vem ordenado DESC (mais recente primeiro)
+      setFiltroMes(meses[0]);
+    }
+  }, [meses]);
+
   // Preencher campos automáticos quando formulasData chegar
   useEffect(() => {
     if (!formulasData || 'erro' in formulasData) return;
