@@ -137,13 +137,14 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
 
   const seriesChaveJ = dadosChaveJ?.series ?? [];
   const labelsChaveJ = dadosChaveJ?.labels ?? [];
-  const top10 = useMemo(() => seriesChaveJ.slice(0, 10), [seriesChaveJ]);
+  // Todas as chaves (sem limite) — atualiza automaticamente conforme novos cadastros
+  const todasChaves = useMemo(() => seriesChaveJ, [seriesChaveJ]);
   const chartDataChaveJ = useMemo(() =>
     labelsChaveJ.map((label, i) => {
       const obj: Record<string, any> = { label };
-      top10.forEach(s => { obj[s.name] = s.data[i] ?? 0; });
+      todasChaves.forEach(s => { obj[s.name] = s.data[i] ?? 0; });
       return obj;
-    }), [labelsChaveJ, top10]);
+    }), [labelsChaveJ, todasChaves]);
 
   const chartDataTipo = dadosTipo?.data ?? [];
   const totalNovo = chartDataTipo.reduce((s, r) => s + r.novo, 0);
@@ -195,7 +196,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
           ) : (
             <div>
               <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-                {top10.map((s, i) => (
+                {todasChaves.map((s, i) => (
                   <div key={s.name} className="rounded-lg border p-2 text-center" style={{ borderColor: CORES[i%CORES.length]+'44', background: CORES[i%CORES.length]+'0d' }}>
                     <p className="text-[10px] font-bold uppercase tracking-wide truncate" style={{ color: CORES[i%CORES.length] }}>{s.name}</p>
                     <p className="text-sm font-bold text-gray-800 mt-0.5">{fmtFull(s.total)}</p>
@@ -209,9 +210,9 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
                   <YAxis tickFormatter={fmtK} tick={{ fontSize: 10 }} width={72} />
                   <RechartTooltip content={<GrafTooltip />} />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
-                  {top10.map((s, i) => (
+                  {todasChaves.map((s, i) => (
                     <Bar key={s.name} dataKey={s.name} stackId="a" fill={CORES[i%CORES.length]}
-                      radius={i === top10.length-1 ? [4,4,0,0] : [0,0,0,0]} />
+                      radius={i === todasChaves.length-1 ? [4,4,0,0] : [0,0,0,0]} />
                   ))}
                 </BarChart>
               </ResponsiveContainer>
