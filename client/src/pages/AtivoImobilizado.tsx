@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo, useCallback } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,61 @@ const emptyForm = {
   situacao: "Ativo",
   observacoes: "",
 };
+
+// Componente de tooltip de foto com URL assinada do S3
+function FotoTooltip({ fotoUrl, fotoKey }: { fotoUrl: string; fotoKey?: string | null }) {
+  const [hover, setHover] = useState(false);
+  const { data: signedData } = trpc.ativoImobilizado.getSignedFotoUrl.useQuery(
+    { fotoKey: fotoKey ?? '' },
+    { enabled: hover && !!fotoKey, staleTime: 5 * 60 * 1000 }
+  );
+  const imgSrc = signedData?.url ?? fotoUrl;
+
+  return (
+    <div
+      className="relative w-10 h-10"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      {/* Miniatura */}
+      <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-amber-300 hover:border-amber-500 transition-colors cursor-zoom-in">
+        <img src={fotoUrl} alt="foto" className="w-full h-full object-cover" />
+      </div>
+
+      {/* Painel expandido — aparece ao hover */}
+      {hover && (
+        <div
+          className="absolute left-0 top-12 z-50 flex flex-col gap-1"
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+        >
+          <div className="bg-white rounded-xl shadow-2xl border-2 border-amber-300 overflow-hidden">
+            {imgSrc ? (
+              <img
+                src={imgSrc}
+                alt="foto ampliada"
+                className="w-64 h-64 object-contain"
+              />
+            ) : (
+              <div className="w-64 h-64 flex items-center justify-center text-slate-400 text-sm">Carregando...</div>
+            )}
+          </div>
+          <button
+            className="bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg px-3 py-1.5 flex items-center gap-1.5 shadow-lg transition-colors"
+            onClick={e => {
+              e.stopPropagation();
+              const url = imgSrc ?? fotoUrl;
+              navigator.clipboard.writeText(url);
+              toast.success('URL da foto copiada!');
+            }}
+          >
+            <Copy className="w-3 h-3" /> Copiar URL
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AtivoImobilizado() {
   const [, navigate] = useLocation();
@@ -217,33 +272,7 @@ export default function AtivoImobilizado() {
                   <tr key={a.id} className={`border-b border-slate-100 hover:bg-amber-50 ${i % 2 === 0 ? "bg-white" : "bg-amber-50/30"}`}>
                     <td className="px-3 py-2">
                       {a.fotoUrl ? (
-                        <div className="relative group/foto w-10 h-10">
-                          <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-amber-300 hover:border-amber-500 transition-colors cursor-zoom-in">
-                            <img src={a.fotoUrl!} alt="foto" className="w-full h-full object-cover" />
-                          </div>
-                          {/* Tooltip com foto ampliada — visível ao hover na miniatura OU no próprio tooltip */}
-                          <div className="absolute left-12 top-1/2 -translate-y-1/2 z-50 invisible group-hover/foto:visible flex flex-col gap-1 pointer-events-auto">
-                            <div className="bg-white rounded-xl shadow-2xl border-2 border-amber-300 overflow-hidden">
-                              <img
-                                src={a.fotoUrl!.startsWith('http') ? a.fotoUrl! : `${window.location.origin}${a.fotoUrl!}`}
-                                alt="foto ampliada"
-                                className="w-64 h-64 object-contain"
-                                onError={e => { (e.target as HTMLImageElement).style.background = '#f3f4f6'; }}
-                              />
-                            </div>
-                            <button
-                              className="bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold rounded-lg px-3 py-1.5 flex items-center gap-1.5 shadow-lg transition-colors"
-                              onClick={e => {
-                                e.stopPropagation();
-                                const fullUrl = a.fotoUrl!.startsWith('http') ? a.fotoUrl! : `${window.location.origin}${a.fotoUrl!}`;
-                                navigator.clipboard.writeText(fullUrl);
-                                toast.success('URL da foto copiada!');
-                              }}
-                            >
-                              <Copy className="w-3 h-3" /> Copiar URL
-                            </button>
-                          </div>
-                        </div>
+                        <FotoTooltip fotoUrl={a.fotoUrl} fotoKey={a.fotoKey} />
                       ) : (
                         <label className="cursor-pointer">
                           <input type="file" accept="image/*" className="hidden" onChange={e => handleFotoChange(e, a.id)} />

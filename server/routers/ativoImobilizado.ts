@@ -4,7 +4,7 @@ import { getDb } from "../db";
 import { ativosImobilizados } from "../../drizzle/schema";
 import { eq, like, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { storagePut } from "../storage";
+import { storagePut, storageGetSignedUrl } from "../storage";
 
 const CATEGORIAS = ["Móvel", "Equipamento", "Veículo", "Imóvel", "Eletrônico", "Outros"] as const;
 const SITUACOES = ["Ativo", "Em Manutenção", "Baixado", "Extraviado"] as const;
@@ -123,6 +123,18 @@ export const ativoImobilizadoRouter = router({
         .set({ fotoUrl: url, fotoKey: key } as any)
         .where(eq(ativosImobilizados.id, input.id));
       return { success: true, url };
+    }),
+
+  // Retornar URL assinada do S3 para uma foto
+  getSignedFotoUrl: publicProcedure
+    .input(z.object({ fotoKey: z.string().min(1) }))
+    .query(async ({ input }) => {
+      try {
+        const url = await storageGetSignedUrl(input.fotoKey);
+        return { url };
+      } catch {
+        return { url: null };
+      }
     }),
 
   // Listar categorias e situações
