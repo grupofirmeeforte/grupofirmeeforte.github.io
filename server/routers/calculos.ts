@@ -53,22 +53,25 @@ export const calculosRouter = router({
         return aaaa > 2026 || (aaaa === 2026 && mm >= 5);
       };
 
-      // Buscar favorecidos de todos os chaveJ de uma vez (evita N+1 queries)
-      const chavesJ = [...new Set(result.map(r => r.chaveJ).filter(Boolean))] as string[];
+      // Buscar favorecidos e nivel de todos os chaveJ de uma vez (evita N+1 queries)
+      const chavesJ = Array.from(new Set(result.map(r => r.chaveJ).filter(Boolean))) as string[];
       const favMap: Record<string, string> = {};
+      const nivelMap: Record<string, string> = {};
       if (chavesJ.length > 0) {
         const agentesFav = await db
-          .select({ chaveJ: agentes.chaveJ, favorecido: agentes.favorecido })
+          .select({ chaveJ: agentes.chaveJ, favorecido: agentes.favorecido, nivel: agentes.nivel })
           .from(agentes)
           .where(sql`${agentes.chaveJ} IN (${sql.join(chavesJ.map(c => sql`${c}`), sql`, `)})`);
         for (const a of agentesFav) {
           if (a.chaveJ && a.favorecido) favMap[a.chaveJ] = a.favorecido;
+          if (a.chaveJ && a.nivel) nivelMap[a.chaveJ] = a.nivel;
         }
       }
 
       const resultComAdto = await Promise.all(result.map(async (reg) => {
         const favorecido = reg.chaveJ ? (favMap[reg.chaveJ] ?? null) : null;
-        if (!isMesNovo(reg.mesRef ?? '') || !reg.chaveJ) return { ...reg, favorecido };
+        const nivelAgente = reg.chaveJ ? (nivelMap[reg.chaveJ] ?? null) : null;
+        if (!isMesNovo(reg.mesRef ?? '') || !reg.chaveJ) return { ...reg, favorecido, nivelAgente };
         const adtoRows = await db.execute(
           sql`SELECT COALESCE(SUM(valor), 0) as total FROM pagamentos WHERE tipoPagto = 'Adto' AND chaveJ = ${reg.chaveJ} AND mesAno = ${reg.mesRef}`
         ) as any;
@@ -90,7 +93,7 @@ export const calculosRouter = router({
         await db.update(calculos)
           .set({ comissaoTotal: String(novaComissaoTotal), adiantamento: String(adiantamento) })
           .where(eq(calculos.id, reg.id));
-        return { ...reg, favorecido, adiantamento: String(adiantamento), comissaoTotal: String(novaComissaoTotal) };
+        return { ...reg, favorecido, nivelAgente, adiantamento: String(adiantamento), comissaoTotal: String(novaComissaoTotal) };
       }));
 
       return resultComAdto;

@@ -820,6 +820,9 @@ export default function Calculo() {
                     {(r as any).favorecido && (
                       <div className="text-[10px] text-blue-600 font-medium leading-tight">Fav: {(r as any).favorecido}</div>
                     )}
+                    {(r as any).nivelAgente && (
+                      <div className="text-[10px] text-orange-600 font-semibold leading-tight">{(r as any).nivelAgente}</div>
+                    )}
                     <div className="text-[10px] text-slate-500">{r.empresa || ''}{r.cidade ? ` · ${r.cidade}` : ''}</div>
                     {r.tipoPagamento && <div className="text-[9px] text-slate-400 mt-0.5">{r.tipoPagamento}</div>}
                   </td>
@@ -827,6 +830,10 @@ export default function Calculo() {
                   <td className="px-1.5 py-1 border-b border-slate-100 min-w-[160px] align-top text-right">
                     {/* RBM Total em destaque */}
                     <div className="font-bold text-purple-800 text-xs">{r.rbmTotal ? fmtMoeda(r.rbmTotal) : '-'}</div>
+                    {/* Percentual usado para pagar o agente */}
+                    {r.percentual && parseFloat(String(r.percentual)) !== 0 && (
+                      <div className="text-[10px] font-semibold text-amber-600">{fmtPerc(r.percentual)} s/ RBM</div>
+                    )}
                     {/* RBMs individuais menores */}
                     {r.rbmCreditoC2 && parseFloat(String(r.rbmCreditoC2)) !== 0 && <div className="text-[10px] text-slate-500">C/C: {fmtMoeda(r.rbmCreditoC2)}</div>}
                     {r.rbmContaCorrente && parseFloat(String(r.rbmContaCorrente)) !== 0 && <div className="text-[10px] text-slate-500">Cta: {fmtMoeda(r.rbmContaCorrente)}</div>}
