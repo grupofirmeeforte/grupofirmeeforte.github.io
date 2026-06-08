@@ -365,11 +365,24 @@ export default function AtivoImobilizado() {
       {/* Modal Visualizar Foto */}
       {fotoVisualizando && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setFotoVisualizando(null)}>
-          <div className="relative max-w-2xl w-full">
+          <div className="relative max-w-2xl w-full" onClick={e => e.stopPropagation()}>
             <button onClick={() => setFotoVisualizando(null)} className="absolute -top-10 right-0 text-white hover:text-gray-300">
               <X className="w-8 h-8" />
             </button>
-            <img src={fotoVisualizando} alt="foto do ativo" className="w-full rounded-xl shadow-2xl" />
+            <img
+              src={fotoVisualizando.startsWith('http') ? fotoVisualizando : `${window.location.origin}${fotoVisualizando}`}
+              alt="foto do ativo"
+              className="w-full rounded-xl shadow-2xl"
+              onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+            <a
+              href={fotoVisualizando.startsWith('http') ? fotoVisualizando : `${window.location.origin}${fotoVisualizando}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block mt-2 text-center text-white/70 text-xs underline hover:text-white"
+            >
+              Abrir em nova aba
+            </a>
           </div>
         </div>
       )}
