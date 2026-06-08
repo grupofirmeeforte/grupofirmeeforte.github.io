@@ -281,20 +281,53 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
           ) : (
             <div>
               <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-blue-600">Financ. Novo</p>
-                  <p className="text-lg font-bold text-blue-800">{fmtFull(totalNovo)}</p>
-                  <p className="text-xs text-blue-500">{totalGeral>0?((totalNovo/totalGeral)*100).toFixed(1):0}%</p>
+                {/* Card Financ. Novo */}
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-blue-600 text-center">Financ. Novo</p>
+                  <div className="mt-1 space-y-0.5">
+                    {chartDataTipo.map(r => r.novo > 0 ? (
+                      <div key={r.periodo} className="flex justify-between items-center gap-1">
+                        <span className="text-[9px] text-gray-500 whitespace-nowrap">{r.periodo}</span>
+                        <span className="text-[9px] font-semibold text-blue-700 whitespace-nowrap">{fmtFull(r.novo)}</span>
+                      </div>
+                    ) : null)}
+                  </div>
+                  <div className="mt-1 pt-1 border-t border-blue-200">
+                    <p className="text-xs font-bold text-center text-blue-800">{fmtFull(totalNovo)}</p>
+                    <p className="text-[9px] text-center text-blue-500">{totalGeral>0?((totalNovo/totalGeral)*100).toFixed(1):0}%</p>
+                  </div>
                 </div>
-                <div className="rounded-lg border border-orange-200 bg-orange-50 p-3 text-center">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-orange-600">Troco/Refin</p>
-                  <p className="text-lg font-bold text-orange-800">{fmtFull(totalRefin)}</p>
-                  <p className="text-xs text-orange-500">{totalGeral>0?((totalRefin/totalGeral)*100).toFixed(1):0}%</p>
+                {/* Card Troco/Refin */}
+                <div className="rounded-lg border border-orange-200 bg-orange-50 p-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-orange-600 text-center">Troco/Refin</p>
+                  <div className="mt-1 space-y-0.5">
+                    {chartDataTipo.map(r => r.refin > 0 ? (
+                      <div key={r.periodo} className="flex justify-between items-center gap-1">
+                        <span className="text-[9px] text-gray-500 whitespace-nowrap">{r.periodo}</span>
+                        <span className="text-[9px] font-semibold text-orange-700 whitespace-nowrap">{fmtFull(r.refin)}</span>
+                      </div>
+                    ) : null)}
+                  </div>
+                  <div className="mt-1 pt-1 border-t border-orange-200">
+                    <p className="text-xs font-bold text-center text-orange-800">{fmtFull(totalRefin)}</p>
+                    <p className="text-[9px] text-center text-orange-500">{totalGeral>0?((totalRefin/totalGeral)*100).toFixed(1):0}%</p>
+                  </div>
                 </div>
-                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-center">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-red-600">Cancelados</p>
-                  <p className="text-lg font-bold text-red-800">{fmtFull(totalCancelado)}</p>
-                  <p className="text-xs text-red-500">{totalGeral>0?((totalCancelado/totalGeral)*100).toFixed(1):0}%</p>
+                {/* Card Cancelados */}
+                <div className="rounded-lg border border-red-200 bg-red-50 p-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-red-600 text-center">Cancelados</p>
+                  <div className="mt-1 space-y-0.5">
+                    {chartDataTipo.map(r => r.cancelado > 0 ? (
+                      <div key={r.periodo} className="flex justify-between items-center gap-1">
+                        <span className="text-[9px] text-gray-500 whitespace-nowrap">{r.periodo}</span>
+                        <span className="text-[9px] font-semibold text-red-700 whitespace-nowrap">{fmtFull(r.cancelado)}</span>
+                      </div>
+                    ) : null)}
+                  </div>
+                  <div className="mt-1 pt-1 border-t border-red-200">
+                    <p className="text-xs font-bold text-center text-red-800">{fmtFull(totalCancelado)}</p>
+                    <p className="text-[9px] text-center text-red-500">{totalGeral>0?((totalCancelado/totalGeral)*100).toFixed(1):0}%</p>
+                  </div>
                 </div>
               </div>
               <ResponsiveContainer width="100%" height={300}>
