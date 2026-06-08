@@ -1132,9 +1132,37 @@ export const appRouter = router({
           })
         );
         
-        // Inserir registros processados
+        // Inserir registros processados (upsert: sobrescreve se nrOperacao+empresa+mes já existe)
         try {
-          await db.insert(consignados).values(processedRecords as any[]);
+          const { sql } = await import('drizzle-orm');
+          for (const record of processedRecords) {
+            await db.insert(consignados).values(record as any)
+              .onDuplicateKeyUpdate({
+                set: {
+                  chaveJ: sql`VALUES(chaveJ)`,
+                  nomeAgente: sql`VALUES(nomeAgente)`,
+                  convenio: sql`VALUES(convenio)`,
+                  valorBruto: sql`VALUES(valorBruto)`,
+                  valorLiquido: sql`VALUES(valorLiquido)`,
+                  rbm: sql`VALUES(rbm)`,
+                  parcela: sql`VALUES(parcela)`,
+                  prefixoBB: sql`VALUES(prefixoBB)`,
+                  dtContratacao: sql`VALUES(dtContratacao)`,
+                  produto: sql`VALUES(produto)`,
+                  descricaoProduto: sql`VALUES(descricaoProduto)`,
+                  juros: sql`VALUES(juros)`,
+                  tabelaMes: sql`VALUES(tabelaMes)`,
+                  percAVista: sql`VALUES(percAVista)`,
+                  restricaoSRCC: sql`VALUES(restricaoSRCC)`,
+                  percPago: sql`VALUES(percPago)`,
+                  totalComissao: sql`VALUES(totalComissao)`,
+                  difEmpresa: sql`VALUES(difEmpresa)`,
+                  tabela: sql`VALUES(tabela)`,
+                  supervisor: sql`VALUES(supervisor)`,
+                  updatedAt: sql`NOW()`,
+                },
+              });
+          }
           return { count: processedRecords.length };
         } catch (err: any) {
           console.error('Erro ao inserir registros:', err);
