@@ -216,11 +216,24 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
             <div className="flex items-center justify-center py-16 text-gray-400">Nenhum dado disponível para 2026.</div>
           ) : (
             <div>
-              <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+              <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {todasChaves.map((s, i) => (
-                  <div key={s.name} className="rounded-lg border p-2 text-center" style={{ borderColor: CORES[i%CORES.length]+'44', background: CORES[i%CORES.length]+'0d' }}>
-                    <p className="text-[10px] font-bold uppercase tracking-wide truncate" style={{ color: CORES[i%CORES.length] }}>{s.name}</p>
-                    <p className="text-sm font-bold text-gray-800 mt-0.5">{fmtFull(s.total)}</p>
+                  <div key={s.name} className="rounded-lg border p-2" style={{ borderColor: CORES[i%CORES.length]+'44', background: CORES[i%CORES.length]+'0d' }}>
+                    <p className="text-[10px] font-bold uppercase tracking-wide truncate text-center" style={{ color: CORES[i%CORES.length] }}>{s.name}</p>
+                    {/* Valores por período */}
+                    <div className="mt-1 space-y-0.5">
+                      {labelsChaveJ.map((label, li) => (
+                        s.data[li] > 0 ? (
+                          <div key={label} className="flex justify-between items-center gap-1">
+                            <span className="text-[9px] text-gray-500 whitespace-nowrap">{label}</span>
+                            <span className="text-[9px] font-semibold text-gray-700 whitespace-nowrap">{fmtFull(s.data[li])}</span>
+                          </div>
+                        ) : null
+                      ))}
+                    </div>
+                    <div className="mt-1 pt-1 border-t border-gray-200">
+                      <p className="text-xs font-bold text-center" style={{ color: CORES[i%CORES.length] }}>{fmtFull(s.total)}</p>
+                    </div>
                   </div>
                 ))}
               </div>
