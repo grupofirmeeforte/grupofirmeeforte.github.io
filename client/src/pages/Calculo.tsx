@@ -416,6 +416,8 @@ export default function Calculo() {
   // Edição inline de Dt Pagto
   const [editandoDtPagto, setEditandoDtPagto] = useState<number | null>(null);
   const [valorDtPagto, setValorDtPagto] = useState("");
+  const [dtPagtoMassa, setDtPagtoMassa] = useState("");
+  const [aplicandoDtMassa, setAplicandoDtMassa] = useState(false);
   const dtPagtoInputRef = useRef<HTMLInputElement>(null);
   // Edição inline de Créditos/Débitos
   const [editandoCreditoDebito, setEditandoCreditoDebito] = useState<number | null>(null);
@@ -565,6 +567,46 @@ export default function Calculo() {
             >
               <Settings className="w-3 h-3" /> Comissão Supervisor
             </Button>
+          </div>
+
+          {/* Campo data em massa */}
+          <div className="flex flex-col">
+            <label className="block text-[10px] text-slate-500 mb-0.5">Dt Pagto em Massa</label>
+            <div className="flex items-center gap-1">
+              <input
+                type="text"
+                placeholder="DD/MM/AAAA"
+                maxLength={10}
+                value={dtPagtoMassa}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/\D/g, "").slice(0, 8);
+                  let masked = raw;
+                  if (raw.length > 4) masked = raw.slice(0,2) + "/" + raw.slice(2,4) + "/" + raw.slice(4);
+                  else if (raw.length > 2) masked = raw.slice(0,2) + "/" + raw.slice(2);
+                  setDtPagtoMassa(masked);
+                }}
+                className="border border-slate-300 rounded px-1.5 py-1 text-xs h-7 w-28 focus:outline-none focus:ring-1 focus:ring-purple-400"
+              />
+              <Button
+                size="sm"
+                disabled={!dtPagtoMassa || selecionados.size === 0 || aplicandoDtMassa}
+                onClick={() => {
+                  if (!dtPagtoMassa) { alert("Digite a data primeiro."); return; }
+                  if (selecionados.size === 0) { alert("Selecione ao menos um registro."); return; }
+                  setAplicandoDtMassa(true);
+                  Array.from(selecionados).forEach((rid) => {
+                    editarMutation.mutate({ id: rid, dtPagto: dtPagtoMassa });
+                  });
+                  setTimeout(() => {
+                    utils.calculosImportados.listar.invalidate();
+                    setAplicandoDtMassa(false);
+                  }, 400);
+                }}
+                className="h-7 px-2 text-xs bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50"
+              >
+                {aplicandoDtMassa ? "..." : `Aplicar${selecionados.size > 0 ? ` (${selecionados.size})` : ""}`}
+              </Button>
+            </div>
           </div>
 
           <div className="ml-auto flex items-end gap-3 pb-0.5">
