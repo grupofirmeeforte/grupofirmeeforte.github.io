@@ -80,11 +80,14 @@ export default function NaoPerturbe() {
         const ws = wb.Sheets[sheetName];
         // Linha 1 é aviso, linha 2 é cabeçalho, dados a partir da linha 3
         const raw = XLSX.utils.sheet_to_json<any>(ws, { header: 1, raw: false });
-        // Encontrar linha do cabeçalho (contém "NOME" ou "CPF")
+        // Encontrar linha do cabeçalho: deve ter célula EXATAMENTE "NOME" e "CPF"
         let headerIdx = -1;
-        for (let i = 0; i < Math.min(raw.length, 5); i++) {
+        for (let i = 0; i < Math.min(raw.length, 10); i++) {
           const row = raw[i] as any[];
-          if (row && row.some(c => String(c ?? "").toUpperCase().includes("NOME") || String(c ?? "").toUpperCase().includes("CPF"))) {
+          if (!row) continue;
+          const cells = row.map((c: any) => String(c ?? "").trim().toUpperCase());
+          // Linha de cabeçalho tem exatamente "NOME" e "CPF" como células separadas
+          if (cells.includes("NOME") && cells.includes("CPF")) {
             headerIdx = i;
             break;
           }
