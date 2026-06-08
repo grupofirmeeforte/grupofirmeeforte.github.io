@@ -806,6 +806,9 @@ export default function Consignado() {
                       <span className="text-[9px] text-gray-400">{mesNumParaStr(r.mes)}</span>
                     </div>
                     <div className="text-[11px] text-gray-800 font-medium whitespace-nowrap">{strVal(r.nomeAgente)}</div>
+                    {(r as any).favorecido && (
+                      <div className="text-[10px] text-blue-600 font-medium leading-tight">Fav: {(r as any).favorecido}</div>
+                    )}
                     {r.supervisor && <div className="text-[10px] text-gray-400">Sup: {r.supervisor}</div>}
                   </td>
                   {/* Coluna Operação + Produto */}

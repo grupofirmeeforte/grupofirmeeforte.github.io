@@ -795,7 +795,23 @@ export const appRouter = router({
         // Ordenar por mês DESC (mais novo primeiro) — formato MM/AAAA → AAAAMM para comparação
         // ex: "04/2026" → CONCAT(RIGHT(mes,4), LEFT(mes,2)) = "202604"
         const mesOrdem = sqlOrd`CONCAT(RIGHT(mes, 4), LEFT(mes, 2))`;
-        return await db.select().from(consignados).where(and(...conditions)).orderBy(desc(mesOrdem), asc(consignados.empresa), asc(consignados.chaveJ));
+        const rows = await db.select().from(consignados).where(and(...conditions)).orderBy(desc(mesOrdem), asc(consignados.empresa), asc(consignados.chaveJ));
+
+        // Buscar favorecido da tabela agentes para cada chaveJ (em lote)
+        const { agentes } = await import('../drizzle/schema');
+        const { sql: sqlIn } = await import('drizzle-orm');
+        const chavesJ = Array.from(new Set(rows.map((r: any) => r.chaveJ).filter(Boolean))) as string[];
+        const favMap: Record<string, string> = {};
+        if (chavesJ.length > 0) {
+          const agentesFav = await db
+            .select({ chaveJ: agentes.chaveJ, favorecido: agentes.favorecido })
+            .from(agentes)
+            .where(sqlIn`${agentes.chaveJ} IN (${sqlIn.join(chavesJ.map((c: string) => sqlIn`${c}`), sqlIn`, `)})`)
+          for (const a of agentesFav) {
+            if (a.chaveJ && a.favorecido) favMap[a.chaveJ] = a.favorecido;
+          }
+        }
+        return rows.map((r: any) => ({ ...r, favorecido: r.chaveJ ? (favMap[r.chaveJ] ?? null) : null }));
       }),
 
     criar: publicProcedure
