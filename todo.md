@@ -673,3 +673,9 @@
 
 ## CORREÇÕES 08/06/2026
 - [x] Corrigir totais do Consignado: tela inicializa com o mês mais recente selecionado automaticamente, evitando soma de todos os meses
+
+## NÃO PERTUBE - IMPORTAÇÃO COM UPSERT (08/06/2026)
+- [x] Expandir tabela lista_nao_perturbe com colunas: nome, cpf, municipio, uf, ocupacao, dataInclusao
+- [x] Implementar importação com upsert por CPF (sobrescreve se já existir)
+- [x] Atualizar frontend da aba Não Pertube para mostrar novas colunas e botão de importar XLSX
+- [x] Criar e entregar template XLSX para importação

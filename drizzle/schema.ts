@@ -1554,14 +1554,23 @@ export type InsertContrato = typeof contratos.$inferInsert;
 // ─── Lista Não Perturbe ───────────────────────────────────────────────────────
 export const listaNaoPerturbe = mysqlTable("lista_nao_perturbe", {
   id: int("id").autoincrement().primaryKey(),
-  telefone: varchar("telefone", { length: 20 }).notNull(),
+  telefone: varchar("telefone", { length: 20 }).notNull().default(''),
   telefoneFormatado: varchar("telefoneFormatado", { length: 25 }),
   motivo: varchar("motivo", { length: 255 }),
   origem: varchar("origem", { length: 50 }).default("manual"),
   adicionadoPorId: int("adicionadoPorId"),
+  // Campos do arquivo Não Pertube BB
+  nome: varchar("nome", { length: 255 }),
+  cpf: varchar("cpf", { length: 20 }),
+  reclamacao: varchar("reclamacao", { length: 255 }),
+  dataInclusao: varchar("dataInclusao", { length: 30 }),
+  municipio: varchar("municipio", { length: 100 }),
+  uf: varchar("uf", { length: 5 }),
+  ocupacao: varchar("ocupacao", { length: 150 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, (table) => ({
   telefoneIdx: index("idx_nao_perturbe_telefone").on(table.telefone),
+  cpfIdx: index("idx_nao_perturbe_cpf").on(table.cpf),
 }));
 export type ListaNaoPerturbe = typeof listaNaoPerturbe.$inferSelect;
 export type InsertListaNaoPerturbe = typeof listaNaoPerturbe.$inferInsert;
