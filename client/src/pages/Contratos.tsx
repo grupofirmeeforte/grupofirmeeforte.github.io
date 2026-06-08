@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import {
   Upload, Search, Phone, MapPin, FileText, CheckCircle,
@@ -76,6 +77,26 @@ export default function ContratosPage() {
     { enabled: todosTelefones.length > 0, staleTime: 60000 }
   );
   const telefonesNaoPerturbe = new Set(naoPerturbeData?.bloqueados ?? []);
+
+  // Verificar CPFs na lista Não Pertube
+  const cpfsDosContratos = useMemo(() => {
+    return (data?.rows ?? []).map((r: any) => r.cpfCliente ?? '').filter(Boolean);
+  }, [data?.rows]);
+  const { data: naoPerturbeDataCpf } = trpc.naoPerturbe.verificarCpfs.useQuery(
+    { cpfs: cpfsDosContratos },
+    { enabled: cpfsDosContratos.length > 0, staleTime: 60000 }
+  );
+  const cpfsBloqueados = useMemo(() => {
+    const map = new Map<string, string>();
+    naoPerturbeDataCpf?.bloqueados.forEach((b: any) => {
+      const norm = b.cpf.replace(/\D/g, '');
+      map.set(norm, b.motivo ?? 'NÃO PERTUBE');
+    });
+    return map;
+  }, [naoPerturbeDataCpf]);
+
+  // Filtro Não Pertube
+  const [filtroNaoPerturbe, setFiltroNaoPerturbe] = useState<'todos' | 'bloqueados' | 'liberados'>('todos');
 
   const uploadLoteMutation = trpc.contratos.uploadLote.useMutation();
   const atualizarMutation = trpc.contratos.atualizar.useMutation();
@@ -236,7 +257,19 @@ export default function ContratosPage() {
     return isNaN(n) ? '—' : n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
-  const rows = rowsFiltrados;
+  // Aplicar filtro Não Pertube sobre rowsFiltrados
+  const rowsComFiltroNP = useMemo(() => {
+    if (filtroNaoPerturbe === 'todos') return rowsFiltrados;
+    return rowsFiltrados.filter((r: any) => {
+      const cpfNorm = (r.cpfCliente ?? '').replace(/\D/g, '');
+      const bloqueado = cpfNorm.length === 11 && cpfsBloqueados.has(cpfNorm);
+      if (filtroNaoPerturbe === 'bloqueados') return bloqueado;
+      if (filtroNaoPerturbe === 'liberados') return !bloqueado;
+      return true;
+    });
+  }, [rowsFiltrados, filtroNaoPerturbe, cpfsBloqueados]);
+
+  const rows = rowsComFiltroNP;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white">
@@ -449,6 +482,16 @@ export default function ContratosPage() {
                   <RefreshCw className="w-4 h-4" />
                 </Button>
               </div>
+              <Select value={filtroNaoPerturbe} onValueChange={v => { setFiltroNaoPerturbe(v as 'todos' | 'bloqueados' | 'liberados'); setPage(1); }}>
+                <SelectTrigger className="bg-slate-800 border-red-800/50 text-white text-xs h-10">
+                  <SelectValue placeholder="Não Pertube" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos (Não Pertube)</SelectItem>
+                  <SelectItem value="bloqueados">⛔ Bloqueados</SelectItem>
+                  <SelectItem value="liberados">✓ Liberados</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {isLoading ? (
@@ -485,7 +528,7 @@ export default function ContratosPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((r, i) => {
+                    {rows.map((r: any, i: number) => {
                       const agNome = agenciaNomeMap.get(String((r as any).agencia ?? '').padStart(4, '0'));
                       const dtaNascFmt = (() => {
                         const d = (r as any).dtaNasc as string | null;
@@ -509,7 +552,7 @@ export default function ContratosPage() {
                         {/* Cliente + CPF + Nasc */}
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
                           <div className="text-white font-medium text-[11px] truncate" title={r.nomeCliente ?? ''}>{r.nomeCliente ?? '—'}</div>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 flex-wrap">
                             <span className="text-slate-400 font-mono text-[10px] truncate">{r.cpfCliente ?? '—'}</span>
                             {r.cpfCliente && (
                               <button
@@ -520,6 +563,13 @@ export default function ContratosPage() {
                                 <Copy className="w-3 h-3" />
                               </button>
                             )}
+                            {(() => {
+                              const cpfNorm = (r.cpfCliente ?? '').replace(/\D/g, '');
+                              const bloqueado = cpfNorm.length === 11 && cpfsBloqueados.has(cpfNorm);
+                              return bloqueado
+                                ? <span className="text-[9px] font-bold text-red-400 bg-red-900/40 px-1 py-0.5 rounded uppercase tracking-wide">NÃO PERTUBE</span>
+                                : <span className="text-[9px] font-semibold text-emerald-400 bg-emerald-900/30 px-1 py-0.5 rounded">OK</span>;
+                            })()}
                           </div>
                           {dtaNascFmt && <div className="text-slate-500 text-[9px]">{dtaNascFmt}</div>}
                         </td>

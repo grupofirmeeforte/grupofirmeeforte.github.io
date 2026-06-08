@@ -687,5 +687,5 @@
 - [x] Clientes não encontrados: exibir badge verde "OK" ou nenhum indicador
 - [x] Mailing: adicionar filtro "Não Pertube" (Todos / Bloqueados / Liberados)
 - [x] Mailing: adicionar filtro "Não Pertube" (Todos / Bloqueados / Liberados)
-- [ ] Contratos: badge NÃO PERTUBE (caixa alta) ou OK ao lado do CPF, buscado na lista Não Pertube
-- [ ] Contratos: adicionar filtro Não Pertube (Todos / Bloqueados / Liberados)
+- [x] Contratos: badge NÃO PERTUBE (caixa alta) ou OK ao lado do CPF, buscado na lista Não Pertube
+- [x] Contratos: adicionar filtro Não Pertube (Todos / Bloqueados / Liberados)
