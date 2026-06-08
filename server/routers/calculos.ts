@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { publicProcedure, router, protectedProcedure } from "../_core/trpc";
-import { getDb } from "../db";
-import { calculos, pagamentos, agentes } from "../../drizzle/schema";
+import { getDb, calcularPercPago } from "../db";
+import { calculos, pagamentos, agentes, consignados } from "../../drizzle/schema";
 import { TRPCError } from "@trpc/server";
 import { eq, and, like, or, sql, desc, asc } from "drizzle-orm";
 
@@ -544,5 +544,121 @@ export const calculosRouter = router({
         atualizados++;
       }
       return { atualizados };
+    }),
+
+  // Recalcular consignado (percPago + totalComissao) E atualizar comissaoConsig no calculos
+  // Faz os dois passos em sequência para o mês informado
+  recalcularConsigECalculo: publicProcedure
+    .input(z.object({
+      mesRef: z.string(), // formato MM/AAAA
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponivel' });
+
+      const mes = input.mesRef; // MM/AAAA
+
+      // PASSO 1: Recalcular percPago e totalComissao na tabela consignados
+      const registrosConsig = await db.select().from(consignados).where(eq(consignados.mes, mes));
+      let consigAtualizados = 0;
+
+      for (const reg of registrosConsig) {
+        if (!reg.chaveJ) continue;
+        const [agente] = await db.select().from(agentes).where(eq(agentes.chaveJ, reg.chaveJ)).limit(1);
+        if (!agente) continue;
+
+        const rbmNum = reg.rbm ? Number(reg.rbm) : 0;
+        if (rbmNum === 0) {
+          await db.update(consignados).set({ percPago: '0', totalComissao: '0' }).where(eq(consignados.id, reg.id));
+          consigAtualizados++;
+          continue;
+        }
+
+        const calcResult = await calcularPercPago(
+          rbmNum,
+          agente.situacao || '',
+          reg.chaveJ,
+          agente.empresa || reg.empresa || '',
+          String(reg.parcela || ''),
+          reg.descricaoProduto || '',
+          reg.juros || '',
+          mes
+        );
+        const percPagoVal = calcResult.perc;
+        if (percPagoVal > 0) {
+          const vl = reg.valorLiquido ? Number(reg.valorLiquido) : 0;
+          const pp = percPagoVal > 1 ? percPagoVal / 100 : percPagoVal;
+          const totalComissao = !isNaN(vl) && !isNaN(pp) ? (vl * pp).toFixed(2) : null;
+          const difEmpresa = !isNaN(rbmNum) && totalComissao ? (rbmNum - parseFloat(totalComissao)).toFixed(2) : null;
+          await db.update(consignados).set({
+            percPago: String(percPagoVal),
+            totalComissao: totalComissao || undefined,
+            difEmpresa: difEmpresa || undefined,
+            tabela: calcResult.ativoUsado || undefined,
+          }).where(eq(consignados.id, reg.id));
+          consigAtualizados++;
+        }
+      }
+
+      // PASSO 2: Agrupar por chaveJ+empresa e somar totalComissao e rbm
+      const registrosAtualizados = await db.select().from(consignados).where(eq(consignados.mes, mes));
+      const grupos = new Map<string, { chaveJ: string; empresa: string; totalComissao: number; rbmTotal: number }>();
+      for (const r of registrosAtualizados) {
+        const chaveJ = r.chaveJ ?? '';
+        const empresa = r.empresa ?? '';
+        if (!chaveJ) continue;
+        const key = `${chaveJ}|${empresa}`;
+        const comissao = parseFloat(String(r.totalComissao ?? 0)) || 0;
+        const rbm = parseFloat(String(r.rbm ?? 0)) || 0;
+        if (grupos.has(key)) {
+          grupos.get(key)!.totalComissao += comissao;
+          grupos.get(key)!.rbmTotal += rbm;
+        } else {
+          grupos.set(key, { chaveJ, empresa, totalComissao: comissao, rbmTotal: rbm });
+        }
+      }
+
+      let calculosAtualizados = 0;
+      for (const grupo of Array.from(grupos.values())) {
+        const { chaveJ, empresa, totalComissao, rbmTotal } = grupo;
+        // Buscar registro existente em calculos
+        const existentes = await db.select().from(calculos)
+          .where(and(eq(calculos.chaveJ, chaveJ), eq(calculos.empresa, empresa), eq(calculos.mesRef, mes)))
+          .limit(1);
+        if (existentes.length === 0) continue;
+        const reg = existentes[0];
+        const toN = (v: any) => parseFloat(String(v ?? 0)) || 0;
+        // Buscar adiantamento
+        const adtoRows = await db.execute(
+          sql`SELECT COALESCE(SUM(valor), 0) as total FROM pagamentos WHERE tipoPagto = 'Adto' AND chaveJ = ${chaveJ} AND mesAno = ${mes}`
+        ) as any;
+        const adtoArr = Array.isArray(adtoRows) ? adtoRows[0] : adtoRows;
+        const adtoList = Array.isArray(adtoArr) ? adtoArr : [adtoArr];
+        const adiantamento = parseFloat(String(adtoList[0]?.total ?? 0)) || 0;
+        const novaComissaoTotal =
+          totalComissao +
+          toN(reg.comissaoConsorcio) +
+          toN(reg.comissaoOurocap) +
+          toN(reg.comissaoCc) +
+          toN(reg.comissaoSeguros) +
+          toN(reg.ajudaCusto) +
+          toN(reg.creditosDebitos) +
+          toN(reg.reajuste) -
+          adiantamento;
+        // Buscar ativo atual do agente
+        const [agenteAtual] = await db.select({ nivel: agentes.nivel, situacao: agentes.situacao })
+          .from(agentes).where(eq(agentes.chaveJ, chaveJ)).limit(1);
+        await db.update(calculos).set({
+          comissaoConsig: String(totalComissao),
+          comissaoTotal: String(novaComissaoTotal),
+          adiantamento: String(adiantamento),
+          rbmTotal: rbmTotal > 0 ? String(rbmTotal) : reg.rbmTotal,
+          rbmCreditoC2: rbmTotal > 0 ? String(rbmTotal) : reg.rbmCreditoC2,
+          situacao: agenteAtual?.situacao || reg.situacao,
+        }).where(eq(calculos.id, reg.id));
+        calculosAtualizados++;
+      }
+
+      return { consigAtualizados, calculosAtualizados };
     }),
 });

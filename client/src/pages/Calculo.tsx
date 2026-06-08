@@ -156,9 +156,9 @@ export default function Calculo() {
       alert(`Erro ao enviar: ${err.message}`);
     },
   });
-  const recalcularMutation = trpc.calculosImportados.recalcularComissaoTotal.useMutation({
+  const recalcularMutation = trpc.calculosImportados.recalcularConsigECalculo.useMutation({
     onSuccess: (data) => {
-      alert(`✅ ${data.atualizados} registro(s) recalculado(s) com sucesso!`);
+      alert(`✅ Consignado: ${data.consigAtualizados} registro(s) recalculado(s).\nCálculo: ${data.calculosAtualizados} registro(s) atualizado(s).`);
       utils.calculosImportados.listar.invalidate();
     },
     onError: (err) => {
@@ -167,10 +167,10 @@ export default function Calculo() {
   });
   const handleRecalcularTotais = () => {
     if (!mesRef) {
-      alert("Selecione um mês para recalcular.");
+      alert("Selecione um mês específico para recalcular.");
       return;
     }
-    if (!confirm(`Recalcular Comissão Total de todos os registros de ${mesRef}?\n\nFórmula: Consig + Consórcio + Ourocap + C/C + Seguros + Ajuda de Custo + Créd/Déb - Adiantamento`)) return;
+    if (!confirm(`Recalcular Consignado + Cálculo para ${mesRef}?\n\nEste processo vai:\n1. Recalcular percPago e comissão de cada operação de consignado com base nas tabelas atuais\n2. Atualizar comissaoConsig e comissaoTotal no Cálculo\n3. Atualizar o ativo atual do agente`)) return;
     recalcularMutation.mutate({ mesRef });
   };
 
