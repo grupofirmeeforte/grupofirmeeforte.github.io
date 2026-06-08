@@ -830,10 +830,20 @@ export default function Calculo() {
                   <td className="px-1.5 py-1 border-b border-slate-100 min-w-[160px] align-top text-right">
                     {/* RBM Total em destaque */}
                     <div className="font-bold text-purple-800 text-xs">{r.rbmTotal ? fmtMoeda(r.rbmTotal) : '-'}</div>
-                    {/* Percentual usado para pagar o agente */}
-                    {r.percentual && parseFloat(String(r.percentual)) !== 0 && (
-                      <div className="text-[10px] font-semibold text-amber-600">{fmtPerc(r.percentual)} s/ RBM</div>
-                    )}
+                    {/* Percentual pago sobre o RBM: usa campo salvo ou calcula dinamicamente */}
+                    {(() => {
+                      const rbm = parseFloat(String(r.rbmTotal ?? 0));
+                      const com = parseFloat(String(r.comissaoTotal ?? 0));
+                      const percSalvo = r.percentual ? parseFloat(String(r.percentual)) : 0;
+                      const percCalc = rbm > 0 ? com / rbm : 0;
+                      const perc = percSalvo !== 0 ? percSalvo : percCalc;
+                      if (perc === 0) return null;
+                      return (
+                        <div className="text-[10px] font-semibold text-amber-600">
+                          {(perc * 100).toFixed(2).replace('.', ',')}% s/ RBM
+                        </div>
+                      );
+                    })()}
                     {/* RBMs individuais menores */}
                     {r.rbmCreditoC2 && parseFloat(String(r.rbmCreditoC2)) !== 0 && <div className="text-[10px] text-slate-500">C/C: {fmtMoeda(r.rbmCreditoC2)}</div>}
                     {r.rbmContaCorrente && parseFloat(String(r.rbmContaCorrente)) !== 0 && <div className="text-[10px] text-slate-500">Cta: {fmtMoeda(r.rbmContaCorrente)}</div>}
