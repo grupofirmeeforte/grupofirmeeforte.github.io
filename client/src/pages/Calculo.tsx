@@ -444,7 +444,8 @@ export default function Calculo() {
     setTimeout(() => creditoDebitoInputRef.current?.focus(), 50);
   };
   const salvarCreditoDebito = (id: number) => {
-    const num = parseFloat(valorCreditoDebito.replace(",", ".")) || 0;
+    const raw = valorCreditoDebito.trim().replace(",", ".");
+    const num = raw === "" ? undefined : (parseFloat(raw) || 0);
     editarMutation.mutate(
       { id, creditosDebitos: num },
       { onSuccess: () => { utils.calculosImportados.listar.invalidate(); } }
@@ -816,6 +817,9 @@ export default function Calculo() {
                       {r.mesRef && <span className="text-[9px] text-purple-500 font-mono">{fmtMesRef(r.mesRef)}</span>}
                     </div>
                     <div className="text-xs font-medium text-slate-800 leading-tight mt-0.5">{r.nomeAgente || '-'}</div>
+                    {(r as any).favorecido && (
+                      <div className="text-[10px] text-blue-600 font-medium leading-tight">Fav: {(r as any).favorecido}</div>
+                    )}
                     <div className="text-[10px] text-slate-500">{r.empresa || ''}{r.cidade ? ` · ${r.cidade}` : ''}</div>
                     {r.tipoPagamento && <div className="text-[9px] text-slate-400 mt-0.5">{r.tipoPagamento}</div>}
                   </td>
