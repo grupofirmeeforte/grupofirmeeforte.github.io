@@ -813,7 +813,14 @@ export default function Calculo() {
                           ref={dtPagtoInputRef}
                           type="text"
                           value={valorDtPagto}
-                          onChange={(e) => setValorDtPagto(e.target.value)}
+                          onChange={(e) => {
+                            // Máscara automática: somente números, formata DD/MM/AAAA
+                            const raw = e.target.value.replace(/\D/g, "").slice(0, 8);
+                            let masked = raw;
+                            if (raw.length > 4) masked = raw.slice(0,2) + "/" + raw.slice(2,4) + "/" + raw.slice(4);
+                            else if (raw.length > 2) masked = raw.slice(0,2) + "/" + raw.slice(2);
+                            setValorDtPagto(masked);
+                          }}
                           onBlur={() => salvarDtPagto(r.id)}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") salvarDtPagto(r.id);
