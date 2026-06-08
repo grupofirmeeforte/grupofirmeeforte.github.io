@@ -445,152 +445,147 @@ export async function calcularPercPago(
       if (mesAno < 202605) return { perc: 0, ativoUsado: null };
     }
 
-    // Regra 1: Se RBM é zero ou vazio, Perc. Pago = 0%
+    // Regra 1: RBM = 0 → comissão = 0
     if (!rbm || rbm === 0) return { perc: 0, ativoUsado: null };
 
-    // 2. Determinar nível do agente
-    // Aceita: Ativo03, Ativo3, Ativo 03, Ativo 3, ativo3 etc. — sempre normaliza para o número
+    // ─── Utilitários ────────────────────────────────────────────────────────
+    // Normaliza string: maiúsculas, sem acento
+    const norm = (s: string) =>
+      (s || '').toUpperCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    // Converte juros para percentual (ex: 0.0238 → 2.38, 2.38 → 2.38)
+    const toPerc = (v: string | number | null | undefined): number => {
+      if (v === null || v === undefined || v === '') return 0;
+      const s = String(v).trim().toLowerCase();
+      if (s === 'acima') return 99999;
+      const n = parseFloat(s.replace(',', '.')) || 0;
+      // Se já está em formato percentual (> 1), retorna direto
+      // Se está em decimal (≤ 1), converte para percentual
+      return n <= 1 && n > 0 ? n * 100 : n;
+    };
+
+    // ─── Passo 1: Determinar nível do ativo do agente ────────────────────────
     let nivelNum: number | null = null;
+
+    // Aceita: Ativo04, Ativo 4, ativo4, etc.
     const nivelMatch = situacao.trim().match(/^Ativo\s*(\d{1,2})$/i);
     if (nivelMatch) {
       nivelNum = parseInt(nivelMatch[1]);
     }
 
-    // Se situação é "Ativo" simples (sem número), calcular pela soma do VrLíquido no mês
-    if (!nivelNum && situacao.trim().toLowerCase() === 'ativo') {
-      // Buscar faixas de nível na tabela valoresCalculo
+    // Se situação é "Ativo" simples (sem número), determina pelo volume do mês
+    if (!nivelNum && norm(situacao) === 'ATIVO') {
       const valoresResult = await db.select().from(valoresCalculo).where(eq(valoresCalculo.id, 1)).limit(1);
       const valores = valoresResult.length > 0 ? valoresResult[0] : null;
 
       if (valores) {
-        // Somar VrLíquido do agente no mês (todos os registros do mesmo mês)
         const whereClause: any[] = [eq(consignados.chaveJ, chaveJ)];
         if (mes) whereClause.push(eq(consignados.mes, mes));
 
-        const consignadosList = await db.select({ valorLiquido: consignados.valorLiquido, restricaoSRCC: consignados.restricaoSRCC })
+        const lista = await db
+          .select({ valorLiquido: consignados.valorLiquido, restricaoSRCC: consignados.restricaoSRCC })
           .from(consignados)
           .where(and(...whereClause));
 
-        // Soma VrLíquido excluindo registros com SRCC = Sim
-        let somaVrLiquido = 0;
-        for (const cons of consignadosList) {
-          const srcc = (cons.restricaoSRCC || '').toLowerCase();
-          if (srcc !== 'sim' && srcc !== 's') {
-            somaVrLiquido += (cons.valorLiquido ? Number(cons.valorLiquido) : 0);
+        // Soma valor líquido excluindo SRCC = Sim
+        let somaLiq = 0;
+        for (const c of lista) {
+          const srcc = norm(c.restricaoSRCC || '');
+          if (srcc !== 'SIM' && srcc !== 'S') {
+            somaLiq += Number(c.valorLiquido) || 0;
           }
         }
 
-        // Encontrar nível pelo valor acumulado
+        // Encontra o nível pela faixa de valor
         const faixas = [
-          { num: 1, ate: Number(valores.ativo01) || 0 },
-          { num: 2, ate: Number(valores.ativo02) || 0 },
-          { num: 3, ate: Number(valores.ativo03) || 0 },
-          { num: 4, ate: Number(valores.ativo04) || 0 },
-          { num: 5, ate: Number(valores.ativo05) || 0 },
-          { num: 6, ate: Number(valores.ativo06) || 0 },
-          { num: 7, ate: Number(valores.ativo07) || 0 },
-          { num: 8, ate: Number(valores.ativo08) || 0 },
-          { num: 9, ate: Number(valores.ativo09) || 0 },
-          { num: 10, ate: Number(valores.ativo10) || 0 },
+          { num: 1, de: Number(valores.ativo01De) || 0, ate: Number(valores.ativo01Ate) || 0 },
+          { num: 2, de: Number(valores.ativo02De) || 0, ate: Number(valores.ativo02Ate) || 0 },
+          { num: 3, de: Number(valores.ativo03De) || 0, ate: Number(valores.ativo03Ate) || 0 },
+          { num: 4, de: Number(valores.ativo04De) || 0, ate: Number(valores.ativo04Ate) || 0 },
+          { num: 5, de: Number(valores.ativo05De) || 0, ate: Number(valores.ativo05Ate) || 0 },
+          { num: 6, de: Number(valores.ativo06De) || 0, ate: Number(valores.ativo06Ate) || 0 },
+          { num: 7, de: Number(valores.ativo07De) || 0, ate: Number(valores.ativo07Ate) || 0 },
+          { num: 8, de: Number(valores.ativo08De) || 0, ate: Number(valores.ativo08Ate) || 0 },
+          { num: 9, de: Number(valores.ativo09De) || 0, ate: Number(valores.ativo09Ate) || 0 },
+          { num: 10, de: Number(valores.ativo10De) || 0, ate: Number(valores.ativo10Ate) || 0 },
         ];
 
-        for (const faixa of faixas) {
-          if (faixa.ate > 0 && somaVrLiquido <= faixa.ate) {
-            nivelNum = faixa.num;
+        for (const f of faixas) {
+          if (f.ate > 0 && somaLiq >= f.de && somaLiq <= f.ate) {
+            nivelNum = f.num;
             break;
           }
         }
-        // Se ultrapassou tudo, usa nível 10
-        if (!nivelNum) nivelNum = 10;
+        if (!nivelNum) nivelNum = 10; // ultrapassou todas as faixas
       }
     }
 
-    // Se ainda não tem nível, usa 1 como padrão
     if (!nivelNum) nivelNum = 1;
-
     const ativoCol = `ativo${String(nivelNum).padStart(2, '0')}`;
 
-    // 3. Buscar percentual na Tabela de Comissão
-    // Filtrar por: empresa + convênio (match com descricaoProduto) + parcela + juros
-    const parcelaNum = typeof parcela === 'string' ? parseInt(parcela) || 0 : parcela;
-    // Normalizar juros: se > 1 está em formato percentual (ex: 4.75%) — converter para decimal (0.0475)
-    const jurosRaw = typeof juros === 'string' ? parseFloat(juros.replace(',', '.')) || 0 : juros;
-    const jurosNum = jurosRaw > 1 ? jurosRaw / 100 : jurosRaw;
+    // ─── Passo 2: Normalizar juros e parcelas do contrato ────────────────────
+    const parcelaNum = typeof parcela === 'string' ? parseInt(parcela) || 0 : (parcela || 0);
+    // Juros do contrato sempre em percentual (ex: 2.38)
+    const jurosPerc = toPerc(juros);
 
-    // Buscar todas as linhas da tabela — filtrar empresa em JS para suportar múltiplas empresas
-    // Ex: tabela cadastrada como "BMF / FLEX" deve bater com agente empresa "BMF" ou "FLEX"
-    const normStr = (s: string) =>
-      s.toUpperCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const bateEmpresa = (empresaAgente: string, empresaTabela: string): boolean => {
-      if (!empresaTabela || !empresaAgente) return true; // se tabela sem empresa, vale para todos
-      const agNorm = normStr(empresaAgente);
-      const partes = empresaTabela.split(/[\/,]/).map(p => normStr(p)).filter(p => p.length > 0);
-      return partes.some(parte => agNorm === parte || agNorm.includes(parte) || parte.includes(agNorm));
-    };
-    const todasLinhas = (await db.select().from(tabelasComissao))
-      .filter(t => bateEmpresa(empresa, t.empresa ?? ''));
+    // ─── Passo 3: Buscar linha na tabela de comissões ────────────────────────
+    // Critério: empresa → convênio → parcelas → juros
+    const todasLinhas = await db.select().from(tabelasComissao);
 
-    // Filtrar por convênio: suporta múltiplos convênios separados por "/" ou ","
-    // Ex: tabela "CONSIGNADO INSS / CONSIGNADO PÚBLICO" deve bater com produto "CONSIGNADO INSS"
-    const bateConvenio = (descProduto: string, convenioTabela: string): boolean => {
-      if (!convenioTabela) return true; // sem convênio na tabela = vale para todos
-      const descNorm = normStr(descProduto);
-      const partes = convenioTabela.split(/[\/,]/).map(p => normStr(p)).filter(p => p.length > 0);
-      return partes.some(parte => descNorm === parte || descNorm.includes(parte) || parte.includes(descNorm));
-    };
-    const linhasFiltradas = todasLinhas.filter(t => {
-      if (!t.convenio) return false;
-      return bateConvenio(descricao || '', t.convenio);
+    // 3a. Filtrar por empresa
+    // Tabela pode ter "BMF / FLEX" — agente pode ter "FLEX" ou "BMF"
+    const linhasEmpresa = todasLinhas.filter(t => {
+      if (!t.empresa) return true; // sem empresa = vale para todos
+      const partes = t.empresa.split(/[\/,]/).map(p => norm(p)).filter(p => p.length > 0);
+      const agNorm = norm(empresa);
+      return partes.some(p => agNorm === p || agNorm.includes(p) || p.includes(agNorm));
     });
 
-    // Filtrar por parcela e juros — ordenar por especificidade:
-    // Faixas com txJurosAte numérico (específico) têm prioridade sobre "acima"
-    const linhasComParcela = linhasFiltradas.filter(t => {
-      const mDe = t.mesesDe ? parseInt(t.mesesDe) : 0;
-      const mAte = t.mesesAte ? parseInt(t.mesesAte) : 9999;
+    // 3b. Filtrar por convênio
+    // Tabela pode ter "CONSIGNADO PÚBLICO / CONVÊNIOS BANCO DO BRASIL"
+    // Produto do contrato pode ser "CONVENIOS BANCO DO BRA..."
+    const linhasConvenio = linhasEmpresa.filter(t => {
+      if (!t.convenio) return false;
+      const descNorm = norm(descricao || '');
+      const partes = t.convenio.split(/[\/,]/).map(p => norm(p)).filter(p => p.length > 0);
+      return partes.some(p => descNorm.includes(p) || p.includes(descNorm));
+    });
+
+    // 3c. Filtrar por prazo (parcelas)
+    const linhasPrazo = linhasConvenio.filter(t => {
+      const mDe = parseInt(t.mesesDe || '0') || 0;
+      const mAte = parseInt(t.mesesAte || '9999') || 9999;
       return parcelaNum >= mDe && parcelaNum <= mAte;
     });
 
-    // Normalizar valor de juros: tratar vírgula como separador decimal
-    // parseJuros: converte valor da tabela para decimal (0.0238) para comparar com jurosNum
-    const parseJuros = (v: string | null | undefined): number => {
-      if (!v) return 0;
-      const s = v.trim().toLowerCase();
-      if (s === 'acima') return 9999;
-      const raw = parseFloat(s.replace(',', '.')) || 0;
-      // Se o valor da tabela está em formato percentual (ex: 2.38), converter para decimal (0.0238)
-      return raw > 1 ? raw / 100 : raw;
-    };
-
-    // Filtrar por faixa de juros (prioridade: faixa mais específica = menor jAte)
-    const linhasComJuros = linhasComParcela.filter(t => {
-      const jDe = parseJuros(t.txJurosDe);
-      const jAte = parseJuros(t.txJurosAte);
-      // Tolerância de 0.0001 para evitar problemas de arredondamento
-      return jurosNum >= (jDe - 0.0001) && jurosNum <= (jAte + 0.0001);
+    // 3d. Filtrar por juros
+    const linhasJuros = linhasPrazo.filter(t => {
+      const jDe = toPerc(t.txJurosDe);
+      const jAte = toPerc(t.txJurosAte);
+      // Tolerância de 0.001% para arredondamento
+      return jurosPerc >= (jDe - 0.001) && jurosPerc <= (jAte + 0.001);
     });
 
-    // Ordenar por especificidade: menor jAte primeiro (faixa mais restrita tem prioridade)
-    linhasComJuros.sort((a, b) => parseJuros(a.txJurosAte) - parseJuros(b.txJurosAte));
+    // Pega a linha mais específica (menor faixa de juros)
+    linhasJuros.sort((a, b) => toPerc(a.txJurosAte) - toPerc(b.txJurosAte));
 
-    let tabelaMatch = linhasComJuros[0] ?? linhasComParcela[0];
-
-    // Se não achou por parcela, pega a primeira linha do convênio
-    if (!tabelaMatch && linhasFiltradas.length > 0) {
-      tabelaMatch = linhasFiltradas[0];
-    }
+    // Fallback: sem filtro de juros → sem filtro de prazo → sem filtro de convênio
+    const tabelaMatch = linhasJuros[0] ?? linhasPrazo[0] ?? linhasConvenio[0] ?? null;
 
     if (!tabelaMatch) {
-      console.warn(`[calcularPercPago] Nenhuma linha encontrada na tabela para empresa=${empresa}, descricao=${descricao}, parcela=${parcelaNum}, juros=${jurosNum}`);
+      console.warn(`[calcularPercPago] Linha não encontrada: empresa=${empresa}, convenio=${descricao}, parcela=${parcelaNum}, juros=${jurosPerc}%`);
       return { perc: 0, ativoUsado: null };
     }
 
+    // ─── Passo 4: Pegar percentual do ativo do agente ────────────────────────
     const percPagoVal = (tabelaMatch as any)[ativoCol];
     if (!percPagoVal) return { perc: 0, ativoUsado: null };
 
-    const perc = parseFloat(String(percPagoVal));
-    // Nome do ativo: ex. ativo01 → Ativo01
+    const perc = parseFloat(String(percPagoVal).replace(',', '.'));
     const ativoNome = `Ativo${String(nivelNum).padStart(2, '0')}`;
+
+    console.log(`[calcularPercPago] empresa=${empresa} convenio=${descricao} parcela=${parcelaNum} juros=${jurosPerc}% → linha id=${tabelaMatch.id} ${ativoCol}=${perc}%`);
+
     return { perc: isNaN(perc) ? 0 : perc, ativoUsado: ativoNome };
 
   } catch (error) {

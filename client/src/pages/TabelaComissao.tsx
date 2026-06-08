@@ -907,37 +907,42 @@ export default function TabelaComissao() {
                           );
                         })()}
                         {/* Coluna Faixas: Juros, Valor Mín, Prazo */}
-                        <td className="px-3 py-2 whitespace-nowrap text-xs">
-                          <div className="text-gray-700 flex items-center gap-1">
-                            <span className="text-gray-400">Juros:</span>
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          {/* Juros */}
+                          <div className="flex items-center gap-1 mb-0.5">
+                            <span className="text-gray-400 text-xs">Juros:</span>
                             {isAdminOuCeo ? (
-                              <span className="inline-flex items-center gap-1">
+                              <span className="inline-flex items-center gap-1 text-sm font-bold text-emerald-600">
                                 <EditableCell value={row.txJurosDe} onSave={(v) => handleCellSave(row.id, 'txJurosDe', v)} isSaving={savingCell === `${row.id}-txJurosDe`} format="percent" />
-                                <span className="text-gray-400">→</span>
+                                <span className="text-gray-400 font-normal text-xs">→</span>
                                 <EditableCell value={row.txJurosAte} onSave={(v) => handleCellSave(row.id, 'txJurosAte', v)} isSaving={savingCell === `${row.id}-txJurosAte`} format="percent" />
                               </span>
                             ) : (
-                              <span>{pct(row.txJurosDe)} → {pct(row.txJurosAte)}</span>
+                              <span className="text-sm font-bold text-emerald-600">{pct(row.txJurosDe)} → {pct(row.txJurosAte)}</span>
                             )}
                           </div>
-                          <div className="text-gray-500 flex items-center gap-1">
-                            <span className="text-gray-400">Mín:</span>
+                          {/* Valor Mínimo */}
+                          <div className="flex items-center gap-1 mb-0.5">
+                            <span className="text-gray-400 text-xs">Mín:</span>
                             {isAdminOuCeo ? (
-                              <EditableCell value={row.valorMinimo} onSave={(v) => handleCellSave(row.id, 'valorMinimo', v)} isSaving={savingCell === `${row.id}-valorMinimo`} />
+                              <span className="text-xs text-gray-600">
+                                <EditableCell value={row.valorMinimo} onSave={(v) => handleCellSave(row.id, 'valorMinimo', v)} isSaving={savingCell === `${row.id}-valorMinimo`} />
+                              </span>
                             ) : (
-                              <span>{row.valorMinimo || '-'}</span>
+                              <span className="text-xs text-gray-600">{row.valorMinimo || '-'}</span>
                             )}
                           </div>
-                          <div className="text-gray-500 flex items-center gap-1">
-                            <span className="text-gray-400">Prazo:</span>
+                          {/* Prazo */}
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-400 text-xs">Prazo:</span>
                             {isAdminOuCeo ? (
-                              <span className="inline-flex items-center gap-1">
+                              <span className="inline-flex items-center gap-1 text-sm font-bold text-blue-600">
                                 <EditableCell value={row.mesesDe} onSave={(v) => handleCellSave(row.id, 'mesesDe', v)} isSaving={savingCell === `${row.id}-mesesDe`} />
-                                <span className="text-gray-400">→</span>
+                                <span className="text-gray-400 font-normal text-xs">→</span>
                                 <EditableCell value={row.mesesAte} onSave={(v) => handleCellSave(row.id, 'mesesAte', v)} isSaving={savingCell === `${row.id}-mesesAte`} />
                               </span>
                             ) : (
-                              <span>{row.mesesDe || '-'} → {row.mesesAte || '-'} meses</span>
+                              <span className="text-sm font-bold text-blue-600">{row.mesesDe || '-'} → {row.mesesAte || '-'}</span>
                             )}
                           </div>
                         </td>
