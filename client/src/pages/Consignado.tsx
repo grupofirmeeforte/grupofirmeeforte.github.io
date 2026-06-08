@@ -831,6 +831,17 @@ export default function Consignado() {
                   </td>
                   {/* Coluna Comissão */}
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
+                    {/* % do RBM usado pela comissão - acima do valor */}
+                    {(() => {
+                      const com = parseFloat(String(r.totalComissao || '0').replace(',', '.'));
+                      const rbmVal = parseFloat(String(r.rbm || '0').replace(',', '.'));
+                      if (com > 0 && rbmVal > 0) {
+                        const pctRbm = (com / rbmVal) * 100;
+                        return <div className="text-[10px] font-semibold text-orange-600">{pctRbm.toFixed(1)}% do RBM</div>;
+                      }
+                      return null;
+                    })()}
+                    <div className="font-bold text-green-700 text-[12px]">{moeda(r.totalComissao)}</div>
                     {/* % da tabela de comissão (percPago salvo no banco) */}
                     {(() => {
                       const pp = parseFloat(String(r.percPago || '0').replace(',', '.'));
@@ -840,7 +851,6 @@ export default function Consignado() {
                       }
                       return null;
                     })()}
-                    <div className="font-bold text-green-700 text-[12px]">{moeda(r.totalComissao)}</div>
                     {r.tabela && r.tabela !== 'NULL' && r.tabela !== '0' && (
                       <div className="text-[10px] text-gray-500">{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
                     )}
