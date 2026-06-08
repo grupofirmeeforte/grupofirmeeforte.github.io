@@ -1202,20 +1202,36 @@ export const febrabanRouter = {
     .input(z.object({
       periodo: z.enum(['bimestre', 'trimestre', 'semestre', 'ano']),
       empresa: z.string().optional(),
+      ano: z.number().optional(), // filtro de ano (ex: 2025, 2026)
     }))
     .query(async ({ input }) => {
       const db = await getDb();
-      if (!db) return { series: [], labels: [], agentes: [] };
-      const rows = await db
-        .select({ mesano: febraban.mesano, operador: febraban.operador, troco: febraban.troco })
+      if (!db) return { series: [], labels: [], agentes: [], anos: [] };
+      // Buscar todos os anos disponíveis para popular o seletor
+      const anosRows = await db
+        .selectDistinct({ mesano: febraban.mesano })
         .from(febraban)
         .where(and(
           eq(febraban.situacao, 'Contratada'),
           input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`
         ));
       const parseMesano = (m: number) => { const s = String(m); return { mes: parseInt(s.slice(0, s.length - 2)), ano: parseInt('20' + s.slice(-2)) }; };
-      const getLabel = (m: number) => { const { mes, ano } = parseMesano(m); if (input.periodo === 'bimestre') return `${Math.ceil(mes / 2)}º Bim/${ano}`; if (input.periodo === 'trimestre') return `${Math.ceil(mes / 3)}º Tri/${ano}`; if (input.periodo === 'semestre') return `${mes <= 6 ? 1 : 2}º Sem/${ano}`; return String(ano); };
-      const getOrder = (m: number) => { const { mes, ano } = parseMesano(m); if (input.periodo === 'bimestre') return ano * 100 + Math.ceil(mes / 2); if (input.periodo === 'trimestre') return ano * 100 + Math.ceil(mes / 3); if (input.periodo === 'semestre') return ano * 100 + (mes <= 6 ? 1 : 2); return ano; };
+      const anosSet = new Set<number>();
+      for (const r of anosRows) { if (r.mesano) { const { ano } = parseMesano(r.mesano); anosSet.add(ano); } }
+      const anos = Array.from(anosSet).sort((a, b) => b - a);
+      // Determinar ano efetivo: usa o fornecido ou o mais recente
+      const anoEfetivo = input.ano ?? (anos[0] ?? new Date().getFullYear());
+      const anoSuffix = String(anoEfetivo).slice(-2);
+      const rows = await db
+        .select({ mesano: febraban.mesano, operador: febraban.operador, troco: febraban.troco })
+        .from(febraban)
+        .where(and(
+          eq(febraban.situacao, 'Contratada'),
+          input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`,
+          sql`RIGHT(LPAD(CAST(${febraban.mesano} AS CHAR), 6, '0'), 2) = ${anoSuffix}`
+        ));
+      const getLabel = (m: number) => { const { mes } = parseMesano(m); if (input.periodo === 'bimestre') return `${Math.ceil(mes / 2)}º Bim`; if (input.periodo === 'trimestre') return `${Math.ceil(mes / 3)}º Tri`; if (input.periodo === 'semestre') return `${mes <= 6 ? 1 : 2}º Sem`; return String(anoEfetivo); };
+      const getOrder = (m: number) => { const { mes } = parseMesano(m); if (input.periodo === 'bimestre') return Math.ceil(mes / 2); if (input.periodo === 'trimestre') return Math.ceil(mes / 3); if (input.periodo === 'semestre') return mes <= 6 ? 1 : 2; return 1; };
       const mapaAgente: Record<string, Record<string, number>> = {};
       const periodosOrder: Record<string, number> = {};
       for (const row of rows) {
@@ -1228,8 +1244,9 @@ export const febrabanRouter = {
       }
       const labels = Object.keys(periodosOrder).sort((a, b) => periodosOrder[a] - periodosOrder[b]);
       const agentes = Object.keys(mapaAgente).sort((a, b) => Object.values(mapaAgente[b]).reduce((s, v) => s + v, 0) - Object.values(mapaAgente[a]).reduce((s, v) => s + v, 0));
+      // total = soma do ano selecionado (todos os períodos do ano)
       const series = agentes.map(ag => ({ name: ag, data: labels.map(l => Math.round((mapaAgente[ag][l] ?? 0) * 100) / 100), total: Math.round(Object.values(mapaAgente[ag]).reduce((s, v) => s + v, 0) * 100) / 100 }));
-      return { series, labels, agentes };
+      return { series, labels, agentes, anos };
     }),
 
   // Gráfico geral por tipo de operação (Financ. Novo / Troco-Refin / Cancelado)
@@ -1237,17 +1254,27 @@ export const febrabanRouter = {
     .input(z.object({
       periodo: z.enum(['bimestre', 'trimestre', 'semestre', 'ano']),
       empresa: z.string().optional(),
+      ano: z.number().optional(),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) return { data: [], labels: [] };
+      const parseMesano = (m: number) => { const s = String(m); return { mes: parseInt(s.slice(0, s.length - 2)), ano: parseInt('20' + s.slice(-2)) }; };
+      // Determinar ano efetivo
+      const anosRows = await db.selectDistinct({ mesano: febraban.mesano }).from(febraban).where(input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`);
+      const anosSet = new Set<number>(); for (const r of anosRows) { if (r.mesano) { const { ano } = parseMesano(r.mesano); anosSet.add(ano); } }
+      const anos = Array.from(anosSet).sort((a, b) => b - a);
+      const anoEfetivo = input.ano ?? (anos[0] ?? new Date().getFullYear());
+      const anoSuffix = String(anoEfetivo).slice(-2);
       const rows = await db
         .select({ mesano: febraban.mesano, situacao: febraban.situacao, troco: febraban.troco, financiado: febraban.financiado })
         .from(febraban)
-        .where(input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`);
-      const parseMesano = (m: number) => { const s = String(m); return { mes: parseInt(s.slice(0, s.length - 2)), ano: parseInt('20' + s.slice(-2)) }; };
-      const getLabel = (m: number) => { const { mes, ano } = parseMesano(m); if (input.periodo === 'bimestre') return `${Math.ceil(mes / 2)}º Bim/${ano}`; if (input.periodo === 'trimestre') return `${Math.ceil(mes / 3)}º Tri/${ano}`; if (input.periodo === 'semestre') return `${mes <= 6 ? 1 : 2}º Sem/${ano}`; return String(ano); };
-      const getOrder = (m: number) => { const { mes, ano } = parseMesano(m); if (input.periodo === 'bimestre') return ano * 100 + Math.ceil(mes / 2); if (input.periodo === 'trimestre') return ano * 100 + Math.ceil(mes / 3); if (input.periodo === 'semestre') return ano * 100 + (mes <= 6 ? 1 : 2); return ano; };
+        .where(and(
+          input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`,
+          sql`RIGHT(LPAD(CAST(${febraban.mesano} AS CHAR), 6, '0'), 2) = ${anoSuffix}`
+        ));
+      const getLabel = (m: number) => { const { mes } = parseMesano(m); if (input.periodo === 'bimestre') return `${Math.ceil(mes / 2)}º Bim`; if (input.periodo === 'trimestre') return `${Math.ceil(mes / 3)}º Tri`; if (input.periodo === 'semestre') return `${mes <= 6 ? 1 : 2}º Sem`; return String(anoEfetivo); };
+      const getOrder = (m: number) => { const { mes } = parseMesano(m); if (input.periodo === 'bimestre') return Math.ceil(mes / 2); if (input.periodo === 'trimestre') return Math.ceil(mes / 3); if (input.periodo === 'semestre') return mes <= 6 ? 1 : 2; return 1; };
       const mapa: Record<string, { novo: number; refin: number; cancelado: number }> = {};
       const periodosOrder: Record<string, number> = {};
       for (const row of rows) {

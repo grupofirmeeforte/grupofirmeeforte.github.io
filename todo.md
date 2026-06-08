@@ -220,6 +220,12 @@
 - [x] Validar testes com sucesso
 
 
+## FEBRABAN GRÁFICOS: FILTRO DE ANO
+- [ ] Adicionar filtro de ano (2025, 2026, etc.) nos gráficos ChaveJ e Por Tipo
+- [ ] Cards mostram total do ano selecionado (não soma histórica)
+- [ ] Botões Bimestre/Trimestre/Semestre/Ano agrupam dentro do ano escolhido
+- [ ] Backend: adicionar parâmetro `ano` nas procedures graficoPorPeriodo e graficoPorTipo
+
 ## FASE 19: RELATORIO DE PRODUCAO BB NA ABA FEBRABAN
 - [x] Criar schema para tabela de relatório BB
 - [x] Criar router para importar/listar relatório
