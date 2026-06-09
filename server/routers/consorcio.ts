@@ -122,7 +122,7 @@ export const consorcioRouter = router({
   importar: protectedProcedure
     .input(z.object({
       rows: z.array(z.object({
-        empresa: z.string(),
+        empresa: z.string().optional(),
         mesAno: z.string(),
         proposta: z.string(),
         data: z.string().optional(),
@@ -199,21 +199,49 @@ export const consorcioRouter = router({
         }
       }
 
+      // ── REGRA 3: Buscar empresa pelo chaveJ no cadastro de agentes ──
+      // Coletar todos os chaveJs únicos que precisam de empresa
+      const todosChaveJs = Array.from(new Set(
+        rows.filter(r => r.chaveJ && !r.empresa)
+            .map(r => r.chaveJ!.toUpperCase())
+      ));
+
+      const empresaPorChaveJ = new Map<string, string>();
+      if (todosChaveJs.length > 0) {
+        const CHUNK_EMP = 200;
+        for (let i = 0; i < todosChaveJs.length; i += CHUNK_EMP) {
+          const chunk = todosChaveJs.slice(i, i + CHUNK_EMP);
+          const found = await db.select({ chaveJ: agentes.chaveJ, empresa: agentes.empresa })
+            .from(agentes)
+            .where(sql`chaveJ IN (${sql.raw(chunk.map(c => `'${c.replace(/'/g, "''")}'`).join(','))})`);
+          found.forEach(a => { if (a.chaveJ && a.empresa) empresaPorChaveJ.set(a.chaveJ.toUpperCase(), a.empresa.toUpperCase()); });
+        }
+      }
+
       // Enriquecer cada row com o agente correto
       const rowsEnriquecidos = rows.map(r => {
         if (!r.proposta) return r;
+        let enriched = { ...r };
+
         if (r.parcLiberada === 'PARC1' && r.chaveJ) {
           // PARC1: buscar nome no cadastro
           const nomeDosCadastro = nomesPorChaveJ.get(r.chaveJ.toUpperCase());
-          return { ...r, chaveJ: r.chaveJ.toUpperCase(), nomeAgente: nomeDosCadastro || r.nomeAgente || '' };
+          enriched = { ...enriched, chaveJ: r.chaveJ.toUpperCase(), nomeAgente: nomeDosCadastro || r.nomeAgente || '' };
         } else if (r.parcLiberada && r.parcLiberada !== 'PARC1') {
           // PARC2+: copiar da PARC1 da mesma proposta
           const parc1 = parc1NoBatch.get(r.proposta);
           if (parc1) {
-            return { ...r, chaveJ: parc1.chaveJ, nomeAgente: parc1.nomeAgente };
+            enriched = { ...enriched, chaveJ: parc1.chaveJ, nomeAgente: parc1.nomeAgente };
           }
         }
-        return r;
+
+        // Buscar empresa pelo chaveJ se não veio no arquivo
+        if (!enriched.empresa && enriched.chaveJ) {
+          const empDoAgente = empresaPorChaveJ.get(enriched.chaveJ.toUpperCase());
+          if (empDoAgente) enriched = { ...enriched, empresa: empDoAgente };
+        }
+
+        return enriched;
       });
 
       // Buscar propostas existentes em batch
@@ -233,11 +261,15 @@ export const consorcioRouter = router({
       }
 
       // Separar em inserções e atualizações
-      const toInsert: typeof rows = [];
-      const toUpdate: typeof rows = [];
+      const toInsert: typeof rowsEnriquecidos = [];
+      const toUpdate: typeof rowsEnriquecidos = [];
 
-      for (const row of rows) {
-        if (!row.proposta || !row.empresa) continue;
+      for (const row of rowsEnriquecidos) {
+        if (!row.proposta) continue;
+        // Se ainda não tem empresa (PARC1 sem chaveJ cadastrado), importa sem empresa para preenchimento manual
+        if (!row.empresa && !row.chaveJ) {
+          // Inserir mesmo sem empresa/chaveJ — será preenchido manualmente depois
+        }
         if (existentes.has(row.proposta)) {
           if (modo === "subscrever") toUpdate.push(row);
         } else {

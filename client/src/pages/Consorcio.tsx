@@ -204,10 +204,15 @@ export default function Consorcio() {
       const ws = wb.Sheets[wb.SheetNames[0]];
       const raw: any[][] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
 
-      // Encontrar linha de cabeçalho (contém "Empresa" ou "EMPRESA")
+      // Encontrar linha de cabeçalho — aceita template antigo (com EMPRESA) e novo (sem EMPRESA)
       let headerIdx = -1;
       for (let i = 0; i < Math.min(raw.length, 10); i++) {
-        if (raw[i]?.some((c: any) => c && norm(String(c)).includes("EMPRESA"))) {
+        if (raw[i]?.some((c: any) => c && (
+          norm(String(c)).includes("EMPRESA") ||
+          norm(String(c)).includes("PROPOSTA") ||
+          norm(String(c)).includes("MESANO") ||
+          norm(String(c)).includes("MES")
+        ))) {
           headerIdx = i;
           break;
         }
@@ -217,46 +222,58 @@ export default function Consorcio() {
       const headers = raw[headerIdx].map((h: any) => norm(String(h ?? "")));
       const colIdx = (name: string) => headers.indexOf(norm(name));
 
-      const iEmpresa    = colIdx("EMPRESA");
-      const iMesAno     = colIdx("MESANO") !== -1 ? colIdx("MESANO") : colIdx("MESANO");
-      const iProposta   = colIdx("PROPOSTA");
-      const iData       = colIdx("DATA");
-      const iSegmento   = colIdx("SEGMENTO");
-      const iValorBem   = colIdx("VALORBEM");
-      const iParcLib    = colIdx("PARCLIBERADA");
-      const iPct1       = colIdx("COMISSAO1") !== -1 ? colIdx("COMISSAO1") : headers.findIndex((_:any,i:number) => headers[i].includes("COMISSAO") && i < 8);
-      const iRbm        = colIdx("RBM");
-      const iPct2       = headers.findIndex((_:any,i:number) => headers[i].includes("COMISSAO") && i > iPct1);
-      const iComissao   = headers.findIndex((_:any,i:number) => headers[i] === "COMISSAO" && i > iPct2);
-      const iChaveJ     = colIdx("CHAVEJ");
-      const iAgente     = colIdx("AGENTE");
+      // Detectar se é template novo (sem coluna EMPRESA)
+      const temEmpresa = colIdx("EMPRESA") !== -1;
 
-      // Fallback: buscar por posição se nome não encontrado
-      const getCol = (idx: number, fallback: number) => idx !== -1 ? idx : fallback;
+      const iEmpresa    = colIdx("EMPRESA");
+      // Template novo: Mês/Ano, Proposta, Data, Segmento, Valor Bem, Parc Liberada, % Comissão 1, RBM
+      const iMesAno     = colIdx("MESANO") !== -1 ? colIdx("MESANO") :
+                          colIdx("MES") !== -1 ? colIdx("MES") : 0;
+      const iProposta   = colIdx("PROPOSTA") !== -1 ? colIdx("PROPOSTA") : (temEmpresa ? 2 : 1);
+      const iData       = colIdx("DATA") !== -1 ? colIdx("DATA") : (temEmpresa ? 3 : 2);
+      const iSegmento   = colIdx("SEGMENTO") !== -1 ? colIdx("SEGMENTO") : (temEmpresa ? 4 : 3);
+      const iValorBem   = colIdx("VALORBEM") !== -1 ? colIdx("VALORBEM") : (temEmpresa ? 5 : 4);
+      const iParcLib    = colIdx("PARCLIBERADA") !== -1 ? colIdx("PARCLIBERADA") :
+                          headers.findIndex((h: string) => h.includes("PARC")) !== -1 ?
+                          headers.findIndex((h: string) => h.includes("PARC")) : (temEmpresa ? 6 : 5);
+      const iPct1       = colIdx("COMISSAO1") !== -1 ? colIdx("COMISSAO1") :
+                          headers.findIndex((h: string) => h.includes("COMISSAO")) !== -1 ?
+                          headers.findIndex((h: string) => h.includes("COMISSAO")) : (temEmpresa ? 7 : 6);
+      const iRbm        = colIdx("RBM") !== -1 ? colIdx("RBM") : (temEmpresa ? 8 : 7);
+      const iPct2       = headers.findIndex((h: string, i: number) => h.includes("COMISSAO") && i > iPct1);
+      const iComissao   = headers.findIndex((h: string, i: number) => h === "COMISSAO" && i > iPct2);
+      const iChaveJ     = colIdx("CHAVEJ") !== -1 ? colIdx("CHAVEJ") : -1;
+      const iAgente     = colIdx("AGENTE") !== -1 ? colIdx("AGENTE") : -1;
 
       const rows: any[] = [];
       for (let r = headerIdx + 1; r < raw.length; r++) {
         const row = raw[r];
         if (!row || !row.some((c: any) => c != null && c !== "")) continue;
 
-        const empresaVal = String(row[getCol(iEmpresa,0)] ?? "").trim().toUpperCase();
-        const propostaVal = String(row[getCol(iProposta,2)] ?? "").trim();
-        if (!empresaVal || !propostaVal || propostaVal === "0") continue;
+        const propostaVal = String(row[iProposta] ?? "").trim();
+        if (!propostaVal || propostaVal === "0") continue;
+
+        // Empresa: só preenche se vier no arquivo (template antigo)
+        // No template novo, será buscada pelo chaveJ no backend
+        const empresaVal = temEmpresa ? String(row[iEmpresa] ?? "").trim().toUpperCase() : undefined;
+        if (temEmpresa && !empresaVal) continue; // template antigo exige empresa
+
+        const chaveJVal = iChaveJ !== -1 ? String(row[iChaveJ] ?? "").trim().toUpperCase() || undefined : undefined;
 
         rows.push({
           empresa: empresaVal,
-          mesAno: toMesAno(row[getCol(iMesAno,1)]),
+          mesAno: toMesAno(row[iMesAno]),
           proposta: propostaVal,
-          data: toDate(row[getCol(iData,3)]),
-          segmento: String(row[getCol(iSegmento,4)] ?? "").trim().toUpperCase() || undefined,
-          valorBem: toNum(row[getCol(iValorBem,5)]) || undefined,
-          parcLiberada: String(row[getCol(iParcLib,6)] ?? "").trim().toUpperCase() || undefined,
-          pctComissao1: toNum(row[getCol(iPct1,7)]) || undefined,
-          rbm: toNum(row[getCol(iRbm,8)]) || undefined,
-          pctComissao2: toNum(row[getCol(iPct2,9)]) || undefined,
-          comissao: toNum(row[getCol(iComissao,10)]) || undefined,
-          chaveJ: String(row[getCol(iChaveJ,11)] ?? "").trim().toUpperCase() || undefined,
-          nomeAgente: String(row[getCol(iAgente,12)] ?? "").trim() || undefined,
+          data: toDate(row[iData]),
+          segmento: String(row[iSegmento] ?? "").trim().toUpperCase() || undefined,
+          valorBem: toNum(row[iValorBem]) || undefined,
+          parcLiberada: String(row[iParcLib] ?? "").trim().toUpperCase() || undefined,
+          pctComissao1: toNum(row[iPct1]) || undefined,
+          rbm: toNum(row[iRbm]) || undefined,
+          pctComissao2: iPct2 !== -1 ? toNum(row[iPct2]) || undefined : undefined,
+          comissao: iComissao !== -1 ? toNum(row[iComissao]) || undefined : undefined,
+          chaveJ: chaveJVal,
+          nomeAgente: iAgente !== -1 ? String(row[iAgente] ?? "").trim() || undefined : undefined,
         });
       }
       setImportRows(rows);
