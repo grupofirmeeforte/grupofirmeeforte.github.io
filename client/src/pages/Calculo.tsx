@@ -938,7 +938,7 @@ export default function Calculo() {
                     </div>
                   </td>
                   {/* Célula compacta Ajustes */}
-                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[110px] align-top text-right">
+                  <td className="px-2 py-1 border-b border-slate-200 align-top text-right">
                     {/* Créditos/Débitos editável */}
                     <div className="text-[9px] text-slate-400 mb-0.5">Créd/Déb</div>
                     {editandoCreditoDebito === r.id ? (

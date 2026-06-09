@@ -273,7 +273,7 @@ function DashboardLayoutContent({
             </div>
           </div>
         )}
-        <main className="flex-1 p-4 pb-16">{children}</main>
+        <main className="flex-1 p-4" style={{paddingBottom:'48px'}}>{children}</main>
       </SidebarInset>
       <BotaoComunicado />
     </>

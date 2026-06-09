@@ -40,7 +40,7 @@ function ensureLicenseNotice() {
     'right:0',
     'z-index:99999',
     'text-align:center',
-    'padding:4px 8px',
+    'padding:5px 8px',
     'font-size:11px',
     'background:rgba(0,0,0,0.75)',
     'color:rgba(255,255,255,0.55)',
