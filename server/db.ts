@@ -401,6 +401,16 @@ export async function atualizarValoresCalculo(dados: Partial<ValoresCalculo>): P
       'ativo08', 'ativo08De', 'ativo08Ate',
       'ativo09', 'ativo09De', 'ativo09Ate',
       'ativo10', 'ativo10De', 'ativo10Ate',
+      'ativo11', 'ativo11De', 'ativo11Ate',
+      'ativo12', 'ativo12De', 'ativo12Ate',
+      'ativo13', 'ativo13De', 'ativo13Ate',
+      'ativo14', 'ativo14De', 'ativo14Ate',
+      'ativo15', 'ativo15De', 'ativo15Ate',
+      'ativo16', 'ativo16De', 'ativo16Ate',
+      'ativo17', 'ativo17De', 'ativo17Ate',
+      'ativo18', 'ativo18De', 'ativo18Ate',
+      'ativo19', 'ativo19De', 'ativo19Ate',
+      'ativo20', 'ativo20De', 'ativo20Ate',
     ] as const;
     
     campos.forEach(campo => {
@@ -508,6 +518,16 @@ export async function calcularPercPago(
           { num: 8, de: Number(valores.ativo08De) || 0, ate: Number(valores.ativo08Ate) || 0 },
           { num: 9, de: Number(valores.ativo09De) || 0, ate: Number(valores.ativo09Ate) || 0 },
           { num: 10, de: Number(valores.ativo10De) || 0, ate: Number(valores.ativo10Ate) || 0 },
+          { num: 11, de: Number((valores as any).ativo11De) || 0, ate: Number((valores as any).ativo11Ate) || 0 },
+          { num: 12, de: Number((valores as any).ativo12De) || 0, ate: Number((valores as any).ativo12Ate) || 0 },
+          { num: 13, de: Number((valores as any).ativo13De) || 0, ate: Number((valores as any).ativo13Ate) || 0 },
+          { num: 14, de: Number((valores as any).ativo14De) || 0, ate: Number((valores as any).ativo14Ate) || 0 },
+          { num: 15, de: Number((valores as any).ativo15De) || 0, ate: Number((valores as any).ativo15Ate) || 0 },
+          { num: 16, de: Number((valores as any).ativo16De) || 0, ate: Number((valores as any).ativo16Ate) || 0 },
+          { num: 17, de: Number((valores as any).ativo17De) || 0, ate: Number((valores as any).ativo17Ate) || 0 },
+          { num: 18, de: Number((valores as any).ativo18De) || 0, ate: Number((valores as any).ativo18Ate) || 0 },
+          { num: 19, de: Number((valores as any).ativo19De) || 0, ate: Number((valores as any).ativo19Ate) || 0 },
+          { num: 20, de: Number((valores as any).ativo20De) || 0, ate: Number((valores as any).ativo20Ate) || 0 },
         ];
 
         for (const f of faixas) {
@@ -516,7 +536,7 @@ export async function calcularPercPago(
             break;
           }
         }
-        if (!nivelNum) nivelNum = 10; // ultrapassou todas as faixas
+        if (!nivelNum) nivelNum = 20; // ultrapassou todas as faixas
       }
     }
 

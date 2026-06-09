@@ -1155,9 +1155,9 @@ function MinhaTabela() {
     const pctVal = n > 1 ? n : n * 100;
     return pctVal.toFixed(2).replace('.', ',') + '%';
   };
-  const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
+  const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10','ativo11','ativo12','ativo13','ativo14','ativo15','ativo16','ativo17','ativo18','ativo19','ativo20'];
   const labelAtivo = (k: string) => `Ativo ${parseInt(k.replace('ativo', ''), 10).toString().padStart(2, '0')}`;
-  const niveisConfigurados = ativoKeys.filter(k => (metasDe[k] ?? 0) > 0 || (metasAte[k] ?? 0) > 0 || (metas[k] ?? 0) > 0).slice(0, 4);
+  const niveisConfigurados = ativoKeys.filter(k => (metasDe[k] ?? 0) > 0 || (metasAte[k] ?? 0) > 0 || (metas[k] ?? 0) > 0).slice(0, 6);
 
   // Colunas da tabela de comissão: todas com dados, destacando anterior e vigente
   const colunasComValor = ativoKeys.filter(k => tabela.some(r => r[k] != null && r[k] !== ''));

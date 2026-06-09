@@ -657,6 +657,16 @@ export const appRouter = router({
         ativo08: z.string().optional(), ativo08De: z.string().optional(), ativo08Ate: z.string().optional(),
         ativo09: z.string().optional(), ativo09De: z.string().optional(), ativo09Ate: z.string().optional(),
         ativo10: z.string().optional(), ativo10De: z.string().optional(), ativo10Ate: z.string().optional(),
+        ativo11: z.string().optional(), ativo11De: z.string().optional(), ativo11Ate: z.string().optional(),
+        ativo12: z.string().optional(), ativo12De: z.string().optional(), ativo12Ate: z.string().optional(),
+        ativo13: z.string().optional(), ativo13De: z.string().optional(), ativo13Ate: z.string().optional(),
+        ativo14: z.string().optional(), ativo14De: z.string().optional(), ativo14Ate: z.string().optional(),
+        ativo15: z.string().optional(), ativo15De: z.string().optional(), ativo15Ate: z.string().optional(),
+        ativo16: z.string().optional(), ativo16De: z.string().optional(), ativo16Ate: z.string().optional(),
+        ativo17: z.string().optional(), ativo17De: z.string().optional(), ativo17Ate: z.string().optional(),
+        ativo18: z.string().optional(), ativo18De: z.string().optional(), ativo18Ate: z.string().optional(),
+        ativo19: z.string().optional(), ativo19De: z.string().optional(), ativo19Ate: z.string().optional(),
+        ativo20: z.string().optional(), ativo20De: z.string().optional(), ativo20Ate: z.string().optional(),
         receboPct: z.string().optional(), pagoPct: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
@@ -687,6 +697,16 @@ export const appRouter = router({
         ativo08: z.string().optional(), ativo08De: z.string().optional(), ativo08Ate: z.string().optional(),
         ativo09: z.string().optional(), ativo09De: z.string().optional(), ativo09Ate: z.string().optional(),
         ativo10: z.string().optional(), ativo10De: z.string().optional(), ativo10Ate: z.string().optional(),
+        ativo11: z.string().optional(), ativo11De: z.string().optional(), ativo11Ate: z.string().optional(),
+        ativo12: z.string().optional(), ativo12De: z.string().optional(), ativo12Ate: z.string().optional(),
+        ativo13: z.string().optional(), ativo13De: z.string().optional(), ativo13Ate: z.string().optional(),
+        ativo14: z.string().optional(), ativo14De: z.string().optional(), ativo14Ate: z.string().optional(),
+        ativo15: z.string().optional(), ativo15De: z.string().optional(), ativo15Ate: z.string().optional(),
+        ativo16: z.string().optional(), ativo16De: z.string().optional(), ativo16Ate: z.string().optional(),
+        ativo17: z.string().optional(), ativo17De: z.string().optional(), ativo17Ate: z.string().optional(),
+        ativo18: z.string().optional(), ativo18De: z.string().optional(), ativo18Ate: z.string().optional(),
+        ativo19: z.string().optional(), ativo19De: z.string().optional(), ativo19Ate: z.string().optional(),
+        ativo20: z.string().optional(), ativo20De: z.string().optional(), ativo20Ate: z.string().optional(),
         receboPct: z.string().optional(), pagoPct: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
@@ -738,6 +758,11 @@ export const appRouter = router({
         ativo05: z.string().optional(), ativo06: z.string().optional(),
         ativo07: z.string().optional(), ativo08: z.string().optional(),
         ativo09: z.string().optional(), ativo10: z.string().optional(),
+        ativo11: z.string().optional(), ativo12: z.string().optional(),
+        ativo13: z.string().optional(), ativo14: z.string().optional(),
+        ativo15: z.string().optional(), ativo16: z.string().optional(),
+        ativo17: z.string().optional(), ativo18: z.string().optional(),
+        ativo19: z.string().optional(), ativo20: z.string().optional(),
         faixa1: z.string().optional(), faixa2: z.string().optional(),
         faixa3: z.string().optional(), faixa4: z.string().optional(), faixa5: z.string().optional(),
         tabelaCalculo: z.string().optional(), referencia: z.string().optional(),
@@ -751,7 +776,7 @@ export const appRouter = router({
         for (const row of input) {
           const { id, ...data } = row;
           // Converter percentuais: se valor > 1, assume que está em formato percentual (ex: 0.80) e divide por 100
-          const campos = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10','txJurosDe','txJurosAte'] as const;
+          const campos = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10','ativo11','ativo12','ativo13','ativo14','ativo15','ativo16','ativo17','ativo18','ativo19','ativo20','txJurosDe','txJurosAte'] as const;
           for (const c of campos) {
             const v = (data as any)[c];
             if (v !== undefined && v !== null && v !== '') {
@@ -1645,6 +1670,16 @@ export const appRouter = router({
         ativo08: z.string().optional(), ativo08De: z.string().optional(), ativo08Ate: z.string().optional(),
         ativo09: z.string().optional(), ativo09De: z.string().optional(), ativo09Ate: z.string().optional(),
         ativo10: z.string().optional(), ativo10De: z.string().optional(), ativo10Ate: z.string().optional(),
+        ativo11: z.string().optional(), ativo11De: z.string().optional(), ativo11Ate: z.string().optional(),
+        ativo12: z.string().optional(), ativo12De: z.string().optional(), ativo12Ate: z.string().optional(),
+        ativo13: z.string().optional(), ativo13De: z.string().optional(), ativo13Ate: z.string().optional(),
+        ativo14: z.string().optional(), ativo14De: z.string().optional(), ativo14Ate: z.string().optional(),
+        ativo15: z.string().optional(), ativo15De: z.string().optional(), ativo15Ate: z.string().optional(),
+        ativo16: z.string().optional(), ativo16De: z.string().optional(), ativo16Ate: z.string().optional(),
+        ativo17: z.string().optional(), ativo17De: z.string().optional(), ativo17Ate: z.string().optional(),
+        ativo18: z.string().optional(), ativo18De: z.string().optional(), ativo18Ate: z.string().optional(),
+        ativo19: z.string().optional(), ativo19De: z.string().optional(), ativo19Ate: z.string().optional(),
+        ativo20: z.string().optional(), ativo20De: z.string().optional(), ativo20Ate: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const dados: Record<string, string | number | null> = {};
@@ -1659,6 +1694,16 @@ export const appRouter = router({
           'ativo08', 'ativo08De', 'ativo08Ate',
           'ativo09', 'ativo09De', 'ativo09Ate',
           'ativo10', 'ativo10De', 'ativo10Ate',
+          'ativo11', 'ativo11De', 'ativo11Ate',
+          'ativo12', 'ativo12De', 'ativo12Ate',
+          'ativo13', 'ativo13De', 'ativo13Ate',
+          'ativo14', 'ativo14De', 'ativo14Ate',
+          'ativo15', 'ativo15De', 'ativo15Ate',
+          'ativo16', 'ativo16De', 'ativo16Ate',
+          'ativo17', 'ativo17De', 'ativo17Ate',
+          'ativo18', 'ativo18De', 'ativo18Ate',
+          'ativo19', 'ativo19De', 'ativo19Ate',
+          'ativo20', 'ativo20De', 'ativo20Ate',
         ] as const;
         
         allCampos.forEach(campo => {
@@ -1833,7 +1878,7 @@ export const appRouter = router({
         }
       }
 
-      const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
+      const ativoKeys = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10','ativo11','ativo12','ativo13','ativo14','ativo15','ativo16','ativo17','ativo18','ativo19','ativo20'];
 
       // Função: determina o nível pelo campo situacao do agente (para o mês anterior = cadastro atual)
       const nivelPorSituacao = (): string | null => {

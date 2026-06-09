@@ -291,6 +291,16 @@ export default function AgentesPage() {
                 <SelectItem value="Ativo08">Ativo08</SelectItem>
                 <SelectItem value="Ativo09">Ativo09</SelectItem>
                 <SelectItem value="Ativo10">Ativo10</SelectItem>
+                <SelectItem value="Ativo11">Ativo11</SelectItem>
+                <SelectItem value="Ativo12">Ativo12</SelectItem>
+                <SelectItem value="Ativo13">Ativo13</SelectItem>
+                <SelectItem value="Ativo14">Ativo14</SelectItem>
+                <SelectItem value="Ativo15">Ativo15</SelectItem>
+                <SelectItem value="Ativo16">Ativo16</SelectItem>
+                <SelectItem value="Ativo17">Ativo17</SelectItem>
+                <SelectItem value="Ativo18">Ativo18</SelectItem>
+                <SelectItem value="Ativo19">Ativo19</SelectItem>
+                <SelectItem value="Ativo20">Ativo20</SelectItem>
                 <SelectItem value="Inativo">Inativo</SelectItem>
                 <SelectItem value="Afastado">Afastado</SelectItem>
                 <SelectItem value="Licença">Licença</SelectItem>
@@ -374,6 +384,26 @@ export default function AgentesPage() {
                               ? 'bg-orange-100 text-orange-800 border-orange-300'
                               : agente.situacao === 'Ativo10'
                               ? 'bg-amber-100 text-amber-800 border-amber-300'
+                              : agente.situacao === 'Ativo11'
+                              ? 'bg-lime-100 text-lime-800 border-lime-300'
+                              : agente.situacao === 'Ativo12'
+                              ? 'bg-green-200 text-green-900 border-green-400'
+                              : agente.situacao === 'Ativo13'
+                              ? 'bg-teal-200 text-teal-900 border-teal-400'
+                              : agente.situacao === 'Ativo14'
+                              ? 'bg-sky-200 text-sky-900 border-sky-400'
+                              : agente.situacao === 'Ativo15'
+                              ? 'bg-indigo-100 text-indigo-800 border-indigo-300'
+                              : agente.situacao === 'Ativo16'
+                              ? 'bg-violet-200 text-violet-900 border-violet-400'
+                              : agente.situacao === 'Ativo17'
+                              ? 'bg-rose-100 text-rose-800 border-rose-300'
+                              : agente.situacao === 'Ativo18'
+                              ? 'bg-red-200 text-red-900 border-red-400'
+                              : agente.situacao === 'Ativo19'
+                              ? 'bg-orange-200 text-orange-900 border-orange-400'
+                              : agente.situacao === 'Ativo20'
+                              ? 'bg-yellow-200 text-yellow-900 border-yellow-400'
                               : agente.situacao === 'Inativo'
                               ? 'bg-red-100 text-red-700 border-red-300'
                               : agente.situacao === 'Afastado'

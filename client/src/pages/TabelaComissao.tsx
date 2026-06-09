@@ -36,6 +36,10 @@ type TabelaRow = {
   ativo04: string | null; ativo05: string | null; ativo06: string | null;
   ativo07: string | null; ativo08: string | null;
   ativo09?: string | null; ativo10?: string | null;
+  ativo11?: string | null; ativo12?: string | null; ativo13?: string | null;
+  ativo14?: string | null; ativo15?: string | null; ativo16?: string | null;
+  ativo17?: string | null; ativo18?: string | null; ativo19?: string | null;
+  ativo20?: string | null;
 };
 
 type FormData = {
@@ -46,6 +50,9 @@ type FormData = {
   ativo01?: string; ativo02?: string; ativo03?: string; ativo04?: string;
   ativo05?: string; ativo06?: string; ativo07?: string; ativo08?: string;
   ativo09?: string; ativo10?: string;
+  ativo11?: string; ativo12?: string; ativo13?: string; ativo14?: string;
+  ativo15?: string; ativo16?: string; ativo17?: string; ativo18?: string;
+  ativo19?: string; ativo20?: string;
 };
 
 const EMPTY_FORM: FormData = {};
@@ -245,7 +252,7 @@ export default function TabelaComissao() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [savingCell, setSavingCell] = useState<string | null>(null);
   const [showColSelector, setShowColSelector] = useState(false);
-  const ALL_ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'] as const;
+  const ALL_ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10','ativo11','ativo12','ativo13','ativo14','ativo15','ativo16','ativo17','ativo18','ativo19','ativo20'] as const;
   const [colsVisiveis, setColsVisiveis] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('tabela_comissao_cols');
@@ -259,7 +266,7 @@ export default function TabelaComissao() {
       return next;
     });
   };
-  const NIVEIS = ['Ativo01','Ativo02','Ativo03','Ativo04','Ativo05','Ativo06','Ativo07','Ativo08','Ativo09','Ativo10'];
+  const NIVEIS = ['Ativo01','Ativo02','Ativo03','Ativo04','Ativo05','Ativo06','Ativo07','Ativo08','Ativo09','Ativo10','Ativo11','Ativo12','Ativo13','Ativo14','Ativo15','Ativo16','Ativo17','Ativo18','Ativo19','Ativo20'];
   const { user } = useAuth();
   const isAdminOuCeo = (user as any)?.cargo === 'CEO' || (user as any)?.cargo === 'SUPORTE' || (user as any)?.role === 'admin';
   const situacaoAgente: string | null = (user as any)?.situacao ?? null;
@@ -269,6 +276,12 @@ export default function TabelaComissao() {
     'Ativo01': 'ativo01', 'Ativo02': 'ativo02', 'Ativo03': 'ativo03',
     'Ativo04': 'ativo04', 'Ativo05': 'ativo05', 'Ativo06': 'ativo06',
     'Ativo07': 'ativo07', 'Ativo08': 'ativo08', 'Ativo09': 'ativo09', 'Ativo10': 'ativo10',
+    'Ativo11': 'ativo11', 'Ativo12': 'ativo12', 'Ativo13': 'ativo13', 'Ativo14': 'ativo14',
+    'Ativo15': 'ativo15', 'Ativo16': 'ativo16', 'Ativo17': 'ativo17', 'Ativo18': 'ativo18',
+    'Ativo19': 'ativo19', 'Ativo20': 'ativo20',
+    'Ativo 11': 'ativo11', 'Ativo 12': 'ativo12', 'Ativo 13': 'ativo13', 'Ativo 14': 'ativo14',
+    'Ativo 15': 'ativo15', 'Ativo 16': 'ativo16', 'Ativo 17': 'ativo17', 'Ativo 18': 'ativo18',
+    'Ativo 19': 'ativo19', 'Ativo 20': 'ativo20',
   };
   // Agente é considerado "ativo" se sua situação começa com 'Ativo'
   const isAgenteAtivo: boolean = situacaoAgente != null && situacaoAgente.startsWith('Ativo');
@@ -482,7 +495,7 @@ export default function TabelaComissao() {
   function handleExportarTemplate() {
     // Exporta os dados atuais como template para edição
     // Campos que são percentuais salvos como decimal no banco (ex: 0.0065 = 0,65%)
-    const ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
+    const ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10','ativo11','ativo12','ativo13','ativo14','ativo15','ativo16','ativo17','ativo18','ativo19','ativo20'];
     const CAMPOS_PCT = [...ATIVOS, 'faixa1','faixa2','faixa3','faixa4','faixa5','tabelaCalculo','referencia'];
     // txJurosDe e txJurosAte são salvos como string direta (ex: '0.0175') e representam percentual
     const CAMPOS_JUROS = ['txJurosDe','txJurosAte'];
@@ -525,7 +538,7 @@ export default function TabelaComissao() {
         const ws = wb.Sheets[wb.SheetNames[0]];
         const rows: any[] = XLSX.utils.sheet_to_json(ws, { defval: '' });
         if (rows.length === 0) { toast.error('Planilha vazia'); return; }
-        const ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10'];
+        const ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10','ativo11','ativo12','ativo13','ativo14','ativo15','ativo16','ativo17','ativo18','ativo19','ativo20'];
         const FAIXAS = ['faixa1','faixa2','faixa3','faixa4','faixa5','tabelaCalculo','referencia'];
         const parsed = rows.map((r: any) => {
           const obj: any = {};
@@ -1041,7 +1054,7 @@ export default function TabelaComissao() {
             <div className="col-span-2">
               <label className="text-sm font-medium text-gray-700 mb-2 block">Valores dos Ativos</label>
               <div className="grid grid-cols-5 gap-2">
-                {['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10'].map((key) => (
+                {['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10', 'ativo11', 'ativo12', 'ativo13', 'ativo14', 'ativo15', 'ativo16', 'ativo17', 'ativo18', 'ativo19', 'ativo20'].map((key) => (
                   <div key={key}>
                     <label className="text-xs font-medium text-gray-600 mb-1 block">{key.replace('ativo', 'Ativo ')}</label>
                     <Input value={form[key as keyof FormData] || ''} onChange={e => setField(key as keyof FormData, e.target.value)} placeholder="0.0065" />

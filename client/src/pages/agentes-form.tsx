@@ -532,6 +532,16 @@ export default function AgentesFormPage() {
                     <SelectItem value="Ativo08">Ativo08</SelectItem>
                     <SelectItem value="Ativo09">Ativo09</SelectItem>
                     <SelectItem value="Ativo10">Ativo10</SelectItem>
+                    <SelectItem value="Ativo11">Ativo11</SelectItem>
+                    <SelectItem value="Ativo12">Ativo12</SelectItem>
+                    <SelectItem value="Ativo13">Ativo13</SelectItem>
+                    <SelectItem value="Ativo14">Ativo14</SelectItem>
+                    <SelectItem value="Ativo15">Ativo15</SelectItem>
+                    <SelectItem value="Ativo16">Ativo16</SelectItem>
+                    <SelectItem value="Ativo17">Ativo17</SelectItem>
+                    <SelectItem value="Ativo18">Ativo18</SelectItem>
+                    <SelectItem value="Ativo19">Ativo19</SelectItem>
+                    <SelectItem value="Ativo20">Ativo20</SelectItem>
                     <SelectItem value="Inativo">Inativo</SelectItem>
                     <SelectItem value="Afastado">Afastado</SelectItem>
                     <SelectItem value="Licença">Licença</SelectItem>

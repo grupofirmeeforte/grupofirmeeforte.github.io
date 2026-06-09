@@ -147,6 +147,16 @@ export default function Consignado() {
     'Ativo08': '',
     'Ativo09': '',
     'Ativo10': '',
+    'Ativo11': '',
+    'Ativo12': '',
+    'Ativo13': '',
+    'Ativo14': '',
+    'Ativo15': '',
+    'Ativo16': '',
+    'Ativo17': '',
+    'Ativo18': '',
+    'Ativo19': '',
+    'Ativo20': '',
   });
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Estado para controlar quando calcular fórmulas (só quando chaveJ tem 7+ chars)
