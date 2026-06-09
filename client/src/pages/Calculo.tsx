@@ -790,7 +790,7 @@ export default function Calculo() {
         ) : registros.length === 0 ? (
           <div className="p-8 text-center text-slate-500">Nenhum registro encontrado</div>
         ) : (
-          <table className="w-full border-collapse" style={{ fontSize: "11px" }}>
+          <table className="w-full border-collapse table-fixed" style={{ fontSize: "11px", minWidth: "700px" }}>
             <thead>
               <tr style={{ background: "linear-gradient(90deg, #a855f7, #ec4899)" }}>
                 {/* Coluna de checkbox */}

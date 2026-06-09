@@ -624,23 +624,24 @@ export const consorcioRouter = router({
         qtd: number;
       }>();
 
-      // Helper: converte "05/2026" ou "05/26" → "526", "426" → "426"
+      // Helper: normaliza mesAno para formato MM/AAAA (formato usado na tabela calculos)
       const normalizarMes = (m: string): string => {
         if (!m) return m;
-        // Formato MM/AAAA → MMAA (ex: "05/2026" → "526")
-        const matchLong = m.match(/^(\d{1,2})\/(\d{4})$/);
-        if (matchLong) {
-          const mm = parseInt(matchLong[1], 10);
-          const aa = matchLong[2].slice(2); // últimos 2 dígitos do ano
-          return `${mm}${aa}`;
-        }
-        // Formato MM/AA → MMAA (ex: "05/26" → "526")
+        // Já está no formato MM/AAAA
+        if (/^\d{2}\/\d{4}$/.test(m)) return m;
+        // Formato MM/AA → MM/20AA (ex: "05/26" → "05/2026")
         const matchShort = m.match(/^(\d{1,2})\/(\d{2})$/);
         if (matchShort) {
-          const mm = parseInt(matchShort[1], 10);
-          return `${mm}${matchShort[2]}`;
+          const mm = matchShort[1].padStart(2, '0');
+          return `${mm}/20${matchShort[2]}`;
         }
-        return m; // já no formato correto (ex: "526", "426")
+        // Formato MMAA (ex: "526" → "05/2026")
+        const matchNum = m.match(/^(\d{1,2})(\d{2})$/);
+        if (matchNum) {
+          const mm = matchNum[1].padStart(2, '0');
+          return `${mm}/20${matchNum[2]}`;
+        }
+        return m;
       };
 
       for (const r of registros) {
