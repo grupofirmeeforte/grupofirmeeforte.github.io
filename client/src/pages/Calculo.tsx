@@ -790,11 +790,11 @@ export default function Calculo() {
         ) : registros.length === 0 ? (
           <div className="p-8 text-center text-slate-500">Nenhum registro encontrado</div>
         ) : (
-          <table className="w-full border-collapse" style={{ fontSize: "11px", tableLayout: "fixed" }}>
+          <table className="w-full border-collapse" style={{ fontSize: "10px", tableLayout: "fixed" }}>
             <thead>
               <tr style={{ background: "linear-gradient(90deg, #a855f7, #ec4899)" }}>
                 {/* Coluna de checkbox */}
-                <th className="px-1.5 py-1.5 text-center border-r border-white/20 w-6">
+                <th className="px-1 py-1 text-center border-r border-white/20" style={{width:'3%'}}>
                   <input
                     type="checkbox"
                     checked={todosSelecionados}
@@ -805,12 +805,12 @@ export default function Calculo() {
                   />
                 </th>
                 {/* Coluna compacta Agente */}
-                <th className="px-2 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'28%'}}>Agente</th>
-                <th className="px-2 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'18%'}}>RBM</th>
-                <th className="px-2 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'18%'}}>Comissões</th>
-                <th className="px-2 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'18%'}}>Pagamento</th>
-                <th className="px-2 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'14%'}}>Ajustes</th>
-                <th className="px-1 py-1.5 text-center border-l border-white/20" style={{width:'4%'}}></th>
+                <th className="px-1.5 py-1 text-left font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'22%'}}>Agente</th>
+                <th className="px-1.5 py-1 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'16%'}}>RBM</th>
+                <th className="px-1.5 py-1 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'18%'}}>Comissões</th>
+                <th className="px-1.5 py-1 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'22%'}}>Pagamento</th>
+                <th className="px-1.5 py-1 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'15%'}}>Ajustes</th>
+                <th className="px-1 py-1 text-center border-l border-white/20" style={{width:'4%'}}></th>
               </tr>
             </thead>
             <tbody>
