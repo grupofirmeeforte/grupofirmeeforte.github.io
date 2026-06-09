@@ -1699,11 +1699,10 @@ export const appRouter = router({
         const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
         const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
         const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
-        // Converter MM/AAAA para formato usado no banco: M26 ou MM26 (mes sem zero + 2 digitos do ano)
+        // O campo mes no banco está no formato MM/AAAA (ex: '05/2026')
         const [mm, aaaa] = mesRef.split('/');
         const mesFormatado = `${mm}/${aaaa}`; // para exibição
-        const anoShort = aaaa ? aaaa.slice(2) : String(anoRef).slice(2); // ex: '26'
-        const mesBanco = `${parseInt(mm, 10)}${anoShort}`; // ex: '426' para 04/2026
+        const mesBanco = mesRef; // usa direto o formato MM/AAAA
         // Verificar se é admin/suporte (pode filtrar por qualquer agente)
         let isAdminOuSuporte = false;
         let chaveJLogado: string | null = null;
