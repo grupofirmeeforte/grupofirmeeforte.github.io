@@ -14,6 +14,7 @@ export const consorcioRouter = router({
       empresa: z.string().optional(),
       mesAno: z.string().optional(),
       segmento: z.string().optional(),
+      parcLiberada: z.string().optional(),
     }))
     .query(async ({ input }) => {
       const db = await getDb();
@@ -29,6 +30,9 @@ export const consorcioRouter = router({
       }
       if (input.segmento && input.segmento !== "__all__") {
         conditions.push(eq(consorcios.segmento, input.segmento));
+      }
+      if (input.parcLiberada && input.parcLiberada !== "__all__") {
+        conditions.push(eq(consorcios.parcLiberada, input.parcLiberada));
       }
       if (input.search) {
         const s = `%${input.search}%`;
@@ -63,9 +67,9 @@ export const consorcioRouter = router({
   // Filtros disponíveis
   filtros: protectedProcedure.query(async () => {
     const db = await getDb();
-    if (!db) return { empresas: [], mesanos: [], segmentos: [] };
+    if (!db) return { empresas: [], mesanos: [], segmentos: [], parcelas: [] };
 
-    const [empresas, mesanos, segmentos] = await Promise.all([
+    const [empresas, mesanos, segmentos, parcelas] = await Promise.all([
       db.selectDistinct({ v: consorcios.empresa }).from(consorcios)
         .where(sql`empresa IS NOT NULL AND empresa != ''`)
         .orderBy(asc(consorcios.empresa)),
@@ -75,12 +79,16 @@ export const consorcioRouter = router({
       db.selectDistinct({ v: consorcios.segmento }).from(consorcios)
         .where(sql`segmento IS NOT NULL AND segmento != ''`)
         .orderBy(asc(consorcios.segmento)),
+      db.selectDistinct({ v: consorcios.parcLiberada }).from(consorcios)
+        .where(sql`parcLiberada IS NOT NULL AND parcLiberada != ''`)
+        .orderBy(asc(sql`CAST(REGEXP_REPLACE(parcLiberada, '[^0-9]', '') AS UNSIGNED)`)),
     ]);
 
     return {
       empresas: empresas.map(r => r.v!).filter(Boolean),
       mesanos: mesanos.map(r => r.v!).filter(Boolean),
       segmentos: segmentos.map(r => r.v!).filter(Boolean),
+      parcelas: parcelas.map(r => r.v!).filter(Boolean),
     };
   }),
 

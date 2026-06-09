@@ -77,6 +77,7 @@ export default function Consorcio() {
   const [empresa, setEmpresa] = useState("__all__");
   const [mesAno, setMesAno] = useState("__all__");
   const [segmento, setSegmento] = useState("__all__");
+  const [parcLiberada, setParcLiberada] = useState("__all__");
   const [page, setPage] = useState(0);
   const LIMIT = 100;
 
@@ -160,6 +161,7 @@ export default function Consorcio() {
     empresa: empresa !== "__all__" ? empresa : undefined,
     mesAno: mesAno !== "__all__" ? mesAno : undefined,
     segmento: segmento !== "__all__" ? segmento : undefined,
+    parcLiberada: parcLiberada !== "__all__" ? parcLiberada : undefined,
   });
 
   const importarMutation = trpc.consorcio.importar.useMutation({
@@ -401,8 +403,16 @@ export default function Consorcio() {
           </SelectContent>
         </Select>
 
-        {(empresa !== "__all__" || mesAno !== "__all__" || segmento !== "__all__" || search) && (
-          <Button variant="ghost" size="sm" className="h-9 text-xs" onClick={() => { setEmpresa("__all__"); setMesAno("__all__"); setSegmento("__all__"); setSearch(""); setPage(0); }}>
+        <Select value={parcLiberada} onValueChange={v => { setParcLiberada(v); setPage(0); }}>
+          <SelectTrigger className="h-9 w-32 text-sm"><SelectValue placeholder="Parcela" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">Todas parcelas</SelectItem>
+            {filtros?.parcelas?.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+          </SelectContent>
+        </Select>
+
+        {(empresa !== "__all__" || mesAno !== "__all__" || segmento !== "__all__" || parcLiberada !== "__all__" || search) && (
+          <Button variant="ghost" size="sm" className="h-9 text-xs" onClick={() => { setEmpresa("__all__"); setMesAno("__all__"); setSegmento("__all__"); setParcLiberada("__all__"); setSearch(""); setPage(0); }}>
             Limpar filtros
           </Button>
         )}
