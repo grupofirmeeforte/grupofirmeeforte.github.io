@@ -771,7 +771,7 @@ export default function TabelaComissao() {
               <thead>
                 <tr style={{background: 'linear-gradient(90deg, #002776 0%, #003d99 40%, #0055cc 70%, #1a6ed8 100%)'}} className="text-white">
                   <th className="px-2 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide text-xs w-8">#</th>
-                  <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide">Convênio</th>
+                  <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide" style={{width:'220px',maxWidth:'220px'}}>Convênio</th>
                   {/* Colunas CEO: Recebo e Pago — invisíveis para promotores */}
                   {isAdminOuCeo && (
                     <>
@@ -810,7 +810,7 @@ export default function TabelaComissao() {
                         {/* Número de linha */}
                         <td className="px-2 py-2 text-center text-xs text-gray-400 font-mono w-8 select-none">{rowIdx + 1}</td>
                         {/* Coluna Convênio: Empresa · Código + badge */}
-                        <td className="px-3 py-2 whitespace-nowrap">
+                        <td className="px-3 py-2" style={{width:'220px',maxWidth:'220px'}}>
                           <div className="flex items-center gap-1 text-xs mb-0.5">
                             {isAdminOuCeo ? (
                               // Admin/CEO: sempre usa EditableCell para permitir digitar ex: "BMF / FLEX"
@@ -843,7 +843,7 @@ export default function TabelaComissao() {
                             )}
                             {(row as any).codigo && <span className="text-gray-400">· {(row as any).codigo}</span>}
                           </div>
-                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${convColor.badge}`}>
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${convColor.badge} max-w-full overflow-hidden`} style={{display:'block',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'200px'}} title={row.convenio || '-'}>
                             {row.convenio || '-'}
                           </span>
                         </td>
