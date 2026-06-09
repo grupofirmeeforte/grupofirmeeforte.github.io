@@ -630,55 +630,47 @@ export default function TabelaComissao() {
         </div>
       </div>
 
-      {/* Valores para Cálculo por Nível - Editáveis Inline — só para admin/CEO */}
-      {isAdminOuCeo && <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b">
-        <div className="mb-3">
-          <div className="flex justify-between items-center mb-2">
-            <label className="text-sm font-semibold text-blue-900 block">Valores para Cálculo por Nível:</label>
-            <Button
-              onClick={() => salvarValoresNoBanco(valoresAtivos)}
-              disabled={salvarValoresMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 text-sm rounded"
-            >
-              💾 Salvar Tudo
-            </Button>
-          </div>
-          {/* Grid: cada Ativo ocupa uma coluna com label + campos De e Até */}
-          <div className="grid grid-cols-5 gap-3">
-            {NIVEIS.map((nivel) => {
-              const keyDe = `${nivel}De`;
-              const keyAte = `${nivel}Ate`;
-              return (
-                <div key={nivel} className="bg-white rounded-lg border border-blue-200 p-2">
-                  <div className="text-xs font-semibold text-blue-800 mb-1.5 text-center">{nivel.replace('Ativo', 'Ativo ')}</div>
-                  <div className="space-y-1">
-                    <div>
-                      <label className="text-[10px] text-gray-500">De</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={valoresAtivos[keyDe] || ''}
-                        onChange={(e) => setValoresAtivos(prev => ({ ...prev, [keyDe]: e.target.value }))}
-                        placeholder="0,00"
-                        className="w-full px-2 py-1 border border-gray-300 rounded text-right text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[10px] text-gray-500">Até</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={valoresAtivos[keyAte] || ''}
-                        onChange={(e) => setValoresAtivos(prev => ({ ...prev, [keyAte]: e.target.value }))}
-                        placeholder="0,00"
-                        className="w-full px-2 py-1 border border-gray-300 rounded text-right text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      />
-                    </div>
-                  </div>
+      {/* Valores para Cálculo por Nível - Compacto — só para admin/CEO */}
+      {isAdminOuCeo && <div className="px-4 py-2 bg-blue-50 border-b">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-xs font-semibold text-blue-800">Níveis:</span>
+          <Button
+            onClick={() => salvarValoresNoBanco(valoresAtivos)}
+            disabled={salvarValoresMutation.isPending}
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-2 py-0.5 text-[10px] h-5 rounded"
+          >
+            💾 Salvar
+          </Button>
+        </div>
+        <div className="grid grid-cols-10 gap-1">
+          {NIVEIS.map((nivel) => {
+            const keyDe = `${nivel}De`;
+            const keyAte = `${nivel}Ate`;
+            return (
+              <div key={nivel} className="bg-white rounded border border-blue-200 px-1 py-0.5">
+                <div className="text-[9px] font-bold text-blue-700 text-center leading-tight">{nivel.replace('Ativo0', '').replace('Ativo', '')}</div>
+                <div className="flex gap-0.5">
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={valoresAtivos[keyDe] || ''}
+                    onChange={(e) => setValoresAtivos(prev => ({ ...prev, [keyDe]: e.target.value }))}
+                    placeholder="De"
+                    className="w-full px-0.5 py-0 border border-gray-200 rounded text-right text-[9px] focus:outline-none focus:ring-1 focus:ring-blue-400 h-4"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={valoresAtivos[keyAte] || ''}
+                    onChange={(e) => setValoresAtivos(prev => ({ ...prev, [keyAte]: e.target.value }))}
+                    placeholder="Até"
+                    className="w-full px-0.5 py-0 border border-gray-200 rounded text-right text-[9px] focus:outline-none focus:ring-1 focus:ring-blue-400 h-4"
+                  />
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>}
 
@@ -740,7 +732,7 @@ export default function TabelaComissao() {
                 className="gap-1.5 border-blue-300 text-blue-700 hover:bg-blue-50"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" /></svg>
-                Colunas ({colsVisiveis.length}/10)
+                Colunas ({colsVisiveis.length}/{ALL_ATIVOS.length})
               </Button>
               {showColSelector && (
                 <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-3 w-52">

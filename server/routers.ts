@@ -755,7 +755,7 @@ export const appRouter = router({
       }
       return result;
     }),
-    salvarNomeAtivo: protectedProcedure
+    salvarNomeAtivo: publicProcedure
       .input(z.object({ ativoKey: z.string(), nome: z.string() }))
       .mutation(async ({ input }) => {
         const db = await getDb();
