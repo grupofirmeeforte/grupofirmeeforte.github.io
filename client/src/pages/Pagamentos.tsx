@@ -663,14 +663,20 @@ export default function PagamentosPage() {
               </Select>
             </div>
             <div>
-              <Label className="text-xs text-gray-400">
-                Chave J {fetchingAgente && <span className="text-yellow-400">(buscando...)</span>}
-                {dadosAgente && chaveJBusca && <span className="text-green-400 ml-1">✓ encontrado</span>}
-              </Label>
-              <Input value={form.chaveJ}
-                onChange={e => { const v = e.target.value; setForm(f => ({ ...f, chaveJ: v })); setChaveJBusca(v); }}
+              <ChaveJRespInput
+                label={`Chave J${fetchingAgente ? ' (buscando...)' : ''}${dadosAgente && chaveJBusca ? ' ✓ encontrado' : ''}`}
+                value={form.chaveJ}
+                onChange={(chaveJ, agente) => {
+                  setForm(f => ({
+                    ...f,
+                    chaveJ,
+                    empresa: agente?.empresa ?? f.empresa,
+                    nomeFavorecido: agente?.favorecido ?? agente?.nomeAgente ?? f.nomeFavorecido,
+                  }));
+                  setChaveJBusca(chaveJ);
+                }}
                 placeholder="Opcional — preenche dados automaticamente"
-                className="bg-gray-800 border-gray-600 text-white h-8 text-sm font-mono" />
+              />
             </div>
             <div>
               <Label className="text-xs text-gray-400">Empresa</Label>
