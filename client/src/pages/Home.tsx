@@ -8,6 +8,7 @@ import { UsuariosConectados } from "@/components/UsuariosConectados";
 import { useState, useMemo } from "react";
 import { usePermissao } from "@/hooks/usePermissao";
 import { trpc } from "@/lib/trpc";
+import { BoasVindasEstacao } from "@/components/BoasVindasEstacao";
 
 type SubModule = {
   title: string;
@@ -37,6 +38,9 @@ export default function Home() {
   const [grupoAberto, setGrupoAberto] = useState<string | null>(null);
   const { podeVer, isAdminOuCeo, cargo } = usePermissao();
   const isCEO = cargo === 'CEO';
+  // Botão de teste de estações — visível apenas para CEO
+  const [testeEstacaoAberto, setTesteEstacaoAberto] = useState(false);
+  const [testeEstacaoForcar, setTesteEstacaoForcar] = useState<'primavera'|'verao'|'outono'|'inverno'|null>(null);
 
   // ─── Quick Stats: dados reais do backend ─────────────────────────────────────
   const { data: totalAgentesData } = trpc.agentes.count.useQuery({}, { enabled: isAdminOuCeo });
@@ -572,6 +576,34 @@ export default function Home() {
         </div>
       )}
 
+      {/* Botão de teste de estações — visível apenas para CEO */}
+      {isCEO && (
+        <>
+          {!testeEstacaoAberto ? (
+            <button
+              onClick={() => setTesteEstacaoAberto(true)}
+              title="Testar animações de estações"
+              className="fixed bottom-24 left-4 z-40 flex items-center justify-center w-10 h-10 rounded-full bg-purple-700/80 hover:bg-purple-600 text-white shadow-lg transition-all hover:scale-110 active:scale-95 print:hidden opacity-60 hover:opacity-100"
+            >
+              <Sparkles className="w-4 h-4" />
+            </button>
+          ) : (
+            <div className="fixed bottom-24 left-4 z-50 bg-gray-900 border border-purple-500/40 rounded-2xl p-3 shadow-2xl flex flex-col gap-2 print:hidden">
+              <p className="text-xs text-purple-300 font-semibold text-center mb-1">Testar Estações</p>
+              {(['primavera','verao','outono','inverno'] as const).map(e => (
+                <button key={e} onClick={() => { setTesteEstacaoForcar(e); setTesteEstacaoAberto(false); }}
+                  className="text-xs px-3 py-1.5 rounded-lg bg-purple-800/60 hover:bg-purple-700 text-white capitalize transition-colors">
+                  {e === 'primavera' ? '🌸 Primavera' : e === 'verao' ? '☀️ Verão' : e === 'outono' ? '🍂 Outono' : '❄️ Inverno'}
+                </button>
+              ))}
+              <button onClick={() => setTesteEstacaoAberto(false)} className="text-xs text-gray-500 hover:text-gray-300 mt-1">Fechar</button>
+            </div>
+          )}
+          {testeEstacaoForcar && (
+            <BoasVindasEstacao forcarEstacao={testeEstacaoForcar} onClose={() => setTesteEstacaoForcar(null)} />
+          )}
+        </>
+      )}
     </div>
   );
 }

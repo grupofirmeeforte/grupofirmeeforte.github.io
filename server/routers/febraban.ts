@@ -1130,12 +1130,12 @@ export const febrabanRouter = {
         totalPorDia[dia] = (totalPorDia[dia] ?? 0) + valor;
       }
 
-      // Calcular dias úteis do mês (seg-sex, excluindo feriados)
-      // Buscar feriados do mês
+      // Calcular dias úteis do mês (seg-sex, excluindo APENAS feriados nacionais)
+      // Feriados municipais e estaduais NÃO são descontados dos dias úteis
       const feriadosRows = await db
         .select({ data: feriados.data, nome: feriados.nome })
         .from(feriados)
-        .where(sql`MONTH(STR_TO_DATE(data, '%d/%m/%Y')) = ${input.mes} AND YEAR(STR_TO_DATE(data, '%d/%m/%Y')) = ${input.ano}`);
+        .where(sql`MONTH(STR_TO_DATE(data, '%d/%m/%Y')) = ${input.mes} AND YEAR(STR_TO_DATE(data, '%d/%m/%Y')) = ${input.ano} AND tipo = 'nacional'`);
       const feriadosSet = new Set<number>();
       const feriadosNome: Record<number, string> = {};
       for (const f of feriadosRows) {

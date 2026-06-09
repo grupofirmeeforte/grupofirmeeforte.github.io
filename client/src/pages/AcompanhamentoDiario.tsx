@@ -75,6 +75,21 @@ export default function AcompanhamentoDiario() {
   const diasUteisTotal = data?.diasUteisTotal ?? 0;
   const feriadosNome: Record<number, string> = (data?.feriadosNome ?? {}) as Record<number, string>;
 
+  // Calcular dias úteis restantes no mês (apenas se for o mês/ano atual)
+  const ehMesAtual = mes === hoje.getMonth() + 1 && ano === hoje.getFullYear();
+  const diaHoje = hoje.getDate();
+  const diasUteisRestantes = useMemo(() => {
+    if (!ehMesAtual || !data) return null;
+    // Contar dias úteis de hoje+1 até o fim do mês
+    const ultimoDia = new Date(ano, mes, 0).getDate();
+    let restantes = 0;
+    for (let d = diaHoje + 1; d <= ultimoDia; d++) {
+      const dow = new Date(ano, mes - 1, d).getDay();
+      if (dow !== 0 && dow !== 6 && !feriadosNome[d]) restantes++;
+    }
+    return restantes;
+  }, [ehMesAtual, data, diaHoje, ano, mes, feriadosNome]);
+
   // Ranking: agentes com aproveitamento >= 50%, ordenados por total
   const ranking = useMemo(() =>
     [...agentes].filter(a => a.aproveitamento >= 0.5).sort((a, b) => b.total - a.total),
@@ -197,6 +212,11 @@ export default function AcompanhamentoDiario() {
         <div>
           <span className="text-gray-400">Dias úteis: </span>
           <span className="font-bold">{diasUteisTotal}</span>
+          {diasUteisRestantes !== null && (
+            <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
+              Faltam {diasUteisRestantes} {diasUteisRestantes === 1 ? 'dia útil' : 'dias úteis'}
+            </span>
+          )}
         </div>
         <div>
           <span className="text-gray-400">Ranking ≥50%: </span>
