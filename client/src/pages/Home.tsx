@@ -314,7 +314,7 @@ export default function Home() {
     <div
       className="min-h-screen"
       style={{
-        backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663564665591/SMgJn6AGQCNfDq7mPzPqc9/home-bg-EBTQH2Xfk3kEiR2R9PayJu.webp')`,
+        backgroundImage: `url('https://d2xsxph8kpxj0f.cloudfront.net/310519663564665591/SMgJn6AGQCNfDq7mPzPqc9/coban-bg-972o7wqxPoimymB3vuTFrF.webp')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
@@ -371,14 +371,14 @@ export default function Home() {
                 return (
                   <div
                     key={grupo.key}
-                    className="flex items-stretch rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                    className="flex items-stretch rounded-xl border border-white/10 bg-black/40 backdrop-blur-sm overflow-hidden shadow-sm hover:shadow-md hover:bg-black/50 transition-all"
                   >
                     {/* Bloco esquerdo: ícone + nome do módulo — compacto */}
-                    <div className="flex flex-col items-center justify-center gap-1 px-3 py-2 min-w-[90px] max-w-[100px] border-r border-slate-200/60">
+                    <div className="flex flex-col items-center justify-center gap-1 px-3 py-2 min-w-[90px] max-w-[100px] border-r border-white/10">
                       <div className={`${grupo.color} w-8 h-8 rounded-lg flex items-center justify-center`}>
                         <Icon className="w-4 h-4 text-white" />
                       </div>
-                      <span className="text-xs font-bold text-slate-800 text-center leading-tight">{grupo.title}</span>
+                      <span className="text-xs font-bold text-white text-center leading-tight">{grupo.title}</span>
                     </div>
 
                     {/* Sub-abas compactas */}
