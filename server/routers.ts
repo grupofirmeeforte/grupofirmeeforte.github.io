@@ -748,10 +748,11 @@ export const appRouter = router({
       const db = await getDb();
       if (!db) return {};
       const { sql } = await import('drizzle-orm');
-      const rows = await db.execute(sql`SELECT ativoKey, nome FROM ativosNomes`);
+      const rawResult = await db.execute(sql`SELECT ativoKey, nome FROM ativosNomes`);
+      const rows = (rawResult as any)[0] || rawResult;
       const result: Record<string, string> = {};
       for (const row of rows as any[]) {
-        result[row.ativoKey] = row.nome || '';
+        if (row.ativoKey) result[row.ativoKey] = row.nome || '';
       }
       return result;
     }),
