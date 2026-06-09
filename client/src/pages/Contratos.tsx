@@ -338,7 +338,7 @@ export default function ContratosPage() {
           {(['upload', 'relatorio', 'crm'] as Aba[]).map(a => (
             <button
               key={a}
-              onClick={() => setAba(a)}
+              onClick={() => { setAba(a); setApenasElegiveis(a === 'crm'); setPage(1); }}
               className={`px-4 py-2 rounded-t text-sm font-medium transition-colors ${
                 aba === a
                   ? 'bg-emerald-600 text-white'
@@ -727,13 +727,13 @@ export default function ContratosPage() {
               <div className="text-center py-12 text-slate-400">Carregando...</div>
             ) : (
               <div className="grid gap-4">
-                {rows.filter((r: any) => r.elegivelRefin).length === 0 ? (
+                {rows.length === 0 ? (
                   <div className="text-center py-12 text-slate-400">
                     <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
                     <p>Nenhum cliente elegível para refinanciamento ainda.</p>
                   </div>
                 ) : (
-                  rows.filter((r: any) => r.elegivelRefin).map((r: any) => (
+                  rows.map((r: any) => (
                     <Card key={r.id} className="bg-slate-800 border-emerald-700/50">
                       <CardContent className="p-4">
                         <div className="flex flex-wrap gap-4 items-start justify-between">
