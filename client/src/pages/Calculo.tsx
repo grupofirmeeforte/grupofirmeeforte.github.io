@@ -805,15 +805,15 @@ export default function Calculo() {
                   />
                 </th>
                 {/* Coluna compacta Agente */}
-                <th className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[220px]">Agente</th>
+                <th className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">Agente</th>
                 {/* Coluna compacta RBM */}
-                <th className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">RBM</th>
+                <th className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[120px]">RBM</th>
                 {/* Coluna compacta Comissões */}
-                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">Comissões</th>
+                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[120px]">Comissões</th>
                 {/* Coluna compacta Pagamento */}
-                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">Pagamento</th>
+                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[120px]">Pagamento</th>
                 {/* Coluna compacta Ajustes */}
-                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[150px]">Ajustes</th>
+                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[110px]">Ajustes</th>
 
                 <th className="px-1.5 py-1.5 text-center border-l border-white/20 w-8"></th>
               </tr>
@@ -840,7 +840,7 @@ export default function Calculo() {
                     />
                   </td>
                   {/* Célula compacta Agente */}
-                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[220px] align-top">
+                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[160px] align-top">
                     <div className="flex items-center gap-1 flex-wrap">
                       <span className="font-bold text-purple-700 text-xs">{r.chaveJ || '-'}</span>
                       {r.situacao && (
@@ -863,7 +863,7 @@ export default function Calculo() {
                     {r.tipoPagamento && <div className="text-[9px] text-slate-400 mt-0.5">{r.tipoPagamento}</div>}
                   </td>
                   {/* Célula compacta RBM */}
-                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[160px] align-top text-right">
+                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[120px] align-top text-right">
                     {/* RBM Total em destaque */}
                     <div className="font-bold text-purple-800 text-xs">{r.rbmTotal ? fmtMoeda(r.rbmTotal) : '-'}</div>
                     {/* Percentual pago sobre o RBM: usa campo salvo ou calcula dinamicamente */}
@@ -886,7 +886,7 @@ export default function Calculo() {
                     )}
                   </td>
                   {/* Célula compacta Comissões */}
-                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[160px] align-top text-right">
+                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[120px] align-top text-right">
                     {/* Comissão Total em destaque */}
                     <div className="font-bold text-pink-700 text-xs">{r.comissaoTotal ? fmtMoeda(r.comissaoTotal) : '-'}</div>
                     {r.percentual && parseFloat(String(r.percentual)) !== 0 && <div className="text-[10px] text-slate-400">{fmtPerc(r.percentual)}</div>}
@@ -897,7 +897,7 @@ export default function Calculo() {
                     {r.comissaoSeguros && parseFloat(String(r.comissaoSeguros)) !== 0 && <div className="text-[10px] text-slate-500">Seg: {fmtMoeda(r.comissaoSeguros)}</div>}
                   </td>
                   {/* Célula compacta Pagamento */}
-                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[160px] align-top text-right">
+                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[120px] align-top text-right">
                     {/* Vr. Líquido em destaque */}
                     <div className="font-bold text-emerald-700 text-xs">{r.vrLiquidoC2 ? fmtMoeda(r.vrLiquidoC2) : '-'}</div>
                     {r.vrLiquidoSrcc && parseFloat(String(r.vrLiquidoSrcc)) !== 0 && <div className="text-[10px] text-slate-500">-SRCC: {fmtMoeda(r.vrLiquidoSrcc)}</div>}
@@ -939,7 +939,7 @@ export default function Calculo() {
                     </div>
                   </td>
                   {/* Célula compacta Ajustes */}
-                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[150px] align-top text-right">
+                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[110px] align-top text-right">
                     {/* Créditos/Débitos editável */}
                     <div className="text-[9px] text-slate-400 mb-0.5">Créd/Déb</div>
                     {editandoCreditoDebito === r.id ? (
