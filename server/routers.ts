@@ -1717,11 +1717,22 @@ export const appRouter = router({
           isAdminOuSuporte = true;
         }
         // Se admin/suporte: usa filtro do input; senão: força a ChaveJ do logado
+        console.log(`[extratoConsignado] openId=${ctx.user?.openId} isAdmin=${isAdminOuSuporte} chaveJLogado=${chaveJLogado} input.chaveJ=${input.chaveJ}`);
         const chaveJ = isAdminOuSuporte ? (input.chaveJ ?? null) : chaveJLogado;
         const conditions: any[] = [];
-        if (chaveJ) conditions.push(like(consignados.chaveJ, `%${chaveJ}%`));
-        else if (!isAdminOuSuporte && chaveJLogado) conditions.push(like(consignados.chaveJ, `%${chaveJLogado}%`));
-        if (input.nomeAgente && isAdminOuSuporte) conditions.push(like(consignados.nomeAgente, `%${input.nomeAgente}%`));
+        // SEGURANÇA: agente não-admin SEMPRE filtra pelo próprio chaveJ
+        // Se não tem chaveJ cadastrado, retorna vazio (nunca mostra dados de outros)
+        if (!isAdminOuSuporte) {
+          if (!chaveJLogado) {
+            // Agente sem chaveJ cadastrado: retorna vazio
+            return { rows: [], mesRef: mesFormatado, chaveJ: '', isAdminOuSuporte: false };
+          }
+          conditions.push(eq(consignados.chaveJ, chaveJLogado));
+        } else {
+          // Admin: aplica filtro do input se fornecido
+          if (chaveJ) conditions.push(like(consignados.chaveJ, `%${chaveJ}%`));
+          if (input.nomeAgente) conditions.push(like(consignados.nomeAgente, `%${input.nomeAgente}%`));
+        }
         if (mesBanco) conditions.push(eq(consignados.mes, mesBanco));
 
         const rows = await db
