@@ -369,6 +369,11 @@ export const contratosRouter = router({
       if (!db) throw new Error('Banco de dados indisponível');
       const offset = (input.page - 1) * input.pageSize;
 
+      // Data limite para elegibilidade: 1 ano atrás
+      const umAnoAtras = new Date();
+      umAnoAtras.setFullYear(umAnoAtras.getFullYear() - 1);
+      const umAnoAtrasStr = `${String(umAnoAtras.getDate()).padStart(2,'0')}/${String(umAnoAtras.getMonth()+1).padStart(2,'0')}/${umAnoAtras.getFullYear()}`;
+
       const rows = await db
         .select()
         .from(contratos)
@@ -380,6 +385,10 @@ export const contratosRouter = router({
             input.nomeOperador ? like(contratos.nomeOperador, `%${input.nomeOperador}%`) : undefined,
             input.empresa ? like(contratos.empresa, `%${input.empresa}%`) : undefined,
             input.linhaCredito ? like(contratos.linhaCredito, `%${input.linhaCredito}%`) : undefined,
+            // Filtro de elegibilidade aplicado no banco para paginacão correta
+            input.apenasElegiveis
+              ? sql`STR_TO_DATE(${contratos.dataPrimeiraParcela}, '%d/%m/%Y') <= STR_TO_DATE(${umAnoAtrasStr}, '%d/%m/%Y')`
+              : undefined,
           )
         )
         .orderBy(desc(contratos.createdAt))
