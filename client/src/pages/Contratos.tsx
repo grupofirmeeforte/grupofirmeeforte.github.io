@@ -787,6 +787,22 @@ export default function ContratosPage() {
                             <p className="text-slate-400 text-xs">Últ. Parcela</p>
                             <p className="text-slate-200 text-sm">{r.dataUltimaParcela ?? '—'}</p>
                           </div>
+                          <div>
+                            <p className="text-slate-400 text-xs">Parc. Restantes</p>
+                            <p className="text-amber-400 text-sm font-semibold">
+                              {(() => {
+                                if (!r.dataUltimaParcela) return '—';
+                                const [d, m, y] = r.dataUltimaParcela.split('/');
+                                if (!d || !m || !y) return '—';
+                                const ultParcela = new Date(Number(y), Number(m) - 1, Number(d));
+                                const hoje = new Date();
+                                if (ultParcela <= hoje) return '0';
+                                const diffMs = ultParcela.getTime() - hoje.getTime();
+                                const meses = Math.ceil(diffMs / (1000 * 60 * 60 * 24 * 30.44));
+                                return meses + ' meses';
+                              })()}
+                            </p>
+                          </div>
                           <div className="ml-auto">
                             {r.telefones?.length > 0 ? (
                               <div className="flex flex-col gap-1">
