@@ -1,21 +1,32 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { arquivoMorto } from "../../drizzle/schema";
+import { arquivoMorto, agentes } from "../../drizzle/schema";
 import { eq, and, like, desc, asc, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { storagePut, storageGetSignedUrl } from "../storage";
 
 // Apenas CEO/Admin pode acessar o Arquivo Morto
-function isCeo(user: any): boolean {
+async function isCeo(user: any): Promise<boolean> {
   if (!user) return false;
+  // Owner do projeto (login OAuth Manus)
   if (user.role === "admin") return true;
-  const cargo = (user.cargo ?? "").toUpperCase();
-  if (["CEO", "ADM", "ADMIN"].includes(cargo)) return true;
-  if ((user.permissoes ?? "") === "admin") return true;
-  // Verificar pelo OWNER_OPEN_ID
   const ownerOpenId = process.env.OWNER_OPEN_ID;
   if (ownerOpenId && user.openId === ownerOpenId) return true;
+  // Agente logado via ChaveJ — buscar cargo/permissoes no banco
+  if (user.openId?.startsWith("agente_")) {
+    const agenteId = parseInt(user.openId.replace("agente_", ""), 10);
+    const db = await getDb();
+    if (db) {
+      const [row] = await db.select({ cargo: agentes.cargo, permissoes: agentes.permissoes })
+        .from(agentes).where(eq(agentes.id, agenteId)).limit(1);
+      if (row) {
+        const cargo = (row.cargo ?? "").toUpperCase();
+        if (["CEO", "ADM", "ADMIN"].includes(cargo)) return true;
+        if ((row.permissoes ?? "") === "admin") return true;
+      }
+    }
+  }
   return false;
 }
 
@@ -43,7 +54,7 @@ export const arquivoMortoRouter = router({
       limit: z.number().default(50),
     }))
     .query(async ({ ctx, input }) => {
-      if (!isCeo(ctx.user)) throw new TRPCError({ code: "FORBIDDEN", message: "Acesso restrito ao CEO" });
+      if (!await isCeo(ctx.user)) throw new TRPCError({ code: "FORBIDDEN", message: "Acesso restrito ao CEO" });
       const db = await getDb();
       if (!db) return { rows: [], total: 0 };
 
@@ -74,7 +85,7 @@ export const arquivoMortoRouter = router({
 
   // Filtros disponíveis
   filtros: protectedProcedure.query(async ({ ctx }) => {
-    if (!isCeo(ctx.user)) throw new TRPCError({ code: "FORBIDDEN" });
+    if (!await isCeo(ctx.user)) throw new TRPCError({ code: "FORBIDDEN" });
     const db = await getDb();
     if (!db) return { modulos: MODULOS, mesanos: [] };
 
@@ -102,7 +113,7 @@ export const arquivoMortoRouter = router({
       mimeType: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      if (!isCeo(ctx.user)) throw new TRPCError({ code: "FORBIDDEN", message: "Acesso restrito ao CEO" });
+      if (!await isCeo(ctx.user)) throw new TRPCError({ code: "FORBIDDEN", message: "Acesso restrito ao CEO" });
       const db = await getDb();
       if (!db) throw new Error("Banco não disponível");
 
@@ -133,7 +144,7 @@ export const arquivoMortoRouter = router({
   getUrl: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
-      if (!isCeo(ctx.user)) throw new TRPCError({ code: "FORBIDDEN" });
+      if (!await isCeo(ctx.user)) throw new TRPCError({ code: "FORBIDDEN" });
       const db = await getDb();
       if (!db) throw new Error("Banco não disponível");
 
@@ -148,7 +159,7 @@ export const arquivoMortoRouter = router({
   excluir: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      if (!isCeo(ctx.user)) throw new TRPCError({ code: "FORBIDDEN" });
+      if (!await isCeo(ctx.user)) throw new TRPCError({ code: "FORBIDDEN" });
       const db = await getDb();
       if (!db) throw new Error("Banco não disponível");
       await db.delete(arquivoMorto).where(eq(arquivoMorto.id, input.id));

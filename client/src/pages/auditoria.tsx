@@ -1544,25 +1544,30 @@ function ArquivoMortoAba() {
     if (!uploadModulo) return toast.error("Selecione o módulo");
     setUploading(true);
     try {
-      const reader = new FileReader();
-      reader.onload = async (ev) => {
-        const base64 = (ev.target?.result as string).split(",")[1];
-        const ext = uploadFile.name.split(".").pop() ?? "bin";
-        const mimeType = uploadFile.type || "application/octet-stream";
-        await uploadMutation.mutateAsync({
-          modulo: uploadModulo,
-          mesAno: uploadMesAno || undefined,
-          nomeArquivo: uploadFile.name,
-          tipoArquivo: ext,
-          tamanho: uploadFile.size,
-          descricao: uploadDescricao || undefined,
-          fileBase64: base64,
-          mimeType,
-        });
-        setUploading(false);
-      };
-      reader.readAsDataURL(uploadFile);
-    } catch {
+      const base64: string = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const result = ev.target?.result as string;
+          resolve(result.split(",")[1]);
+        };
+        reader.onerror = () => reject(new Error("Falha ao ler o arquivo"));
+        reader.readAsDataURL(uploadFile);
+      });
+      const ext = uploadFile.name.split(".").pop() ?? "bin";
+      const mimeType = uploadFile.type || "application/octet-stream";
+      await uploadMutation.mutateAsync({
+        modulo: uploadModulo,
+        mesAno: uploadMesAno || undefined,
+        nomeArquivo: uploadFile.name,
+        tipoArquivo: ext,
+        tamanho: uploadFile.size,
+        descricao: uploadDescricao || undefined,
+        fileBase64: base64,
+        mimeType,
+      });
+    } catch (err: any) {
+      toast.error("Erro ao enviar: " + (err?.message || "Tente novamente"));
+    } finally {
       setUploading(false);
     }
   };
