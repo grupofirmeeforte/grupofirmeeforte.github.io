@@ -371,7 +371,7 @@ export default function Home() {
                 return (
                   <div
                     key={grupo.key}
-                    className={`flex items-stretch rounded-xl border-2 ${grupo.borderColor} bg-gradient-to-br ${grupo.bgColor} overflow-hidden shadow-sm hover:shadow-md transition-shadow`}
+                    className="flex items-stretch rounded-xl border border-slate-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                   >
                     {/* Bloco esquerdo: ícone + nome do módulo — compacto */}
                     <div className="flex flex-col items-center justify-center gap-1 px-3 py-2 min-w-[90px] max-w-[100px] border-r border-slate-200/60">
