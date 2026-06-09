@@ -695,3 +695,8 @@
 - [x] Mailing: adicionar filtro "Não Pertube" (Todos / Bloqueados / Liberados)
 - [x] Contratos: badge NÃO PERTUBE (caixa alta) ou OK ao lado do CPF, buscado na lista Não Pertube
 - [x] Contratos: adicionar filtro Não Pertube (Todos / Bloqueados / Liberados)
+
+- [ ] Arquivo Morto em Auditoria: upload de Excel/PDF organizados por módulo e mês/ano, somente CEO
+- [ ] Consórcio: comissão só aparece quando paga ao agente (sobre o valor pago × percentual); sem comissão = sem percentual exibido
+- [x] Arquivo Morto em Auditoria: upload de Excel/PDF organizados por módulo e mês/ano, somente CEO
+- [x] Consórcio: comissão só aparece quando paga ao agente (sobre o valor pago × percentual); sem comissão = sem percentual exibido

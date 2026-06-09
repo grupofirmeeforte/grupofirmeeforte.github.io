@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Download, Search, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2, Shield, Activity, Users, Clock, Filter, X, LogOut, RefreshCw, Wallet, Lock, Eye, EyeOff, AlertTriangle, DatabaseBackup, Mail, CheckCircle2, Unlock, UserX } from 'lucide-react';
+import { Download, Search, CalendarDays, ClipboardList, Plus, Pencil, Trash2, ChevronFirst, ChevronLast, ChevronLeft, ChevronRight, BarChart2, Shield, Activity, Users, Clock, Filter, X, LogOut, RefreshCw, Wallet, Lock, Eye, EyeOff, AlertTriangle, DatabaseBackup, Mail, CheckCircle2, Unlock, UserX, FolderArchive, Upload, FileSpreadsheet, FileText, File } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import AuditoriaPermissoes from './auditoria-permissoes';
 import { useLocation } from 'wouter';
@@ -38,8 +38,8 @@ export default function AuditoriaPage() {
   const [, navigate] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const abaParam = searchParams.get('aba');
-  const [aba, setAba] = useState<'logs' | 'feriados' | 'credito-despesas' | 'permissoes' | 'despesas-internas' | 'backup' | 'bloqueios'>(
-    abaParam === 'feriados' ? 'feriados' : abaParam === 'credito-despesas' ? 'credito-despesas' : abaParam === 'permissoes' ? 'permissoes' : abaParam === 'despesas-internas' ? 'despesas-internas' : abaParam === 'backup' ? 'backup' : abaParam === 'bloqueios' ? 'bloqueios' : 'logs'
+  const [aba, setAba] = useState<'logs' | 'feriados' | 'credito-despesas' | 'permissoes' | 'despesas-internas' | 'backup' | 'bloqueios' | 'arquivo-morto'>(
+    abaParam === 'feriados' ? 'feriados' : abaParam === 'credito-despesas' ? 'credito-despesas' : abaParam === 'permissoes' ? 'permissoes' : abaParam === 'despesas-internas' ? 'despesas-internas' : abaParam === 'backup' ? 'backup' : abaParam === 'bloqueios' ? 'bloqueios' : abaParam === 'arquivo-morto' ? 'arquivo-morto' : 'logs'
   );
 
   // Atualiza aba quando o parâmetro de URL muda
@@ -51,6 +51,7 @@ export default function AuditoriaPage() {
     else if (p === 'permissoes') setAba('permissoes');
     else if (p === 'despesas-internas') setAba('despesas-internas');
     else if (p === 'backup') setAba('backup');
+    else if (p === 'arquivo-morto') setAba('arquivo-morto');
     else setAba('logs');
   }, [window.location.search]);
 
@@ -319,6 +320,8 @@ export default function AuditoriaPage() {
         <BloqueiosAbaBtn aba={aba} setAba={setAba} />
         {/* Aba Backup — só aparece para admin/CEO */}
         <BackupAbaBtn aba={aba} setAba={setAba} />
+        {/* Aba Arquivo Morto — só aparece para admin/CEO */}
+        <ArquivoMortoAbaBtn aba={aba} setAba={setAba} />
       </div>
 
       {/* ── ABA LOGS ─────────────────────────────────────────────────────────────────── */}
@@ -855,6 +858,7 @@ export default function AuditoriaPage() {
       {aba === 'bloqueios' && <BloqueiosAba />}
       {/* ── ABA BACKUP ─────────────────────────────────────────────────────────────── */}
       {aba === 'backup' && <BackupAba />}
+      {aba === 'arquivo-morto' && <ArquivoMortoAba />}
     </div>
   );
 }
@@ -1439,6 +1443,344 @@ function BackupAba() {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ─── BOTÃO DA ABA ARQUIVO MORTO (só aparece para admin/CEO) ──────────────────
+function ArquivoMortoAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => void }) {
+  const { user } = useAuth();
+  const cargo = ((user as any)?.cargo ?? '').toUpperCase();
+  const permissoes = (user as any)?.permissoes ?? '';
+  const role = (user as any)?.role ?? '';
+  const temAcesso = role === 'admin' || ['CEO', 'ADM', 'ADMIN'].includes(cargo) || permissoes === 'admin';
+  if (!temAcesso) return null;
+  return (
+    <button
+      onClick={() => setAba('arquivo-morto')}
+      className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
+        aba === 'arquivo-morto' ? 'bg-white border border-b-white border-gray-200 text-amber-700' : 'text-gray-500 hover:text-gray-700'
+      }`}
+    >
+      <FolderArchive className="w-4 h-4" /> Arquivo Morto
+    </button>
+  );
+}
+
+// ─── ABA ARQUIVO MORTO ────────────────────────────────────────────────────────
+const MODULOS_ARQUIVO = [
+  "Consignado", "Consórcio", "Conta Corrente", "Ourocap",
+  "Seguros", "BB Dental", "Febraban", "Cálculo", "Pagamentos", "Outros",
+];
+
+function ArquivoMortoAba() {
+  const utils = trpc.useUtils();
+  const [modulo, setModulo] = useState("__all__");
+  const [mesAno, setMesAno] = useState("__all__");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const LIMIT = 50;
+
+  // Modal de upload
+  const [uploadModal, setUploadModal] = useState(false);
+  const [uploadModulo, setUploadModulo] = useState(MODULOS_ARQUIVO[0]);
+  const [uploadMesAno, setUploadMesAno] = useState("");
+  const [uploadDescricao, setUploadDescricao] = useState("");
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const { data: filtros } = trpc.arquivoMorto.filtros.useQuery();
+  const { data, isLoading } = trpc.arquivoMorto.list.useQuery({
+    modulo: modulo !== "__all__" ? modulo : undefined,
+    mesAno: mesAno !== "__all__" ? mesAno : undefined,
+    search: search || undefined,
+    page,
+    limit: LIMIT,
+  });
+
+  const uploadMutation = trpc.arquivoMorto.upload.useMutation({
+    onSuccess: () => {
+      utils.arquivoMorto.list.invalidate();
+      utils.arquivoMorto.filtros.invalidate();
+      setUploadModal(false);
+      setUploadFile(null);
+      setUploadDescricao("");
+      toast.success("Arquivo enviado com sucesso!");
+    },
+    onError: (e) => toast.error("Erro ao enviar: " + e.message),
+  });
+
+  const excluirMutation = trpc.arquivoMorto.excluir.useMutation({
+    onSuccess: () => { utils.arquivoMorto.list.invalidate(); toast.success("Arquivo excluído."); },
+    onError: (e) => toast.error("Erro: " + e.message),
+  });
+
+  const getUrlQuery = trpc.arquivoMorto.getUrl.useQuery(
+    { id: -1 },
+    { enabled: false }
+  );
+
+  const handleDownload = async (id: number, nome: string) => {
+    try {
+      const result = await utils.arquivoMorto.getUrl.fetch({ id });
+      const a = document.createElement("a");
+      a.href = result.url;
+      a.download = nome;
+      a.target = "_blank";
+      a.click();
+    } catch (e: any) {
+      toast.error("Erro ao baixar: " + e.message);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (f) setUploadFile(f);
+  };
+
+  const handleUpload = async () => {
+    if (!uploadFile) return toast.error("Selecione um arquivo");
+    if (!uploadModulo) return toast.error("Selecione o módulo");
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        const base64 = (ev.target?.result as string).split(",")[1];
+        const ext = uploadFile.name.split(".").pop() ?? "bin";
+        const mimeType = uploadFile.type || "application/octet-stream";
+        await uploadMutation.mutateAsync({
+          modulo: uploadModulo,
+          mesAno: uploadMesAno || undefined,
+          nomeArquivo: uploadFile.name,
+          tipoArquivo: ext,
+          tamanho: uploadFile.size,
+          descricao: uploadDescricao || undefined,
+          fileBase64: base64,
+          mimeType,
+        });
+        setUploading(false);
+      };
+      reader.readAsDataURL(uploadFile);
+    } catch {
+      setUploading(false);
+    }
+  };
+
+  function fmtTamanho(bytes: number | null | undefined) {
+    if (!bytes) return "-";
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  }
+
+  function getFileIcon(tipo: string | null | undefined) {
+    const t = (tipo ?? "").toLowerCase();
+    if (["xlsx", "xls", "csv"].includes(t)) return <FileSpreadsheet className="w-4 h-4 text-green-600" />;
+    if (t === "pdf") return <FileText className="w-4 h-4 text-red-500" />;
+    return <File className="w-4 h-4 text-gray-400" />;
+  }
+
+  const rows = data?.rows ?? [];
+  const total = data?.total ?? 0;
+  const totalPages = Math.ceil(total / LIMIT);
+
+  return (
+    <div className="space-y-4 mt-4">
+      {/* Cabeçalho */}
+      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <FolderArchive className="w-7 h-7 text-amber-600" />
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">Arquivo Morto</h2>
+            <p className="text-sm text-gray-500">Armazenamento de arquivos originais (Excel, PDF) por módulo e mês/ano</p>
+          </div>
+        </div>
+        <Button
+          onClick={() => setUploadModal(true)}
+          className="bg-amber-600 hover:bg-amber-700 text-white gap-2"
+        >
+          <Upload className="w-4 h-4" /> Enviar Arquivo
+        </Button>
+      </div>
+
+      {/* Filtros */}
+      <div className="bg-white border border-gray-200 rounded-xl p-3 flex flex-wrap gap-2">
+        <div className="relative">
+          <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-400" />
+          <input
+            className="pl-8 h-9 w-52 text-sm border border-gray-200 rounded-md px-3 focus:outline-none focus:ring-1 focus:ring-amber-400"
+            placeholder="Nome do arquivo..."
+            value={search}
+            onChange={e => { setSearch(e.target.value); setPage(0); }}
+          />
+        </div>
+        <Select value={modulo} onValueChange={v => { setModulo(v); setPage(0); }}>
+          <SelectTrigger className="h-9 w-44 text-sm"><SelectValue placeholder="Módulo" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">Todos os módulos</SelectItem>
+            {MODULOS_ARQUIVO.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={mesAno} onValueChange={v => { setMesAno(v); setPage(0); }}>
+          <SelectTrigger className="h-9 w-36 text-sm"><SelectValue placeholder="Mês/Ano" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="__all__">Todos os meses</SelectItem>
+            {filtros?.mesanos.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        {(modulo !== "__all__" || mesAno !== "__all__" || search) && (
+          <Button variant="ghost" size="sm" className="h-9 text-xs" onClick={() => { setModulo("__all__"); setMesAno("__all__"); setSearch(""); setPage(0); }}>
+            Limpar
+          </Button>
+        )}
+      </div>
+
+      {/* Tabela */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-amber-700 text-white">
+              {["Arquivo", "Módulo", "Mês/Ano", "Tamanho", "Enviado por", "Data", "Ações"].map(h => (
+                <th key={h} className="px-3 py-2 text-left font-semibold whitespace-nowrap">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
+              <tr><td colSpan={7} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+            ) : rows.length === 0 ? (
+              <tr><td colSpan={7} className="text-center py-10 text-gray-400">
+                <FolderArchive className="w-10 h-10 mx-auto mb-2 text-gray-300" />
+                Nenhum arquivo encontrado. Clique em "Enviar Arquivo" para adicionar.
+              </td></tr>
+            ) : rows.map((row, i) => (
+              <tr key={row.id} className={i % 2 === 0 ? "bg-white" : "bg-amber-50/30"}>
+                <td className="px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    {getFileIcon(row.tipoArquivo)}
+                    <span className="font-medium text-gray-800 text-xs">{row.nomeArquivo}</span>
+                  </div>
+                  {row.descricao && <div className="text-[10px] text-gray-400 mt-0.5">{row.descricao}</div>}
+                </td>
+                <td className="px-3 py-2">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-medium">{row.modulo}</span>
+                </td>
+                <td className="px-3 py-2 text-xs text-gray-600">{row.mesAno ?? "-"}</td>
+                <td className="px-3 py-2 text-xs text-gray-500">{fmtTamanho(row.tamanho)}</td>
+                <td className="px-3 py-2 text-xs text-gray-500">{row.uploadadoPor ?? "-"}</td>
+                <td className="px-3 py-2 text-xs text-gray-400">
+                  {row.createdAt ? new Date(row.createdAt).toLocaleDateString("pt-BR") : "-"}
+                </td>
+                <td className="px-3 py-2">
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => handleDownload(row.id, row.nomeArquivo)}
+                      className="p-1.5 rounded hover:bg-blue-100 text-blue-600"
+                      title="Baixar arquivo"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => { if (confirm(`Excluir "${row.nomeArquivo}"?`)) excluirMutation.mutate({ id: row.id }); }}
+                      className="p-1.5 rounded hover:bg-red-100 text-red-500"
+                      title="Excluir"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Paginação */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-2 py-2 text-sm">
+          <span className="text-gray-500">Página {page + 1} de {totalPages} — {total} arquivos</span>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>Anterior</Button>
+            <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>Próxima</Button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Upload */}
+      <Dialog open={uploadModal} onOpenChange={setUploadModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="w-5 h-5 text-amber-600" /> Enviar Arquivo para o Arquivo Morto
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Módulo *</Label>
+              <Select value={uploadModulo} onValueChange={setUploadModulo}>
+                <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {MODULOS_ARQUIVO.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Mês/Ano (MM/AAAA)</Label>
+              <input
+                className="mt-1 w-full h-9 border border-gray-200 rounded-md px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
+                placeholder="ex: 05/2026"
+                value={uploadMesAno}
+                onChange={e => setUploadMesAno(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Descrição (opcional)</Label>
+              <input
+                className="mt-1 w-full h-9 border border-gray-200 rounded-md px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
+                placeholder="ex: Planilha original importada em 09/06/2026"
+                value={uploadDescricao}
+                onChange={e => setUploadDescricao(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Arquivo *</Label>
+              <div
+                className="mt-1 border-2 border-dashed border-amber-300 rounded-lg p-4 text-center cursor-pointer hover:bg-amber-50 transition-colors"
+                onClick={() => fileRef.current?.click()}
+              >
+                {uploadFile ? (
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-700">
+                    {getFileIcon(uploadFile.name.split(".").pop())}
+                    <span className="font-medium">{uploadFile.name}</span>
+                    <span className="text-gray-400">({fmtTamanho(uploadFile.size)})</span>
+                  </div>
+                ) : (
+                  <div className="text-gray-400 text-sm">
+                    <Upload className="w-6 h-6 mx-auto mb-1 text-amber-400" />
+                    Clique para selecionar o arquivo (Excel, PDF, CSV...)
+                  </div>
+                )}
+              </div>
+              <input ref={fileRef} type="file" className="hidden" onChange={handleFileSelect} accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.txt" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setUploadModal(false); setUploadFile(null); }}>Cancelar</Button>
+            <Button
+              onClick={handleUpload}
+              disabled={!uploadFile || uploading || uploadMutation.isPending}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              {uploading || uploadMutation.isPending ? (
+                <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Enviando...</>
+              ) : (
+                <><Upload className="w-4 h-4 mr-2" /> Enviar</>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

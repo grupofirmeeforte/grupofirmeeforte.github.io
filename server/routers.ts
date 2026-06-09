@@ -38,6 +38,7 @@ import { reconhecimentoFacialRouter } from "./routers/reconhecimentoFacial";
 import { extratosBancariosRouter } from "./routers/extratosBancarios";
 import { contratosRouter } from "./routers/contratos";
 import { naoPerturbeRouter } from "./routers/naoPerturbe";
+import { arquivoMortoRouter } from "./routers/arquivoMorto";
 import { agenciasBbRouter } from "./routers/agenciasBb";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago, updateAuditLogSaidaPorChaveJ } from "./db";
@@ -2101,6 +2102,7 @@ export const appRouter = router({
   // ─── DESPESAS INTERNAS (somente Sidnei e Thiago Ultramare) ─────────────────
   backup: backupRouter,
   contratos: contratosRouter,
+  arquivoMorto: arquivoMortoRouter,
   naoPerturbe: naoPerturbeRouter,
   agenciasBb: agenciasBbRouter,
   despesasInternas: router({

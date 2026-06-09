@@ -1588,3 +1588,29 @@ export const agenciasBb = mysqlTable("agencias_bb", {
 }));
 export type AgenciaBb = typeof agenciasBb.$inferSelect;
 export type InsertAgenciaBb = typeof agenciasBb.$inferInsert;
+
+/**
+ * Tabela de Arquivo Morto
+ * Armazena arquivos originais (Excel, PDF) organizados por módulo e mês/ano
+ * Acesso restrito ao CEO/Admin
+ */
+export const arquivoMorto = mysqlTable("arquivoMorto", {
+  id: int("id").autoincrement().primaryKey(),
+  modulo: varchar("modulo", { length: 100 }).notNull(),   // Consignado, Consórcio, C/C, etc.
+  mesAno: varchar("mesAno", { length: 10 }),              // MM/AAAA
+  nomeArquivo: varchar("nomeArquivo", { length: 255 }).notNull(),
+  tipoArquivo: varchar("tipoArquivo", { length: 50 }),    // xlsx, pdf, csv, etc.
+  tamanho: int("tamanho"),                                // bytes
+  arquivoKey: varchar("arquivoKey", { length: 500 }).notNull(),
+  arquivoUrl: varchar("arquivoUrl", { length: 500 }).notNull(),
+  descricao: text("descricao"),
+  uploadadoPor: varchar("uploadadoPor", { length: 255 }), // nome do CEO
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  moduloIdx: index("idx_arquivoMorto_modulo").on(table.modulo),
+  mesAnoIdx: index("idx_arquivoMorto_mesAno").on(table.mesAno),
+}));
+
+export type ArquivoMorto = typeof arquivoMorto.$inferSelect;
+export type InsertArquivoMorto = typeof arquivoMorto.$inferInsert;

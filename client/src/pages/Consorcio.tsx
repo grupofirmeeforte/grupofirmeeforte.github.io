@@ -479,8 +479,14 @@ export default function Consorcio() {
                 </td>
                 {/* Coluna Comissão */}
                 <td className="px-2 py-1.5 border-r border-gray-200 text-right whitespace-nowrap">
-                  <div className="font-bold text-green-700 text-[12px]">{fmtMoeda(row.comissao)}</div>
-                  <div className="text-[10px] text-gray-400">{fmtPct(row.pctComissao1)} · {fmtPct(row.pctComissao2)}</div>
+                  {parseFloat(row.comissao ?? '0') > 0 ? (
+                    <>
+                      <div className="font-bold text-green-700 text-[12px]">{fmtMoeda(row.comissao)}</div>
+                      <div className="text-[10px] text-gray-400">{fmtPct(row.pctComissao1)}</div>
+                    </>
+                  ) : (
+                    <span className="text-[11px] text-gray-300">-</span>
+                  )}
                 </td>
                 <td className="px-2 py-1.5 whitespace-nowrap">
                   <div className="flex gap-1">
