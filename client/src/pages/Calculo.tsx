@@ -900,8 +900,12 @@ export default function Calculo() {
                   <td className="px-1.5 py-1 border-b border-slate-100 min-w-[120px] align-top text-right">
                     {/* Vr. Líquido em destaque */}
                     <div className="font-bold text-emerald-700 text-xs">{r.vrLiquidoC2 ? fmtMoeda(r.vrLiquidoC2) : '-'}</div>
-                    {r.vrLiquidoSrcc && parseFloat(String(r.vrLiquidoSrcc)) !== 0 && <div className="text-[10px] text-slate-500">-SRCC: {fmtMoeda(r.vrLiquidoSrcc)}</div>}
-                    {r.srccC2 && parseFloat(String(r.srccC2)) !== 0 && <div className="text-[10px] text-slate-400">SRCC: {fmtMoeda(r.srccC2)}</div>}
+                    {r.srccC2 && parseFloat(String(r.srccC2)) !== 0 && (
+                      <>
+                        <div className="text-[10px] text-red-500">-SRCC: {fmtMoeda(r.srccC2)}</div>
+                        {r.vrLiquidoSrcc && <div className="text-[10px] text-emerald-600 font-semibold">= {fmtMoeda(r.vrLiquidoSrcc)}</div>}
+                      </>
+                    )}
                     {r.qtdeContas && String(r.qtdeContas) !== '0' && <div className="text-[10px] text-slate-400">Contas: {r.qtdeContas}</div>}
                     {/* Dt Pagto editável */}
                     <div className="mt-0.5">

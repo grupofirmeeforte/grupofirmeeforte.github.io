@@ -686,11 +686,25 @@ export const consorcioRouter = router({
         const rbmStr = entry.rbmTotal.toFixed(2);
 
         if (existente.length > 0) {
-          // Já existe: atualiza apenas comissaoConsorcio e rbmConsorcioC2
+          // Já existe: buscar registro completo para recalcular comissaoTotal
+          const reg = await db.select().from(calculos).where(eq(calculos.id, existente[0].id)).limit(1);
+          const r = reg[0];
+          const toN = (v: any) => parseFloat(String(v ?? 0)) || 0;
+          const novaComissaoTotal = (
+            toN(r.comissaoConsig) +
+            entry.comissaoConsorcio +
+            toN(r.comissaoOurocap) +
+            toN(r.comissaoCc) +
+            toN(r.comissaoSeguros) +
+            toN(r.ajudaCusto) +
+            toN(r.creditosDebitos) +
+            toN(r.reajuste)
+          );
           await db.update(calculos)
             .set({
               comissaoConsorcio: comissaoStr,
               rbmConsorcioC2: rbmStr,
+              comissaoTotal: novaComissaoTotal.toFixed(2),
             })
             .where(eq(calculos.id, existente[0].id));
           atualizados++;
