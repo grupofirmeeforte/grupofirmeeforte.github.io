@@ -1738,6 +1738,7 @@ export const appRouter = router({
             chaveJ: consignados.chaveJ,
             mes: consignados.mes,
             empresa: consignados.empresa,
+            descricaoProduto: consignados.descricaoProduto,
           })
           .from(consignados)
           .where(conditions.length ? and(...conditions) : undefined)

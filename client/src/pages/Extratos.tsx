@@ -211,8 +211,14 @@ function ExtratoConsignado() {
   );
 
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const fmtPct = (v: string | number | null) =>
-    v != null ? `${parseFloat(String(v)).toFixed(2)}%` : '—';
+  // percPago salvo como decimal (ex: 0.0170 = 1,70%) → multiplica por 100
+  const fmtPct = (v: string | number | null) => {
+    if (v == null) return '—';
+    const n = parseFloat(String(v));
+    if (isNaN(n) || n === 0) return '—';
+    const pct = n <= 1 ? n * 100 : n; // se decimal ≤ 1, converte para %
+    return `${pct.toFixed(2).replace('.', ',')}%`;
+  };
 
   return (
     <div>
@@ -263,7 +269,7 @@ function ExtratoConsignado() {
                           {row.parcelas ?? '—'}x
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-gray-700 text-sm">{row.convenio || '—'}</TableCell>
+                      <TableCell className="text-gray-700 text-sm">{row.descricaoProduto || row.convenio || '—'}</TableCell>
                       <TableCell className="text-right text-gray-700">{fmtPct(row.juros)}</TableCell>
                       <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.valorLiquido ?? 0)))}</TableCell>
                       <TableCell className="text-right text-gray-700">{fmtPct(row.percentual)}</TableCell>
