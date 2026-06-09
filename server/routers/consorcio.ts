@@ -244,19 +244,27 @@ export const consorcioRouter = router({
         return enriched;
       });
 
-      // Buscar propostas existentes em batch
-      const propostas = rowsEnriquecidos.map(r => r.proposta).filter(Boolean);
-      const existentes = new Set<string>();
+      // Buscar registros existentes por proposta+parcLiberada+mesAno (chave composta real)
+      const chaveExistentes = new Set<string>();
+      const idPorChave = new Map<string, number>();
 
-      if (propostas.length > 0) {
+      if (rowsEnriquecidos.length > 0) {
+        const propostasSet = new Set(rowsEnriquecidos.map(r => r.proposta).filter(Boolean) as string[]);
+        const propostas = Array.from(propostasSet);
         const CHUNK = 500;
         for (let i = 0; i < propostas.length; i += CHUNK) {
           const chunk = propostas.slice(i, i + CHUNK);
           const found = await db
-            .select({ proposta: consorcios.proposta })
+            .select({ id: consorcios.id, proposta: consorcios.proposta, parcLiberada: consorcios.parcLiberada, mesAno: consorcios.mesAno })
             .from(consorcios)
             .where(sql`proposta IN (${sql.raw(chunk.map(p => `'${p.replace(/'/g, "''")}'`).join(','))})`);
-          found.forEach(r => { if (r.proposta) existentes.add(r.proposta); });
+          found.forEach(r => {
+            if (r.proposta && r.parcLiberada && r.mesAno) {
+              const key = `${r.proposta}|${r.parcLiberada}|${r.mesAno}`;
+              chaveExistentes.add(key);
+              idPorChave.set(key, r.id);
+            }
+          });
         }
       }
 
@@ -266,12 +274,14 @@ export const consorcioRouter = router({
 
       for (const row of rowsEnriquecidos) {
         if (!row.proposta) continue;
-        // Se ainda não tem empresa (PARC1 sem chaveJ cadastrado), importa sem empresa para preenchimento manual
-        if (!row.empresa && !row.chaveJ) {
-          // Inserir mesmo sem empresa/chaveJ — será preenchido manualmente depois
+        // Calcular comissão: rbm * pctComissao1 (se disponíveis)
+        if (row.rbm != null && row.pctComissao1 != null && !row.comissao) {
+          row.comissao = Number(row.rbm) * Number(row.pctComissao1);
         }
-        if (existentes.has(row.proposta)) {
-          if (modo === "subscrever") toUpdate.push(row);
+        const key = `${row.proposta}|${row.parcLiberada ?? ''}|${row.mesAno ?? ''}`;
+        if (chaveExistentes.has(key)) {
+          // Sempre atualiza quando a combinação proposta+parcela+mês já existe
+          toUpdate.push(row);
         } else {
           toInsert.push(row);
         }
@@ -321,7 +331,7 @@ export const consorcioRouter = router({
               chaveJ: r.chaveJ ?? null,
               nomeAgente: r.nomeAgente ?? null,
             })
-            .where(eq(consorcios.proposta, r.proposta));
+            .where(sql`proposta = ${r.proposta} AND parcLiberada = ${r.parcLiberada ?? ''} AND mesAno = ${r.mesAno ?? ''}`);
           atualizados++;
         } catch (e) {
           erros++;
