@@ -790,7 +790,7 @@ export default function Calculo() {
         ) : registros.length === 0 ? (
           <div className="p-8 text-center text-slate-500">Nenhum registro encontrado</div>
         ) : (
-          <table className="w-full border-collapse table-fixed" style={{ fontSize: "11px", minWidth: "700px" }}>
+          <table className="w-full border-collapse" style={{ fontSize: "11px", tableLayout: "fixed" }}>
             <thead>
               <tr style={{ background: "linear-gradient(90deg, #a855f7, #ec4899)" }}>
                 {/* Coluna de checkbox */}
@@ -805,17 +805,12 @@ export default function Calculo() {
                   />
                 </th>
                 {/* Coluna compacta Agente */}
-                <th className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[160px]">Agente</th>
-                {/* Coluna compacta RBM */}
-                <th className="px-1.5 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[120px]">RBM</th>
-                {/* Coluna compacta Comissões */}
-                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[120px]">Comissões</th>
-                {/* Coluna compacta Pagamento */}
-                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[120px]">Pagamento</th>
-                {/* Coluna compacta Ajustes */}
-                <th className="px-1.5 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20 min-w-[110px]">Ajustes</th>
-
-                <th className="px-1.5 py-1.5 text-center border-l border-white/20 w-8"></th>
+                <th className="px-2 py-1.5 text-left font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'28%'}}>Agente</th>
+                <th className="px-2 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'18%'}}>RBM</th>
+                <th className="px-2 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'18%'}}>Comissões</th>
+                <th className="px-2 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'18%'}}>Pagamento</th>
+                <th className="px-2 py-1.5 text-right font-bold text-white whitespace-nowrap border-r border-white/20" style={{width:'14%'}}>Ajustes</th>
+                <th className="px-1 py-1.5 text-center border-l border-white/20" style={{width:'4%'}}></th>
               </tr>
             </thead>
             <tbody>
@@ -824,10 +819,10 @@ export default function Calculo() {
                   key={r.id}
                   className={
                     selecionados.has(r.id)
-                      ? "bg-purple-100 hover:bg-purple-150"
+                      ? "bg-purple-100 hover:bg-purple-200"
                       : idx % 2 === 0
                       ? "bg-white hover:bg-purple-50"
-                      : "bg-slate-50 hover:bg-purple-50"
+                      : "bg-purple-50/60 hover:bg-purple-100"
                   }
                 >
                   {/* Checkbox da linha */}
@@ -840,7 +835,7 @@ export default function Calculo() {
                     />
                   </td>
                   {/* Célula compacta Agente */}
-                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[160px] align-top">
+                  <td className="px-2 py-1 border-b border-slate-200 align-top overflow-hidden">
                     <div className="flex items-center gap-1 flex-wrap">
                       <span className="font-bold text-purple-700 text-xs">{r.chaveJ || '-'}</span>
                       {r.situacao && (
@@ -863,7 +858,7 @@ export default function Calculo() {
                     {r.tipoPagamento && <div className="text-[9px] text-slate-400 mt-0.5">{r.tipoPagamento}</div>}
                   </td>
                   {/* Célula compacta RBM */}
-                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[120px] align-top text-right">
+                  <td className="px-2 py-1 border-b border-slate-200 align-top text-right">
                     {/* RBM Total em destaque */}
                     <div className="font-bold text-purple-800 text-xs">{r.rbmTotal ? fmtMoeda(r.rbmTotal) : '-'}</div>
                     {/* Percentual pago sobre o RBM: usa campo salvo ou calcula dinamicamente */}
@@ -886,7 +881,7 @@ export default function Calculo() {
                     )}
                   </td>
                   {/* Célula compacta Comissões */}
-                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[120px] align-top text-right">
+                  <td className="px-2 py-1 border-b border-slate-200 align-top text-right">
                     {/* Comissão Total em destaque */}
                     <div className="font-bold text-pink-700 text-xs">{r.comissaoTotal ? fmtMoeda(r.comissaoTotal) : '-'}</div>
                     {r.percentual && parseFloat(String(r.percentual)) !== 0 && <div className="text-[10px] text-slate-400">{fmtPerc(r.percentual)}</div>}
@@ -897,7 +892,7 @@ export default function Calculo() {
                     {r.comissaoSeguros && parseFloat(String(r.comissaoSeguros)) !== 0 && <div className="text-[10px] text-slate-500">Seg: {fmtMoeda(r.comissaoSeguros)}</div>}
                   </td>
                   {/* Célula compacta Pagamento */}
-                  <td className="px-1.5 py-1 border-b border-slate-100 min-w-[120px] align-top text-right">
+                  <td className="px-2 py-1 border-b border-slate-200 align-top text-right">
                     {/* Vr. Líquido em destaque */}
                     <div className="font-bold text-emerald-700 text-xs">{r.vrLiquidoC2 ? fmtMoeda(r.vrLiquidoC2) : '-'}</div>
                     {r.srccC2 && parseFloat(String(r.srccC2)) !== 0 && (
