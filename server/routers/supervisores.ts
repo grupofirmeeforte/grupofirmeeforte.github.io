@@ -137,35 +137,18 @@ export const supervisoresRouter = router({
         const pctSeguro    = parseFloat(sup.pctSeguro    ?? sup.pctseguro    ?? 0);
         const pctDental    = parseFloat(sup.pctDental    ?? sup.pctdental    ?? 0);
 
-        // RBM Consignado — soma do campo rbm da tabela consignados dos agentes supervisionados
-        // Cada operação de consignado tem um RBM específico; a supervisora ganha % sobre cada RBM
-        let rbmConsig = 0;
+        // Busca os totais de comissão dos agentes supervisionados na tabela calculos
+        // A comissão do supervisor é: total_comissao_agentes × % supervisor
+        let baseConsig = 0, baseConsorcio = 0, baseCc = 0, baseOurocap = 0, baseSeguros = 0;
         {
           const r = mesRef
             ? await db!.execute(sql`
-                SELECT COALESCE(SUM(cs.rbm), 0) as total
-                FROM consignados cs
-                JOIN agentes a ON cs.chaveJ = a.chaveJ
-                WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
-                  AND TRIM(a.supervisor) != ''
-                  AND cs.mes = ${mesRef}
-              `) as any
-            : await db!.execute(sql`
-                SELECT COALESCE(SUM(cs.rbm), 0) as total
-                FROM consignados cs
-                JOIN agentes a ON cs.chaveJ = a.chaveJ
-                WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
-                  AND TRIM(a.supervisor) != ''
-              `) as any;
-          rbmConsig = extractSum(r);
-        }
-
-        // RBM Consórcio — busca em calculos (rbmConsorcioC2)
-        let rbmConsorcio = 0;
-        {
-          const r = mesRef
-            ? await db!.execute(sql`
-                SELECT COALESCE(SUM(c.rbmConsorcioC2), 0) as total
+                SELECT
+                  COALESCE(SUM(c.comissaoConsig), 0)    as totalConsig,
+                  COALESCE(SUM(c.comissaoConsorcio), 0) as totalConsorcio,
+                  COALESCE(SUM(c.comissaoCc), 0)        as totalCc,
+                  COALESCE(SUM(c.comissaoOurocap), 0)   as totalOurocap,
+                  COALESCE(SUM(c.comissaoSeguros), 0)   as totalSeguros
                 FROM calculos c
                 JOIN agentes a ON c.chaveJ = a.chaveJ
                 WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
@@ -173,88 +156,36 @@ export const supervisoresRouter = router({
                   AND c.mesRef = ${mesRef}
               `) as any
             : await db!.execute(sql`
-                SELECT COALESCE(SUM(c.rbmConsorcioC2), 0) as total
+                SELECT
+                  COALESCE(SUM(c.comissaoConsig), 0)    as totalConsig,
+                  COALESCE(SUM(c.comissaoConsorcio), 0) as totalConsorcio,
+                  COALESCE(SUM(c.comissaoCc), 0)        as totalCc,
+                  COALESCE(SUM(c.comissaoOurocap), 0)   as totalOurocap,
+                  COALESCE(SUM(c.comissaoSeguros), 0)   as totalSeguros
                 FROM calculos c
                 JOIN agentes a ON c.chaveJ = a.chaveJ
                 WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
                   AND TRIM(a.supervisor) != ''
               `) as any;
-          rbmConsorcio = extractSum(r);
+          const rows = getRows(r);
+          if (rows.length) {
+            baseConsig    = parseFloat(String(rows[0].totalConsig    ?? rows[0].totalconsig    ?? 0)) || 0;
+            baseConsorcio = parseFloat(String(rows[0].totalConsorcio ?? rows[0].totalconsorcio ?? 0)) || 0;
+            baseCc        = parseFloat(String(rows[0].totalCc        ?? rows[0].totalcc        ?? 0)) || 0;
+            baseOurocap   = parseFloat(String(rows[0].totalOurocap   ?? rows[0].totalourocap   ?? 0)) || 0;
+            baseSeguros   = parseFloat(String(rows[0].totalSeguros   ?? rows[0].totalseguros   ?? 0)) || 0;
+          }
         }
 
-        // RBM Conta Corrente — busca em calculos (rbmContaCorrente)
-        let rbmCc = 0;
-        {
-          const r = mesRef
-            ? await db!.execute(sql`
-                SELECT COALESCE(SUM(c.rbmContaCorrente), 0) as total
-                FROM calculos c
-                JOIN agentes a ON c.chaveJ = a.chaveJ
-                WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
-                  AND TRIM(a.supervisor) != ''
-                  AND c.mesRef = ${mesRef}
-              `) as any
-            : await db!.execute(sql`
-                SELECT COALESCE(SUM(c.rbmContaCorrente), 0) as total
-                FROM calculos c
-                JOIN agentes a ON c.chaveJ = a.chaveJ
-                WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
-                  AND TRIM(a.supervisor) != ''
-              `) as any;
-          rbmCc = extractSum(r);
-        }
-
-        // RBM Ourocap — busca em calculos (rbmOurocap)
-        let rbmOurocap = 0;
-        {
-          const r = mesRef
-            ? await db!.execute(sql`
-                SELECT COALESCE(SUM(c.rbmOurocap), 0) as total
-                FROM calculos c
-                JOIN agentes a ON c.chaveJ = a.chaveJ
-                WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
-                  AND TRIM(a.supervisor) != ''
-                  AND c.mesRef = ${mesRef}
-              `) as any
-            : await db!.execute(sql`
-                SELECT COALESCE(SUM(c.rbmOurocap), 0) as total
-                FROM calculos c
-                JOIN agentes a ON c.chaveJ = a.chaveJ
-                WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
-                  AND TRIM(a.supervisor) != ''
-              `) as any;
-          rbmOurocap = extractSum(r);
-        }
-
-        // RBM Seguros — busca em calculos (rbmSeguros)
-        let rbmSeguros = 0;
-        {
-          const r = mesRef
-            ? await db!.execute(sql`
-                SELECT COALESCE(SUM(c.rbmSeguros), 0) as total
-                FROM calculos c
-                JOIN agentes a ON c.chaveJ = a.chaveJ
-                WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
-                  AND TRIM(a.supervisor) != ''
-                  AND c.mesRef = ${mesRef}
-              `) as any
-            : await db!.execute(sql`
-                SELECT COALESCE(SUM(c.rbmSeguros), 0) as total
-                FROM calculos c
-                JOIN agentes a ON c.chaveJ = a.chaveJ
-                WHERE UPPER(${nomeSup}) LIKE CONCAT('%', UPPER(TRIM(a.supervisor)), '%')
-                  AND TRIM(a.supervisor) != ''
-              `) as any;
-          rbmSeguros = extractSum(r);
-        }
-
-        // Calcular comissões
-        const comissaoConsig    = Math.round(rbmConsig    * pctConsig    / 100 * 100) / 100;
-        const comissaoConsorcio = Math.round(rbmConsorcio * pctConsorcio / 100 * 100) / 100;
-        const comissaoCc        = Math.round(rbmCc        * pctCc        / 100 * 100) / 100;
-        const comissaoOurocap   = Math.round(rbmOurocap   * pctOurocap   / 100 * 100) / 100;
-        const comissaoSeguros   = Math.round(rbmSeguros   * pctSeguro    / 100 * 100) / 100;
+        // Comissão do supervisor = base (total pago aos agentes) × % supervisor
+        const comissaoConsig    = Math.round(baseConsig    * pctConsig    / 100 * 100) / 100;
+        const comissaoConsorcio = Math.round(baseConsorcio * pctConsorcio / 100 * 100) / 100;
+        const comissaoCc        = Math.round(baseCc        * pctCc        / 100 * 100) / 100;
+        const comissaoOurocap   = Math.round(baseOurocap   * pctOurocap   / 100 * 100) / 100;
+        const comissaoSeguros   = Math.round(baseSeguros   * pctSeguro    / 100 * 100) / 100;
         const total = comissaoConsig + comissaoConsorcio + comissaoCc + comissaoOurocap + comissaoSeguros;
+        // Manter rbm* como 0 (não usado mais, mas mantido para compatibilidade do retorno)
+        const rbmConsig = 0, rbmConsorcio = 0, rbmCc = 0, rbmOurocap = 0, rbmSeguros = 0;
 
         return {
           id: Number(sup.id),
