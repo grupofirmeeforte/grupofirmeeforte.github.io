@@ -1733,8 +1733,8 @@ export const appRouter = router({
             convenio: consignados.convenio,
             juros: consignados.juros,
             valorLiquido: consignados.valorLiquido,
-            percentual: consignados.percentual,
-            comissao: consignados.comissao,
+            percentual: consignados.percPago,
+            comissao: consignados.totalComissao,
             chaveJ: consignados.chaveJ,
             mes: consignados.mes,
             empresa: consignados.empresa,
@@ -1933,9 +1933,9 @@ export const appRouter = router({
         const db = dbConn;
         const { and, eq, like, gt } = await import('drizzle-orm');
         const agora = new Date();
-        const mesAtual = agora.getMonth() + 1;
-        const anoRef = agora.getFullYear();
-        const mesRef = input.mesAno ?? `${String(mesAtual).padStart(2, '0')}/${anoRef}`;
+        const mesAnterior = agora.getMonth() === 0 ? 12 : agora.getMonth();
+        const anoRef = agora.getMonth() === 0 ? agora.getFullYear() - 1 : agora.getFullYear();
+        const mesRef = input.mesAno ?? `${String(mesAnterior).padStart(2, '0')}/${anoRef}`;
         let isAdminOuSuporte = false;
         let chaveJLogado: string | null = null;
         if (ctx.user?.openId?.startsWith('agente_')) {

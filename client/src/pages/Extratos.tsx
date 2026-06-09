@@ -1153,10 +1153,12 @@ function MinhaTabela() {
   const labelAtivo = (k: string) => `Ativo ${parseInt(k.replace('ativo', ''), 10).toString().padStart(2, '0')}`;
   const niveisConfigurados = ativoKeys.filter(k => (metasDe[k] ?? 0) > 0 || (metasAte[k] ?? 0) > 0 || (metas[k] ?? 0) > 0).slice(0, 4);
 
-  // Coluna da tabela de comissão a destacar
+  // Colunas da tabela de comissão: todas com dados, destacando anterior e vigente
   const colunasComValor = ativoKeys.filter(k => tabela.some(r => r[k] != null && r[k] !== ''));
   const colunaAnterior = nivelAnterior && colunasComValor.includes(nivelAnterior) ? nivelAnterior : null;
   const colunaVigente = nivelVigente && colunasComValor.includes(nivelVigente) ? nivelVigente : null;
+  // Sempre mostrar todas as colunas com dados (não só as do nível atingido)
+  const todasColunas = colunasComValor;
 
   // Índices para a régua
   const idxVigente = nivelVigente ? niveisConfigurados.indexOf(nivelVigente) : -1;
@@ -1274,16 +1276,17 @@ function MinhaTabela() {
                     <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3 text-center min-w-[130px]">Tx Juros (De → Até)</TableHead>
                     <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3 text-center min-w-[110px]">Meses (De → Até)</TableHead>
                     <TableHead className="text-white font-semibold text-xs uppercase py-2 px-3 text-center min-w-[90px]">Valor Mín.</TableHead>
-                    {colunaAnterior && (
-                      <TableHead className="text-amber-300 font-bold text-xs uppercase bg-amber-900 py-2 px-3 text-center min-w-[100px]">
-                        {labelAtivo(colunaAnterior)}<br/><span className="text-[9px] font-normal text-amber-200">tabela atual</span>
+                    {todasColunas.map(k => (
+                      <TableHead key={k} className={`font-bold text-xs uppercase py-2 px-3 text-center min-w-[100px] ${
+                        k === colunaAnterior ? 'text-amber-300 bg-amber-900' :
+                        k === colunaVigente  ? 'text-green-300 bg-green-900' :
+                        'text-gray-300 bg-gray-700'
+                      }`}>
+                        {labelAtivo(k)}
+                        {k === colunaAnterior && <><br/><span className="text-[9px] font-normal text-amber-200">tabela atual</span></>}
+                        {k === colunaVigente && k !== colunaAnterior && <><br/><span className="text-[9px] font-normal text-green-200">mês vigente</span></>}
                       </TableHead>
-                    )}
-                    {colunaVigente && colunaVigente !== colunaAnterior && (
-                      <TableHead className="text-green-300 font-bold text-xs uppercase bg-green-900 py-2 px-3 text-center min-w-[100px]">
-                        {labelAtivo(colunaVigente)}<br/><span className="text-[9px] font-normal text-green-200">mês vigente</span>
-                      </TableHead>
-                    )}
+                    ))}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1301,16 +1304,15 @@ function MinhaTabela() {
                         <span className="font-semibold text-blue-700">{row.mesesAte ?? '—'}</span>
                       </TableCell>
                       <TableCell className="text-xs py-1 px-3 text-center whitespace-nowrap">{row.valorMinimo ?? '—'}</TableCell>
-                      {colunaAnterior && (
-                        <TableCell className="font-bold text-amber-700 bg-amber-50 text-xs py-1 px-3 text-center whitespace-nowrap">
-                          {fmtPct(row[colunaAnterior])}
+                      {todasColunas.map(k => (
+                        <TableCell key={k} className={`font-bold text-xs py-1 px-3 text-center whitespace-nowrap ${
+                          k === colunaAnterior ? 'text-amber-700 bg-amber-50' :
+                          k === colunaVigente  ? 'text-green-700 bg-green-50' :
+                          'text-gray-700'
+                        }`}>
+                          {fmtPct(row[k])}
                         </TableCell>
-                      )}
-                      {colunaVigente && colunaVigente !== colunaAnterior && (
-                        <TableCell className="font-bold text-green-700 bg-green-50 text-xs py-1 px-3 text-center whitespace-nowrap">
-                          {fmtPct(row[colunaVigente])}
-                        </TableCell>
-                      )}
+                      ))}
                     </TableRow>
                   ))}
                 </TableBody>
