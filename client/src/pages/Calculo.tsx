@@ -234,6 +234,21 @@ export default function Calculo() {
   const criarSupMut = trpc.supervisores.criar.useMutation({ onSuccess: () => { refetchSup(); setModalSup(null); } });
   const editarSupMut = trpc.supervisores.editar.useMutation({ onSuccess: () => { refetchSup(); setModalSup(null); } });
   const excluirSupMut = trpc.supervisores.excluir.useMutation({ onSuccess: () => refetchSup() });
+  const [dtPagtoSup, setDtPagtoSup] = useState('');
+  const enviarSupPagtoMut = trpc.supervisores.enviarParaPagto.useMutation({
+    onSuccess: (data) => {
+      alert(`✅ ${data.inseridos} inserido(s), ${data.atualizados} atualizado(s) em Pagamentos.`);
+    },
+    onError: (err) => alert('Erro: ' + err.message),
+  });
+  const handleEnviarSupParaPagto = () => {
+    if (!mesRef) { alert('Selecione um mês específico.'); return; }
+    if (!dtPagtoSup) { alert('Informe a data de pagamento do supervisor.'); return; }
+    const sups = calcSup.filter((s: any) => s.total > 0).map((s: any) => ({ chaveJ: s.chaveJ, nome: s.nome, total: s.total }));
+    if (sups.length === 0) { alert('Nenhum supervisor com valor a pagar.'); return; }
+    if (!confirm(`Enviar comissões de ${sups.length} supervisor(es) para Pagamentos?\nData: ${dtPagtoSup}`)) return;
+    enviarSupPagtoMut.mutate({ mesRef, dtPagto: dtPagtoSup, supervisores: sups });
+  };
 
   const abrirNovoSup = () => {
     setModalSup({ novo: true });
@@ -623,7 +638,7 @@ export default function Calculo() {
           <div className="mt-3 border border-violet-200 rounded-lg bg-violet-50 p-3">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-violet-800">Comissão Supervisor {mesRef ? `— ${fmtMesRef(mesRef)}` : "— Todos os meses"}</span>
-              <div className="flex gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <Button
                   size="sm"
                   onClick={() => refetchCalcSup()}
@@ -635,6 +650,27 @@ export default function Calculo() {
                   ) : (
                     <>📊 Calcular</>
                   )}
+                </Button>
+                {/* Campo data de pagamento do supervisor */}
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] text-violet-700 font-medium">Dt Pagto:</span>
+                  <input
+                    type="text"
+                    placeholder="DD/MM/AAAA"
+                    value={dtPagtoSup}
+                    onChange={e => setDtPagtoSup(e.target.value)}
+                    className="h-6 w-24 text-[10px] border border-violet-300 rounded px-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-violet-400"
+                    maxLength={10}
+                  />
+                </div>
+                <Button
+                  size="sm"
+                  onClick={handleEnviarSupParaPagto}
+                  disabled={enviarSupPagtoMut.isPending || calcSup.length === 0}
+                  className="h-6 px-2 text-[10px] bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1 disabled:opacity-60"
+                >
+                  <Send className="w-3 h-3" />
+                  {enviarSupPagtoMut.isPending ? 'Enviando...' : 'Enviar para Pagto'}
                 </Button>
                 <Button size="sm" onClick={abrirNovoSup} className="h-6 px-2 text-[10px] bg-violet-600 hover:bg-violet-700 text-white flex items-center gap-1">
                   <Plus className="w-3 h-3" /> Novo Supervisor

@@ -1,7 +1,8 @@
 import { z } from "zod";
-import { protectedProcedure, router } from "../_core/trpc";
+import { protectedProcedure, publicProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
-import { sql } from "drizzle-orm";
+import { sql, eq, and } from "drizzle-orm";
+import { pagamentos, agentes } from "../../drizzle/schema";
 
 // Helper: normaliza retorno de db.execute (TiDB retorna [rows, fields])
 function getRows(res: any): any[] {
@@ -267,5 +268,81 @@ export const supervisoresRouter = router({
       }));
 
       return resultado;
+    }),
+
+  // Enviar comissões dos supervisores para a tabela pagamentos
+  enviarParaPagto: publicProcedure
+    .input(z.object({
+      mesRef: z.string(),
+      dtPagto: z.string(),
+      supervisores: z.array(z.object({
+        chaveJ: z.string(),
+        nome: z.string(),
+        total: z.number(),
+      })),
+    }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('DB indisponível');
+
+      let inseridos = 0;
+      let atualizados = 0;
+
+      for (const sup of input.supervisores) {
+        if (sup.total <= 0) continue;
+
+        // Buscar dados bancários do agente
+        const [agente] = await db.select({
+          favorecido: agentes.favorecido,
+          banco: agentes.banco,
+          agencia: agentes.agencia,
+          conta: agentes.conta,
+          cpfCnpj: agentes.cpfAgente,
+          tipoConta: agentes.tipo,
+          pix: agentes.pix,
+          empresa: agentes.empresa,
+        }).from(agentes).where(eq(agentes.chaveJ, sup.chaveJ)).limit(1);
+
+        // Verificar se já existe lançamento para este supervisor no mês
+        const existentes = await db.select({ id: pagamentos.id })
+          .from(pagamentos)
+          .where(and(
+            eq(pagamentos.chaveJ, sup.chaveJ),
+            eq(pagamentos.mesAno, input.mesRef),
+            eq(pagamentos.tipoPagto, 'Comissão Supervisor')
+          ))
+          .limit(1);
+
+        const valores = {
+          mesAno: input.mesRef,
+          tipoPagto: 'Comissão Supervisor',
+          chaveJ: sup.chaveJ,
+          nomeFavorecido: agente?.favorecido || sup.nome,
+          banco: agente?.banco || null,
+          agencia: agente?.agencia || null,
+          conta: agente?.conta || null,
+          cpfCnpj: agente?.cpfCnpj || null,
+          tipoConta: agente?.tipoConta || null,
+          pix: agente?.pix || null,
+          empresa: agente?.empresa || null,
+          valor: String(sup.total),
+          dataPagto: input.dtPagto,
+          dataVencer: input.dtPagto,
+          origem: 'sistema',
+          pago: false,
+        };
+
+        if (existentes.length > 0) {
+          await db.update(pagamentos)
+            .set(valores as any)
+            .where(eq(pagamentos.id, existentes[0].id));
+          atualizados++;
+        } else {
+          await db.insert(pagamentos).values(valores as any);
+          inseridos++;
+        }
+      }
+
+      return { inseridos, atualizados, total: inseridos + atualizados };
     }),
 });
