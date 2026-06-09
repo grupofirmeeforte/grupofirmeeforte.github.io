@@ -83,6 +83,24 @@ function extrairDadosContrato(texto: string) {
   const cpfRaw = campo(/\bCPF\b\s*\n([\d.,]+)/i);
   const cpfCliente = cpfRaw ? cpfRaw.replace(/[^\d]/g, '') : null;
 
+  // Normaliza qualquer formato de data para DD/MM/YYYY
+  function normalizarData(d: string | null | undefined): string | null {
+    if (!d) return null;
+    const s = d.trim();
+    // Já está no formato DD/MM/YYYY
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
+    // Formato DD.MM.YYYY → DD/MM/YYYY
+    if (/^\d{2}\.\d{2}\.\d{4}$/.test(s)) return s.replace(/\./g, '/');
+    // Formato YYYY-MM-DD → DD/MM/YYYY
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+      const [y, m, dd] = s.split('-');
+      return `${dd}/${m}/${y}`;
+    }
+    // Formato DD-MM-YYYY → DD/MM/YYYY
+    if (/^\d{2}-\d{2}-\d{4}$/.test(s)) return s.replace(/-/g, '/');
+    return s; // retorna como está se não reconhecer
+  }
+
   // Convênio
   const nomeConvenio = campo(/Nome do convênio\s*\n([^\n]+)/i);
   const nrConvenio = campo(/Número do Convênio\s*\n(\d+)/i);
@@ -135,9 +153,9 @@ function extrairDadosContrato(texto: string) {
     cpfCliente,
     nrConvenio,
     nomeConvenio: nomeConvenio?.trim() ?? null,
-    dataContrato: dataContrato?.trim() ?? null,
-    dataPrimeiraParcela,
-    dataUltimaParcela,
+    dataContrato: normalizarData(dataContrato),
+    dataPrimeiraParcela: normalizarData(dataPrimeiraParcela),
+    dataUltimaParcela: normalizarData(dataUltimaParcela),
     chaveJOperador,
     nomeOperador: nomeOperador?.trim() ?? null,
     empresa: empresa?.trim() ?? null,
@@ -369,10 +387,10 @@ export const contratosRouter = router({
       if (!db) throw new Error('Banco de dados indisponível');
       const offset = (input.page - 1) * input.pageSize;
 
-      // Data limite para elegibilidade: 1 ano atrás (formato DD.MM.YYYY como no banco)
+      // Data limite para elegibilidade: 1 ano atrás (formato DD/MM/YYYY padronizado)
       const umAnoAtras = new Date();
       umAnoAtras.setFullYear(umAnoAtras.getFullYear() - 1);
-      const umAnoAtrasStr = `${String(umAnoAtras.getDate()).padStart(2,'0')}.${String(umAnoAtras.getMonth()+1).padStart(2,'0')}.${umAnoAtras.getFullYear()}`;
+      const umAnoAtrasStr = `${String(umAnoAtras.getDate()).padStart(2,'0')}/${String(umAnoAtras.getMonth()+1).padStart(2,'0')}/${umAnoAtras.getFullYear()}`;
 
       const rows = await db
         .select()
@@ -387,7 +405,7 @@ export const contratosRouter = router({
             input.linhaCredito ? like(contratos.linhaCredito, `%${input.linhaCredito}%`) : undefined,
             // Filtro de elegibilidade aplicado no banco (formato DD.MM.YYYY)
             input.apenasElegiveis
-              ? sql`STR_TO_DATE(${contratos.dataPrimeiraParcela}, '%d.%m.%Y') <= STR_TO_DATE(${umAnoAtrasStr}, '%d.%m.%Y')`
+              ? sql`STR_TO_DATE(${contratos.dataPrimeiraParcela}, '%d/%m/%Y') <= STR_TO_DATE(${umAnoAtrasStr}, '%d/%m/%Y')`
               : undefined,
           )
         )
