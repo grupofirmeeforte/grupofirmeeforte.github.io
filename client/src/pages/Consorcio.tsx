@@ -482,7 +482,7 @@ export default function Consorcio() {
                   {parseFloat(row.comissao ?? '0') > 0 ? (
                     <>
                       <div className="font-bold text-green-700 text-[12px]">{fmtMoeda(row.comissao)}</div>
-                      <div className="text-[10px] text-gray-400">{fmtPct(row.pctComissao1)}</div>
+                      <div className="text-[10px] text-gray-400">{fmtPct(row.pctComissao2)}</div>
                     </>
                   ) : (
                     <span className="text-[11px] text-gray-300">-</span>
