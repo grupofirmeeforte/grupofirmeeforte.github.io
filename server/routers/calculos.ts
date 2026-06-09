@@ -68,10 +68,36 @@ export const calculosRouter = router({
         }
       }
 
+      // Buscar valor líquido de consignado por chaveJ+mesRef em lote
+      const vlConsigMap: Record<string, number> = {};
+      if (chavesJ.length > 0) {
+        const mesRefs = Array.from(new Set(result.map(r => r.mesRef).filter(Boolean))) as string[];
+        for (const mes of mesRefs) {
+          const chavesDoMes = result.filter(r => r.mesRef === mes).map(r => r.chaveJ).filter(Boolean) as string[];
+          if (chavesDoMes.length === 0) continue;
+          // Buscar soma do valorLiquido de consignados agrupado por chaveJ
+          const vlRows = await db
+            .select({
+              chaveJ: consignados.chaveJ,
+              totalVL: sql<number>`COALESCE(SUM(${consignados.valorLiquido}), 0)`,
+            })
+            .from(consignados)
+            .where(and(
+              eq(consignados.mes, mes),
+              sql`${consignados.chaveJ} IN (${sql.join(chavesDoMes.map(c => sql`${c}`), sql`, `)})`
+            ))
+            .groupBy(consignados.chaveJ);
+          for (const row of vlRows) {
+            if (row.chaveJ) vlConsigMap[`${row.chaveJ}__${mes}`] = parseFloat(String(row.totalVL ?? 0)) || 0;
+          }
+        }
+      }
+
       const resultComAdto = await Promise.all(result.map(async (reg) => {
         const favorecido = reg.chaveJ ? (favMap[reg.chaveJ] ?? null) : null;
         const nivelAgente = reg.chaveJ ? (nivelMap[reg.chaveJ] ?? null) : null;
-        if (!isMesNovo(reg.mesRef ?? '') || !reg.chaveJ) return { ...reg, favorecido, nivelAgente };
+        const vlConsig = reg.chaveJ && reg.mesRef ? (vlConsigMap[`${reg.chaveJ}__${reg.mesRef}`] ?? null) : null;
+        if (!isMesNovo(reg.mesRef ?? '') || !reg.chaveJ) return { ...reg, favorecido, nivelAgente, vlConsig };
         const adtoRows = await db.execute(
           sql`SELECT COALESCE(SUM(valor), 0) as total FROM pagamentos WHERE tipoPagto = 'Adto' AND chaveJ = ${reg.chaveJ} AND mesAno = ${reg.mesRef}`
         ) as any;
@@ -93,7 +119,7 @@ export const calculosRouter = router({
         await db.update(calculos)
           .set({ comissaoTotal: String(novaComissaoTotal), adiantamento: String(adiantamento) })
           .where(eq(calculos.id, reg.id));
-        return { ...reg, favorecido, nivelAgente, adiantamento: String(adiantamento), comissaoTotal: String(novaComissaoTotal) };
+        return { ...reg, favorecido, nivelAgente, adiantamento: String(adiantamento), comissaoTotal: String(novaComissaoTotal), vlConsig };
       }));
 
       return resultComAdto;

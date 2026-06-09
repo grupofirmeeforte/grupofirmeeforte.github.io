@@ -880,12 +880,10 @@ export default function Calculo() {
                         </div>
                       );
                     })()}
-                    {/* RBMs individuais menores */}
-                    {r.rbmCreditoC2 && parseFloat(String(r.rbmCreditoC2)) !== 0 && <div className="text-[10px] text-slate-500">C/C: {fmtMoeda(r.rbmCreditoC2)}</div>}
-                    {r.rbmContaCorrente && parseFloat(String(r.rbmContaCorrente)) !== 0 && <div className="text-[10px] text-slate-500">Cta: {fmtMoeda(r.rbmContaCorrente)}</div>}
-                    {r.rbmConsorcioC2 && parseFloat(String(r.rbmConsorcioC2)) !== 0 && <div className="text-[10px] text-slate-500">Cons: {fmtMoeda(r.rbmConsorcioC2)}</div>}
-                    {r.rbmOurocap && parseFloat(String(r.rbmOurocap)) !== 0 && <div className="text-[10px] text-slate-500">Ouro: {fmtMoeda(r.rbmOurocap)}</div>}
-                    {r.rbmSeguros && parseFloat(String(r.rbmSeguros)) !== 0 && <div className="text-[10px] text-slate-500">Seg: {fmtMoeda(r.rbmSeguros)}</div>}
+                    {/* Valor Líquido de Consignado do mês */}
+                    {(r as any).vlConsig != null && (r as any).vlConsig > 0 && (
+                      <div className="text-[10px] text-blue-600 font-medium mt-0.5">Consig: {fmtMoeda((r as any).vlConsig)}</div>
+                    )}
                   </td>
                   {/* Célula compacta Comissões */}
                   <td className="px-1.5 py-1 border-b border-slate-100 min-w-[160px] align-top text-right">
