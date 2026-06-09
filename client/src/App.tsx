@@ -50,12 +50,14 @@ import ExtratosBancarios from './pages/ExtratosBancarios';
 import ContratosPage from './pages/Contratos';
 import NaoPerturbe from './pages/NaoPerturbe';
 import AgenciasBb from './pages/AgenciasBb';
+import PreviewEstacoes from './pages/PreviewEstacoes';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
 import { useDisconnectNotification } from "./hooks/useDisconnectNotification";
 import { LGPDModal } from "./components/LGPDModal";
 import { BoasVindasComemorativo } from "./components/BoasVindasComemorativo";
+import { BoasVindasEstacao, useBoasVindasEstacao } from "./components/BoasVindasEstacao";
 import { useState, useEffect } from "react";
 import { useAuth } from "./hooks/useAuth";
 import { trpc } from "./lib/trpc";
@@ -141,6 +143,7 @@ function RouterWithInactivity() {
       <Route path={"/contratos"} component={ContratosPage} />
       <Route path={"/nao-perturbe"} component={NaoPerturbe} />
       <Route path={"/agencias-bb"} component={AgenciasBb} />
+      <Route path={"/preview-estacoes"} component={PreviewEstacoes} />
       <Route path={"/febraban/relatorio-chavej"} component={RelatorioChaveJ} />
       <Route path={"/relatorio-rbm-despesas"} component={RelatorioRBMDespesas} />
       <Route path={"/extratos"} component={ExtratosPage} />
@@ -175,6 +178,7 @@ function LGPDGate() {
   const [showLGPD, setShowLGPD] = useState(false);
   const [isAccepting, setIsAccepting] = useState(false);
   const [showBoasVindas, setShowBoasVindas] = useState(false);
+  const { deveExibirEstacao, setDeveExibirEstacao } = useBoasVindasEstacao();
   const acceptLGPDMutation = trpc.auth.acceptLGPD.useMutation();
   const verificarBoasVindas = trpc.recados.verificarBoasVindas.useQuery(undefined, {
     enabled: isAuthenticated && !!user,
@@ -212,6 +216,9 @@ function LGPDGate() {
       {showLGPD && <LGPDModal onAccept={handleAcceptLGPD} isLoading={isAccepting} />}
       {showBoasVindas && !showLGPD && (
         <BoasVindasComemorativo onClose={() => setShowBoasVindas(false)} />
+      )}
+      {deveExibirEstacao && !showLGPD && !showBoasVindas && (
+        <BoasVindasEstacao onClose={() => setDeveExibirEstacao(false)} />
       )}
       <RouterWithInactivity />
       <BotaoComunicadoGlobal />
