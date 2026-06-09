@@ -743,6 +743,28 @@ export const appRouter = router({
       return rows.map(r => r.convenio).filter(Boolean);
     }),
 
+    // Nomes personalizados dos ativos (controle do CEO)
+    listarNomesAtivos: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return {};
+      const { sql } = await import('drizzle-orm');
+      const rows = await db.execute(sql`SELECT ativoKey, nome FROM ativosNomes`);
+      const result: Record<string, string> = {};
+      for (const row of rows as any[]) {
+        result[row.ativoKey] = row.nome || '';
+      }
+      return result;
+    }),
+    salvarNomeAtivo: protectedProcedure
+      .input(z.object({ ativoKey: z.string(), nome: z.string() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'DB indisponível' });
+        const { sql } = await import('drizzle-orm');
+        await db.execute(sql`UPDATE ativosNomes SET nome = ${input.nome} WHERE ativoKey = ${input.ativoKey}`);
+        return { success: true };
+      }),
+
     // Importação em lote: atualiza registros existentes (por id) ou cria novos
     importarLote: protectedProcedure
       .input(z.array(z.object({

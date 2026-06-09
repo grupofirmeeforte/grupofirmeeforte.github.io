@@ -302,6 +302,12 @@ export default function TabelaComissao() {
   const { data: empresas = [] } = trpc.tabelaComissao.listarEmpresas.useQuery();
   const { data: convenios = [] } = trpc.tabelaComissao.listarConvenios.useQuery();
 
+  // Nomes personalizados dos ativos (controle do CEO)
+  const { data: nomesAtivos = {} } = trpc.tabelaComissao.listarNomesAtivos.useQuery();
+  const salvarNomeMut = trpc.tabelaComissao.salvarNomeAtivo.useMutation({
+    onSuccess: () => utils.tabelaComissao.listarNomesAtivos.invalidate(),
+  });
+
   // Carregar valores do banco ao montar
   const { data: valoresDB } = trpc.valoresCalculo.obter.useQuery();
   useEffect(() => {
@@ -782,6 +788,35 @@ export default function TabelaComissao() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
+                {/* Linha de nomes personalizados (só CEO) */}
+                {isAdminOuCeo && (
+                  <tr style={{background:'#1a1a2e'}}>
+                    <th className="px-2 py-1 w-8"></th>
+                    <th className="px-3 py-1" style={{width:'220px',maxWidth:'220px'}}></th>
+                    <th className="px-1.5 py-1"></th>
+                    <th className="px-2 py-1"></th>
+                    <th className="px-3 py-1"></th>
+                    {ALL_ATIVOS.map((col, i) => colsVisiveis.includes(col) && (
+                      <th key={`nome-${col}`} className="px-1 py-1 text-center">
+                        <input
+                          type="text"
+                          defaultValue={(nomesAtivos as Record<string, string>)[col] || ''}
+                          placeholder={`—`}
+                          onBlur={(e) => {
+                            const val = e.target.value.trim();
+                            if (val !== ((nomesAtivos as Record<string, string>)[col] || '')) {
+                              salvarNomeMut.mutate({ ativoKey: col, nome: val });
+                            }
+                          }}
+                          onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+                          className="w-full text-center text-[10px] font-medium bg-transparent border border-gray-600 rounded px-1 py-0.5 text-yellow-300 placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30"
+                          style={{minWidth:'50px', maxWidth:'80px'}}
+                        />
+                      </th>
+                    ))}
+                    <th className="px-3 py-1"></th>
+                  </tr>
+                )}
                 <tr style={{background: 'linear-gradient(90deg, #002776 0%, #003d99 40%, #0055cc 70%, #1a6ed8 100%)'}} className="text-white">
                   <th className="px-2 py-2.5 text-center whitespace-nowrap font-semibold tracking-wide text-xs w-8">#</th>
                   <th className="px-3 py-2.5 text-left whitespace-nowrap font-semibold tracking-wide" style={{width:'220px',maxWidth:'220px'}}>Convênio</th>
