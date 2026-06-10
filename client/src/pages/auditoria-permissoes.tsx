@@ -67,6 +67,7 @@ const MODULOS_PERMISSOES = [
     { key: 'acompanhamento-diario', label: 'Acompanhamento Diário' },
     { key: 'graficos', label: 'Gráficos' },
     { key: 'relatorio-chavej', label: 'Relatório por Chave J' },
+    { key: 'retorno-documentos', label: 'Retorno Documentos' },
   ]},
   { modulo: 'auditoria', label: 'Auditoria', subabas: [
     { key: 'logs', label: 'Logs de Acesso' },

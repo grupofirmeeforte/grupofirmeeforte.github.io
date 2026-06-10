@@ -51,6 +51,7 @@ import ContratosPage from './pages/Contratos';
 import NaoPerturbe from './pages/NaoPerturbe';
 import AgenciasBb from './pages/AgenciasBb';
 import PreviewEstacoes from './pages/PreviewEstacoes';
+import RetornoDocumentosPage from './pages/RetornoDocumentosPage';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -145,6 +146,7 @@ function RouterWithInactivity() {
       <Route path={"/agencias-bb"} component={AgenciasBb} />
       <Route path={"/preview-estacoes"} component={PreviewEstacoes} />
       <Route path={"/febraban/relatorio-chavej"} component={RelatorioChaveJ} />
+      <Route path={"/febraban/retorno-documentos"} component={RetornoDocumentosPage} />
       <Route path={"/relatorio-rbm-despesas"} component={RelatorioRBMDespesas} />
       <Route path={"/extratos"} component={ExtratosPage} />
       <Route path={"/extratos-bancarios"} component={ExtratosBancarios} />
