@@ -708,3 +708,9 @@
 
 ## BUG FIX - PAGAMENTO "PAGO" INCORRETO
 - [x] Investigar bug: pagamento enviado por supervisora aparece como "Pago" — código do enviarParaPagto confirmado correto (dataPagto: null, pago: false). Badge depende de dataPagto preenchido no banco.
+
+## BUG FIX - PAGAMENTO NASCENDO COMO "PAGO"
+- [x] Corrigir supervisores.ts: dataPagto deve ser null ao enviar para pagamento (bug: copiava dtPagto do input)
+
+## CORREÇÃO VISUAL - EXTRATOS
+- [x] Escurecer texto das tabelas de Extratos (text-gray-200 → text-gray-700) para melhor legibilidade no fundo branco

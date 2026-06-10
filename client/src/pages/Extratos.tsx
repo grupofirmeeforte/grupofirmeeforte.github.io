@@ -263,16 +263,16 @@ function ExtratoConsignado() {
                   {(rows as any[]).map((row: any, rowIdx: number) => (
                     <TableRow key={row.id} className={rowIdx % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}>
                       <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
-                      <TableCell className="text-gray-200 font-mono text-sm">{row.nrOperacao || '—'}</TableCell>
+                      <TableCell className="text-gray-700 font-mono text-sm">{row.nrOperacao || '—'}</TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className="text-xs">
                           {row.parcelas ?? '—'}x
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-gray-200 text-sm">{row.descricaoProduto || row.convenio || '—'}</TableCell>
-                      <TableCell className="text-right text-gray-200">{fmtPct(row.juros)}</TableCell>
+                      <TableCell className="text-gray-700 text-sm">{row.descricaoProduto || row.convenio || '—'}</TableCell>
+                      <TableCell className="text-right text-gray-700">{fmtPct(row.juros)}</TableCell>
                       <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.valorLiquido ?? 0)))}</TableCell>
-                      <TableCell className="text-right text-gray-200">{fmtPct(row.percentual)}</TableCell>
+                      <TableCell className="text-right text-gray-700">{fmtPct(row.percentual)}</TableCell>
                       <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                     </TableRow>
                   ))}
@@ -567,12 +567,12 @@ function PerspectivadeGanho() {
                 ) : (
                   (rows as any[]).map((row: any, rowIdx: number) => (
                     <TableRow key={row.id} className={rowIdx % 2 === 0 ? 'bg-white hover:bg-blue-900/30' : 'bg-blue-900/20/30 hover:bg-blue-100/40'}>
-                      <TableCell className="font-mono text-sm font-medium text-white">{row.proposta || '—'}</TableCell>
-                      <TableCell className="text-xs text-gray-300 whitespace-nowrap">
+                      <TableCell className="font-mono text-sm font-medium text-gray-900">{row.proposta || '—'}</TableCell>
+                      <TableCell className="text-xs text-gray-600 whitespace-nowrap">
                         {row.solicitacao || '—'}
                       </TableCell>
                       <TableCell className="text-sm">
-                        <div className="font-medium text-white">{row.nomeCliente || '—'}</div>
+                        <div className="font-medium text-gray-900">{row.nomeCliente || '—'}</div>
                         {row.cpfCliente && <div className="text-xs text-gray-400 font-mono">{row.cpfCliente}</div>}
                       </TableCell>
                       <TableCell>
@@ -621,10 +621,10 @@ function PerspectivadeGanho() {
                       <TableCell className="text-xs text-gray-300 max-w-[130px] truncate" title={row.produtoConsig ?? row.linha ?? ''}>
                         <span className="text-blue-600 font-medium">{row.produtoConsig || row.linha || '—'}</span>
                       </TableCell>
-                      <TableCell className="text-right text-sm text-gray-200">
+                      <TableCell className="text-right text-sm text-gray-700">
                         {row.taxaJuros > 0 ? fmtPct(row.taxaJuros) : '—'}
                       </TableCell>
-                      <TableCell className="text-right text-sm text-gray-200">
+                      <TableCell className="text-right text-sm text-gray-700">
                         {row.prazoMeses > 0 ? `${row.prazoMeses}x` : (row.prazo || '—')}
                       </TableCell>
                       <TableCell className="text-right font-semibold text-blue-700">
@@ -768,9 +768,9 @@ function ExtratoCC() {
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
-                  <TableRow key={row.id} className="hover:bg-gray-800">
-                    <TableCell className="text-gray-200">{row.agencia || '—'}</TableCell>
-                    <TableCell className="font-mono text-sm text-gray-200">{row.chaveJ || '—'}</TableCell>
+                  <TableRow key={row.id} className="hover:bg-gray-50">
+                    <TableCell className="text-gray-700">{row.agencia || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-700">{row.chaveJ || '—'}</TableCell>
                     <TableCell className="font-medium text-gray-900">{row.nome || '—'}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                   </TableRow>
@@ -842,14 +842,14 @@ function ExtratoConsorcio() {
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
-                  <TableRow key={row.id} className="hover:bg-gray-800">
-                    {isAdminOuSuporte && <TableCell className="text-sm font-medium text-white">{row.nomeAgente || '—'}</TableCell>}
-                    <TableCell className="font-mono text-sm text-gray-200">{row.proposta || '—'}</TableCell>
-                    <TableCell className="text-sm text-gray-300">{row.empresa || '—'}</TableCell>
+                  <TableRow key={row.id} className="hover:bg-gray-50">
+                    {isAdminOuSuporte && <TableCell className="text-sm font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>}
+                    <TableCell className="font-mono text-sm text-gray-700">{row.proposta || '—'}</TableCell>
+                    <TableCell className="text-sm text-gray-700">{row.empresa || '—'}</TableCell>
                     <TableCell className="text-center">
                       <Badge variant="outline" className="text-xs">{row.parcLiberada ?? '—'}</Badge>
                     </TableCell>
-                    <TableCell className="text-gray-200 text-sm">{row.segmento || '—'}</TableCell>
+                    <TableCell className="text-gray-700 text-sm">{row.segmento || '—'}</TableCell>
                     <TableCell className="text-right text-blue-700 font-semibold">{fmtNum(row.valorBem)}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                   </TableRow>
@@ -917,8 +917,8 @@ function ExtratoOurocap() {
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
-                  <TableRow key={row.id} className="hover:bg-gray-800">
-                    <TableCell className="font-mono text-sm text-gray-200">{row.nrOperacao || '—'}</TableCell>
+                  <TableRow key={row.id} className="hover:bg-gray-50">
+                    <TableCell className="font-mono text-sm text-gray-700">{row.nrOperacao || '—'}</TableCell>
                     <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.valorLiquido ?? 0)))}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                   </TableRow>
