@@ -448,6 +448,55 @@ export const pagamentosRouter = {
         .orderBy(asc(pagamentos.empresa), asc(pagamentos.nomeFavorecido));
     }),
 
+  // Resumo mensal: totais por tipo (a pagar vs pago)
+  resumoMensal: publicProcedure
+    .input(z.object({ mesAno: z.string() }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return { comissoes: { aPagar: 0, pago: 0 }, alugueis: { aPagar: 0, pago: 0 }, outros: { aPagar: 0, pago: 0 }, total: { aPagar: 0, pago: 0 } };
+
+      const pagRows = await db.select({
+        tipoPagto: pagamentos.tipoPagto,
+        pago: pagamentos.pago,
+        total: sql<string>`COALESCE(SUM(valor), 0)`,
+      }).from(pagamentos)
+        .where(eq(pagamentos.mesAno, input.mesAno))
+        .groupBy(pagamentos.tipoPagto, pagamentos.pago);
+
+      const despRows = await db.select({
+        tipoPagto: despesasFixas.tipoPagto,
+        pago: despesasFixas.pago,
+        total: sql<string>`COALESCE(SUM(valor), 0)`,
+      }).from(despesasFixas)
+        .where(eq(despesasFixas.mesAno, input.mesAno))
+        .groupBy(despesasFixas.tipoPagto, despesasFixas.pago);
+
+      const allRows = [...pagRows, ...despRows];
+      let comissoesPago = 0, comissoesAPagar = 0;
+      let alugueisPago = 0, alugueisAPagar = 0;
+      let outrosPago = 0, outrosAPagar = 0;
+
+      for (const row of allRows) {
+        const val = parseFloat(String(row.total)) || 0;
+        const isPago = row.pago === true || (row.pago as any) === 1;
+        const tipo = (row.tipoPagto || '').toLowerCase();
+        if (tipo.includes('comiss')) {
+          if (isPago) comissoesPago += val; else comissoesAPagar += val;
+        } else if (tipo.includes('aluguel')) {
+          if (isPago) alugueisPago += val; else alugueisAPagar += val;
+        } else {
+          if (isPago) outrosPago += val; else outrosAPagar += val;
+        }
+      }
+
+      return {
+        comissoes: { aPagar: comissoesAPagar, pago: comissoesPago },
+        alugueis: { aPagar: alugueisAPagar, pago: alugueisPago },
+        outros: { aPagar: outrosAPagar, pago: outrosPago },
+        total: { aPagar: comissoesAPagar + alugueisAPagar + outrosAPagar, pago: comissoesPago + alugueisPago + outrosPago },
+      };
+    }),
+
   // Gerar próximo código automático para lançamento avulso (ex: 001A, 002A, ...)
   nextCodigo: publicProcedure.query(async () => {
     const db = await getDb();

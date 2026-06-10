@@ -213,6 +213,14 @@ export default function PagamentosPage() {
   const utils = trpc.useUtils();
   const { data: nextCodigo } = trpc.pagamentos.nextCodigo.useQuery();
 
+  // Demonstrativo mensal
+  const mesAtual = `${String(new Date().getMonth() + 1).padStart(2, '0')}/${new Date().getFullYear()}`;
+  const [mesDemonstrativo, setMesDemonstrativo] = useState(mesAtual);
+  const { data: resumo } = trpc.pagamentos.resumoMensal.useQuery(
+    { mesAno: mesDemonstrativo },
+    { enabled: !!mesDemonstrativo }
+  );
+
   const editarDespMutation = trpc.despesasFixas.editar.useMutation({
     onSuccess: () => { toast.success("Despesa fixa atualizada!"); setEditandoDesp(null); utils.pagamentos.listUnificado.invalidate(); },
     onError: (e) => toast.error(e.message),
@@ -470,6 +478,46 @@ export default function PagamentosPage() {
             setFiltroPago("todos"); setFiltroChaveJ(""); setFiltroNome(""); setPage(1);
           }} className="text-gray-400 hover:text-white h-8 text-xs">✕ Limpar</Button>
         )}
+      </div>
+
+      {/* Demonstrativo Mensal */}
+      <div className="bg-gray-800 border-b border-gray-700 px-6 py-3">
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-yellow-400">Demonstrativo:</span>
+            <Input value={mesDemonstrativo} onChange={e => setMesDemonstrativo(maskMesAno(e.target.value))}
+              placeholder="MM/AAAA" className="bg-gray-900 border-gray-600 text-white w-24 h-6 text-xs" />
+          </div>
+          {resumo && (
+            <div className="flex gap-4 flex-wrap text-xs">
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">Comissões:</span>
+                <span className="text-red-400 font-medium">R$ {resumo.comissoes.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                <span className="text-gray-500">/</span>
+                <span className="text-green-400 font-medium">R$ {resumo.comissoes.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">Aluguéis:</span>
+                <span className="text-red-400 font-medium">R$ {resumo.alugueis.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                <span className="text-gray-500">/</span>
+                <span className="text-green-400 font-medium">R$ {resumo.alugueis.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">Outros:</span>
+                <span className="text-red-400 font-medium">R$ {resumo.outros.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                <span className="text-gray-500">/</span>
+                <span className="text-green-400 font-medium">R$ {resumo.outros.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+              </div>
+              <div className="flex items-center gap-1 border-l border-gray-600 pl-4">
+                <span className="text-white font-bold">TOTAL:</span>
+                <span className="text-red-400 font-bold">R$ {resumo.total.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                <span className="text-gray-500">/</span>
+                <span className="text-green-400 font-bold">R$ {resumo.total.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="text-[10px] text-gray-500 mt-1">Vermelho = a pagar | Verde = pago</div>
       </div>
 
       {totalPages > 1 && (
