@@ -336,7 +336,7 @@ export const pagamentosRouter = {
         .orderBy(desc(pagamentos.id));
 
       // Buscar tipo de conta atualizado do cadastro do agente
-      const chaveJs = [...new Set(rowsPagRaw.filter(r => r.chaveJ).map(r => r.chaveJ!))];
+      const chaveJs = Array.from(new Set(rowsPagRaw.filter(r => r.chaveJ).map(r => r.chaveJ!)));
       const agenteTipoMap: Record<string, string> = {};
       if (chaveJs.length > 0) {
         const chunks: string[][] = [];
