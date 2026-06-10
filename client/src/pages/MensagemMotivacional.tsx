@@ -25,10 +25,6 @@ export default function MensagemMotivacional() {
       >
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <Zap className="w-6 h-6 text-white drop-shadow" />
-          <div>
-            <h1 className="text-xl font-bold text-white">Mensagem Motivacional</h1>
-            <p className="text-xs text-amber-100 capitalize">{hoje}</p>
-          </div>
         </div>
       </div>
 

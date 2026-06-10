@@ -487,55 +487,55 @@ export default function PagamentosPage() {
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">Comissões:</span>
                 <span className="text-red-400 font-medium">R$ {resumo.comissoes.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                <span className="text-gray-500">/</span>
+                <span className="text-gray-400">/</span>
                 <span className="text-green-400 font-medium">R$ {resumo.comissoes.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">Salários:</span>
                 <span className="text-red-400 font-medium">R$ {resumo.salarios.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                <span className="text-gray-500">/</span>
+                <span className="text-gray-400">/</span>
                 <span className="text-green-400 font-medium">R$ {resumo.salarios.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">Aluguéis:</span>
                 <span className="text-red-400 font-medium">R$ {resumo.alugueis.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                <span className="text-gray-500">/</span>
+                <span className="text-gray-400">/</span>
                 <span className="text-green-400 font-medium">R$ {resumo.alugueis.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">Energia:</span>
                 <span className="text-red-400 font-medium">R$ {resumo.energia.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                <span className="text-gray-500">/</span>
+                <span className="text-gray-400">/</span>
                 <span className="text-green-400 font-medium">R$ {resumo.energia.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">Água:</span>
                 <span className="text-red-400 font-medium">R$ {resumo.agua.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                <span className="text-gray-500">/</span>
+                <span className="text-gray-400">/</span>
                 <span className="text-green-400 font-medium">R$ {resumo.agua.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">Internet:</span>
                 <span className="text-red-400 font-medium">R$ {resumo.internet.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                <span className="text-gray-500">/</span>
+                <span className="text-gray-400">/</span>
                 <span className="text-green-400 font-medium">R$ {resumo.internet.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">Outros:</span>
                 <span className="text-red-400 font-medium">R$ {resumo.outros.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                <span className="text-gray-500">/</span>
+                <span className="text-gray-400">/</span>
                 <span className="text-green-400 font-medium">R$ {resumo.outros.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
               <div className="flex items-center gap-1 border-l border-gray-600 pl-3">
                 <span className="text-white font-bold">TOTAL:</span>
                 <span className="text-red-400 font-bold">R$ {resumo.total.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
-                <span className="text-gray-500">/</span>
+                <span className="text-gray-400">/</span>
                 <span className="text-green-400 font-bold">R$ {resumo.total.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
             </div>
           )}
         </div>
-        <div className="text-[10px] text-gray-500 mt-1">Vermelho = a pagar | Verde = pago | Filtro por data de pagamento &nbsp;—&nbsp; {total} registro{total !== 1 ? "s" : ""}</div>
+        <div className="text-[10px] text-gray-400 mt-1">Vermelho = a pagar | Verde = pago | Filtro por data de pagamento &nbsp;—&nbsp; {total} registro{total !== 1 ? "s" : ""}</div>
       </div>
 
       {totalPages > 1 && (
@@ -562,7 +562,7 @@ export default function PagamentosPage() {
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-12 text-gray-500">
+                <td colSpan={5} className="text-center py-12 text-gray-400">
                   Nenhum registro encontrado. Clique em "+ Novo Lançamento" para começar.
                 </td>
               </tr>
@@ -578,7 +578,7 @@ export default function PagamentosPage() {
                     }
                     {row.chaveJ && <span className="font-mono text-[10px] text-purple-300 font-semibold">{row.chaveJ}</span>}
                     {row.tipoPagto && <span className="text-[9px] px-1 py-0.5 rounded bg-gray-700 text-gray-300">{row.tipoPagto}</span>}
-                    {row.mesAno && <span className="text-[9px] text-gray-500">{row.mesAno}</span>}
+                    {row.mesAno && <span className="text-[9px] text-gray-400">{row.mesAno}</span>}
                   </div>
                   <div className="text-[11px] text-white font-medium truncate max-w-[200px]" title={row.nomeFavorecido ?? ""}>{row.nomeFavorecido || "-"}</div>
                   <div className="text-[10px] text-gray-400">{row.empresa || ""}{row.cidadeUF ? ` · ${row.cidadeUF}` : ""}</div>
@@ -587,7 +587,7 @@ export default function PagamentosPage() {
                 <td className="px-2 py-1.5 whitespace-nowrap text-[10px]">
                   <div className="text-gray-300">
                     {row.banco || "-"}{row.agencia ? ` · Ag ${row.agencia}` : ""}{row.conta ? ` · Cc ${row.conta}` : ""}
-                    {row.tipoConta && <span className="ml-1 text-gray-500">({row.tipoConta})</span>}
+                    {row.tipoConta && <span className="ml-1 text-gray-400">({row.tipoConta})</span>}
                   </div>
                   {row.cpfCnpj && <div className="text-gray-400 font-mono">{row.cpfCnpj}</div>}
                   {row.pix && (
@@ -642,7 +642,7 @@ export default function PagamentosPage() {
                       <span onClick={() => iniciarEdicaoDtPagto(row, i)}
                         className="cursor-pointer hover:bg-blue-900/40 rounded px-1 py-0.5 min-w-[6rem] inline-block border border-transparent hover:border-blue-600"
                         title="Clique para editar data de pagamento">
-                        Pagto: {row.dataPagto || <span className="text-gray-500 italic">DD/MM/AAAA</span>}
+                        Pagto: {row.dataPagto || <span className="text-gray-400 italic">DD/MM/AAAA</span>}
                       </span>
                     )}
                   </div>
@@ -652,7 +652,7 @@ export default function PagamentosPage() {
                         ? <span className="font-bold text-red-400">⚠ Vence: {row.dataVencer}</span>
                         : !row.pago && !row.dataPagto && isHoje(row.dataVencer)
                           ? <span className="font-bold text-yellow-300">🔔 Vence: {row.dataVencer}</span>
-                          : <span className="text-gray-500">Vence: {row.dataVencer}</span>
+                          : <span className="text-gray-400">Vence: {row.dataVencer}</span>
                       }
                     </div>
                   )}

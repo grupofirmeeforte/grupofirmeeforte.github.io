@@ -34,10 +34,6 @@ export default function MensagemHoroscopo() {
       <div className="shadow-lg" style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5986 60%, #c8960c 100%)' }}>
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <Star className="w-6 h-6 text-yellow-300 fill-yellow-300" />
-          <div>
-            <h1 className="text-xl font-bold text-white">Horóscopo do Dia</h1>
-            <p className="text-xs text-yellow-300 capitalize">{hoje}</p>
-          </div>
         </div>
       </div>
 
@@ -59,7 +55,7 @@ export default function MensagemHoroscopo() {
                     className={`flex flex-col items-center p-2 rounded-lg border-2 transition-all text-xs font-medium ${
                       signoSelecionado === signo
                         ? "border-yellow-500 bg-yellow-50 text-yellow-800"
-                        : "border-gray-200 hover:border-blue-300 text-slate-600"
+                        : "border-gray-700 hover:border-blue-300 text-slate-600"
                     }`}
                   >
                     <span className="text-xl">{SIGNO_EMOJIS[signo]}</span>

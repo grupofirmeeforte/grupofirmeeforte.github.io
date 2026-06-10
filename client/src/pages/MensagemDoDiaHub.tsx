@@ -446,7 +446,7 @@ function AbaOrixas() {
     <div className="max-w-2xl mx-auto py-8 space-y-6">
 
       {/* Seletor dos 10 Orixás */}
-      <div className="bg-white rounded-2xl shadow-md p-4">
+      <div className="bg-gray-900 rounded-2xl shadow-md p-4">
         <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 text-center">Escolha seu Orixá</p>
         <div className="grid grid-cols-5 gap-2">
           {ORIXAS_10.map((o, idx) => (
@@ -558,7 +558,7 @@ function AbaHoroscopo() {
                 {TODOS_SIGNOS.map((signo) => (
                   <button key={signo} onClick={() => { setSignoSelecionado(signo); setMostrarTodos(false); }}
                     className={`flex flex-col items-center p-2 rounded-lg border-2 transition-all text-xs font-medium ${
-                      signoSelecionado === signo ? "border-yellow-500 bg-yellow-50 text-yellow-800" : "border-gray-200 hover:border-blue-300 text-slate-600"
+                      signoSelecionado === signo ? "border-yellow-500 bg-yellow-50 text-yellow-800" : "border-gray-700 hover:border-blue-300 text-slate-600"
                     }`}>
                     <span className="text-xl">{SIGNO_EMOJIS[signo]}</span>
                     <span className="mt-1 leading-tight text-center">{signo}</span>
@@ -615,17 +615,13 @@ export default function MensagemDoDiaHub() {
   const hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950 text-white">
       <PageHeader title="Mensagem do Dia" />
 
       {/* Cabeçalho */}
-      <div className="bg-white border-b px-6 py-4">
-        <h1 className="text-2xl font-bold text-gray-900">Mensagem do Dia</h1>
-        <p className="text-sm text-gray-500 mt-0.5 capitalize">{abaInfo?.label} — {hoje}</p>
-      </div>
 
       {/* Navegação por abas */}
-      <div className="bg-white border-b px-6">
+      <div className="bg-gray-900 border-b border-gray-700 px-6">
         <div className="flex gap-1 overflow-x-auto">
           {ABAS.map(a => {
             const Icon = a.icon;
@@ -636,8 +632,8 @@ export default function MensagemDoDiaHub() {
                 onClick={() => setAba(a.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   ativa
-                    ? 'border-blue-600 text-blue-700 bg-blue-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-600 text-blue-700 bg-blue-900/20'
+                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />

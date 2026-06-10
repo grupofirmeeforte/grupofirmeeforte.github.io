@@ -235,24 +235,12 @@ export default function Seguros() {
   const totalPages = Math.ceil(total / LIMIT);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950 text-white">
       <PageHeader title="Seguros" />
       <div className="max-w-[1600px] mx-auto px-4 py-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <h1 className="text-2xl font-bold text-blue-900">Seguros — Apólices e Operações</h1>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => refetch()}>
-              <RefreshCw className="w-4 h-4 mr-1" /> Atualizar
-            </Button>
-            <Button size="sm" className="bg-blue-700 hover:bg-blue-800 text-white" onClick={() => fileRef.current?.click()}>
-              <Upload className="w-4 h-4 mr-1" /> Importar XLSX
-            </Button>
-            <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleFileChange} />
-          </div>
-        </div>
 
         {/* Filtros */}
-        <div className="flex flex-wrap gap-3 mb-4 bg-white rounded-lg p-3 shadow-sm border">
+        <div className="flex flex-wrap gap-3 mb-4 bg-gray-900 rounded-lg p-3 shadow-sm border">
           <div className="flex items-center gap-2 flex-1 min-w-[200px]">
             <Search className="w-4 h-4 text-gray-400" />
             <Input placeholder="Buscar contrato, agente, chave J..." value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} className="h-8" />
@@ -274,7 +262,7 @@ export default function Seguros() {
         </div>
 
         {/* Tabela */}
-        <div className="bg-white rounded-lg shadow border overflow-x-auto">
+        <div className="bg-gray-900 rounded-lg border border-gray-700 border overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-blue-800 text-white">
@@ -290,7 +278,7 @@ export default function Seguros() {
               ) : rows.length === 0 ? (
                 <tr><td colSpan={COLUNAS_SEGUROS.length + 1} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
               ) : rows.map((row, i) => (
-                <tr key={row.id} className={i % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}>
+                <tr key={row.id} className={i % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}>
                   {COLUNAS_SEGUROS.map(c => {
                     const val = (row as any)[c.field];
                     let display: string;
@@ -313,7 +301,7 @@ export default function Seguros() {
 
         {/* Paginação */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-3 text-sm text-gray-600">
+          <div className="flex items-center justify-between mt-3 text-sm text-gray-300">
             <span>{total} registros no total</span>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>Anterior</Button>
@@ -331,8 +319,8 @@ export default function Seguros() {
             <DialogTitle>Importar Seguros</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
-            <p className="text-sm text-gray-600">Arquivo: <strong>{importFileName}</strong></p>
-            <p className="text-sm text-gray-600">{importRows.length} registros encontrados</p>
+            <p className="text-sm text-gray-300">Arquivo: <strong>{importFileName}</strong></p>
+            <p className="text-sm text-gray-300">{importRows.length} registros encontrados</p>
             <div>
               <label className="text-sm font-medium">Modo de importação:</label>
               <Select value={importModo} onValueChange={v => setImportModo(v as any)}>
@@ -362,7 +350,7 @@ export default function Seguros() {
       <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Confirmar exclusão</DialogTitle></DialogHeader>
-          <p className="text-sm text-gray-600">Deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-300">Deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
             <Button variant="destructive" onClick={() => deleteId && excluirMut.mutate({ id: deleteId })}>Excluir</Button>

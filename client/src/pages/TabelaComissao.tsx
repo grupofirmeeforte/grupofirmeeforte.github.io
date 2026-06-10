@@ -405,7 +405,7 @@ export default function TabelaComissao() {
   };
 
   function getConvenioColor(convenio: string | null) {
-    if (!convenio) return { row: 'bg-white hover:bg-gray-50', badge: 'bg-gray-100 text-gray-700 border border-gray-300' };
+    if (!convenio) return { row: 'bg-white hover:bg-gray-800', badge: 'bg-gray-100 text-gray-200 border border-gray-300' };
     const upper = convenio.toUpperCase();
     for (const [key, val] of Object.entries(CONVENIO_COLORS)) {
       if (upper.includes(key)) return val;
@@ -589,49 +589,40 @@ export default function TabelaComissao() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <PageHeader title="Tabela Comissão" />
-      {/* Header */}
-      <div className="bg-white border-b shadow-sm px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div>
-            <h1 className="text-lg font-bold text-gray-800">Tabela de Comissão</h1>
-            <p className="text-xs text-gray-500">{filteredRows.length} registros</p>
-          </div>
-          <div className="ml-auto flex items-center gap-2">
-            {/* Exportar template */}
+    <div className="min-h-screen bg-gray-950 text-white">
+      <PageHeader title="Tabela Comissão" actions={
+        <div className="flex gap-2 items-center">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportarTemplate}
+            className="flex items-center gap-1 border-green-400 text-green-300 hover:bg-green-400/20 bg-transparent text-xs"
+          >
+            <Download className="w-3 h-3" /> Exportar Template
+          </Button>
+          <label className="cursor-pointer">
+            <input type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportarExcel} />
             <Button
               variant="outline"
-              onClick={handleExportarTemplate}
-              className="flex items-center gap-2 text-green-700 border-green-300 hover:bg-green-50"
-              title="Exportar tabela atual como Excel para edição em massa"
+              size="sm"
+              asChild
+              className="flex items-center gap-1 border-blue-400 text-blue-300 hover:bg-blue-400/20 bg-transparent text-xs"
             >
-              <Download className="w-4 h-4" /> Exportar Template
+              <span>
+                <Upload className="w-3 h-3" />
+                {importarLoteMutation.isPending ? 'Importando...' : 'Importar Excel'}
+              </span>
             </Button>
-            {/* Importar Excel */}
-            <label className="cursor-pointer">
-              <input type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportarExcel} />
-              <Button
-                variant="outline"
-                asChild
-                className="flex items-center gap-2 text-blue-700 border-blue-300 hover:bg-blue-50"
-                title="Importar planilha editada de volta para o sistema"
-              >
-                <span>
-                  <Upload className="w-4 h-4" />
-                  {importarLoteMutation.isPending ? 'Importando...' : 'Importar Excel'}
-                </span>
-              </Button>
-            </label>
-            <Button onClick={openNovo} className="flex items-center gap-2" style={{ backgroundColor: '#002776' }}>
-              <Plus className="w-4 h-4" /> Novo
-            </Button>
-          </div>
+          </label>
+          <Button size="sm" onClick={openNovo} className="flex items-center gap-1 bg-blue-700 hover:bg-blue-600 text-white text-xs">
+            <Plus className="w-3 h-3" /> Novo
+          </Button>
         </div>
-      </div>
+      } />
+      <div className="px-6 py-1 text-xs text-gray-400">{filteredRows.length} registros</div>
 
       {/* Valores para Cálculo por Nível - Compacto — só para admin/CEO */}
-      {isAdminOuCeo && <div className="px-4 py-2 bg-blue-50 border-b">
+      {isAdminOuCeo && <div className="px-4 py-2 bg-gray-900 border-b border-gray-700">
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-semibold text-blue-800">Níveis:</span>
           <Button
@@ -648,7 +639,7 @@ export default function TabelaComissao() {
             const keyDe = `${nivel}De`;
             const keyAte = `${nivel}Ate`;
             return (
-              <div key={nivel} className="bg-white rounded border border-blue-200 px-1 py-0.5">
+              <div key={nivel} className="bg-gray-900 rounded border border-blue-200 px-1 py-0.5">
                 <div className="text-[9px] font-bold text-blue-700 text-center leading-tight">{nivel.replace('Ativo0', '').replace('Ativo', '')}</div>
                 <div className="flex gap-0.5">
                   <input
@@ -657,7 +648,7 @@ export default function TabelaComissao() {
                     value={valoresAtivos[keyDe] || ''}
                     onChange={(e) => setValoresAtivos(prev => ({ ...prev, [keyDe]: e.target.value }))}
                     placeholder="De"
-                    className="w-full px-0.5 py-0 border border-gray-200 rounded text-right text-[9px] focus:outline-none focus:ring-1 focus:ring-blue-400 h-4"
+                    className="w-full px-0.5 py-0 border border-gray-700 rounded text-right text-[9px] focus:outline-none focus:ring-1 focus:ring-blue-400 h-4"
                   />
                   <input
                     type="number"
@@ -665,7 +656,7 @@ export default function TabelaComissao() {
                     value={valoresAtivos[keyAte] || ''}
                     onChange={(e) => setValoresAtivos(prev => ({ ...prev, [keyAte]: e.target.value }))}
                     placeholder="Até"
-                    className="w-full px-0.5 py-0 border border-gray-200 rounded text-right text-[9px] focus:outline-none focus:ring-1 focus:ring-blue-400 h-4"
+                    className="w-full px-0.5 py-0 border border-gray-700 rounded text-right text-[9px] focus:outline-none focus:ring-1 focus:ring-blue-400 h-4"
                   />
                 </div>
               </div>
@@ -675,7 +666,7 @@ export default function TabelaComissao() {
       </div>}
 
       {/* Filtros */}
-      <div className="px-6 py-4 bg-white border-b">
+      <div className="px-6 py-4 bg-gray-900 border-b border-gray-700">
         <div className="flex flex-wrap gap-3 items-center">
           <div className="flex items-center gap-2 flex-1 min-w-[200px]">
             <Search className="w-4 h-4 text-gray-400" />
@@ -686,7 +677,7 @@ export default function TabelaComissao() {
               className="max-w-xs"
             />
             {busca && (
-              <button onClick={() => setBusca('')} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setBusca('')} className="text-gray-400 hover:text-gray-300">
                 <X className="w-4 h-4" />
               </button>
             )}
@@ -729,29 +720,29 @@ export default function TabelaComissao() {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowColSelector(v => !v)}
-                className="gap-1.5 border-blue-300 text-blue-700 hover:bg-blue-50"
+                className="gap-1.5 border-blue-300 text-blue-700 hover:bg-blue-900/30"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" /></svg>
                 Colunas ({colsVisiveis.length}/{ALL_ATIVOS.length})
               </Button>
               {showColSelector && (
-                <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-3 w-52">
+                <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-700 rounded-xl shadow-xl p-3 w-52">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Ativos visíveis</span>
-                    <button onClick={() => setShowColSelector(false)} className="text-gray-400 hover:text-gray-600">
+                    <span className="text-xs font-semibold text-gray-300 uppercase tracking-wide">Ativos visíveis</span>
+                    <button onClick={() => setShowColSelector(false)} className="text-gray-400 hover:text-gray-300">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                   <div className="space-y-1">
                     {ALL_ATIVOS.map((col, i) => (
-                      <label key={col} className="flex items-center gap-2 cursor-pointer hover:bg-blue-50 rounded px-1.5 py-1">
+                      <label key={col} className="flex items-center gap-2 cursor-pointer hover:bg-blue-900/30 rounded px-1.5 py-1">
                         <input
                           type="checkbox"
                           checked={colsVisiveis.includes(col)}
                           onChange={() => toggleCol(col)}
                           className="accent-blue-600"
                         />
-                        <span className="text-sm text-gray-700">Ativo {String(i + 1).padStart(2, '0')}</span>
+                        <span className="text-sm text-gray-200">Ativo {String(i + 1).padStart(2, '0')}</span>
                       </label>
                     ))}
                   </div>
@@ -769,7 +760,7 @@ export default function TabelaComissao() {
 
       {/* Info — só para admin */}
       {isAdminOuCeo && (
-        <div className="px-6 py-2 bg-blue-50 border-b text-xs text-blue-700">
+        <div className="px-6 py-2 bg-blue-900/20 border-b text-xs text-blue-700">
           💡 Clique em qualquer célula para editar. Pressione Enter para salvar ou Escape para cancelar.
         </div>
       )}
@@ -839,9 +830,9 @@ export default function TabelaComissao() {
               </thead>
               <tbody>
                 {isLoading ? (
-                  <tr><td colSpan={isAdminOuCeo ? 13 : ativoAgente ? 4 : 2} className="text-center py-8 text-gray-500">Carregando...</td></tr>
+                  <tr><td colSpan={isAdminOuCeo ? 13 : ativoAgente ? 4 : 2} className="text-center py-8 text-gray-400">Carregando...</td></tr>
                 ) : filteredRows.length === 0 ? (
-                  <tr><td colSpan={isAdminOuCeo ? 13 : ativoAgente ? 4 : 2} className="text-center py-8 text-gray-500">Nenhum registro encontrado</td></tr>
+                  <tr><td colSpan={isAdminOuCeo ? 13 : ativoAgente ? 4 : 2} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
                 ) : (
                   filteredRows.map((row, rowIdx) => {
                     const convColor = getConvenioColor(row.convenio);
@@ -864,7 +855,7 @@ export default function TabelaComissao() {
                                     renderDisplay={(val) => eStyle ? (
                                       <span className={`inline-block px-2 py-0.5 rounded font-bold text-xs cursor-pointer ${eStyle.bg} ${eStyle.text} border ${eStyle.border}`} title="Clique para editar">{val || '-'}</span>
                                     ) : (
-                                      <span className="font-medium text-gray-800 cursor-pointer hover:underline" title="Clique para editar">{val || '-'}</span>
+                                      <span className="font-medium text-white cursor-pointer hover:underline" title="Clique para editar">{val || '-'}</span>
                                     )}
                                   />
                                 );
@@ -877,7 +868,7 @@ export default function TabelaComissao() {
                                     {row.empresa}
                                   </span>
                                 ) : (
-                                  <span className="font-medium text-gray-800">{row.empresa || '-'}</span>
+                                  <span className="font-medium text-white">{row.empresa || '-'}</span>
                                 );
                               })()
                             )}
@@ -965,11 +956,11 @@ export default function TabelaComissao() {
                           <div className="flex items-center gap-1 mb-0.5">
                             <span className="text-gray-400 text-xs">Mín:</span>
                             {isAdminOuCeo ? (
-                              <span className="text-xs text-gray-600">
+                              <span className="text-xs text-gray-300">
                                 <EditableCell value={row.valorMinimo} onSave={(v) => handleCellSave(row.id, 'valorMinimo', v)} isSaving={savingCell === `${row.id}-valorMinimo`} />
                               </span>
                             ) : (
-                              <span className="text-xs text-gray-600">{row.valorMinimo || '-'}</span>
+                              <span className="text-xs text-gray-300">{row.valorMinimo || '-'}</span>
                             )}
                           </div>
                           {/* Prazo */}
@@ -1002,7 +993,7 @@ export default function TabelaComissao() {
                           </>
                         ) : ativoAgente ? (
                           <>
-                            <td className="px-3 py-2 font-semibold text-gray-800 whitespace-nowrap">
+                            <td className="px-3 py-2 font-semibold text-white whitespace-nowrap">
                               {row.empresa || '-'}
                             </td>
                             <td className="px-3 py-1.5 text-center font-bold whitespace-nowrap text-base" style={{color: (row as any)[ativoAgente] ? '#1d4ed8' : '#9ca3af'}}>
@@ -1014,7 +1005,7 @@ export default function TabelaComissao() {
                         {isAdminOuCeo && (
                           <td className="px-3 py-1.5 text-center whitespace-nowrap">
                             <div className="flex items-center justify-center gap-1">
-                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-50" onClick={() => openEditar(row as TabelaRow)} title="Editar tudo">
+                              <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-blue-600 hover:text-blue-800 hover:bg-blue-900/30" onClick={() => openEditar(row as TabelaRow)} title="Editar tudo">
                                 <Pencil className="w-3.5 h-3.5" />
                               </Button>
                               <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => setDeleteId(row.id)} title="Excluir">
@@ -1042,48 +1033,48 @@ export default function TabelaComissao() {
 
           <div className="grid grid-cols-2 gap-4 py-2">
              <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Empresa</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Empresa</label>
               <Input value={form.empresa || ''} onChange={e => setField('empresa', e.target.value)} placeholder="BMF, FLEX..." />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Código <span className="text-gray-400 text-xs">(até 5 códigos separados por /)</span></label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Código <span className="text-gray-400 text-xs">(até 5 códigos separados por /)</span></label>
               <Input value={form.codigo || ''} onChange={e => setField('codigo', e.target.value.slice(0,24))} placeholder="2880/2881/2882" maxLength={24} />
             </div>
             <div className="col-span-2">
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Convênio</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Convênio</label>
               <Input value={form.convenio || ''} onChange={e => setField('convenio', e.target.value)} placeholder="CONSIGNADO INSS, FEDERAL..." />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Tx Juros De</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Tx Juros De</label>
               <Input value={form.txJurosDe || ''} onChange={e => setField('txJurosDe', e.target.value)} placeholder="0.0185" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Tx Juros Até</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Tx Juros Até</label>
               <Input value={form.txJurosAte || ''} onChange={e => setField('txJurosAte', e.target.value)} placeholder="acima ou 0.0199" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Valor Mínimo</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Valor Mínimo</label>
               <Input value={form.valorMinimo || ''} onChange={e => setField('valorMinimo', e.target.value)} placeholder=">=$1.000,00" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Meses De</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Meses De</label>
               <Input value={form.mesesDe || ''} onChange={e => setField('mesesDe', e.target.value)} placeholder="48" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 block">Meses Até</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Meses Até</label>
               <Input value={form.mesesAte || ''} onChange={e => setField('mesesAte', e.target.value)} placeholder="60" />
             </div>
 
             <div className="col-span-2">
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Valores dos Ativos</label>
+              <label className="text-sm font-medium text-gray-200 mb-2 block">Valores dos Ativos</label>
               <div className="grid grid-cols-5 gap-2">
                 {['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10', 'ativo11', 'ativo12', 'ativo13', 'ativo14', 'ativo15', 'ativo16', 'ativo17', 'ativo18', 'ativo19', 'ativo20'].map((key) => (
                   <div key={key}>
-                    <label className="text-xs font-medium text-gray-600 mb-1 block">{key.replace('ativo', 'Ativo ')}</label>
+                    <label className="text-xs font-medium text-gray-300 mb-1 block">{key.replace('ativo', 'Ativo ')}</label>
                     <Input value={form[key as keyof FormData] || ''} onChange={e => setField(key as keyof FormData, e.target.value)} placeholder="0.0065" />
                   </div>
                 ))}

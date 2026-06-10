@@ -51,43 +51,13 @@ export default function RelatorioRBMDespesas() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <PageHeader title="Relatório RBM Despesas" />
-
-      {/* Barra de filtros */}
-      <div className="bg-white border-b border-gray-200 px-4 py-2 flex flex-wrap items-center gap-3">
-        <div>
-          <span className="text-sm font-bold text-gray-800">Relatório RBM × Despesas</span>
-          <span className="ml-2 text-xs text-gray-400">{data.length} registro(s)</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 ml-auto">
-          <div className="flex items-center gap-1">
-            <label className="text-xs text-gray-500">Ano</label>
-            <select value={ano} onChange={e=>setAno(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-xs">
-              {anosDisponiveis.map(a=><option key={a} value={a!}>{a}</option>)}
-            </select>
-          </div>
-          <div className="flex items-center gap-1">
-            <label className="text-xs text-gray-500">Mês</label>
-            <select value={mes} onChange={e=>setMes(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-xs">
-              <option value="">Todos</option>
-              {["01","02","03","04","05","06","07","08","09","10","11","12"].map(m=>(
-                <option key={m} value={m}>{new Date(2000,parseInt(m)-1,1).toLocaleString('pt-BR',{month:'short'}).replace(/^./,c=>c.toUpperCase()).replace('.','')}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center gap-1">
-            <label className="text-xs text-gray-500">Empresa</label>
-            <select value={empresa} onChange={e=>setEmpresa(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-xs">
-              <option value="Todas">Todas</option>
-              <option value="BMF">BMF</option>
-              <option value="FLEX">FLEX</option>
-            </select>
-          </div>
-          <Button onClick={exportarCSV} variant="outline" size="sm" className="gap-1 text-xs h-7">
+      <PageHeader title="Relatório RBM Despesas" actions={
+        <div className="flex gap-1.5 items-center flex-wrap">
+          <Button onClick={exportarCSV} variant="outline" size="sm" className="gap-1 text-[10px] h-6">
             <Download className="w-3 h-3"/> CSV
           </Button>
         </div>
-      </div>
+      } />
 
       {/* Conteúdo */}
       <div className="px-3 py-3">
@@ -103,15 +73,15 @@ export default function RelatorioRBMDespesas() {
                 const pctAlto = r.pctConsumido >= 100;
                 const pctMedio = r.pctConsumido >= 70 && r.pctConsumido < 100;
                 return (
-                  <div key={`${r.chaveJ}-${r.empresa}`} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div key={`${r.chaveJ}-${r.empresa}`} className="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
                     {/* Cabeçalho do card */}
                     <div className="flex items-start justify-between px-3 py-2 border-b border-gray-100">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className={`shrink-0 px-2 py-0.5 rounded text-xs font-bold ${r.empresa==='BMF'?'bg-green-100 text-green-800':r.empresa==='FLEX'?'bg-blue-100 text-blue-800':'bg-gray-100 text-gray-700'}`}>
+                        <span className={`shrink-0 px-2 py-0.5 rounded text-xs font-bold ${r.empresa==='BMF'?'bg-green-100 text-green-800':r.empresa==='FLEX'?'bg-blue-100 text-blue-800':'bg-gray-100 text-gray-200'}`}>
                           {r.empresa}
                         </span>
                         <div className="min-w-0">
-                          <div className="font-semibold text-gray-800 text-sm truncate">{r.nomeAgente || r.chaveJ}</div>
+                          <div className="font-semibold text-white text-sm truncate">{r.nomeAgente || r.chaveJ}</div>
                           <div className="text-xs text-gray-400">{r.chaveJ} · {r.cidade || "-"}{r.nAgentesNaCidade > 1 && <span className="text-orange-500"> ÷{r.nAgentesNaCidade}</span>} · {r.meses} {r.meses === 1 ? "mês" : "meses"}</div>
                         </div>
                       </div>
@@ -128,11 +98,11 @@ export default function RelatorioRBMDespesas() {
                       <div className="px-3 py-2">
                         <div className="text-[10px] text-gray-400 font-medium mb-1 uppercase tracking-wide">RBM</div>
                         <div className="font-bold text-blue-800 text-sm">{fmtBRL(r.rbmTotal)}</div>
-                        {r.rbmConsig > 0 && <div className="text-gray-500 mt-0.5">Consig: <span className="text-blue-600">{fmtBRL(r.rbmConsig)}</span></div>}
-                        {r.rbmCC > 0 && <div className="text-gray-500">C/C: <span className="text-blue-600">{fmtBRL(r.rbmCC)}</span></div>}
-                        {r.rbmConsorcio > 0 && <div className="text-gray-500">Consórc: <span className="text-blue-600">{fmtBRL(r.rbmConsorcio)}</span></div>}
-                        {r.rbmOurocap > 0 && <div className="text-gray-500">Ouro: <span className="text-blue-600">{fmtBRL(r.rbmOurocap)}</span></div>}
-                        {r.rbmSeguros > 0 && <div className="text-gray-500">Seg: <span className="text-blue-600">{fmtBRL(r.rbmSeguros)}</span></div>}
+                        {r.rbmConsig > 0 && <div className="text-gray-400 mt-0.5">Consig: <span className="text-blue-600">{fmtBRL(r.rbmConsig)}</span></div>}
+                        {r.rbmCC > 0 && <div className="text-gray-400">C/C: <span className="text-blue-600">{fmtBRL(r.rbmCC)}</span></div>}
+                        {r.rbmConsorcio > 0 && <div className="text-gray-400">Consórc: <span className="text-blue-600">{fmtBRL(r.rbmConsorcio)}</span></div>}
+                        {r.rbmOurocap > 0 && <div className="text-gray-400">Ouro: <span className="text-blue-600">{fmtBRL(r.rbmOurocap)}</span></div>}
+                        {r.rbmSeguros > 0 && <div className="text-gray-400">Seg: <span className="text-blue-600">{fmtBRL(r.rbmSeguros)}</span></div>}
                       </div>
 
                       {/* Comissões */}
@@ -145,9 +115,9 @@ export default function RelatorioRBMDespesas() {
                       <div className="px-3 py-2">
                         <div className="text-[10px] text-gray-400 font-medium mb-1 uppercase tracking-wide">Despesas</div>
                         <div className={`font-bold text-sm ${r.totalDesp > 0 ? "text-orange-700" : "text-gray-400"}`}>{fmtBRL(r.totalDesp)}</div>
-                        {r.totalDespFixas > 0 && <div className="text-gray-500 mt-0.5">Fixas: <span className="text-orange-600">{fmtBRL(r.totalDespFixas)}</span></div>}
-                        {r.totalDespAvulsas > 0 && <div className="text-gray-500">Avulsas: <span className="text-orange-600">{fmtBRL(r.totalDespAvulsas)}</span></div>}
-                        <div className={`mt-1 text-xs font-semibold ${pctAlto ? "text-red-600" : pctMedio ? "text-orange-500" : "text-gray-500"}`}>
+                        {r.totalDespFixas > 0 && <div className="text-gray-400 mt-0.5">Fixas: <span className="text-orange-600">{fmtBRL(r.totalDespFixas)}</span></div>}
+                        {r.totalDespAvulsas > 0 && <div className="text-gray-400">Avulsas: <span className="text-orange-600">{fmtBRL(r.totalDespAvulsas)}</span></div>}
+                        <div className={`mt-1 text-xs font-semibold ${pctAlto ? "text-red-600" : pctMedio ? "text-orange-500" : "text-gray-400"}`}>
                           {fmtPct(r.pctConsumido)} consumido
                         </div>
                       </div>

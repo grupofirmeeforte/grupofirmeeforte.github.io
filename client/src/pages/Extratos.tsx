@@ -25,7 +25,7 @@ function BuscaAgentesSugestoes({ termo, onSelect }: {
 
   if (isLoading) {
     return (
-      <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-md shadow-lg mt-1 p-2 text-xs text-gray-500">
+      <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-700 rounded-md shadow-lg mt-1 p-2 text-xs text-gray-400">
         Buscando...
       </div>
     );
@@ -34,16 +34,16 @@ function BuscaAgentesSugestoes({ termo, onSelect }: {
   if (!data || data.length === 0) return null;
 
   return (
-    <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
+    <div className="absolute top-full left-0 right-0 z-50 bg-white border border-gray-700 rounded-md shadow-lg mt-1 max-h-48 overflow-y-auto">
       {data.map((ag: any) => (
         <button
           key={ag.id}
           type="button"
-          className="w-full text-left px-3 py-2 text-sm hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100 last:border-0"
+          className="w-full text-left px-3 py-2 text-sm hover:bg-blue-900/30 flex items-center gap-2 border-b border-gray-100 last:border-0"
           onMouseDown={e => { e.preventDefault(); onSelect(ag.chaveJ ?? '', ag.nomeAgente ?? ''); }}
         >
           <span className="font-medium text-blue-700 shrink-0">{ag.chaveJ}</span>
-          <span className="text-gray-700 truncate">{ag.nomeAgente}</span>
+          <span className="text-gray-200 truncate">{ag.nomeAgente}</span>
           {ag.empresa && <span className="text-xs text-gray-400 ml-auto shrink-0">{ag.empresa}</span>}
         </button>
       ))}
@@ -73,7 +73,7 @@ function PainelIdentificacao({ chaveJ, nomeAgente, mesRef }: {
 }) {
   return (
     <div className="grid grid-cols-3 gap-4 mb-6">
-      <Card className="border-blue-100 bg-blue-50">
+      <Card className="border-blue-100 bg-blue-900/20">
         <CardContent className="flex items-center gap-3 py-4">
           <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
             <Key className="w-5 h-5 text-white" />
@@ -160,7 +160,7 @@ function PainelFiltros({ filtroChaveJ, setFiltroChaveJ, filtroNome, setFiltroNom
                   onMouseDown={() => handleSelecionarAgente(s.nomeAgente ?? '', s.chaveJ ?? '')}
                   className="w-full text-left px-3 py-2 hover:bg-indigo-50 text-sm border-b last:border-b-0"
                 >
-                  <span className="font-medium text-gray-800">{s.nomeAgente}</span>
+                  <span className="font-medium text-white">{s.nomeAgente}</span>
                   <span className="ml-2 text-xs text-indigo-500 font-mono">{s.chaveJ}</span>
                 </button>
               ))}
@@ -238,7 +238,7 @@ function ExtratoConsignado() {
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
             <FileText className="w-12 h-12 text-gray-300" />
-            <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+            <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
             <p className="text-gray-400 text-sm">Verifique se há produção importada para o mês de referência.</p>
           </CardContent>
         </Card>
@@ -248,31 +248,31 @@ function ExtratoConsignado() {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-gray-50">
-                    <TableHead className="font-semibold text-gray-700">Nome</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Nº Operação</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-center">Parcelas</TableHead>
-                    <TableHead className="font-semibold text-gray-700">Convênio</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-right">Juros</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-right">Valor Líquido</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-right">Percentual</TableHead>
-                    <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                  <TableRow className="bg-gray-800">
+                    <TableHead className="font-semibold text-gray-200">Nome</TableHead>
+                    <TableHead className="font-semibold text-gray-200">Nº Operação</TableHead>
+                    <TableHead className="font-semibold text-gray-200 text-center">Parcelas</TableHead>
+                    <TableHead className="font-semibold text-gray-200">Convênio</TableHead>
+                    <TableHead className="font-semibold text-gray-200 text-right">Juros</TableHead>
+                    <TableHead className="font-semibold text-gray-200 text-right">Valor Líquido</TableHead>
+                    <TableHead className="font-semibold text-gray-200 text-right">Percentual</TableHead>
+                    <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {(rows as any[]).map((row: any, rowIdx: number) => (
-                    <TableRow key={row.id} className={rowIdx % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}>
+                    <TableRow key={row.id} className={rowIdx % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}>
                       <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
-                      <TableCell className="text-gray-700 font-mono text-sm">{row.nrOperacao || '—'}</TableCell>
+                      <TableCell className="text-gray-200 font-mono text-sm">{row.nrOperacao || '—'}</TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className="text-xs">
                           {row.parcelas ?? '—'}x
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-gray-700 text-sm">{row.descricaoProduto || row.convenio || '—'}</TableCell>
-                      <TableCell className="text-right text-gray-700">{fmtPct(row.juros)}</TableCell>
+                      <TableCell className="text-gray-200 text-sm">{row.descricaoProduto || row.convenio || '—'}</TableCell>
+                      <TableCell className="text-right text-gray-200">{fmtPct(row.juros)}</TableCell>
                       <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.valorLiquido ?? 0)))}</TableCell>
-                      <TableCell className="text-right text-gray-700">{fmtPct(row.percentual)}</TableCell>
+                      <TableCell className="text-right text-gray-200">{fmtPct(row.percentual)}</TableCell>
                       <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                     </TableRow>
                   ))}
@@ -280,8 +280,8 @@ function ExtratoConsignado() {
               </Table>
             </div>
             {/* Rodapé com totais */}
-            <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-gray-500">{rows.length} operação(ões)</span>
+            <div className="border-t bg-gray-800 px-4 py-3 flex items-center justify-between">
+              <span className="text-sm text-gray-400">{rows.length} operação(ões)</span>
               <div className="flex gap-6">
                 <div className="text-right">
                   <p className="text-xs text-gray-400">Total Valor Líquido</p>
@@ -427,7 +427,7 @@ function PerspectivadeGanho() {
 
       {/* Campo de busca por nome ou ChaveJ — apenas CEO/Admin */}
       {isCeoOuAdmin && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="mb-4 p-3 bg-blue-900/20 border border-blue-200 rounded-lg">
           <div className="flex items-center gap-2">
             <Search className="w-4 h-4 text-blue-500 shrink-0" />
             <div className="relative flex-1 max-w-sm">
@@ -526,7 +526,7 @@ function PerspectivadeGanho() {
       </div>
 
       {/* Nota de edição */}
-      <div className="mb-3 text-xs text-gray-500 flex items-center gap-1">
+      <div className="mb-3 text-xs text-gray-400 flex items-center gap-1">
         <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" />
         Clique no badge de situação de qualquer contrato para alterar manualmente.
       </div>
@@ -537,17 +537,17 @@ function PerspectivadeGanho() {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Proposta</TableHead>
-                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Data</TableHead>
-                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Cliente / CPF</TableHead>
-                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Situação</TableHead>
-                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Produto</TableHead>
-                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-right">Taxa</TableHead>
-                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-right">Prazo</TableHead>
-                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-right">Valor</TableHead>
-                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide text-center">Fontes</TableHead>
-                  <TableHead className="font-semibold text-gray-700 uppercase text-xs tracking-wide">Telefone</TableHead>
+                <TableRow className="bg-gray-800">
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Data</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Cliente / CPF</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Situação</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Taxa</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Prazo</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Valor</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-center">Fontes</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Telefone</TableHead>
                   <TableHead className="font-semibold text-amber-600 uppercase text-xs tracking-wide text-right bg-amber-50">% / Comissão</TableHead>
                 </TableRow>
               </TableHeader>
@@ -566,14 +566,14 @@ function PerspectivadeGanho() {
                   </TableRow>
                 ) : (
                   (rows as any[]).map((row: any, rowIdx: number) => (
-                    <TableRow key={row.id} className={rowIdx % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-blue-50/30 hover:bg-blue-100/40'}>
-                      <TableCell className="font-mono text-sm font-medium text-gray-800">{row.proposta || '—'}</TableCell>
-                      <TableCell className="text-xs text-gray-600 whitespace-nowrap">
+                    <TableRow key={row.id} className={rowIdx % 2 === 0 ? 'bg-white hover:bg-blue-900/30' : 'bg-blue-900/20/30 hover:bg-blue-100/40'}>
+                      <TableCell className="font-mono text-sm font-medium text-white">{row.proposta || '—'}</TableCell>
+                      <TableCell className="text-xs text-gray-300 whitespace-nowrap">
                         {row.solicitacao || '—'}
                       </TableCell>
                       <TableCell className="text-sm">
-                        <div className="font-medium text-gray-800">{row.nomeCliente || '—'}</div>
-                        {row.cpfCliente && <div className="text-xs text-gray-500 font-mono">{row.cpfCliente}</div>}
+                        <div className="font-medium text-white">{row.nomeCliente || '—'}</div>
+                        {row.cpfCliente && <div className="text-xs text-gray-400 font-mono">{row.cpfCliente}</div>}
                       </TableCell>
                       <TableCell>
                         {/* Edição inline de situação */}
@@ -597,7 +597,7 @@ function PerspectivadeGanho() {
                             >OK</button>
                             <button
                               onClick={() => setEditandoSituacaoId(null)}
-                              className="text-xs bg-gray-400 text-white px-1.5 py-0.5 rounded hover:bg-gray-500"
+                              className="text-xs bg-gray-400 text-white px-1.5 py-0.5 rounded hover:bg-gray-8000"
                             >X</button>
                           </div>
                         ) : (
@@ -618,13 +618,13 @@ function PerspectivadeGanho() {
                           </button>
                         )}
                       </TableCell>
-                      <TableCell className="text-xs text-gray-600 max-w-[130px] truncate" title={row.produtoConsig ?? row.linha ?? ''}>
+                      <TableCell className="text-xs text-gray-300 max-w-[130px] truncate" title={row.produtoConsig ?? row.linha ?? ''}>
                         <span className="text-blue-600 font-medium">{row.produtoConsig || row.linha || '—'}</span>
                       </TableCell>
-                      <TableCell className="text-right text-sm text-gray-700">
+                      <TableCell className="text-right text-sm text-gray-200">
                         {row.taxaJuros > 0 ? fmtPct(row.taxaJuros) : '—'}
                       </TableCell>
-                      <TableCell className="text-right text-sm text-gray-700">
+                      <TableCell className="text-right text-sm text-gray-200">
                         {row.prazoMeses > 0 ? `${row.prazoMeses}x` : (row.prazo || '—')}
                       </TableCell>
                       <TableCell className="text-right font-semibold text-blue-700">
@@ -658,7 +658,7 @@ function PerspectivadeGanho() {
                             >OK</button>
                             <button
                               onClick={() => setEditandoTelefoneId(null)}
-                              className="text-xs bg-gray-400 text-white px-1.5 py-0.5 rounded hover:bg-gray-500"
+                              className="text-xs bg-gray-400 text-white px-1.5 py-0.5 rounded hover:bg-gray-8000"
                             >X</button>
                           </div>
                         ) : (
@@ -698,9 +698,9 @@ function PerspectivadeGanho() {
             </Table>
           </div>
           {/* Rodapé com totais */}
-          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
+          <div className="border-t bg-gray-800 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-500">{rows.length} contrato(s)</span>
+              <span className="text-sm text-gray-400">{rows.length} contrato(s)</span>
               {periodoInicio && <span className="text-xs text-indigo-600">{periodoInicio} → {periodoFim}</span>}
               <span className="text-xs text-green-600 font-medium">{totalContratadas} contratada(s)</span>
               {ativoCol && <span className="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-medium">{ativoCol.replace('ativo', 'Ativo ')}</span>}
@@ -752,25 +752,25 @@ function ExtratoCC() {
       ) : rows.length === 0 ? (
         <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
           <CreditCard className="w-12 h-12 text-gray-300" />
-          <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+          <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
         </CardContent></Card>
       ) : (
         <Card><CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead className="font-semibold text-gray-700">Agência</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Chave J</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Nome</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                <TableRow className="bg-gray-800">
+                  <TableHead className="font-semibold text-gray-200">Agência</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Chave J</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
-                  <TableRow key={row.id} className="hover:bg-gray-50">
-                    <TableCell className="text-gray-700">{row.agencia || '—'}</TableCell>
-                    <TableCell className="font-mono text-sm text-gray-700">{row.chaveJ || '—'}</TableCell>
+                  <TableRow key={row.id} className="hover:bg-gray-800">
+                    <TableCell className="text-gray-200">{row.agencia || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-200">{row.chaveJ || '—'}</TableCell>
                     <TableCell className="font-medium text-gray-900">{row.nome || '—'}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                   </TableRow>
@@ -778,8 +778,8 @@ function ExtratoCC() {
               </TableBody>
             </Table>
           </div>
-          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-gray-500">{rows.length} registro(s)</span>
+          <div className="border-t bg-gray-800 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-400">{rows.length} registro(s)</span>
             <div className="text-right">
               <p className="text-xs text-gray-400">Total Comissão</p>
               <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
@@ -823,33 +823,33 @@ function ExtratoConsorcio() {
       ) : rows.length === 0 ? (
         <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
           <Users className="w-12 h-12 text-gray-300" />
-          <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+          <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
         </CardContent></Card>
       ) : (
         <Card><CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50">
-                  {isAdminOuSuporte && <TableHead className="font-semibold text-gray-700">Agente</TableHead>}
-                  <TableHead className="font-semibold text-gray-700">Proposta</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Empresa</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-center">Parc. Liberada</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Segmento</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-right">Valor Bem</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                <TableRow className="bg-gray-800">
+                  {isAdminOuSuporte && <TableHead className="font-semibold text-gray-200">Agente</TableHead>}
+                  <TableHead className="font-semibold text-gray-200">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Empresa</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-center">Parc. Liberada</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Segmento</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Valor Bem</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
-                  <TableRow key={row.id} className="hover:bg-gray-50">
-                    {isAdminOuSuporte && <TableCell className="text-sm font-medium text-gray-800">{row.nomeAgente || '—'}</TableCell>}
-                    <TableCell className="font-mono text-sm text-gray-700">{row.proposta || '—'}</TableCell>
-                    <TableCell className="text-sm text-gray-600">{row.empresa || '—'}</TableCell>
+                  <TableRow key={row.id} className="hover:bg-gray-800">
+                    {isAdminOuSuporte && <TableCell className="text-sm font-medium text-white">{row.nomeAgente || '—'}</TableCell>}
+                    <TableCell className="font-mono text-sm text-gray-200">{row.proposta || '—'}</TableCell>
+                    <TableCell className="text-sm text-gray-300">{row.empresa || '—'}</TableCell>
                     <TableCell className="text-center">
                       <Badge variant="outline" className="text-xs">{row.parcLiberada ?? '—'}</Badge>
                     </TableCell>
-                    <TableCell className="text-gray-700 text-sm">{row.segmento || '—'}</TableCell>
+                    <TableCell className="text-gray-200 text-sm">{row.segmento || '—'}</TableCell>
                     <TableCell className="text-right text-blue-700 font-semibold">{fmtNum(row.valorBem)}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                   </TableRow>
@@ -857,8 +857,8 @@ function ExtratoConsorcio() {
               </TableBody>
             </Table>
           </div>
-          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-gray-500">{rows.length} operação(ões)</span>
+          <div className="border-t bg-gray-800 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-400">{rows.length} operação(ões)</span>
             <div className="text-right">
               <p className="text-xs text-gray-400">Total Comissão</p>
               <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
@@ -902,23 +902,23 @@ function ExtratoOurocap() {
       ) : rows.length === 0 ? (
         <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
           <Star className="w-12 h-12 text-gray-300" />
-          <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+          <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
         </CardContent></Card>
       ) : (
         <Card><CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead className="font-semibold text-gray-700">Nº Operação</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-right">Valor Líquido</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                <TableRow className="bg-gray-800">
+                  <TableHead className="font-semibold text-gray-200">Nº Operação</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Valor Líquido</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
-                  <TableRow key={row.id} className="hover:bg-gray-50">
-                    <TableCell className="font-mono text-sm text-gray-700">{row.nrOperacao || '—'}</TableCell>
+                  <TableRow key={row.id} className="hover:bg-gray-800">
+                    <TableCell className="font-mono text-sm text-gray-200">{row.nrOperacao || '—'}</TableCell>
                     <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.valorLiquido ?? 0)))}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                   </TableRow>
@@ -926,8 +926,8 @@ function ExtratoOurocap() {
               </TableBody>
             </Table>
           </div>
-          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-gray-500">{rows.length} operação(ões)</span>
+          <div className="border-t bg-gray-800 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-400">{rows.length} operação(ões)</span>
             <div className="flex gap-6">
               <div className="text-right">
                 <p className="text-xs text-gray-400">Total Valor Líquido</p>
@@ -976,27 +976,27 @@ function ExtratoSeguros() {
       ) : rows.length === 0 ? (
         <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
           <Shield className="w-12 h-12 text-gray-300" />
-          <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+          <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
         </CardContent></Card>
       ) : (
         <Card><CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead className="font-semibold text-gray-700">Nome</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Contrato</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Banco</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-right">Valor Empréstimo</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                <TableRow className="bg-gray-800">
+                  <TableHead className="font-semibold text-gray-200">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Contrato</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Banco</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Valor Empréstimo</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
-                  <TableRow key={row.id} className="hover:bg-gray-50">
+                  <TableRow key={row.id} className="hover:bg-gray-800">
                     <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
-                    <TableCell className="font-mono text-sm text-gray-700">{row.nrContrato || '—'}</TableCell>
-                    <TableCell className="text-gray-700 text-sm">{row.banco || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-200">{row.nrContrato || '—'}</TableCell>
+                    <TableCell className="text-gray-200 text-sm">{row.banco || '—'}</TableCell>
                     <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.vrEmprestimo ?? 0)))}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissaoAgente ?? 0)))}</TableCell>
                   </TableRow>
@@ -1004,8 +1004,8 @@ function ExtratoSeguros() {
               </TableBody>
             </Table>
           </div>
-          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-gray-500">{rows.length} registro(s)</span>
+          <div className="border-t bg-gray-800 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-400">{rows.length} registro(s)</span>
             <div className="text-right">
               <p className="text-xs text-gray-400">Total Comissão</p>
               <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
@@ -1048,27 +1048,27 @@ function ExtratoBBDental() {
       ) : rows.length === 0 ? (
         <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
           <Smile className="w-12 h-12 text-gray-300" />
-          <p className="text-gray-500 font-medium">Nenhuma operação encontrada para {mesRef}</p>
+          <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
         </CardContent></Card>
       ) : (
         <Card><CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gray-50">
-                  <TableHead className="font-semibold text-gray-700">Nome</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Proposta</TableHead>
-                  <TableHead className="font-semibold text-gray-700">Produto</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-right">Valor Produto</TableHead>
-                  <TableHead className="font-semibold text-gray-700 text-right">Comissão</TableHead>
+                <TableRow className="bg-gray-800">
+                  <TableHead className="font-semibold text-gray-200">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Valor Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
-                  <TableRow key={row.id} className="hover:bg-gray-50">
+                  <TableRow key={row.id} className="hover:bg-gray-800">
                     <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
-                    <TableCell className="font-mono text-sm text-gray-700">{row.proposta || '—'}</TableCell>
-                    <TableCell className="text-gray-700 text-sm">{row.produto || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-200">{row.proposta || '—'}</TableCell>
+                    <TableCell className="text-gray-200 text-sm">{row.produto || '—'}</TableCell>
                     <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.vrProduto ?? 0)))}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                   </TableRow>
@@ -1076,8 +1076,8 @@ function ExtratoBBDental() {
               </TableBody>
             </Table>
           </div>
-          <div className="border-t bg-gray-50 px-4 py-3 flex items-center justify-between">
-            <span className="text-sm text-gray-500">{rows.length} registro(s)</span>
+          <div className="border-t bg-gray-800 px-4 py-3 flex items-center justify-between">
+            <span className="text-sm text-gray-400">{rows.length} registro(s)</span>
             <div className="text-right">
               <p className="text-xs text-gray-400">Total Comissão</p>
               <p className="font-bold text-green-700">{fmt(totalComissao)}</p>
@@ -1112,7 +1112,7 @@ function ConteudoAbaPlaceholder({ aba }: { aba: Aba }) {
           <div className={`w-16 h-16 rounded-2xl ${info.cor} flex items-center justify-center`}>
             <Icon className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-700">{info.label}</h2>
+          <h2 className="text-xl font-semibold text-gray-200">{info.label}</h2>
           <p className="text-gray-400 text-sm">Módulo em desenvolvimento. Em breve disponível.</p>
         </CardContent>
       </Card>
@@ -1196,7 +1196,7 @@ function MinhaTabela() {
         </div>
 
         {/* Bloco 2: Tabela sendo construída no mês vigente */}
-        <div className="px-4 py-3 bg-blue-50 border-2 border-blue-300 rounded-lg">
+        <div className="px-4 py-3 bg-blue-900/20 border-2 border-blue-300 rounded-lg">
           <p className="text-xs text-blue-700 font-bold uppercase tracking-wide mb-1">
             Tabela sendo construída em {mesVigenteRef}
           </p>
@@ -1225,7 +1225,7 @@ function MinhaTabela() {
       {/* Régua de Níveis */}
       {niveisConfigurados.length > 0 && (
         <div className="mb-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Faixas de Nível — Produza mais para ganhar mais!</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Faixas de Nível — Produza mais para ganhar mais!</p>
           <div className="grid gap-2" style={{gridTemplateColumns: `repeat(${niveisConfigurados.length}, 1fr)`}}>
             {niveisConfigurados.map((k, idx) => {
               const isAtualVig = k === nivelVigente;
@@ -1242,8 +1242,8 @@ function MinhaTabela() {
                       : isAtualVig
                       ? 'border-green-500 bg-green-50 shadow-md'
                       : isAlcancadoVig
-                      ? 'border-blue-300 bg-blue-50'
-                      : 'border-gray-200 bg-white'
+                      ? 'border-blue-300 bg-blue-900/20'
+                      : 'border-gray-700 bg-white'
                   }`}
                 >
                   <div className={`text-xs font-bold uppercase mb-0.5 ${
@@ -1254,7 +1254,7 @@ function MinhaTabela() {
                   {isAtualAnt && <div className="text-[9px] text-amber-600 font-semibold mb-0.5">tabela atual</div>}
                   {isAtualVig && !isAtualAnt && <div className="text-[9px] text-green-600 font-semibold mb-0.5">mês vigente</div>}
                   <div className={`text-[11px] font-medium ${
-                    isAtualAnt ? 'text-amber-800' : isAtualVig ? 'text-green-800' : isAlcancadoVig ? 'text-blue-700' : 'text-gray-500'
+                    isAtualAnt ? 'text-amber-800' : isAtualVig ? 'text-green-800' : isAlcancadoVig ? 'text-blue-700' : 'text-gray-400'
                   }`}>
                     {de > 0 ? fmt(de) : '—'}
                     {ate > 0 ? <><br/><span className="text-[10px] text-gray-400">até</span><br/>{fmt(ate)}</> : ''}
@@ -1297,15 +1297,15 @@ function MinhaTabela() {
                 </TableHeader>
                 <TableBody>
                   {tabela.map((row: any) => (
-                    <TableRow key={row.id} className="hover:bg-gray-50">
+                    <TableRow key={row.id} className="hover:bg-gray-800">
                       <TableCell className="font-medium text-xs py-1 px-3 whitespace-nowrap">{row.convenio ?? '—'}</TableCell>
                       <TableCell className="text-xs py-1 px-3 text-center whitespace-nowrap">
-                        <span className="text-gray-500">{row.txJurosDe ? fmtPct(row.txJurosDe) : '—'}</span>
+                        <span className="text-gray-400">{row.txJurosDe ? fmtPct(row.txJurosDe) : '—'}</span>
                         <span className="text-gray-400 mx-1">→</span>
-                        <span className="font-semibold text-gray-800">{row.txJurosAte === 'acima' ? 'acima' : (row.txJurosAte ? fmtPct(row.txJurosAte) : '—')}</span>
+                        <span className="font-semibold text-white">{row.txJurosAte === 'acima' ? 'acima' : (row.txJurosAte ? fmtPct(row.txJurosAte) : '—')}</span>
                       </TableCell>
                       <TableCell className="text-xs py-1 px-3 text-center whitespace-nowrap">
-                        <span className="text-gray-500">{row.mesesDe ?? '—'}</span>
+                        <span className="text-gray-400">{row.mesesDe ?? '—'}</span>
                         <span className="text-gray-400 mx-1">→</span>
                         <span className="font-semibold text-blue-700">{row.mesesAte ?? '—'}</span>
                       </TableCell>
@@ -1314,7 +1314,7 @@ function MinhaTabela() {
                         <TableCell key={k} className={`font-bold text-xs py-1 px-3 text-center whitespace-nowrap ${
                           k === colunaAnterior ? 'text-amber-700 bg-amber-50' :
                           k === colunaVigente  ? 'text-green-700 bg-green-50' :
-                          'text-gray-700'
+                          'text-gray-200'
                         }`}>
                           {fmtPct(row[k])}
                         </TableCell>
@@ -1344,19 +1344,15 @@ export default function ExtratosPage() {
   const subtituloPagina = abaInfo ? abaInfo.label : 'Extratos bancários e financeiros';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950 text-white">
       <PageHeader title="Extratos" />
       {/* Cabeçalho */}
-      <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Extratos</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{subtituloPagina}</p>
-        </div>
+      <div className="bg-gray-900 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
         
       </div>
 
       {/* Navegação por abas */}
-      <div className="bg-white border-b px-6">
+      <div className="bg-gray-900 border-b border-gray-700 px-6">
         <div className="flex gap-1 overflow-x-auto">
           {ABAS.map(a => {
             const Icon = a.icon;
@@ -1367,8 +1363,8 @@ export default function ExtratosPage() {
                 onClick={() => setAba(a.id)}
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   ativa
-                    ? 'border-blue-600 text-blue-700 bg-blue-50'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-600 text-blue-700 bg-blue-900/20'
+                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />

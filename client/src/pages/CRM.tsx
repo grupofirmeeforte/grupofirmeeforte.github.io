@@ -35,7 +35,7 @@ const STATUS_OPORTUNIDADE: Record<string, { label: string; color: string }> = {
 };
 
 const STATUS_MAILING: Record<string, { label: string; color: string }> = {
-  nao_contatado: { label: "Não Contatado", color: "bg-gray-100 text-gray-800" },
+  nao_contatado: { label: "Não Contatado", color: "bg-gray-100 text-white" },
   em_contato: { label: "Em Contato", color: "bg-yellow-100 text-yellow-800" },
   convertido: { label: "Convertido", color: "bg-green-100 text-green-800" },
   sem_interesse: { label: "Sem Interesse", color: "bg-red-100 text-red-800" },
@@ -93,7 +93,7 @@ function AbaRelatorios() {
                 <Icon className={`w-8 h-8 ${color}`} />
                 <div>
                   <p className="text-2xl font-bold">{isLoading ? "..." : value}</p>
-                  <p className="text-xs text-gray-500">{label}</p>
+                  <p className="text-xs text-gray-400">{label}</p>
                 </div>
               </div>
             </CardContent>
@@ -106,7 +106,7 @@ function AbaRelatorios() {
         <CardHeader><CardTitle className="text-base">Funil de Oportunidades</CardTitle></CardHeader>
         <CardContent>
           {!funil || funil.length === 0 ? (
-            <p className="text-gray-500 text-sm text-center py-4">Nenhuma oportunidade cadastrada</p>
+            <p className="text-gray-400 text-sm text-center py-4">Nenhuma oportunidade cadastrada</p>
           ) : (
             <div className="space-y-2">
               {Object.entries(STATUS_OPORTUNIDADE).map(([key, { label, color }]) => {
@@ -115,7 +115,7 @@ function AbaRelatorios() {
                 const pct = totalFunil > 0 ? Math.round((total / totalFunil) * 100) : 0;
                 return (
                   <div key={key} className="flex items-center gap-3">
-                    <span className="w-32 text-xs text-gray-600 text-right">{label}</span>
+                    <span className="w-32 text-xs text-gray-300 text-right">{label}</span>
                     <div className="flex-1 bg-gray-100 rounded-full h-5 relative">
                       <div className={`h-5 rounded-full ${color.replace("text-", "bg-").replace("-800", "-400").replace("-100", "-400")}`} style={{ width: `${pct}%`, minWidth: total > 0 ? "2rem" : 0 }} />
                     </div>
@@ -148,7 +148,7 @@ function AbaRelatorios() {
                   {produtividade.oportunidades.map((op, i) => {
                     const at = produtividade.atendimentos.find(a => a.chaveJ === op.chaveJ);
                     return (
-                      <tr key={i} className="border-b hover:bg-gray-50">
+                      <tr key={i} className="border-b hover:bg-gray-800">
                         <td className="py-2 px-2">{op.agente ?? op.chaveJ ?? "—"}</td>
                         <td className="text-center py-2 px-2">{op.total}</td>
                         <td className="text-center py-2 px-2 text-green-600 font-semibold">{op.fechados}</td>
@@ -205,10 +205,10 @@ function AbaClientes() {
 
       <div className="overflow-x-auto rounded-lg border">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
+          <thead className="bg-gray-800 border-b">
             <tr>
               {["Nome", "CPF", "Telefone", "Convênio", "Margem", "Agente", "Ações"].map(h => (
-                <th key={h} className="text-left py-2 px-3 font-medium text-gray-600">{h}</th>
+                <th key={h} className="text-left py-2 px-3 font-medium text-gray-300">{h}</th>
               ))}
             </tr>
           </thead>
@@ -218,13 +218,13 @@ function AbaClientes() {
             ) : !data?.clientes.length ? (
               <tr><td colSpan={7} className="text-center py-8 text-gray-400">Nenhum cliente cadastrado</td></tr>
             ) : data.clientes.map(c => (
-              <tr key={c.id} className="border-b hover:bg-gray-50">
+              <tr key={c.id} className="border-b hover:bg-gray-800">
                 <td className="py-2 px-3 font-medium">{c.nome}</td>
-                <td className="py-2 px-3 text-gray-600">{c.cpf ?? "—"}</td>
+                <td className="py-2 px-3 text-gray-300">{c.cpf ?? "—"}</td>
                 <td className="py-2 px-3">{c.telefone ?? "—"}</td>
                 <td className="py-2 px-3">{c.convenio ?? "—"}</td>
                 <td className="py-2 px-3">{fmtMoeda(c.margemDisponivel)}</td>
-                <td className="py-2 px-3 text-gray-500 text-xs">{c.chaveJAgente ?? "—"}</td>
+                <td className="py-2 px-3 text-gray-400 text-xs">{c.chaveJAgente ?? "—"}</td>
                 <td className="py-2 px-3">
                   <div className="flex gap-1">
                     <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => abrirEditar(c)}><Edit className="w-3.5 h-3.5" /></Button>
@@ -238,7 +238,7 @@ function AbaClientes() {
       </div>
 
       {totalPaginas > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-600">
+        <div className="flex items-center justify-between text-sm text-gray-300">
           <span>{data?.total} clientes</span>
           <div className="flex gap-2 items-center">
             <Button size="sm" variant="outline" disabled={pagina === 1} onClick={() => setPagina(p => p - 1)}><ChevronLeft className="w-4 h-4" /></Button>
@@ -351,10 +351,10 @@ function AbaOportunidades() {
 
       <div className="overflow-x-auto rounded-lg border">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b">
+          <thead className="bg-gray-800 border-b">
             <tr>
               {["Cliente", "Produto", "Valor Est.", "Status", "Previsão", "Agente", "Ações"].map(h => (
-                <th key={h} className="text-left py-2 px-3 font-medium text-gray-600">{h}</th>
+                <th key={h} className="text-left py-2 px-3 font-medium text-gray-300">{h}</th>
               ))}
             </tr>
           </thead>
@@ -364,15 +364,15 @@ function AbaOportunidades() {
             ) : !data?.length ? (
               <tr><td colSpan={7} className="text-center py-8 text-gray-400">Nenhuma oportunidade encontrada</td></tr>
             ) : data.map(o => {
-              const st = STATUS_OPORTUNIDADE[o.status] ?? { label: o.status, color: "bg-gray-100 text-gray-800" };
+              const st = STATUS_OPORTUNIDADE[o.status] ?? { label: o.status, color: "bg-gray-100 text-white" };
               return (
-                <tr key={o.id} className="border-b hover:bg-gray-50">
+                <tr key={o.id} className="border-b hover:bg-gray-800">
                   <td className="py-2 px-3 font-medium">{o.clienteNome}</td>
-                  <td className="py-2 px-3 text-gray-600">{o.produto ?? "—"}</td>
+                  <td className="py-2 px-3 text-gray-300">{o.produto ?? "—"}</td>
                   <td className="py-2 px-3">{fmtMoeda(o.valorEstimado)}</td>
                   <td className="py-2 px-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${st.color}`}>{st.label}</span></td>
-                  <td className="py-2 px-3 text-gray-500">{o.previsaoFechamento ? fmtData(o.previsaoFechamento) : "—"}</td>
-                  <td className="py-2 px-3 text-gray-500 text-xs">{o.chaveJAgente ?? "—"}</td>
+                  <td className="py-2 px-3 text-gray-400">{o.previsaoFechamento ? fmtData(o.previsaoFechamento) : "—"}</td>
+                  <td className="py-2 px-3 text-gray-400 text-xs">{o.chaveJAgente ?? "—"}</td>
                   <td className="py-2 px-3">
                     <div className="flex gap-1">
                       <Button size="sm" variant="ghost" className="h-7 px-2" onClick={() => abrirEditar(o)}><Edit className="w-3.5 h-3.5" /></Button>
@@ -475,8 +475,8 @@ function AbaAtendimentos() {
                           {RESULTADO_LABELS[a.resultado] ?? a.resultado}
                         </Badge>
                       </div>
-                      {a.assunto && <p className="text-sm text-gray-600 mt-1">{a.assunto}</p>}
-                      {a.descricao && <p className="text-xs text-gray-500 mt-1">{a.descricao}</p>}
+                      {a.assunto && <p className="text-sm text-gray-300 mt-1">{a.assunto}</p>}
+                      {a.descricao && <p className="text-xs text-gray-400 mt-1">{a.descricao}</p>}
                       {a.proximoPasso && <p className="text-xs text-blue-600 mt-1">Próximo passo: {a.proximoPasso}</p>}
                       <p className="text-xs text-gray-400 mt-1">{fmtData(a.dataAtendimento)} · {a.chaveJAgente ?? "—"}</p>
                     </div>
@@ -551,7 +551,7 @@ function AbaTarefas() {
   };
   const concluir = (id: number) => atualizar.mutate({ id, status: "concluida", dataConclusao: new Date().toISOString() });
 
-  const PRIORIDADE_COLORS: Record<string, string> = { baixa: "bg-gray-100 text-gray-600", media: "bg-yellow-100 text-yellow-700", alta: "bg-red-100 text-red-700" };
+  const PRIORIDADE_COLORS: Record<string, string> = { baixa: "bg-gray-100 text-gray-300", media: "bg-yellow-100 text-yellow-700", alta: "bg-red-100 text-red-700" };
   const TIPO_ICONS: Record<string, any> = { ligar: PhoneCall, whatsapp: MessageCircle, email: Mail, visita: MapPin, enviar_proposta: Send, outro: CheckSquare };
 
   return (
@@ -559,7 +559,7 @@ function AbaTarefas() {
       <div className="flex gap-2 flex-wrap items-center">
         <div className="flex gap-1">
           {["todos", "pendente", "em_andamento", "concluida", "cancelada"].map(s => (
-            <button key={s} onClick={() => setFiltroStatus(s)} className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${filtroStatus === s ? "bg-sky-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+            <button key={s} onClick={() => setFiltroStatus(s)} className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${filtroStatus === s ? "bg-sky-600 text-white" : "bg-gray-100 text-gray-300 hover:bg-gray-200"}`}>
               {s === "todos" ? "Todas" : STATUS_TAREFA[s]?.label ?? s}
             </button>
           ))}
@@ -575,10 +575,10 @@ function AbaTarefas() {
           <p className="text-center text-gray-400 py-8">Nenhuma tarefa encontrada</p>
         ) : data.map(t => {
           const TipoIcon = TIPO_ICONS[t.tipo] ?? CheckSquare;
-          const st = STATUS_TAREFA[t.status] ?? { label: t.status, color: "bg-gray-100 text-gray-800", icon: CheckSquare };
+          const st = STATUS_TAREFA[t.status] ?? { label: t.status, color: "bg-gray-100 text-white", icon: CheckSquare };
           const vencida = t.dataVencimento && new Date(t.dataVencimento) < new Date() && t.status === "pendente";
           return (
-            <div key={t.id} className={`flex items-center gap-3 p-3 rounded-lg border ${vencida ? "border-red-200 bg-red-50" : "bg-white hover:bg-gray-50"} transition-colors`}>
+            <div key={t.id} className={`flex items-center gap-3 p-3 rounded-lg border ${vencida ? "border-red-200 bg-red-50" : "bg-white hover:bg-gray-800"} transition-colors`}>
               <div className="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center flex-shrink-0">
                 <TipoIcon className="w-4 h-4 text-sky-600" />
               </div>
@@ -589,7 +589,7 @@ function AbaTarefas() {
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${st.color}`}>{st.label}</span>
                   {vencida && <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">Vencida</span>}
                 </div>
-                {t.clienteNome && <p className="text-xs text-gray-500 mt-0.5">Cliente: {t.clienteNome}</p>}
+                {t.clienteNome && <p className="text-xs text-gray-400 mt-0.5">Cliente: {t.clienteNome}</p>}
                 {t.dataVencimento && <p className="text-xs text-gray-400">Vence: {fmtData(t.dataVencimento)}</p>}
               </div>
               <div className="flex gap-1 flex-shrink-0">
@@ -693,8 +693,8 @@ function AbaMailing() {
       <div className="space-y-4">
         <div className="flex items-center gap-3 flex-wrap">
           <Button size="sm" onClick={() => { setListaAtiva(null); setBusca(""); setFiltroStatus("todos"); setPagina(1); }} className="gap-1 rounded-full font-semibold" style={{background:"linear-gradient(135deg,#1d4ed8 0%,#1e40af 100%)",color:"#fff",border:"1.5px solid #3b82f6",boxShadow:"0 2px 12px rgba(59,130,246,0.35)"}}><ArrowLeft className="w-4 h-4" /> Voltar</Button>
-          <h3 className="font-semibold text-gray-800">{listaNomeAtiva}</h3>
-          <span className="text-sm text-gray-500">{contatos?.total ?? 0} contatos</span>
+          <h3 className="font-semibold text-white">{listaNomeAtiva}</h3>
+          <span className="text-sm text-gray-400">{contatos?.total ?? 0} contatos</span>
         </div>
         <div className="flex gap-2 flex-wrap">
           <div className="relative flex-1 min-w-48">
@@ -711,8 +711,8 @@ function AbaMailing() {
         </div>
         <div className="overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b">
-              <tr>{["Nome", "CPF", "Telefone", "Convênio", "Margem", "Status", "Ação"].map(h => <th key={h} className="text-left py-2 px-3 font-medium text-gray-600">{h}</th>)}</tr>
+            <thead className="bg-gray-800 border-b">
+              <tr>{["Nome", "CPF", "Telefone", "Convênio", "Margem", "Status", "Ação"].map(h => <th key={h} className="text-left py-2 px-3 font-medium text-gray-300">{h}</th>)}</tr>
             </thead>
             <tbody>
               {loadingContatos ? (
@@ -720,13 +720,13 @@ function AbaMailing() {
               ) : !contatos?.contatos.length ? (
                 <tr><td colSpan={7} className="text-center py-8 text-gray-400">Nenhum contato</td></tr>
               ) : contatos.contatos.map(c => {
-                const st = STATUS_MAILING[c.status] ?? { label: c.status, color: "bg-gray-100 text-gray-800" };
+                const st = STATUS_MAILING[c.status] ?? { label: c.status, color: "bg-gray-100 text-white" };
                 return (
-                  <tr key={c.id} className="border-b hover:bg-gray-50">
+                  <tr key={c.id} className="border-b hover:bg-gray-800">
                     <td className="py-2 px-3 font-medium">{c.nome}</td>
-                    <td className="py-2 px-3 text-gray-500">{c.cpf ?? "—"}</td>
+                    <td className="py-2 px-3 text-gray-400">{c.cpf ?? "—"}</td>
                     <td className="py-2 px-3">{c.telefone ?? "—"}</td>
-                    <td className="py-2 px-3 text-gray-500">{c.convenio ?? "—"}</td>
+                    <td className="py-2 px-3 text-gray-400">{c.convenio ?? "—"}</td>
                     <td className="py-2 px-3">{fmtMoeda(c.margemDisponivel)}</td>
                     <td className="py-2 px-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${st.color}`}>{st.label}</span></td>
                     <td className="py-2 px-3">
@@ -742,7 +742,7 @@ function AbaMailing() {
           </table>
         </div>
         {totalPaginas > 1 && (
-          <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="flex items-center justify-between text-sm text-gray-300">
             <span>{contatos?.total} contatos</span>
             <div className="flex gap-2 items-center">
               <Button size="sm" variant="outline" disabled={pagina === 1} onClick={() => setPagina(p => p - 1)}><ChevronLeft className="w-4 h-4" /></Button>
@@ -766,7 +766,7 @@ function AbaMailing() {
       ) : !listas?.length ? (
         <div className="text-center py-12">
           <Mail className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">Nenhuma lista de mailing</p>
+          <p className="text-gray-400">Nenhuma lista de mailing</p>
           <p className="text-sm text-gray-400">Importe uma lista CSV para começar</p>
         </div>
       ) : (
@@ -776,10 +776,10 @@ function AbaMailing() {
               <CardContent className="pt-4 pb-4">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="font-semibold text-gray-800">{l.listaNome}</h4>
-                    <p className="text-sm text-gray-500 mt-1">{Number(l.total)} contatos</p>
+                    <h4 className="font-semibold text-white">{l.listaNome}</h4>
+                    <p className="text-sm text-gray-400 mt-1">{Number(l.total)} contatos</p>
                     <div className="flex gap-3 mt-2 text-xs">
-                      <span className="text-gray-500">{Number(l.naoContatados)} não contatados</span>
+                      <span className="text-gray-400">{Number(l.naoContatados)} não contatados</span>
                       <span className="text-green-600 font-medium">{Number(l.convertidos)} convertidos</span>
                     </div>
                   </div>
@@ -832,19 +832,11 @@ export default function CRMPage() {
   const [abaAtiva, setAbaAtiva] = useState<AbaType>("clientes");
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950 text-white">
       <PageHeader title="CRM" />
-      {/* Header */}
-      <div className="bg-white border-b px-4 py-3 flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-bold text-gray-900">CRM</h1>
-          <p className="text-xs text-gray-500">Gestão de Relacionamento com Clientes</p>
-        </div>
-        
-      </div>
 
       {/* Abas */}
-      <div className="bg-white border-b px-4">
+      <div className="bg-gray-900 border-b border-gray-700 px-4">
         <div className="flex gap-0 overflow-x-auto">
           {ABAS.map(({ key, label, icon: Icon }) => (
             <button
@@ -853,7 +845,7 @@ export default function CRMPage() {
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 abaAtiva === key
                   ? "border-sky-600 text-sky-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                  : "border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300"
               }`}
             >
               <Icon className="w-4 h-4" />

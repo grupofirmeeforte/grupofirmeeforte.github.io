@@ -198,14 +198,14 @@ function ContratoBMF({ ag }: { ag: any }) {
             <p className="text-xs">CNPJ: 24.541.627/0001-18</p>
             <p className="text-xs">THIAGO VIANA ULTRAMARE</p>
             <p className="text-xs">CPF: 046.219.855-31</p>
-            <p className="text-xs text-gray-500">Contratante</p>
+            <p className="text-xs text-gray-400">Contratante</p>
           </div>
         </div>
         <div className="text-center">
           <div className="border-t border-gray-800 pt-2">
             <p className="font-semibold">{ag.nomeAgente || "___________________________________"}</p>
             <p className="text-xs">CPF: {ag.cpfAgente || "___________________________________"}</p>
-            <p className="text-xs text-gray-500">Contratado(a)</p>
+            <p className="text-xs text-gray-400">Contratado(a)</p>
           </div>
         </div>
       </div>
@@ -215,14 +215,14 @@ function ContratoBMF({ ag }: { ag: any }) {
           <div className="border-t border-gray-800 pt-2">
             <p className="text-xs font-semibold">Thales Viana Ultramare</p>
             <p className="text-xs">CPF: 037.012.791-95</p>
-            <p className="text-xs text-gray-500">Testemunha 1</p>
+            <p className="text-xs text-gray-400">Testemunha 1</p>
           </div>
         </div>
         <div className="text-center">
           <div className="border-t border-gray-800 pt-2">
             <p className="text-xs font-semibold">Sidnei Honorato Ultramare</p>
             <p className="text-xs">CPF: 041.574.758-95</p>
-            <p className="text-xs text-gray-500">Testemunha 2</p>
+            <p className="text-xs text-gray-400">Testemunha 2</p>
           </div>
         </div>
       </div>
@@ -251,7 +251,7 @@ function ContratoBMF({ ag }: { ag: any }) {
         <p className="mb-6">Por estar ciente assino e concordo com esse adendo.</p>
 
         {/* Assinatura do adendo */}
-        <div className="text-right text-xs text-gray-600 mb-6">
+        <div className="text-right text-xs text-gray-300 mb-6">
           Barreiras (BA) {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
         </div>
         <div className="flex justify-center">
@@ -259,7 +259,7 @@ function ContratoBMF({ ag }: { ag: any }) {
             <div className="border-t border-gray-800 pt-1 w-64">
               <p className="text-xs font-semibold">{ag.nomeAgente}</p>
               <p className="text-xs">CPF: {ag.cpfAgente}</p>
-              <p className="text-xs text-gray-500">Contratado(a)</p>
+              <p className="text-xs text-gray-400">Contratado(a)</p>
             </div>
           </div>
         </div>
@@ -277,8 +277,8 @@ function ContratoFLEX({ ag }: { ag: any }) {
       {/* Cabeçalho */}
       <div className="text-center mb-8">
         <h1 className="text-base font-bold uppercase tracking-wide">CONTRATO DE PRESTAÇÃO DE SERVIÇOS</h1>
-        <p className="text-xs mt-2 text-gray-600">Firme &amp; Forte Ltda — CNPJ: 32.828.962/0001-20</p>
-        <p className="text-xs text-gray-600">Rua 24 de Outubro nº 283, Centro, Barreiras-BA — CEP: 47800-041</p>
+        <p className="text-xs mt-2 text-gray-300">Firme &amp; Forte Ltda — CNPJ: 32.828.962/0001-20</p>
+        <p className="text-xs text-gray-300">Rua 24 de Outubro nº 283, Centro, Barreiras-BA — CEP: 47800-041</p>
       </div>
 
       <p className="mb-4 text-justify">Pelo presente instrumento particular e na melhor forma de direito, de um lado,</p>
@@ -458,14 +458,14 @@ function ContratoFLEX({ ag }: { ag: any }) {
           <div className="border-t border-gray-800 pt-2">
             <p className="font-semibold">FIRME &amp; FORTE LTDA</p>
             <p className="text-xs">CNPJ/MF sob o nº 32.828.962/0001-20</p>
-            <p className="text-xs text-gray-500">Contratante</p>
+            <p className="text-xs text-gray-400">Contratante</p>
           </div>
         </div>
         <div className="text-center">
           <div className="border-t border-gray-800 pt-2">
             <p className="font-semibold">{ag.nomeAgente || "___________________________________"}</p>
             <p className="text-xs">CPF/MF sob Nº {ag.cpfAgente || "___________________"}</p>
-            <p className="text-xs text-gray-500">Contratado(a)</p>
+            <p className="text-xs text-gray-400">Contratado(a)</p>
           </div>
         </div>
       </div>
@@ -496,11 +496,11 @@ export default function AgenteContrato() {
   const { data: agente, isLoading } = trpc.agentes.getById.useQuery({ id: agenteId });
 
   if (isLoading) {
-    return <div className="flex items-center justify-center h-64 text-gray-500">Carregando contrato...</div>;
+    return <div className="flex items-center justify-center h-64 text-gray-400">Carregando contrato...</div>;
   }
 
   if (!agente) {
-    return <div className="flex items-center justify-center h-64 text-gray-500">Agente não encontrado.</div>;
+    return <div className="flex items-center justify-center h-64 text-gray-400">Agente não encontrado.</div>;
   }
 
   const ag = agente as any;
@@ -515,11 +515,11 @@ export default function AgenteContrato() {
       <div className="print:hidden">
         <PageHeader title="Contrato do Agente" onBack={() => navigate("/agentes")} />
         {tipoContrato && (
-          <div className="bg-white border-b px-6 py-2 flex items-center gap-3">
+          <div className="bg-gray-900 border-b border-gray-700 px-6 py-2 flex items-center gap-3">
             <Button size="sm" onClick={() => window.print()} className="bg-orange-600 hover:bg-orange-700 text-white">
               <Printer className="w-4 h-4 mr-1" /> Imprimir / Salvar PDF
             </Button>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-400">
               Contrato {tipoContrato} — {ag.nomeAgente}
             </span>
           </div>
@@ -527,17 +527,17 @@ export default function AgenteContrato() {
       </div>
 
       {/* Conteúdo */}
-      <div className="max-w-4xl mx-auto bg-white shadow-lg print:shadow-none my-6 print:my-0 p-10 print:p-8">
+      <div className="max-w-4xl mx-auto bg-gray-900 border border-gray-700-lg print:shadow-none my-6 print:my-0 p-10 print:p-8">
         {!tipoContrato ? (
           <div className="text-center py-16">
-            <p className="text-lg font-semibold text-gray-700 mb-2">Empresa não identificada para geração de contrato</p>
-            <p className="text-sm text-gray-500">
+            <p className="text-lg font-semibold text-gray-200 mb-2">Empresa não identificada para geração de contrato</p>
+            <p className="text-sm text-gray-400">
               A empresa cadastrada é: <strong>{ag.empresa || "não informada"}</strong>
             </p>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-400 mt-2">
               O contrato é gerado automaticamente para agentes das empresas <strong>BMF</strong> (Brasil Mais Forte) ou <strong>FLEX</strong> (Firme &amp; Forte / Bevicred).
             </p>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-400 mt-2">
               Verifique o campo "Empresa" no cadastro do agente.
             </p>
           </div>
@@ -549,7 +549,7 @@ export default function AgenteContrato() {
 
         {/* Rodapé */}
         {tipoContrato && (
-          <div className="mt-8 pt-4 border-t border-gray-200 text-xs text-gray-400 text-center print:hidden">
+          <div className="mt-8 pt-4 border-t border-gray-700 text-xs text-gray-400 text-center print:hidden">
             Documento gerado pelo Sistema de Gestão — Grupo Firme &amp; Forte · {new Date().toLocaleString('pt-BR')}
           </div>
         )}

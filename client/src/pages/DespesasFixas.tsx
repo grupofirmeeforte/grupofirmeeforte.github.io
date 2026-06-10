@@ -253,25 +253,15 @@ export default function DespesasFixasPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
-      <PageHeader title="Despesas Fixas" />
-      {/* Header */}
-      <div className="bg-gray-900 border-b border-gray-800 px-3 py-2 flex items-center justify-between">
-        <div>
-          <h1 className="text-base font-bold text-white">Despesas Fixas</h1>
-          <p className="text-[10px] text-gray-400">
-            Total: {total} registros
-            {selecionados.size > 0 && <span className="ml-2 text-purple-400 font-semibold">· {selecionados.size} selecionado(s)</span>}
-          </p>
-        </div>
-        <div className="flex gap-1.5">
-          <Button onClick={abrirNovo} size="sm" className="bg-purple-700 hover:bg-purple-600 text-white text-xs h-7 px-2">+ Novo</Button>
-          <Button onClick={handleEnviarParaPagto} disabled={selecionados.size === 0 || enviarParaPagtoMutation.isPending} size="sm" className="bg-blue-700 hover:bg-blue-600 text-white text-xs h-7 px-2 disabled:opacity-40">
-            {enviarParaPagtoMutation.isPending ? "Enviando..." : "Enviar Para Pagto"}
+      <PageHeader title="Despesas Fixas" actions={
+        <div className="flex gap-1.5 items-center">
+          <Button onClick={abrirNovo} size="sm" className="bg-purple-700 hover:bg-purple-600 text-white text-[10px] h-6 px-2">+ Novo</Button>
+          <Button onClick={handleEnviarParaPagto} disabled={selecionados.size === 0 || enviarParaPagtoMutation.isPending} size="sm" className="bg-blue-700 hover:bg-blue-600 text-white text-[10px] h-6 px-2 disabled:opacity-40">
+            {enviarParaPagtoMutation.isPending ? "..." : "Enviar Pagto"}
           </Button>
-          <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white text-xs h-7 px-2">Excel</Button>
-          
+          <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white text-[10px] h-6 px-2">Excel</Button>
         </div>
-      </div>
+      } />
 
       {/* Filtros */}
       <div className="bg-gray-900 border-b border-gray-800 px-3 py-2">
@@ -328,7 +318,7 @@ export default function DespesasFixasPage() {
           </thead>
           <tbody>
             {rows.length === 0 ? (
-              <tr><td colSpan={5} className="text-center py-10 text-gray-500">Nenhum registro encontrado.</td></tr>
+              <tr><td colSpan={5} className="text-center py-10 text-gray-400">Nenhum registro encontrado.</td></tr>
             ) : rows.map((row, i) => {
               const sel = selecionados.has(row.id);
               return (
@@ -341,7 +331,7 @@ export default function DespesasFixasPage() {
                     <div className="flex items-center gap-1.5 mb-0.5">
                       {row.chaveResp && <span className="font-mono text-[10px] text-purple-300 font-semibold">{row.chaveResp}</span>}
                       {row.tipoPagto && <span className="text-[9px] px-1 py-0.5 rounded bg-purple-900/50 text-purple-300 border border-purple-700">{row.tipoPagto}</span>}
-                      {row.mesAno && <span className="text-[9px] text-gray-500">{row.mesAno}</span>}
+                      {row.mesAno && <span className="text-[9px] text-gray-400">{row.mesAno}</span>}
                     </div>
                     <div className="text-[11px] text-white font-medium truncate max-w-[200px]" title={row.nome ?? ""}>{row.nome || "-"}</div>
                     <div className="text-[10px] text-gray-400">{row.empresa || ""}{row.cidadeUF ? ` · ${row.cidadeUF}` : ""}</div>
@@ -350,7 +340,7 @@ export default function DespesasFixasPage() {
                   <td className="px-2 py-1.5 whitespace-nowrap text-[10px]">
                     <div className="text-gray-300">
                       {row.banco || "-"}{row.agencia ? ` · Ag ${row.agencia}` : ""}{row.conta ? ` · Cc ${row.conta}` : ""}
-                      {row.tipoConta && <span className="ml-1 text-gray-500">({row.tipoConta})</span>}
+                      {row.tipoConta && <span className="ml-1 text-gray-400">({row.tipoConta})</span>}
                     </div>
                     {row.cpfCnpj && <div className="text-gray-400 font-mono">{row.cpfCnpj}</div>}
                     {row.pix && <div className="text-blue-400 truncate max-w-[180px]" title={row.pix}>PIX: {row.pix}</div>}

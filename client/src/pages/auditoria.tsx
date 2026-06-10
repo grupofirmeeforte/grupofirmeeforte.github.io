@@ -230,10 +230,10 @@ export default function AuditoriaPage() {
       'Uniformes e Crachás': 'bg-lime-100 text-lime-800',
       'Documentação Agentes': 'bg-sky-100 text-sky-800',
       'Agências BB': 'bg-blue-100 text-blue-800',
-      'Auditoria': 'bg-gray-100 text-gray-800',
+      'Auditoria': 'bg-gray-100 text-white',
       'dashboard': 'bg-slate-100 text-slate-700',
     };
-    return map[m] ?? 'bg-gray-100 text-gray-600';
+    return map[m] ?? 'bg-gray-100 text-gray-300';
   };
 
   const acaoBadge = (acao: string | null | undefined) => {
@@ -243,7 +243,7 @@ export default function AuditoriaPage() {
     if (a.includes('edit') || a.includes('atualiz')) return 'bg-yellow-100 text-yellow-800';
     if (a.includes('cri') || a.includes('adicion') || a.includes('insert')) return 'bg-blue-100 text-blue-800';
     if (a.includes('delet') || a.includes('remov') || a.includes('exclu')) return 'bg-red-100 text-red-800';
-    return 'bg-gray-100 text-gray-600';
+    return 'bg-gray-100 text-gray-300';
   };
 
   const fmtDuracao = (entrada: any, saida: any) => {
@@ -281,36 +281,32 @@ export default function AuditoriaPage() {
       <PageHeader title="Auditoria" />
       {/* Header */}
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Auditoria</h1>
-          <p className="text-gray-500 mt-1 text-sm">Logs de acesso e feriados do sistema</p>
-        </div>
         
       </div>
 
       {/* Abas */}
-      <div className="flex gap-1 border-b border-gray-200">
+      <div className="flex gap-1 border-b border-gray-700">
         <button
           onClick={() => setAba('logs')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'logs' ? 'bg-white border border-b-white border-gray-200 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'logs' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
         >
           <ClipboardList className="w-4 h-4" /> Logs de Acesso
         </button>
         <button
           onClick={() => setAba('feriados')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'feriados' ? 'bg-white border border-b-white border-gray-200 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'feriados' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
         >
           <CalendarDays className="w-4 h-4" /> Feriados
         </button>
         <button
           onClick={() => setAba('credito-despesas')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'credito-despesas' ? 'bg-white border border-b-white border-gray-200 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'credito-despesas' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
         >
           <BarChart2 className="w-4 h-4" /> Crédito x Despesas
         </button>
         <button
           onClick={() => setAba('permissoes')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'permissoes' ? 'bg-white border border-b-white border-gray-200 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'permissoes' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
         >
           <Shield className="w-4 h-4" /> Permissões
         </button>
@@ -330,7 +326,7 @@ export default function AuditoriaPage() {
 
           {/* Cards de estatísticas */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center gap-3">
+            <div className="bg-blue-900/20 border border-blue-200 rounded-lg p-3 flex items-center gap-3">
               <Activity className="w-8 h-8 text-blue-500 shrink-0" />
               <div>
                 <div className="text-xs text-blue-600 font-medium">Hoje</div>
@@ -368,7 +364,7 @@ export default function AuditoriaPage() {
                   <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                   <span className="font-semibold text-sm text-emerald-800">Sessões Ativas ({sessoesAtivas.length})</span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => refetchSessoes()} className="h-7 gap-1 text-xs text-gray-500">
+                <Button variant="ghost" size="sm" onClick={() => refetchSessoes()} className="h-7 gap-1 text-xs text-gray-400">
                   <RefreshCw className="w-3 h-3" /> Atualizar
                 </Button>
               </div>
@@ -376,7 +372,7 @@ export default function AuditoriaPage() {
                 {sessoesAtivas.map((s: any) => (
                   <div key={s.id} className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
                     <span className="font-mono text-[11px] text-blue-700 font-semibold">{s.chaveJ}</span>
-                    <span className="text-[11px] text-gray-700">{s.nomeAgente}</span>
+                    <span className="text-[11px] text-gray-200">{s.nomeAgente}</span>
                     {s.modulo && <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">{s.modulo}</span>}
                     <span className="text-[10px] text-gray-400">{tempoOnline(s.ultimoAcesso)}</span>
                     {isCeo && (
@@ -395,11 +391,11 @@ export default function AuditoriaPage() {
           )}
 
           {/* Filtros avançados */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <div className="bg-white border border-gray-700 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Filtros</span>
+                <Filter className="w-4 h-4 text-gray-400" />
+                <span className="text-sm font-medium text-gray-200">Filtros</span>
                 {temFiltroAtivo && <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full">ativos</span>}
               </div>
               {temFiltroAtivo && (
@@ -453,7 +449,7 @@ export default function AuditoriaPage() {
 
           {/* Barra de ações e paginação topo */}
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-400">
               {totalCount != null ? <><strong>{totalCount}</strong> registro{totalCount !== 1 ? 's' : ''}</> : 'Carregando...'}
               {temFiltroAtivo && <span className="text-blue-600 ml-1">(filtrado)</span>}
             </p>
@@ -472,7 +468,7 @@ export default function AuditoriaPage() {
           </div>
 
           {/* Tabela de logs */}
-          <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto shadow-sm">
+          <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-x-auto shadow-sm">
             <table className="w-full text-xs">
               <thead>
                 <tr className="bg-blue-800 text-white">
@@ -488,11 +484,11 @@ export default function AuditoriaPage() {
                   <tr><td colSpan={5} className="text-center py-6 text-gray-400">Carregando...</td></tr>
                 ) : logs && logs.length > 0 ? (
                   logs.map((log: any, idx: number) => (
-                    <tr key={log.id} className={idx % 2 === 0 ? 'bg-white hover:bg-blue-50' : 'bg-blue-50/30 hover:bg-blue-100/40'}>
+                    <tr key={log.id} className={idx % 2 === 0 ? 'bg-white hover:bg-blue-900/30' : 'bg-blue-900/20/30 hover:bg-blue-100/40'}>
                       {/* Coluna Agente */}
                       <td className="px-2 py-1">
                         <div className="font-mono text-[10px] text-blue-700 font-semibold leading-tight">{log.chaveJ}</div>
-                        <div className="text-[10px] text-gray-700 leading-tight truncate max-w-[170px]" title={log.nomeAgente}>{log.nomeAgente}</div>
+                        <div className="text-[10px] text-gray-200 leading-tight truncate max-w-[170px]" title={log.nomeAgente}>{log.nomeAgente}</div>
                         {log.ipAddress && <div className="text-[9px] text-gray-400 leading-tight">{log.ipAddress}</div>}
                       </td>
                       {/* Coluna Módulo/Ação */}
@@ -512,8 +508,8 @@ export default function AuditoriaPage() {
                       </td>
                       {/* Coluna Horário */}
                       <td className="px-2 py-1 whitespace-nowrap">
-                        <div className="text-[10px] text-gray-800 leading-tight">{new Date(log.horarioEntrada).toLocaleDateString('pt-BR')}</div>
-                        <div className="text-[9px] text-gray-500 leading-tight">{new Date(log.horarioEntrada).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
+                        <div className="text-[10px] text-white leading-tight">{new Date(log.horarioEntrada).toLocaleDateString('pt-BR')}</div>
+                        <div className="text-[9px] text-gray-400 leading-tight">{new Date(log.horarioEntrada).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
                       </td>
                       {/* Coluna Duração */}
                       <td className="px-2 py-1 whitespace-nowrap">
@@ -524,7 +520,7 @@ export default function AuditoriaPage() {
                       </td>
                       {/* Coluna Descrição */}
                       <td className="px-2 py-1">
-                        <div className="text-[10px] text-gray-600 truncate max-w-[320px]" title={log.descricao || ''}>{log.descricao || '-'}</div>
+                        <div className="text-[10px] text-gray-300 truncate max-w-[320px]" title={log.descricao || ''}>{log.descricao || '-'}</div>
                         <div className="text-[9px] text-gray-400 font-mono leading-tight">{log.numeroEntrada}</div>
                       </td>
                     </tr>
@@ -538,7 +534,7 @@ export default function AuditoriaPage() {
 
           {/* Paginação rodapé */}
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-500">Página {page + 1} de {Math.max(1, totalPages)}</p>
+            <p className="text-sm text-gray-400">Página {page + 1} de {Math.max(1, totalPages)}</p>
             <div className="flex gap-1">
               <Button onClick={() => setPage(0)} disabled={page === 0} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronFirst className="w-4 h-4" /></Button>
               <Button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronLeft className="w-4 h-4" /></Button>
@@ -554,14 +550,14 @@ export default function AuditoriaPage() {
       {aba === 'feriados' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-500">{feriadosList ? `${feriadosList.length} feriados em ${filtroAno}` : 'Carregando...'}</p>
+            <p className="text-sm text-gray-400">{feriadosList ? `${feriadosList.length} feriados em ${filtroAno}` : 'Carregando...'}</p>
             <Button onClick={abrirCriar} className="gap-2 bg-blue-700 hover:bg-blue-800 text-white">
               <Plus className="w-4 h-4" /> Novo Feriado
             </Button>
           </div>
           {/* Paginação topo feriados (navegação por ano) */}
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-500">Ano: {filtroAno}</p>
+            <p className="text-sm text-gray-400">Ano: {filtroAno}</p>
             <div className="flex gap-1">
               <Button onClick={() => setFiltroAno(a => a - 1)} variant="outline" size="sm"><ChevronLeft className="w-4 h-4" /></Button>
               <span className="px-3 py-1 text-sm font-semibold border rounded-md bg-white">{filtroAno}</span>
@@ -618,7 +614,7 @@ export default function AuditoriaPage() {
 
           {/* Paginação rodapé feriados */}
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-500">Ano: {filtroAno}</p>
+            <p className="text-sm text-gray-400">Ano: {filtroAno}</p>
             <div className="flex gap-1">
               <Button onClick={() => setFiltroAno(a => a - 1)} variant="outline" size="sm"><ChevronLeft className="w-4 h-4" /></Button>
               <span className="px-3 py-1 text-sm font-semibold border rounded-md bg-white">{filtroAno}</span>
@@ -630,7 +626,7 @@ export default function AuditoriaPage() {
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="bg-gray-50">
+                    <TableRow className="bg-gray-800">
                       <TableHead>Data</TableHead>
                       <TableHead>Nome do Feriado</TableHead>
                       <TableHead>Tipo</TableHead>
@@ -644,7 +640,7 @@ export default function AuditoriaPage() {
                       <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-400">Carregando...</TableCell></TableRow>
                     ) : feriadosList && feriadosList.length > 0 ? (
                       feriadosList.map((f: Feriado, idx: number) => (
-                        <TableRow key={f.id} className={idx % 2 === 0 ? 'bg-blue-50/30' : ''}>
+                        <TableRow key={f.id} className={idx % 2 === 0 ? 'bg-blue-900/20/30' : ''}>
                           <TableCell className="font-mono font-semibold">{f.data}</TableCell>
                           <TableCell className="font-medium">{f.nome}</TableCell>
                           <TableCell>
@@ -653,10 +649,10 @@ export default function AuditoriaPage() {
                             </span>
                           </TableCell>
                           <TableCell>{f.estado ?? '—'}</TableCell>
-                          <TableCell className="text-sm text-gray-600">{f.cidade ?? '—'}</TableCell>
+                          <TableCell className="text-sm text-gray-300">{f.cidade ?? '—'}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex gap-1 justify-end">
-                              <Button size="sm" variant="ghost" onClick={() => abrirEditar(f)} className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50">
+                              <Button size="sm" variant="ghost" onClick={() => abrirEditar(f)} className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-900/30">
                                 <Pencil className="w-3.5 h-3.5" />
                               </Button>
                               <Button size="sm" variant="ghost" onClick={() => deletarFeriado.mutate({ id: f.id })} className="h-7 w-7 p-0 text-red-500 hover:bg-red-50">
@@ -734,7 +730,7 @@ export default function AuditoriaPage() {
           {/* Filtros */}
           <div className="flex flex-wrap gap-3 items-end">
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-600">Mês/Ano</label>
+              <label className="text-xs font-medium text-gray-300">Mês/Ano</label>
               <Select value={cdMesAno || 'todos'} onValueChange={v => setCdMesAno(v === 'todos' ? '' : v)}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Todos" />
@@ -748,7 +744,7 @@ export default function AuditoriaPage() {
               </Select>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-600">Chave J</label>
+              <label className="text-xs font-medium text-gray-300">Chave J</label>
               <Input
                 placeholder="Filtrar por Chave J"
                 value={cdChaveJ}
@@ -756,11 +752,11 @@ export default function AuditoriaPage() {
                 className="w-44"
               />
             </div>
-            <p className="text-sm text-gray-500 ml-auto">{cdDados ? `${cdDados.length} registro(s)` : ''}</p>
+            <p className="text-sm text-gray-400 ml-auto">{cdDados ? `${cdDados.length} registro(s)` : ''}</p>
           </div>
 
           {/* Tabela */}
-          <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+          <div className="overflow-x-auto rounded-lg border border-gray-700 shadow-sm">
             <table className="min-w-max text-xs border-collapse">
               <thead>
                 <tr className="bg-blue-700 text-white">
@@ -807,34 +803,34 @@ export default function AuditoriaPage() {
                   <tr><td colSpan={28} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
                 ) : (
                   cdDados.map((row, i) => (
-                    <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors`}>
-                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-200 font-medium">{row.mesAno}</td>
-                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-200">{row.chaveJ}</td>
-                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-200">{row.empresa}</td>
-                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-200 max-w-[180px] truncate">{row.agente}</td>
-                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-200">{row.cidade}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 font-medium text-blue-800">{fmtCD(row.rbmTotal)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-green-700">{fmtCD(row.comissao)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-green-700">{fmtCD(row.ajudaCusto)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-green-700">{fmtCD(row.creditos)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 font-bold text-green-800">{fmtCD(row.totalCreditos)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.aluguel)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.internet)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.energia)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.agua)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.propaganda)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.despesasLoja)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.reembolso)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.reajuste)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.despesaBancaria)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-red-600">{fmtCD(row.outros)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 font-bold text-red-800">{fmtCD(row.totalDespesas)}</td>
-                      <td className={`px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 font-bold ${row.saldo >= 0 ? 'text-green-700' : 'text-red-700'}`}>{fmtCD(row.saldo)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-purple-700">{fmtCD(row.rbmTotal2)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-purple-700">{fmtCD(row.rbmCredito)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-purple-700">{fmtCD(row.rbmCC)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-purple-700">{fmtCD(row.rbmConsorcio)}</td>
-                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-200 text-purple-700">{fmtCD(row.rbmOurocap)}</td>
+                    <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-800'} hover:bg-blue-900/30 transition-colors`}>
+                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-700 font-medium">{row.mesAno}</td>
+                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-700">{row.chaveJ}</td>
+                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-700">{row.empresa}</td>
+                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-700 max-w-[180px] truncate">{row.agente}</td>
+                      <td className="px-2 py-1.5 whitespace-nowrap border-r border-gray-700">{row.cidade}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 font-medium text-blue-800">{fmtCD(row.rbmTotal)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-green-700">{fmtCD(row.comissao)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-green-700">{fmtCD(row.ajudaCusto)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-green-700">{fmtCD(row.creditos)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 font-bold text-green-800">{fmtCD(row.totalCreditos)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-red-600">{fmtCD(row.aluguel)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-red-600">{fmtCD(row.internet)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-red-600">{fmtCD(row.energia)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-red-600">{fmtCD(row.agua)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-red-600">{fmtCD(row.propaganda)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-red-600">{fmtCD(row.despesasLoja)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-red-600">{fmtCD(row.reembolso)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-red-600">{fmtCD(row.reajuste)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-red-600">{fmtCD(row.despesaBancaria)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-red-600">{fmtCD(row.outros)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 font-bold text-red-800">{fmtCD(row.totalDespesas)}</td>
+                      <td className={`px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 font-bold ${row.saldo >= 0 ? 'text-green-700' : 'text-red-700'}`}>{fmtCD(row.saldo)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-purple-700">{fmtCD(row.rbmTotal2)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-purple-700">{fmtCD(row.rbmCredito)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-purple-700">{fmtCD(row.rbmCC)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-purple-700">{fmtCD(row.rbmConsorcio)}</td>
+                      <td className="px-2 py-1.5 text-right whitespace-nowrap border-r border-gray-700 text-purple-700">{fmtCD(row.rbmOurocap)}</td>
                       <td className="px-2 py-1.5 text-right whitespace-nowrap text-purple-700">{fmtCD(row.rbmSeguros)}</td>
                     </tr>
                   ))
@@ -877,7 +873,7 @@ function DespesasInternasAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any)
     <button
       onClick={() => setAba('despesas-internas')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'despesas-internas' ? 'bg-white border border-b-white border-gray-200 text-red-700' : 'text-gray-500 hover:text-gray-700'
+        aba === 'despesas-internas' ? 'bg-white border border-b-white border-gray-700 text-red-700' : 'text-gray-400 hover:text-gray-200'
       }`}
     >
       <Wallet className="w-4 h-4" /> Despesas Internas
@@ -976,13 +972,13 @@ function DespesasInternasAba() {
   if (!senhaDesbloqueada) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-6">
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 w-full max-w-sm flex flex-col items-center gap-5">
+        <div className="bg-white border border-gray-700 rounded-2xl shadow-lg p-8 w-full max-w-sm flex flex-col items-center gap-5">
           <div className="bg-red-100 rounded-full p-4">
             <Lock className="w-10 h-10 text-red-600" />
           </div>
           <div className="text-center">
             <h2 className="text-xl font-bold text-gray-900">Área Restrita</h2>
-            <p className="text-gray-500 text-sm mt-1">Informe a senha CEO para acessar as Despesas Internas</p>
+            <p className="text-gray-400 text-sm mt-1">Informe a senha CEO para acessar as Despesas Internas</p>
           </div>
           <div className="w-full space-y-2">
             <Label className="text-sm font-medium">Senha CEO</Label>
@@ -998,7 +994,7 @@ function DespesasInternasAba() {
               <button
                 type="button"
                 onClick={() => setMostrarSenha(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
               >
                 {mostrarSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -1027,12 +1023,12 @@ function DespesasInternasAba() {
           </div>
           <div>
             <h2 className="text-lg font-bold text-gray-900">Despesas Internas</h2>
-            <p className="text-xs text-gray-500">Acesso restrito — Diretoria</p>
+            <p className="text-xs text-gray-400">Acesso restrito — Diretoria</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-600">Filtrar por Mês</label>
+            <label className="text-xs font-medium text-gray-300">Filtrar por Mês</label>
             <Input
               placeholder="MM/AAAA"
               value={filtroMes}
@@ -1089,14 +1085,14 @@ function DespesasInternasAba() {
                         <TableCell>
                           <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">{d.categoria}</span>
                         </TableCell>
-                        <TableCell className="text-sm text-gray-700 max-w-[180px] truncate">{d.descricao ?? '—'}</TableCell>
-                        <TableCell className="text-sm text-gray-600">{d.dataLancamento ?? '—'}</TableCell>
-                        <TableCell className="text-sm text-gray-600">{d.lancadoPor ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-200 max-w-[180px] truncate">{d.descricao ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-300">{d.dataLancamento ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-300">{d.lancadoPor ?? '—'}</TableCell>
                         <TableCell className="text-right font-bold text-red-700">{fmt(d.valor)}</TableCell>
-                        <TableCell className="text-sm text-gray-500 max-w-[120px] truncate">{d.observacao ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-400 max-w-[120px] truncate">{d.observacao ?? '—'}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex gap-1 justify-end">
-                            <Button size="sm" variant="ghost" onClick={() => abrirEditar(d)} className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-50">
+                            <Button size="sm" variant="ghost" onClick={() => abrirEditar(d)} className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-900/30">
                               <Pencil className="w-3.5 h-3.5" />
                             </Button>
                             <Button size="sm" variant="ghost" onClick={() => excluirMutation.mutate({ id: d.id })} className="h-7 w-7 p-0 text-red-500 hover:bg-red-50">
@@ -1111,7 +1107,7 @@ function DespesasInternasAba() {
               </Table>
             </div>
             <div className="border-t bg-red-50 px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-gray-500">{(despesas ?? []).length} registro(s)</span>
+              <span className="text-sm text-gray-400">{(despesas ?? []).length} registro(s)</span>
               <div className="text-right">
                 <p className="text-xs text-gray-400">Total do Período</p>
                 <p className="font-bold text-red-700 text-lg">{fmt(totalMes)}</p>
@@ -1194,7 +1190,7 @@ function BloqueiosAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => voi
     <button
       onClick={() => setAba('bloqueios')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'bloqueios' ? 'bg-white border border-b-white border-gray-200 text-red-700' : 'text-gray-500 hover:text-gray-700'
+        aba === 'bloqueios' ? 'bg-white border border-b-white border-gray-700 text-red-700' : 'text-gray-400 hover:text-gray-200'
       }`}
     >
       <Lock className="w-4 h-4" /> Bloqueios
@@ -1215,7 +1211,7 @@ function BloqueiosAba() {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-red-200 shadow-sm p-5">
+      <div className="bg-gray-900 rounded-xl border border-red-200 shadow-sm p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Lock className="w-5 h-5 text-red-600" />
@@ -1225,7 +1221,7 @@ function BloqueiosAba() {
             <RefreshCw className="w-3 h-3 mr-1" /> Atualizar
           </Button>
         </div>
-        <p className="text-xs text-gray-500 mb-4">
+        <p className="text-xs text-gray-400 mb-4">
           Agentes são bloqueados automaticamente após 3 tentativas de login com senha incorreta. Clique em <strong>Desbloquear</strong> para liberar o acesso.
         </p>
 
@@ -1257,10 +1253,10 @@ function BloqueiosAba() {
                         {b.attempts} tentativas
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-600">
+                    <td className="px-4 py-3 text-xs text-gray-300">
                       {b.updatedAt ? new Date(b.updatedAt).toLocaleString('pt-BR') : '-'}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-600">
+                    <td className="px-4 py-3 text-xs text-gray-300">
                       {b.blockedUntil ? new Date(b.blockedUntil).toLocaleString('pt-BR') : '-'}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -1302,7 +1298,7 @@ function BackupAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => void }
     <button
       onClick={() => setAba('backup')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'backup' ? 'bg-white border border-b-white border-gray-200 text-emerald-700' : 'text-gray-500 hover:text-gray-700'
+        aba === 'backup' ? 'bg-white border border-b-white border-gray-700 text-emerald-700' : 'text-gray-400 hover:text-gray-200'
       }`}
     >
       <DatabaseBackup className="w-4 h-4" /> Backup
@@ -1353,12 +1349,12 @@ function BackupAba() {
 
   return (
     <div className="space-y-6 mt-4">
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <div className="bg-white border border-gray-700 rounded-xl p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
           <DatabaseBackup className="w-7 h-7 text-emerald-600" />
           <div>
-            <h2 className="text-xl font-bold text-gray-800">Backup do Sistema</h2>
-            <p className="text-sm text-gray-500">Exportação completa de todas as tabelas do banco de dados</p>
+            <h2 className="text-xl font-bold text-white">Backup do Sistema</h2>
+            <p className="text-sm text-gray-400">Exportação completa de todas as tabelas do banco de dados</p>
           </div>
         </div>
 
@@ -1369,10 +1365,10 @@ function BackupAba() {
               <Download className="w-5 h-5 text-emerald-700" />
               <h3 className="font-semibold text-emerald-800">Download Manual</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-300 mb-4">
               Gera um arquivo ZIP com todas as tabelas em formato Excel (.xlsx). Faça o download agora e guarde em local seguro.
             </p>
-            <div className="text-xs text-gray-500 mb-4 space-y-1">
+            <div className="text-xs text-gray-400 mb-4 space-y-1">
               <p>• Agentes • Febraban • Consignados • Contas Correntes</p>
               <p>• Consórcios • OuroCap • Seguros • BB Dental</p>
               <p>• Despesas Fixas • Despesas Internas • Certificações</p>
@@ -1392,25 +1388,25 @@ function BackupAba() {
           </div>
 
           {/* Card E-mail */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+          <div className="bg-blue-900/20 border border-blue-200 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-2">
               <Mail className="w-5 h-5 text-blue-700" />
               <h3 className="font-semibold text-blue-800">Enviar por E-mail</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-2">
+            <p className="text-sm text-gray-300 mb-2">
               Envia o backup completo para o e-mail cadastrado do sistema.
             </p>
             <div className="bg-white border border-blue-200 rounded-lg px-3 py-2 mb-4 text-sm font-mono text-blue-800">
               ultramare@gmail.com
             </div>
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-gray-400 mb-4">
               O arquivo ZIP será enviado como anexo. Certifique-se de que as configurações de SMTP estão ativas no sistema.
             </p>
             <Button
               onClick={handleEmail}
               disabled={emailMutation.isPending}
               variant="outline"
-              className="w-full border-blue-400 text-blue-700 hover:bg-blue-50 font-semibold"
+              className="w-full border-blue-400 text-blue-700 hover:bg-blue-900/30 font-semibold"
             >
               {emailMutation.isPending ? (
                 <><RefreshCw className="w-4 h-4 mr-2 animate-spin" /> Enviando...</>
@@ -1425,11 +1421,11 @@ function BackupAba() {
 
         {/* Último backup */}
         {ultimoBackup && (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-center gap-3">
+          <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
             <div className="text-sm">
-              <span className="font-semibold text-gray-700">Último backup gerado:</span>{' '}
-              <span className="text-gray-600">{ultimoBackup.dataHora}</span>
+              <span className="font-semibold text-gray-200">Último backup gerado:</span>{' '}
+              <span className="text-gray-300">{ultimoBackup.dataHora}</span>
               <span className="text-gray-400 ml-2">• {ultimoBackup.tabelas} tabelas • {ultimoBackup.tamanhoKB} KB</span>
             </div>
           </div>
@@ -1459,7 +1455,7 @@ function ArquivoMortoAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => 
     <button
       onClick={() => setAba('arquivo-morto')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'arquivo-morto' ? 'bg-white border border-b-white border-gray-200 text-amber-700' : 'text-gray-500 hover:text-gray-700'
+        aba === 'arquivo-morto' ? 'bg-white border border-b-white border-gray-700 text-amber-700' : 'text-gray-400 hover:text-gray-200'
       }`}
     >
       <FolderArchive className="w-4 h-4" /> Arquivo Morto
@@ -1594,12 +1590,12 @@ function ArquivoMortoAba() {
   return (
     <div className="space-y-4 mt-4">
       {/* Cabeçalho */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex items-center justify-between">
+      <div className="bg-white border border-gray-700 rounded-xl p-4 shadow-sm flex items-center justify-between">
         <div className="flex items-center gap-3">
           <FolderArchive className="w-7 h-7 text-amber-600" />
           <div>
-            <h2 className="text-xl font-bold text-gray-800">Arquivo Morto</h2>
-            <p className="text-sm text-gray-500">Armazenamento de arquivos originais (Excel, PDF) por módulo e mês/ano</p>
+            <h2 className="text-xl font-bold text-white">Arquivo Morto</h2>
+            <p className="text-sm text-gray-400">Armazenamento de arquivos originais (Excel, PDF) por módulo e mês/ano</p>
           </div>
         </div>
         <Button
@@ -1611,11 +1607,11 @@ function ArquivoMortoAba() {
       </div>
 
       {/* Filtros */}
-      <div className="bg-white border border-gray-200 rounded-xl p-3 flex flex-wrap gap-2">
+      <div className="bg-white border border-gray-700 rounded-xl p-3 flex flex-wrap gap-2">
         <div className="relative">
           <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-400" />
           <input
-            className="pl-8 h-9 w-52 text-sm border border-gray-200 rounded-md px-3 focus:outline-none focus:ring-1 focus:ring-amber-400"
+            className="pl-8 h-9 w-52 text-sm border border-gray-700 rounded-md px-3 focus:outline-none focus:ring-1 focus:ring-amber-400"
             placeholder="Nome do arquivo..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0); }}
@@ -1643,7 +1639,7 @@ function ArquivoMortoAba() {
       </div>
 
       {/* Tabela */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white border border-gray-700 rounded-xl shadow-sm overflow-hidden">
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="bg-amber-700 text-white">
@@ -1665,16 +1661,16 @@ function ArquivoMortoAba() {
                 <td className="px-3 py-2">
                   <div className="flex items-center gap-2">
                     {getFileIcon(row.tipoArquivo)}
-                    <span className="font-medium text-gray-800 text-xs">{row.nomeArquivo}</span>
+                    <span className="font-medium text-white text-xs">{row.nomeArquivo}</span>
                   </div>
                   {row.descricao && <div className="text-[10px] text-gray-400 mt-0.5">{row.descricao}</div>}
                 </td>
                 <td className="px-3 py-2">
                   <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-medium">{row.modulo}</span>
                 </td>
-                <td className="px-3 py-2 text-xs text-gray-600">{row.mesAno ?? "-"}</td>
-                <td className="px-3 py-2 text-xs text-gray-500">{fmtTamanho(row.tamanho)}</td>
-                <td className="px-3 py-2 text-xs text-gray-500">{row.uploadadoPor ?? "-"}</td>
+                <td className="px-3 py-2 text-xs text-gray-300">{row.mesAno ?? "-"}</td>
+                <td className="px-3 py-2 text-xs text-gray-400">{fmtTamanho(row.tamanho)}</td>
+                <td className="px-3 py-2 text-xs text-gray-400">{row.uploadadoPor ?? "-"}</td>
                 <td className="px-3 py-2 text-xs text-gray-400">
                   {row.createdAt ? new Date(row.createdAt).toLocaleDateString("pt-BR") : "-"}
                 </td>
@@ -1705,7 +1701,7 @@ function ArquivoMortoAba() {
       {/* Paginação */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-2 py-2 text-sm">
-          <span className="text-gray-500">Página {page + 1} de {totalPages} — {total} arquivos</span>
+          <span className="text-gray-400">Página {page + 1} de {totalPages} — {total} arquivos</span>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>Anterior</Button>
             <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>Próxima</Button>
@@ -1734,7 +1730,7 @@ function ArquivoMortoAba() {
             <div>
               <Label>Mês/Ano (MM/AAAA)</Label>
               <input
-                className="mt-1 w-full h-9 border border-gray-200 rounded-md px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
+                className="mt-1 w-full h-9 border border-gray-700 rounded-md px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
                 placeholder="ex: 05/2026"
                 value={uploadMesAno}
                 onChange={e => setUploadMesAno(e.target.value)}
@@ -1743,7 +1739,7 @@ function ArquivoMortoAba() {
             <div>
               <Label>Descrição (opcional)</Label>
               <input
-                className="mt-1 w-full h-9 border border-gray-200 rounded-md px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
+                className="mt-1 w-full h-9 border border-gray-700 rounded-md px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
                 placeholder="ex: Planilha original importada em 09/06/2026"
                 value={uploadDescricao}
                 onChange={e => setUploadDescricao(e.target.value)}
@@ -1768,7 +1764,7 @@ function ArquivoMortoAba() {
                 }}
               >
                 {uploadFile ? (
-                  <div className="flex items-center justify-center gap-2 text-sm text-gray-700">
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-200">
                     {getFileIcon(uploadFile.name.split(".").pop())}
                     <span className="font-medium">{uploadFile.name}</span>
                     <span className="text-gray-400">({fmtTamanho(uploadFile.size)})</span>

@@ -130,15 +130,11 @@ export default function Relatorios() {
       <div className="max-w-full">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-4xl font-bold text-slate-900">Cálculo</h1>
-            <p className="text-sm text-slate-600">Cálculo de comissões por Chave J</p>
-          </div>
           
         </div>
 
         {/* Filtros */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-gray-900 rounded-lg border border-gray-700 p-6 mb-6">
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Filtros</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -176,7 +172,7 @@ export default function Relatorios() {
         </div>
 
         {/* Tabela com registros agrupados */}
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-x-auto">
           {isLoading ? (
             <div className="p-8 text-center text-slate-500">Carregando...</div>
           ) : registrosComMesAno.length === 0 ? (
@@ -194,7 +190,7 @@ export default function Relatorios() {
               </thead>
               <tbody>
                 {registrosComMesAno.map((registro: any, index: number) => (
-                  <tr key={index} className={`border-b border-slate-200 transition-colors ${index % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}`}>
+                  <tr key={index} className={`border-b border-slate-200 transition-colors ${index % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}`}>
                     {campos.map((campo) => {
                       // Campos que devem ser formatados como moeda
                       const camposMoeda = ['vrLiquidoSoma', 'srccSoma', 'vrLiquidoSrccSoma'];

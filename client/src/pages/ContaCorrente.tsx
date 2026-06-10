@@ -346,14 +346,10 @@ export default function ContaCorrente() {
   const totalPages = Math.ceil(total / LIMIT);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950 text-white">
       <PageHeader title="Conta Corrente" />
       {/* Header */}
-      <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
-        <div>
-          <h1 className="text-lg font-bold text-gray-800">Produção — Conta Corrente</h1>
-          <p className="text-xs text-gray-500">{total.toLocaleString("pt-BR")} registros</p>
-        </div>
+      <div className="bg-gray-900 border-b border-gray-700 px-4 py-3 flex items-center gap-3">
         <div className="ml-auto flex items-center gap-2">
           <Button
             size="sm"
@@ -413,7 +409,7 @@ export default function ContaCorrente() {
       </div>
 
       {/* Filtros */}
-      <div className="bg-white border-b px-4 py-2 flex items-center gap-3 flex-wrap">
+      <div className="bg-gray-900 border-b border-gray-700 px-4 py-2 flex items-center gap-3 flex-wrap">
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
@@ -454,16 +450,16 @@ export default function ContaCorrente() {
       {/* Painel de Configuração de Comissão */}
       {showConfig && (
         <div className="w-72 min-w-[18rem] bg-white border-r shadow-sm flex-shrink-0 p-4 space-y-4">
-          <h3 className="text-sm font-bold text-gray-700">Configuração de Comissão</h3>
+          <h3 className="text-sm font-bold text-gray-200">Configuração de Comissão</h3>
 
           {/* Comissão Padrão */}
           <div className="border border-green-200 rounded-lg p-3 bg-green-50">
             <h4 className="text-xs font-semibold text-green-800 mb-2">Comissão Padrão</h4>
             <div className="space-y-2">
               <div>
-                <label className="text-xs text-gray-600">Padrão (R$)</label>
+                <label className="text-xs text-gray-300">Padrão (R$)</label>
                 <div className="flex items-center gap-1 mt-1">
-                  <span className="text-xs text-gray-500 font-medium">R$</span>
+                  <span className="text-xs text-gray-400 font-medium">R$</span>
                   <Input
                     className="h-7 text-sm w-full"
                     placeholder="0,00"
@@ -476,13 +472,13 @@ export default function ContaCorrente() {
           </div>
 
           {/* Comissão Especial */}
-          <div className="border border-blue-200 rounded-lg p-3 bg-blue-50">
+          <div className="border border-blue-200 rounded-lg p-3 bg-blue-900/20">
             <h4 className="text-xs font-semibold text-blue-800 mb-2">Comissão Especial</h4>
             <div className="space-y-2">
               <div>
-                <label className="text-xs text-gray-600">Especial (R$)</label>
+                <label className="text-xs text-gray-300">Especial (R$)</label>
                 <div className="flex items-center gap-1 mt-1">
-                  <span className="text-xs text-gray-500 font-medium">R$</span>
+                  <span className="text-xs text-gray-400 font-medium">R$</span>
                   <Input
                     className="h-7 text-sm w-full"
                     placeholder="0,00"
@@ -492,7 +488,7 @@ export default function ContaCorrente() {
                 </div>
               </div>
               <div>
-                <label className="text-xs text-gray-600">Agentes com comissão especial</label>
+                <label className="text-xs text-gray-300">Agentes com comissão especial</label>
                 <textarea
                   className="mt-1 w-full border rounded p-1.5 text-xs font-mono resize-none h-24 focus:outline-none focus:ring-1 focus:ring-blue-400"
                   placeholder="Um ChaveJ por linha\nEx: J12345\nJ67890"
@@ -522,14 +518,14 @@ export default function ContaCorrente() {
       {/* Tabela */}
       <div className="p-4 overflow-x-auto flex-1">
         {isLoading ? (
-          <div className="text-center py-12 text-gray-500">Carregando...</div>
+          <div className="text-center py-12 text-gray-400">Carregando...</div>
         ) : rows.length === 0 ? (
           <div className="text-center py-12 text-gray-400">
             <p className="text-lg font-medium">Nenhum registro encontrado</p>
             <p className="text-sm mt-1">Importe uma planilha Excel para começar</p>
           </div>
         ) : (
-          <table className="w-full text-xs border-collapse bg-white rounded-lg shadow-sm overflow-hidden">
+          <table className="w-full text-xs border-collapse bg-gray-900 rounded-lg border border-gray-700-sm overflow-hidden">
             <thead>
               <tr className="bg-gradient-to-r from-blue-800 to-blue-900 text-white">
                 <th className="px-2 py-2 text-center w-8">
@@ -554,10 +550,10 @@ export default function ContaCorrente() {
                     key={r.id}
                     className={`border-b cursor-pointer transition-colors ${
                       isSelected
-                        ? "bg-blue-50 border-blue-200"
+                        ? "bg-blue-900/20 border-blue-200"
                         : idx % 2 === 0
-                        ? "bg-white hover:bg-gray-50"
-                        : "bg-gray-50 hover:bg-gray-100"
+                        ? "bg-white hover:bg-gray-800"
+                        : "bg-gray-800 hover:bg-gray-100"
                     }`}
                     onClick={() => toggleSelect(r.id)}
                   >
@@ -576,12 +572,12 @@ export default function ContaCorrente() {
                         <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{r.empresa || ""}</span>
                         <span className="text-[9px] text-gray-400">{r.mesAno || ""}</span>
                       </div>
-                      <div className="text-[11px] text-gray-800 font-medium">{r.agente || "-"}</div>
+                      <div className="text-[11px] text-white font-medium">{r.agente || "-"}</div>
                       {r.supervisor && <div className="text-[10px] text-gray-400">Sup: {r.supervisor}</div>}
                     </td>
                     {/* Coluna Conta */}
                     <td className="px-2 py-1.5">
-                      <div className="text-[11px] text-gray-700">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
+                      <div className="text-[11px] text-gray-200">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
                       <div className="text-[10px] text-gray-400">
                         {r.dataOperacao
                           ? (r.dataOperacao instanceof Date
@@ -599,7 +595,7 @@ export default function ContaCorrente() {
                       <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() => { setEditRow({ ...r }); setEditModal(true); }}
-                          className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                          className="p-1 text-blue-600 hover:bg-blue-900/30 rounded"
                           title="Editar"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -623,7 +619,7 @@ export default function ContaCorrente() {
         {/* Paginação */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-400">
               Página {page + 1} de {totalPages} — {total.toLocaleString("pt-BR")} registros
             </span>
             <div className="flex gap-2">
@@ -649,17 +645,17 @@ export default function ContaCorrente() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setImportModo("inserir")}
-                className={`p-3 rounded border-2 text-left transition ${importModo === "inserir" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+                className={`p-3 rounded border-2 text-left transition ${importModo === "inserir" ? "border-blue-500 bg-blue-900/20" : "border-gray-700 hover:border-gray-300"}`}
               >
                 <div className="font-semibold text-sm">Apenas Inserir</div>
-                <div className="text-xs text-gray-500 mt-1">Adiciona somente registros novos.</div>
+                <div className="text-xs text-gray-400 mt-1">Adiciona somente registros novos.</div>
               </button>
               <button
                 onClick={() => setImportModo("subscrever")}
-                className={`p-3 rounded border-2 text-left transition ${importModo === "subscrever" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+                className={`p-3 rounded border-2 text-left transition ${importModo === "subscrever" ? "border-blue-500 bg-blue-900/20" : "border-gray-700 hover:border-gray-300"}`}
               >
                 <div className="font-semibold text-sm">Subscrever</div>
-                <div className="text-xs text-gray-500 mt-1">Adiciona todos os registros (pode duplicar).</div>
+                <div className="text-xs text-gray-400 mt-1">Adiciona todos os registros (pode duplicar).</div>
               </button>
             </div>
             <div>
@@ -672,21 +668,21 @@ export default function ContaCorrente() {
                 style={{ display: "block", width: "100%", padding: "10px", border: "2px dashed #d1d5db", borderRadius: 8, cursor: "pointer", fontSize: 13, background: "#f9fafb" }}
               />
               {importFileName && (
-                <p className="text-xs text-gray-500 mt-1">📄 {importFileName} — {importRows.length} registros lidos</p>
+                <p className="text-xs text-gray-400 mt-1">📄 {importFileName} — {importRows.length} registros lidos</p>
               )}
             </div>
-            <div className="bg-blue-50 rounded-lg p-3 text-xs text-blue-700">
+            <div className="bg-blue-900/20 rounded-lg p-3 text-xs text-blue-700">
               <p className="font-semibold mb-1">Colunas esperadas na planilha:</p>
               <p>Agência | Conta Corrente | Chave J | Tipo Serv | Data | Produto | Modalidade | Ag Relacionamento | RBM | Comissão | Supervisor</p>
               <p className="mt-1 text-blue-600">✓ Empresa, Mês/Ano e Agente são preenchidos automaticamente</p>
             </div>
             {importing && (
               <div>
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <div className="flex justify-between text-xs text-gray-400 mb-1">
                   <span>Importando...</span><span>{importProgress}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${importProgress}%` }} />
+                  <div className="bg-blue-900/200 h-2 rounded-full transition-all" style={{ width: `${importProgress}%` }} />
                 </div>
               </div>
             )}
@@ -785,7 +781,7 @@ export default function ContaCorrente() {
           <DialogHeader>
             <DialogTitle>Confirmar Exclusão</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-300">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
             <Button

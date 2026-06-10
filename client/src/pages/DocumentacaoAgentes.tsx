@@ -29,7 +29,7 @@ const CORES_TIPO: Record<string, string> = {
   'CNH': 'bg-orange-100 text-orange-800',
   'Comprovante de Conta Bancária': 'bg-teal-100 text-teal-800',
   'Foto 3x4': 'bg-pink-100 text-pink-800',
-  'Outros': 'bg-gray-100 text-gray-800',
+  'Outros': 'bg-gray-100 text-white',
 };
 
 function formatBytes(bytes: number) {
@@ -42,7 +42,7 @@ function formatBytes(bytes: number) {
 function getFileIcon(tipo: string) {
   if (tipo?.startsWith('image/')) return <ImageIcon className="w-5 h-5 text-blue-500" />;
   if (tipo === 'application/pdf') return <FileText className="w-5 h-5 text-red-500" />;
-  return <File className="w-5 h-5 text-gray-500" />;
+  return <File className="w-5 h-5 text-gray-400" />;
 }
 
 export default function DocumentacaoAgentes() {
@@ -165,21 +165,21 @@ export default function DocumentacaoAgentes() {
   // ── VISÃO: Documentos do agente selecionado ──
   if (agenteSelecionado) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-950 text-white">
         <PageHeader title="Documentação Agentes" />
         {/* Header */}
-        <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
+        <div className="bg-gray-900 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-mono text-blue-700 font-bold text-lg">{agenteSelecionado.chaveJ}</span>
                 <span className="text-gray-400">—</span>
-                <span className="font-semibold text-gray-800 text-lg">{agenteSelecionado.nomeAgente}</span>
+                <span className="font-semibold text-white text-lg">{agenteSelecionado.nomeAgente}</span>
                 {agenteSelecionado.empresa && (
-                  <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">{agenteSelecionado.empresa}</span>
+                  <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{agenteSelecionado.empresa}</span>
                 )}
               </div>
-              <p className="text-sm text-gray-500">Documentos do agente</p>
+              <p className="text-sm text-gray-400">Documentos do agente</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -200,7 +200,7 @@ export default function DocumentacaoAgentes() {
         </div>
 
         {/* Filtro tipo */}
-        <div className="px-6 py-3 bg-white border-b flex gap-3 items-center">
+        <div className="px-6 py-3 bg-gray-900 border-b border-gray-700 flex gap-3 items-center">
           <Select value={filtroTipoDoc || 'todos'} onValueChange={v => setFiltroTipoDoc(v === 'todos' ? '' : v)}>
             <SelectTrigger className="w-52">
               <SelectValue placeholder="Tipo de Documento" />
@@ -212,12 +212,12 @@ export default function DocumentacaoAgentes() {
               ))}
             </SelectContent>
           </Select>
-          <span className="text-sm text-gray-500">{docsFiltrados.length} documento(s)</span>
+          <span className="text-sm text-gray-400">{docsFiltrados.length} documento(s)</span>
         </div>
 
         {/* Tabela de documentos */}
         <div className="px-6 py-4">
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-gray-900 rounded-lg shadow overflow-hidden border border-gray-700">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-blue-800 text-white">
@@ -232,7 +232,7 @@ export default function DocumentacaoAgentes() {
                 </thead>
                 <tbody>
                   {loadingDocs ? (
-                    <tr><td colSpan={6} className="text-center py-8 text-gray-500">Carregando...</td></tr>
+                    <tr><td colSpan={6} className="text-center py-8 text-gray-400">Carregando...</td></tr>
                   ) : docsFiltrados.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center py-12">
@@ -245,9 +245,9 @@ export default function DocumentacaoAgentes() {
                     </tr>
                   ) : (
                     docsFiltrados.map((doc, i) => (
-                      <tr key={doc.id} className={i % 2 === 0 ? 'bg-white' : 'bg-blue-50/40'}>
+                      <tr key={doc.id} className={i % 2 === 0 ? 'bg-gray-900' : 'bg-gray-800'}>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${CORES_TIPO[doc.tipoDocumento] ?? 'bg-gray-100 text-gray-700'}`}>
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${CORES_TIPO[doc.tipoDocumento] ?? 'bg-gray-100 text-gray-200'}`}>
                             {doc.tipoDocumento}
                           </span>
                         </td>
@@ -257,16 +257,16 @@ export default function DocumentacaoAgentes() {
                             <span className="truncate max-w-[200px]" title={doc.arquivoNome ?? ''}>{doc.arquivoNome ?? '—'}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-gray-600">{doc.descricao ?? '—'}</td>
-                        <td className="px-4 py-3 text-gray-500">{doc.tamanho ? formatBytes(doc.tamanho) : '—'}</td>
-                        <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                        <td className="px-4 py-3 text-gray-300">{doc.descricao ?? '—'}</td>
+                        <td className="px-4 py-3 text-gray-400">{doc.tamanho ? formatBytes(doc.tamanho) : '—'}</td>
+                        <td className="px-4 py-3 text-gray-400 whitespace-nowrap">
                           {doc.createdAt ? new Date(doc.createdAt).toLocaleDateString('pt-BR') : '—'}
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-center gap-2">
                             {doc.arquivoUrl && (
                               <Button size="sm" variant="outline" onClick={() => setDocVisualizar(doc)}
-                                className="h-7 w-7 p-0 border-blue-300 text-blue-600 hover:bg-blue-50" title="Visualizar">
+                                className="h-7 w-7 p-0 border-blue-300 text-blue-600 hover:bg-blue-900/30" title="Visualizar">
                                 <Eye className="w-3.5 h-3.5" />
                               </Button>
                             )}
@@ -296,7 +296,7 @@ export default function DocumentacaoAgentes() {
             </DialogHeader>
             <div className="space-y-4 py-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-200 mb-1">
                   Tipo de Documento <span className="text-red-500">*</span>
                 </label>
                 <Select value={uploadForm.tipoDocumento} onValueChange={v => setUploadForm(p => ({ ...p, tipoDocumento: v }))}>
@@ -307,32 +307,32 @@ export default function DocumentacaoAgentes() {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                <label className="block text-sm font-medium text-gray-200 mb-1">Descrição</label>
                 <Input placeholder="Ex: RG frente e verso..." value={uploadForm.descricao}
                   onChange={e => setUploadForm(p => ({ ...p, descricao: e.target.value }))} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Observação</label>
+                <label className="block text-sm font-medium text-gray-200 mb-1">Observação</label>
                 <Input placeholder="Observações adicionais..." value={uploadForm.observacao}
                   onChange={e => setUploadForm(p => ({ ...p, observacao: e.target.value }))} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-200 mb-1">
                   Arquivo <span className="text-red-500">*</span>
                   <span className="text-gray-400 font-normal ml-1">(PDF, JPG, PNG — máx. 10MB)</span>
                 </label>
                 <div
-                  className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${arquivoSelecionado ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'}`}
+                  className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${arquivoSelecionado ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:border-blue-400 hover:bg-blue-900/30'}`}
                   onClick={() => fileInputRef.current?.click()}
                 >
                   {arquivoSelecionado ? (
                     <div className="flex items-center justify-center gap-2 text-green-700">
                       {getFileIcon(arquivoSelecionado.type)}
                       <span className="font-medium truncate max-w-[200px]">{arquivoSelecionado.name}</span>
-                      <span className="text-sm text-gray-500">({formatBytes(arquivoSelecionado.size)})</span>
+                      <span className="text-sm text-gray-400">({formatBytes(arquivoSelecionado.size)})</span>
                     </div>
                   ) : (
-                    <div className="text-gray-500">
+                    <div className="text-gray-400">
                       <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
                       <p className="text-sm">Clique para selecionar o arquivo</p>
                     </div>
@@ -368,14 +368,14 @@ export default function DocumentacaoAgentes() {
           return (
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2 text-sm">
-                <span className={`px-2 py-1 rounded text-xs font-semibold ${CORES_TIPO[docVisualizar.tipoDocumento] ?? 'bg-gray-100 text-gray-700'}`}>
+                <span className={`px-2 py-1 rounded text-xs font-semibold ${CORES_TIPO[docVisualizar.tipoDocumento] ?? 'bg-gray-100 text-gray-200'}`}>
                   {docVisualizar.tipoDocumento}
                 </span>
-                {docVisualizar.descricao && <span className="text-gray-500">{docVisualizar.descricao}</span>}
+                {docVisualizar.descricao && <span className="text-gray-400">{docVisualizar.descricao}</span>}
               </div>
               <div className="border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center" style={{ minHeight: 400 }}>
                 {carregando ? (
-                  <div className="text-center text-gray-500 py-8">
+                  <div className="text-center text-gray-400 py-8">
                     <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-2" />
                     <p>Carregando arquivo...</p>
                   </div>
@@ -385,7 +385,7 @@ export default function DocumentacaoAgentes() {
                 ) : docVisualizar.arquivoTipo === 'application/pdf' ? (
                   <iframe src={urlFinal} className="w-full" style={{ height: '60vh' }} title={docVisualizar.arquivoNome} />
                 ) : (
-                  <div className="text-center text-gray-500 py-8">
+                  <div className="text-center text-gray-400 py-8">
                     <File className="w-12 h-12 mx-auto mb-2" />
                     <p>Pré-visualização não disponível</p>
                     <a href={urlFinal} target="_blank" rel="noopener noreferrer"
@@ -394,7 +394,7 @@ export default function DocumentacaoAgentes() {
                 )}
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-400">
                   {docVisualizar.createdAt ? new Date(docVisualizar.createdAt).toLocaleDateString('pt-BR') : '—'}
                 </span>
                 {!carregando && (
@@ -415,18 +415,10 @@ export default function DocumentacaoAgentes() {
 
   // ── VISÃO: Lista de agentes ──
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950 text-white">
       <PageHeader title="Documentação Agentes" />
-      {/* Header */}
-      <div className="bg-white border-b px-6 py-4">
-        <div>
-          <h1 className="text-xl font-bold text-gray-800">Documentação Agentes</h1>
-          <p className="text-sm text-gray-500">Cópias de documentos por agente</p>
-        </div>
-      </div>
-
       {/* Filtro */}
-      <div className="px-6 py-4 bg-white border-b flex gap-3 items-center">
+      <div className="px-6 py-3 bg-gray-900 border-b border-gray-700 flex gap-3 items-center">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
@@ -441,7 +433,7 @@ export default function DocumentacaoAgentes() {
             </button>
           )}
         </div>
-        <span className="text-sm text-gray-500">{agentesComDocs.length} agente(s)</span>
+        <span className="text-sm text-gray-400">{agentesComDocs.length} agente(s)</span>
         <span className="text-xs text-gray-400">
           <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1 align-middle" />
           Com documentos
@@ -450,7 +442,7 @@ export default function DocumentacaoAgentes() {
 
       {/* Tabela de agentes */}
       <div className="px-6 py-4">
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-gray-900 rounded-lg shadow overflow-hidden border border-gray-700">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-blue-800 text-white">
@@ -465,7 +457,7 @@ export default function DocumentacaoAgentes() {
               </thead>
               <tbody>
                 {loadingAgentes ? (
-                  <tr><td colSpan={6} className="text-center py-8 text-gray-500">Carregando agentes...</td></tr>
+                  <tr><td colSpan={6} className="text-center py-8 text-gray-400">Carregando agentes...</td></tr>
                 ) : agentesComDocs.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="text-center py-12">
@@ -479,20 +471,20 @@ export default function DocumentacaoAgentes() {
                   agentesComDocs.map((agente, i) => (
                     <tr
                       key={agente.chaveJ}
-                      className={`cursor-pointer hover:bg-blue-50 transition-colors ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'}`}
+                      className={`cursor-pointer hover:bg-gray-800 transition-colors ${i % 2 === 0 ? 'bg-gray-900' : 'bg-gray-800'}`}
                       onClick={() => setAgenteSelecionado({ chaveJ: agente.chaveJ!, nomeAgente: agente.nomeAgente, empresa: agente.empresa })}
                     >
                       <td className="px-4 py-3 font-mono text-blue-700 font-semibold">{agente.chaveJ}</td>
                       <td className="px-4 py-3 font-medium">
-                        <span className={agente.qtdDocumentos > 0 ? 'text-green-700 font-semibold' : 'text-gray-800'}>
+                        <span className={agente.qtdDocumentos > 0 ? 'text-green-700 font-semibold' : 'text-white'}>
                           {agente.nomeAgente ?? '—'}
                         </span>
                         {agente.qtdDocumentos > 0 && (
                           <span className="ml-2 inline-block w-2 h-2 rounded-full bg-green-500 align-middle" title="Tem documentos" />
                         )}
                       </td>
-                      <td className="px-4 py-3 text-gray-600">{agente.empresa ?? '—'}</td>
-                      <td className="px-4 py-3 text-gray-500">{agente.situacao ?? '—'}</td>
+                      <td className="px-4 py-3 text-gray-300">{agente.empresa ?? '—'}</td>
+                      <td className="px-4 py-3 text-gray-400">{agente.situacao ?? '—'}</td>
                       <td className="px-4 py-3 text-center">
                         {agente.qtdDocumentos > 0 ? (
                           <span className="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full">

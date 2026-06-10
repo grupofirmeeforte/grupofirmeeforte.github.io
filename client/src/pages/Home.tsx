@@ -339,7 +339,7 @@ export default function Home() {
             <span className="text-lg font-bold text-white tracking-wide">Módulo do Sistema</span>
             <span className="text-xs text-yellow-300 mt-0.5 font-medium">Selecione um módulo para começar</span>
           </div>
-          <div className="flex flex-col items-end gap-1.5">
+          <div className="flex items-center gap-3">
             <Button
               variant="outline"
               onClick={handleLogout}
@@ -348,9 +348,7 @@ export default function Home() {
               <LogOut className="w-4 h-4" />
               Sair
             </Button>
-            <div className="text-right">
-              <span className="text-[10px] text-white/40 tracking-wide">v1.0.0 &nbsp;&bull;&nbsp; Desenvolvido por Sidnei H. Ultramare &nbsp;&bull;&nbsp; {new Date().getFullYear()}</span>
-            </div>
+            <img src="/manus-storage/logo-firme-forte-v2_bac9b5e6.png" alt="Logo" className="w-12 h-12 object-contain drop-shadow-lg" />
           </div>
         </div>
       </header>

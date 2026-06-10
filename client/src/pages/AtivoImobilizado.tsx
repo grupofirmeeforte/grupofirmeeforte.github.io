@@ -78,7 +78,7 @@ function FotoTooltip({ fotoUrl, fotoKey }: { fotoUrl: string; fotoKey?: string |
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
         >
-          <div className="bg-white rounded-xl shadow-2xl border-2 border-amber-300 overflow-hidden">
+          <div className="bg-gray-900 rounded-xl border border-gray-700-2xl border-2 border-amber-300 overflow-hidden">
             {imgSrc ? (
               <img
                 src={imgSrc}
@@ -209,10 +209,10 @@ export default function AtivoImobilizado() {
     const cores: Record<string, string> = {
       "Ativo": "bg-green-100 text-green-800",
       "Em Manutenção": "bg-yellow-100 text-yellow-800",
-      "Baixado": "bg-gray-100 text-gray-600",
+      "Baixado": "bg-gray-100 text-gray-300",
       "Extraviado": "bg-red-100 text-red-800",
     };
-    return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cores[s ?? ""] ?? "bg-gray-100 text-gray-600"}`}>{s ?? "-"}</span>;
+    return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cores[s ?? ""] ?? "bg-gray-100 text-gray-300"}`}>{s ?? "-"}</span>;
   };
 
   return (
@@ -225,10 +225,6 @@ export default function AtivoImobilizado() {
             <div className="bg-amber-600 w-10 h-10 rounded-lg flex items-center justify-center">
               <Package className="w-5 h-5 text-white" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Controle de Ativo Imobilizado</h1>
-              <p className="text-sm text-slate-500">Gestão de bens patrimoniais</p>
-            </div>
           </div>
           <div className="flex gap-2">
             <Button onClick={() => { setShowForm(true); setEditando(null); setForm(emptyForm); setFotoPreview(null); }} className="bg-green-600 hover:bg-green-700 text-white gap-1">
@@ -239,7 +235,7 @@ export default function AtivoImobilizado() {
         </div>
 
         {/* Filtros */}
-        <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <div className="bg-gray-900 rounded-lg border border-gray-700 p-4 mb-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Input placeholder="Descrição..." value={filtros.descricao} onChange={e => setFiltros(f => ({ ...f, descricao: e.target.value }))} />
             <select className="border rounded-md px-3 py-2 text-sm" value={filtros.categoria} onChange={e => setFiltros(f => ({ ...f, categoria: e.target.value }))}>
@@ -255,7 +251,7 @@ export default function AtivoImobilizado() {
         </div>
 
         {/* Tabela */}
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-x-auto">
           {isLoading ? (
             <div className="p-8 text-center text-slate-400">Carregando...</div>
           ) : ativos.length === 0 ? (
@@ -328,7 +324,7 @@ export default function AtivoImobilizado() {
       {/* Modal Formulário */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={fecharForm}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-slate-900">{editando ? "Editar Ativo" : "Novo Ativo Imobilizado"}</h2>
               <button onClick={fecharForm} className="p-2 rounded-lg hover:bg-slate-100"><X className="w-5 h-5" /></button>

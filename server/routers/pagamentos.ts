@@ -3,7 +3,7 @@ import { publicProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { pagamentos, agentes, despesasFixas } from "../../drizzle/schema";
-import { eq, and, like, desc, count, asc, sql } from "drizzle-orm";
+import { eq, and, like, desc, count, asc, sql, inArray } from "drizzle-orm";
 
 export const TIPOS_PAGTO = [
   "Agua",
@@ -331,9 +331,26 @@ export const pagamentosRouter = {
       if (input.nome) condPag.push(like(pagamentos.nomeFavorecido, `%${input.nome}%`));
       if (input.pago === "sim") condPag.push(eq(pagamentos.pago, true));
       if (input.pago === "nao") condPag.push(eq(pagamentos.pago, false));
-      const rowsPag = await db.select().from(pagamentos)
+      const rowsPagRaw = await db.select().from(pagamentos)
         .where(condPag.length > 0 ? and(...condPag) : undefined)
         .orderBy(desc(pagamentos.id));
+
+      // Buscar tipo de conta atualizado do cadastro do agente
+      const chaveJs = [...new Set(rowsPagRaw.filter(r => r.chaveJ).map(r => r.chaveJ!))];
+      const agenteTipoMap: Record<string, string> = {};
+      if (chaveJs.length > 0) {
+        const chunks: string[][] = [];
+        for (let i = 0; i < chaveJs.length; i += 50) chunks.push(chaveJs.slice(i, i + 50));
+        for (const chunk of chunks) {
+          const agRows = await db.select({ chaveJ: agentes.chaveJ, tipo: agentes.tipo }).from(agentes).where(inArray(agentes.chaveJ, chunk));
+          for (const a of agRows) { if (a.chaveJ && a.tipo) agenteTipoMap[a.chaveJ] = a.tipo; }
+        }
+      }
+      // Sobrescrever tipoConta com o valor do cadastro do agente (fonte de verdade)
+      const rowsPag = rowsPagRaw.map(p => ({
+        ...p,
+        tipoConta: (p.chaveJ && agenteTipoMap[p.chaveJ]) ? agenteTipoMap[p.chaveJ] : p.tipoConta,
+      }));
 
       // Buscar despesas fixas
       const condDesp: any[] = [];

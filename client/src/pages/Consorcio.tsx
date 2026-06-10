@@ -318,14 +318,10 @@ export default function Consorcio() {
   const totalPages = Math.ceil(total / LIMIT);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-950 text-white">
       <PageHeader title="Consórcio" />
       {/* Header */}
-      <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
-        <div>
-          <h1 className="text-lg font-bold text-gray-800">Produção — Consórcio</h1>
-          <p className="text-xs text-gray-500">{total.toLocaleString("pt-BR")} registros</p>
-        </div>
+      <div className="bg-gray-900 border-b border-gray-700 px-4 py-3 flex items-center gap-3">
         <div className="ml-auto flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => setConfigAberta(true)} className="gap-1">
             <Settings className="w-4 h-4" /> Comissões
@@ -368,7 +364,7 @@ export default function Consorcio() {
       </div>
 
       {/* Filtros */}
-      <div className="bg-white border-b px-4 py-2 flex flex-wrap gap-2">
+      <div className="bg-gray-900 border-b border-gray-700 px-4 py-2 flex flex-wrap gap-2">
         <div className="relative">
           <Search className="absolute left-2 top-2 w-4 h-4 text-gray-400" />
           <Input
@@ -443,8 +439,8 @@ export default function Consorcio() {
             ) : rows.length === 0 ? (
               <tr><td colSpan={6} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
             ) : rows.map((row, i) => (
-              <tr key={row.id} className={`${i % 2 === 0 ? "bg-white" : "bg-gray-50"} ${selectedIds.has(row.id) ? "ring-1 ring-inset ring-blue-400" : ""}`}>
-                <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+              <tr key={row.id} className={`${i % 2 === 0 ? "bg-white" : "bg-gray-800"} ${selectedIds.has(row.id) ? "ring-1 ring-inset ring-blue-400" : ""}`}>
+                <td className="px-2 py-1.5 border-r border-gray-700 text-center">
                   <input
                     type="checkbox"
                     checked={selectedIds.has(row.id)}
@@ -453,18 +449,18 @@ export default function Consorcio() {
                   />
                 </td>
                 {/* Coluna Agente */}
-                <td className="px-2 py-1.5 border-r border-gray-200">
+                <td className="px-2 py-1.5 border-r border-gray-700">
                   <div className="flex items-center gap-1.5 mb-0.5">
                     <span className="font-mono text-[11px] text-blue-700 font-semibold">{row.chaveJ ?? "-"}</span>
                     <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{row.empresa ?? ""}</span>
                     <span className="text-[9px] text-gray-400">{row.mesAno ?? ""}</span>
                   </div>
-                  <div className="text-[11px] text-gray-800 font-medium whitespace-nowrap">{row.nomeAgente ?? "-"}</div>
+                  <div className="text-[11px] text-white font-medium whitespace-nowrap">{row.nomeAgente ?? "-"}</div>
                 </td>
                 {/* Coluna Operação */}
-                <td className="px-2 py-1.5 border-r border-gray-200">
-                  <div className="font-mono text-[11px] text-gray-700 font-medium">{row.proposta ?? "-"}</div>
-                  <div className="text-[10px] text-gray-500 whitespace-nowrap">{row.data ?? ""}</div>
+                <td className="px-2 py-1.5 border-r border-gray-700">
+                  <div className="font-mono text-[11px] text-gray-200 font-medium">{row.proposta ?? "-"}</div>
+                  <div className="text-[10px] text-gray-400 whitespace-nowrap">{row.data ?? ""}</div>
                   {row.segmento && (
                     <span className={`text-[9px] px-1 py-0.5 rounded font-medium ${row.segmento === "IMOVEL" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
                       {row.segmento}
@@ -472,13 +468,13 @@ export default function Consorcio() {
                   )}
                 </td>
                 {/* Coluna Valores */}
-                <td className="px-2 py-1.5 border-r border-gray-200 text-right whitespace-nowrap">
+                <td className="px-2 py-1.5 border-r border-gray-700 text-right whitespace-nowrap">
                   <div className="font-bold text-blue-800 text-[12px]">{fmtMoeda(row.valorBem)}</div>
                   <div className="text-[10px] text-gray-400">RBM: {fmtMoeda(row.rbm)}</div>
                   {row.parcLiberada && <div className="text-[10px] text-gray-400">Parc: {row.parcLiberada}</div>}
                 </td>
                 {/* Coluna Comissão */}
-                <td className="px-2 py-1.5 border-r border-gray-200 text-right whitespace-nowrap">
+                <td className="px-2 py-1.5 border-r border-gray-700 text-right whitespace-nowrap">
                   {parseFloat(row.comissao ?? '0') > 0 ? (
                     <>
                       <div className="font-bold text-green-700 text-[12px]">{fmtMoeda(row.comissao)}</div>
@@ -515,7 +511,7 @@ export default function Consorcio() {
       {/* Paginação */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-4 py-3 bg-white border-t text-sm">
-          <span className="text-gray-500">
+          <span className="text-gray-400">
             Página {page + 1} de {totalPages} — {total.toLocaleString("pt-BR")} registros
           </span>
           <div className="flex gap-2">
@@ -533,24 +529,24 @@ export default function Consorcio() {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="p-3 bg-blue-50 rounded border border-blue-200 text-xs text-blue-700">
+            <div className="p-3 bg-blue-900/20 rounded border border-blue-200 text-xs text-blue-700">
               <strong>Colunas esperadas:</strong> Empresa, Mês/Ano, Proposta, Data, Segmento, Valor Bem, Parc Liberada, % Comissão, RBM, % Comissão2, Comissão, ChaveJ, Agente
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setImportModo("inserir")}
-                className={`p-3 rounded border-2 text-left transition ${importModo === "inserir" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+                className={`p-3 rounded border-2 text-left transition ${importModo === "inserir" ? "border-blue-500 bg-blue-900/20" : "border-gray-700 hover:border-gray-300"}`}
               >
                 <div className="font-semibold text-sm">Apenas Inserir</div>
-                <div className="text-xs text-gray-500 mt-1">Adiciona somente registros novos. Ignora propostas já existentes.</div>
+                <div className="text-xs text-gray-400 mt-1">Adiciona somente registros novos. Ignora propostas já existentes.</div>
               </button>
               <button
                 onClick={() => setImportModo("subscrever")}
-                className={`p-3 rounded border-2 text-left transition ${importModo === "subscrever" ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300"}`}
+                className={`p-3 rounded border-2 text-left transition ${importModo === "subscrever" ? "border-blue-500 bg-blue-900/20" : "border-gray-700 hover:border-gray-300"}`}
               >
                 <div className="font-semibold text-sm">Subscrever</div>
-                <div className="text-xs text-gray-500 mt-1">Adiciona novos e atualiza os existentes pelo número da proposta.</div>
+                <div className="text-xs text-gray-400 mt-1">Adiciona novos e atualiza os existentes pelo número da proposta.</div>
               </button>
             </div>
 
@@ -563,17 +559,17 @@ export default function Consorcio() {
                 style={{ display: "block", width: "100%", padding: "10px", border: "2px dashed #d1d5db", borderRadius: 8, cursor: "pointer", fontSize: 13, background: "#f9fafb" }}
               />
               {importFileName && (
-                <p className="text-xs text-gray-500 mt-1">📄 {importFileName} — {importRows.length} registros lidos</p>
+                <p className="text-xs text-gray-400 mt-1">📄 {importFileName} — {importRows.length} registros lidos</p>
               )}
             </div>
 
             {importing && (
               <div>
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <div className="flex justify-between text-xs text-gray-400 mb-1">
                   <span>Importando...</span><span>{importProgress}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full transition-all" style={{ width: `${importProgress}%` }} />
+                  <div className="bg-blue-900/200 h-2 rounded-full transition-all" style={{ width: `${importProgress}%` }} />
                 </div>
               </div>
             )}
@@ -675,7 +671,7 @@ export default function Consorcio() {
               <div className="grid grid-cols-6 gap-2 items-end">
                 {/* % Demais */}
                 <div>
-                  <Label className="text-xs text-gray-600">% Demais</Label>
+                  <Label className="text-xs text-gray-300">% Demais</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,65" value={cfgPadraoDemais1} onChange={e => setCfgPadraoDemais1(e.target.value)} />
                     <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
@@ -683,7 +679,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Demais De */}
                 <div>
-                  <Label className="text-xs text-gray-600">Parc. Demais De</Label>
+                  <Label className="text-xs text-gray-300">Parc. Demais De</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoDemaisParc1} onChange={e => setCfgPadraoDemaisParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -691,7 +687,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Demais Até */}
                 <div>
-                  <Label className="text-xs text-gray-600">Até</Label>
+                  <Label className="text-xs text-gray-300">Até</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoDemaisParc1Ate} onChange={e => setCfgPadraoDemaisParc1Ate(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -699,7 +695,7 @@ export default function Consorcio() {
                 </div>
                 {/* % Imóvel */}
                 <div>
-                  <Label className="text-xs text-gray-600">% Imóvel</Label>
+                  <Label className="text-xs text-gray-300">% Imóvel</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,20" value={cfgPadraoDemais2} onChange={e => setCfgPadraoDemais2(e.target.value)} />
                     <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
@@ -707,7 +703,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Imóvel De */}
                 <div>
-                  <Label className="text-xs text-gray-600">Parc. Imóvel De</Label>
+                  <Label className="text-xs text-gray-300">Parc. Imóvel De</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoImovelParc1} onChange={e => setCfgPadraoImovelParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -715,7 +711,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Imóvel Até */}
                 <div>
-                  <Label className="text-xs text-gray-600">Até</Label>
+                  <Label className="text-xs text-gray-300">Até</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoImovelParc2} onChange={e => setCfgPadraoImovelParc2(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -725,12 +721,12 @@ export default function Consorcio() {
             </div>
 
             {/* Card Especial */}
-            <div className="p-4 border rounded-lg bg-blue-50 border-blue-200">
+            <div className="p-4 border rounded-lg bg-blue-900/20 border-blue-200">
               <h3 className="font-semibold text-sm text-blue-800 mb-3">Comissão Especial</h3>
               <div className="grid grid-cols-6 gap-2 items-end">
                 {/* % Demais */}
                 <div>
-                  <Label className="text-xs text-gray-600">% Demais</Label>
+                  <Label className="text-xs text-gray-300">% Demais</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 1,00" value={cfgEspecialDemais1} onChange={e => setCfgEspecialDemais1(e.target.value)} />
                     <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
@@ -738,7 +734,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Demais De */}
                 <div>
-                  <Label className="text-xs text-gray-600">Parc. Demais De</Label>
+                  <Label className="text-xs text-gray-300">Parc. Demais De</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialDemaisParc1} onChange={e => setCfgEspecialDemaisParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -746,7 +742,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Demais Até */}
                 <div>
-                  <Label className="text-xs text-gray-600">Até</Label>
+                  <Label className="text-xs text-gray-300">Até</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialDemaisParc1Ate} onChange={e => setCfgEspecialDemaisParc1Ate(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -754,7 +750,7 @@ export default function Consorcio() {
                 </div>
                 {/* % Imóvel */}
                 <div>
-                  <Label className="text-xs text-gray-600">% Imóvel</Label>
+                  <Label className="text-xs text-gray-300">% Imóvel</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,75" value={cfgEspecialDemais2} onChange={e => setCfgEspecialDemais2(e.target.value)} />
                     <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
@@ -762,7 +758,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Imóvel De */}
                 <div>
-                  <Label className="text-xs text-gray-600">Parc. Imóvel De</Label>
+                  <Label className="text-xs text-gray-300">Parc. Imóvel De</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialImovelParc1} onChange={e => setCfgEspecialImovelParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -770,7 +766,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Imóvel Até */}
                 <div>
-                  <Label className="text-xs text-gray-600">Até</Label>
+                  <Label className="text-xs text-gray-300">Até</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialImovelParc2} onChange={e => setCfgEspecialImovelParc2(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -778,7 +774,7 @@ export default function Consorcio() {
                 </div>
               </div>
               <div className="mt-3">
-                <Label className="text-xs text-gray-600">Agentes com comissão especial (ChaveJ, um por linha)</Label>
+                <Label className="text-xs text-gray-300">Agentes com comissão especial (ChaveJ, um por linha)</Label>
                 <textarea
                   className="w-full mt-1 p-2 border rounded text-xs font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-300"
                   rows={4}
@@ -822,7 +818,7 @@ export default function Consorcio() {
           <DialogHeader>
             <DialogTitle>Confirmar Exclusão</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-300">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
             <Button variant="destructive" onClick={() => deleteId && excluirMutation.mutate({ id: deleteId })} disabled={excluirMutation.isPending}>

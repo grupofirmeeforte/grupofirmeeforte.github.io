@@ -110,32 +110,30 @@ export default function AgentesPage() {
   const totalPages = totalCount ? Math.ceil(totalCount / limit) : 0;
 
   return (
-    <div className="space-y-6 p-6">
-      <PageHeader title="Agentes" onBack={() => navigate("/")} />
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-5xl font-bold">Agentes</h1>
-          <p className="text-gray-600 mt-1">
-            {totalCount ? `Total: ${totalCount} agentes` : "Carregando..."}
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-950 text-white space-y-4 pb-6">
+      <PageHeader title="Agentes" onBack={() => navigate("/")} actions={
         <div className="flex gap-2">
           <Button
             variant="outline"
+            size="sm"
             onClick={() => setShowDuplicatas(!showDuplicatas)}
-            className="gap-2 border-orange-400 text-orange-700 hover:bg-orange-50"
+            className="gap-1 border-orange-400 text-orange-300 hover:bg-orange-400/20 bg-transparent text-xs"
           >
-            <GitMerge className="w-4 h-4" />
+            <GitMerge className="w-3 h-3" />
             Duplicatas
           </Button>
           <Button
+            size="sm"
             onClick={() => navigate("/agentes/novo")}
-            className="gap-2"
+            className="gap-1 bg-blue-700 hover:bg-blue-600 text-white text-xs"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3 h-3" />
             Novo Agente
           </Button>
         </div>
+      } />
+      <div className="px-6 text-sm text-gray-400">
+        {totalCount ? `Total: ${totalCount} agentes` : "Carregando..."}
       </div>
 
       {/* Painel de duplicatas */}
@@ -149,7 +147,7 @@ export default function AgentesPage() {
           </CardHeader>
           <CardContent>
             {!duplicatas ? (
-              <p className="text-sm text-gray-500">Carregando...</p>
+              <p className="text-sm text-gray-400">Carregando...</p>
             ) : duplicatas.length === 0 ? (
               <p className="text-sm text-green-700 font-medium">✅ Nenhum cadastro duplicado encontrado!</p>
             ) : (
@@ -165,7 +163,7 @@ export default function AgentesPage() {
                         <p className="font-semibold text-sm">{grupo[0]?.nomeAgente} &mdash; CPF: {grupo[0]?.cpfAgente}</p>
                         <div className="mt-2 space-y-1">
                           {grupo.map((ag) => (
-                            <div key={ag.id} className="text-xs text-gray-600 flex gap-4">
+                            <div key={ag.id} className="text-xs text-gray-300 flex gap-4">
                               <span className="font-mono">#{ag.id}</span>
                               <span>{ag.empresa}</span>
                               <span>{ag.chaveJ}</span>
@@ -408,7 +406,7 @@ export default function AgentesPage() {
                               ? 'bg-red-100 text-red-700 border-red-300'
                               : agente.situacao === 'Afastado'
                               ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
-                              : 'bg-gray-100 text-gray-600 border-gray-300'
+                              : 'bg-gray-100 text-gray-300 border-gray-300'
                           }`}>{agente.situacao || '-'}</span>
                         </div>
                         {/* Linha 3: Nome + Data Nascimento */}
@@ -416,7 +414,7 @@ export default function AgentesPage() {
                           {agente.nomeAgente}{agente.dataNascimento ? <span className="font-normal text-gray-400 text-xs ml-1">· {formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '')}</span> : ''}
                         </div>
                         {/* Linha 4: Empresa + Email + CEP */}
-                        <div className="text-xs text-gray-500 mt-0.5">{agente.empresa || '-'}{agente.email ? <span className="text-blue-500 ml-1">{agente.email}</span> : ''}{(agente as any).cep ? <span className="text-gray-400 ml-1">· CEP {(agente as any).cep}</span> : ''}</div>
+                        <div className="text-xs text-gray-400 mt-0.5">{agente.empresa || '-'}{agente.email ? <span className="text-blue-500 ml-1">{agente.email}</span> : ''}{(agente as any).cep ? <span className="text-gray-400 ml-1">· CEP {(agente as any).cep}</span> : ''}</div>
                         {/* Linha 5: Endereço + Cidade/UF */}
                         <div className="text-xs text-gray-400">{(agente as any).endereco ? `${(agente as any).endereco}${(agente as any).numero ? `, ${(agente as any).numero}` : ''}${(agente as any).bairro ? ` - ${(agente as any).bairro}` : ''} · ` : ''}{agente.cidade ? `${agente.cidade}${agente.uf ? `/${agente.uf}` : ''}` : (agente.uf || '')}</div>
                       </TableCell>
@@ -454,10 +452,10 @@ export default function AgentesPage() {
                       <TableCell>{agente.supervisor}</TableCell>
                       <TableCell className="min-w-[150px]">
                         {agente.cpfAgente
-                          ? <div className="text-sm font-mono text-gray-800">{agente.cpfAgente}</div>
+                          ? <div className="text-sm font-mono text-white">{agente.cpfAgente}</div>
                           : <span className="text-xs text-slate-400">-</span>}
                         {agente.celular && (
-                          <div className="text-xs text-gray-500 mt-0.5">{agente.celular}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{agente.celular}</div>
                         )}
                       </TableCell>
                       {/* Dados bancários compactos */}
@@ -536,7 +534,7 @@ export default function AgentesPage() {
 
       {totalPages > 1 && (
         <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-300">
             Página {page + 1} de {totalPages}
           </div>
           <div className="space-x-2">

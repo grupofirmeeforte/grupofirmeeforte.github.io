@@ -238,11 +238,7 @@ export default function Certificacoes() {
   return (
     <div className="min-h-screen bg-slate-50">
       <PageHeader title="Certificações" />
-      <div className="bg-white border-b px-6 py-3 flex items-center gap-3">
-        <div>
-          <h1 className="text-lg font-bold text-slate-800">Certificações</h1>
-          <p className="text-xs text-slate-500">Controle de certificações dos agentes (CONSIG e LGPD)</p>
-        </div>
+      <div className="bg-gray-900 border-b border-gray-700 px-6 py-3 flex items-center gap-3">
         <div className="ml-auto flex items-center gap-2">
           <Input
             placeholder="Buscar por ChaveJ, Nome ou CPF..."
@@ -265,7 +261,7 @@ export default function Certificacoes() {
         {/* Tabela */}
 
         {/* Tabela */}
-        <div className="bg-white rounded-lg border overflow-x-auto">
+        <div className="bg-gray-900 rounded-lg border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-blue-700 hover:bg-blue-700">
@@ -287,7 +283,7 @@ export default function Certificacoes() {
                   </TableCell>
                 </TableRow>
               ) : registros.map((c, idx) => (
-                <TableRow key={c.id != null ? c.id : `sint-${idx}`} className={idx % 2 === 0 ? "bg-white hover:bg-blue-50" : "bg-blue-50/30 hover:bg-blue-100/40"}>
+                <TableRow key={c.id != null ? c.id : `sint-${idx}`} className={idx % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}>
                   {/* Coluna Agente compacta */}
                   <TableCell className="min-w-[200px]">
                     <div className="flex items-center gap-1">
@@ -298,8 +294,8 @@ export default function Certificacoes() {
                         }`}>{c.situacao}</span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-800 mt-0.5">{c.nomeAgente || '-'}</div>
-                    <div className="text-[11px] text-gray-500 mt-0.5">
+                    <div className="text-sm text-white mt-0.5">{c.nomeAgente || '-'}</div>
+                    <div className="text-[11px] text-gray-400 mt-0.5">
                       {(c as any).empresa && <span>{(c as any).empresa}</span>}
                       {c.cpf && <span className="ml-1 font-mono">· {c.cpf}</span>}
                     </div>
@@ -309,12 +305,12 @@ export default function Certificacoes() {
                     {(c.dataCertif || c.ventoCertif || c.situacaoCertif) ? (
                       <div className="space-y-0.5">
                         <div className={`text-xs font-semibold ${situacaoColor(c.situacaoCertif)}`}>{c.situacaoCertif || '-'}</div>
-                        <div className="text-[11px] text-gray-600">
+                        <div className="text-[11px] text-gray-300">
                           {c.dataCertif && <span>Certif: {fmtDate(c.dataCertif)}</span>}
                           {c.ventoCertif && <span className="ml-1">· Venc: {fmtDate(c.ventoCertif)}</span>}
                         </div>
                         {c.diasFaltando != null && (
-                          <div className="text-[11px] text-gray-500">{c.diasFaltando}d restantes</div>
+                          <div className="text-[11px] text-gray-400">{c.diasFaltando}d restantes</div>
                         )}
                         {c.nrCertificadoConsig && (
                           <div className="text-[10px] font-mono text-gray-400">Nr: {c.nrCertificadoConsig}</div>
@@ -327,12 +323,12 @@ export default function Certificacoes() {
                     {(c.dataCertif2 || c.ventoCertif3 || c.situacaoCertif3) ? (
                       <div className="space-y-0.5">
                         <div className={`text-xs font-semibold ${situacaoColor(c.situacaoCertif3)}`}>{c.situacaoCertif3 || '-'}</div>
-                        <div className="text-[11px] text-gray-600">
+                        <div className="text-[11px] text-gray-300">
                           {c.dataCertif2 && <span>Certif: {fmtDate(c.dataCertif2)}</span>}
                           {c.ventoCertif3 && <span className="ml-1">· Venc: {fmtDate(c.ventoCertif3)}</span>}
                         </div>
                         {c.diasFaltando2 != null && (
-                          <div className="text-[11px] text-gray-500">{c.diasFaltando2}d restantes</div>
+                          <div className="text-[11px] text-gray-400">{c.diasFaltando2}d restantes</div>
                         )}
                         {c.nrCertificadoPldft && (
                           <div className="text-[10px] font-mono text-gray-400">Nr: {c.nrCertificadoPldft}</div>

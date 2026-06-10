@@ -194,17 +194,13 @@ export default function ContasLojas() {
 
   return (
     <div className="p-4 md:p-6 min-h-screen bg-gray-950 text-white">
-      <PageHeader title="Contas Lojas" />
-      {/* Cabeçalho */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-white">Contas das Lojas</h1>
-          <p className="text-gray-400 text-sm mt-0.5">{contas.length} registro(s) — {pendentes.length} pendente(s)</p>
-        </div>
-        <Button onClick={abrirNovo} className="bg-yellow-500 hover:bg-yellow-400 text-black font-semibold">
+      <PageHeader title="Contas Lojas" actions={
+        <div className="flex gap-1.5 items-center flex-wrap">
+          <Button onClick={abrirNovo} className="bg-yellow-500 hover:bg-yellow-400 text-black font-semibold">
           + Nova Conta
         </Button>
-      </div>
+        </div>
+      } />
 
       {/* Filtros */}
       <div className="flex flex-wrap gap-3 mb-5 p-4 bg-gray-900/60 rounded-xl border border-gray-800">
@@ -245,9 +241,9 @@ export default function ContasLojas() {
 
       {/* Tabela */}
       {isLoading ? (
-        <div className="text-center py-16 text-gray-500">Carregando...</div>
+        <div className="text-center py-16 text-gray-400">Carregando...</div>
       ) : contas.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">
+        <div className="text-center py-16 text-gray-400">
           <div className="text-4xl mb-3">📄</div>
           <p>Nenhuma conta encontrada. Clique em "+ Nova Conta" para começar.</p>
         </div>
@@ -292,7 +288,7 @@ export default function ContasLojas() {
                         </svg>
                         {conta.arquivoNome ? conta.arquivoNome.slice(0, 20) + (conta.arquivoNome.length > 20 ? "…" : "") : "Ver arquivo"}
                       </a>
-                    ) : <span className="text-gray-600 text-xs">-</span>}
+                    ) : <span className="text-gray-300 text-xs">-</span>}
                   </td>
                   <td className="px-3 py-2 text-gray-400 text-xs max-w-[120px] truncate" title={conta.observacao ?? ""}>
                     {conta.observacao || "-"}
@@ -412,7 +408,7 @@ export default function ContasLojas() {
                   {arquivoSelecionado ? (
                     <p className="text-blue-400 text-sm">{arquivoSelecionado.name}</p>
                   ) : (
-                    <p className="text-gray-500 text-sm">Clique para selecionar ou arraste o arquivo aqui<br/><span className="text-xs">PDF, JPG, PNG — máx. 16MB</span></p>
+                    <p className="text-gray-400 text-sm">Clique para selecionar ou arraste o arquivo aqui<br/><span className="text-xs">PDF, JPG, PNG — máx. 16MB</span></p>
                   )}
                 </div>
                 <input ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp"
@@ -430,7 +426,7 @@ export default function ContasLojas() {
               <Button variant="outline" onClick={() => setShowModal(false)}
                 className="border-gray-600 text-gray-300">Cancelar</Button>
               <Button onClick={salvar} disabled={uploading || criarMutation.isPending || editarMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-500 text-white">
+                className="bg-blue-600 hover:bg-blue-900/300 text-white">
                 {uploading ? "Enviando arquivo..." : (criarMutation.isPending || editarMutation.isPending) ? "Salvando..." : "Salvar"}
               </Button>
             </div>

@@ -489,54 +489,26 @@ export default function Calculo() {
   return (
     <>
     <div className="min-h-screen bg-slate-50">
-      <PageHeader title="Cálculo" />
-      {/* Header */}
-      <div className="flex items-center gap-3 px-3 py-2 bg-white border-b border-slate-200">
-        <div>
-          <h1 className="text-base font-bold text-slate-800">Cálculo</h1>
-          <p className="text-[10px] text-slate-500">
-            {registros.length} registro(s)
-            {selecionados.size > 0 && (
-              <span className="ml-2 text-purple-600 font-medium">· {selecionados.size} selecionado(s)</span>
-            )}
-          </p>
-        </div>
-        <div className="ml-auto flex gap-1.5">
-          <Button onClick={handleExportar} size="sm" className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1 h-7 px-2 text-xs">
+      <PageHeader title="Cálculo" actions={
+        <div className="flex gap-1.5">
+          <Button onClick={handleExportar} size="sm" className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1 h-6 px-2 text-[10px]">
             <Download className="w-3 h-3" /> Excel
           </Button>
-          <Button
-            onClick={handleRecalcularTotais}
-            disabled={recalcularMutation.isPending}
-            size="sm"
-            className="bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-1 h-7 px-2 text-xs disabled:opacity-60"
-          >
-            <RefreshCw className="w-3 h-3" /> Recalcular Totais
+          <Button onClick={handleRecalcularTotais} disabled={recalcularMutation.isPending} size="sm" className="bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-1 h-6 px-2 text-[10px] disabled:opacity-60">
+            <RefreshCw className="w-3 h-3" /> Recalcular
           </Button>
-          <Button
-            onClick={handleEnviarParaPagto}
-            disabled={enviarMutation.isPending}
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1 h-7 px-2 text-xs disabled:opacity-60"
-          >
-            <Send className="w-3 h-3" /> Enviar Para Pagto
+          <Button onClick={handleEnviarParaPagto} disabled={enviarMutation.isPending} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1 h-6 px-2 text-[10px] disabled:opacity-60">
+            <Send className="w-3 h-3" /> Enviar Pagto
           </Button>
-          <Button
-            onClick={() => {
-              setModalManual(true);
-              setFormManual({ chaveJ: "", nomeAgente: "", mesRef: mesRef || "", comissaoConsig: "", comissaoConsorcio: "", comissaoOurocap: "", comissaoCc: "", comissaoSeguros: "", ajudaCusto: "", creditosDebitos: "", adiantamento: "", reajuste: "" });
-              setChaveJBuscaManual("");
-            }}
-            size="sm"
-            className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-1 h-7 px-2 text-xs"
-          >
-            <Plus className="w-3 h-3" /> Adicionar Manual
+          <Button onClick={() => { setModalManual(true); setFormManual({ chaveJ: "", nomeAgente: "", mesRef: mesRef || "", comissaoConsig: "", comissaoConsorcio: "", comissaoOurocap: "", comissaoCc: "", comissaoSeguros: "", ajudaCusto: "", creditosDebitos: "", adiantamento: "", reajuste: "" }); setChaveJBuscaManual(""); }} size="sm" className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-1 h-6 px-2 text-[10px]">
+            <Plus className="w-3 h-3" /> Manual
           </Button>
         </div>
-      </div>
+      } />
+      <div className="px-3 py-1 text-[10px] text-gray-400">{registros.length} registro(s){selecionados.size > 0 && <span className="ml-2 text-purple-400 font-medium">· {selecionados.size} selecionado(s)</span>}</div>
 
       {/* Filtros + Painel Supervisores */}
-      <div className="bg-white border-b border-slate-200 px-3 py-2">
+      <div className="bg-gray-900 border-b border-gray-700 border-slate-200 px-3 py-2">
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex flex-col">
             <label className="block text-[10px] text-slate-500 mb-0.5">Mês/Ano</label>
@@ -776,7 +748,7 @@ export default function Calculo() {
       </div>
 
       {/* Paginador TOPO */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-white border-b border-slate-200">
+      <div className="flex items-center justify-between px-3 py-1.5 bg-gray-900 border-b border-gray-700 border-slate-200">
         <span className="text-[11px] text-slate-500">{total} registros · Pág. {page}/{totalPages}</span>
         <div className="flex gap-1">
           <Button size="sm" variant="outline" className="h-6 text-xs px-2" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Anterior</Button>
@@ -842,7 +814,7 @@ export default function Calculo() {
                         <span className={`text-[9px] font-semibold px-1 py-0.5 rounded-full border ${
                           r.situacao === 'Ativo' ? 'bg-green-100 text-green-800 border-green-300'
                           : r.situacao === 'Inativo' ? 'bg-red-100 text-red-700 border-red-300'
-                          : 'bg-gray-100 text-gray-600 border-gray-300'
+                          : 'bg-gray-100 text-gray-300 border-gray-300'
                         }`}>{r.situacao}</span>
                       )}
                       {r.mesRef && <span className="text-[9px] text-purple-500 font-mono">{fmtMesRef(r.mesRef)}</span>}
@@ -1173,7 +1145,7 @@ export default function Calculo() {
           </div>
 
           {/* Resumo */}
-          <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded px-3 py-2">
+          <div className="flex items-center justify-between bg-blue-900/20 border border-blue-200 rounded px-3 py-2">
             <span className="text-xs text-blue-700">
               <strong>{selecionadosEnvio.size > 0 ? registrosFiltradosEnvio.filter((r: any) => selecionadosEnvio.has(r.id)).length : 0}</strong> registro(s) serão enviados para Financeiro → Pagamentos
             </span>

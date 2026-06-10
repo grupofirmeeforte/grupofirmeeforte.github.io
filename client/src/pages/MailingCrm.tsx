@@ -127,7 +127,7 @@ function resultadoBadge(resultado?: string | null) {
     return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 font-medium">{resultado}</span>;
   if (r.includes("retornar") || r.includes("aguardando") || r.includes("pendente"))
     return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-medium">{resultado}</span>;
-  return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">{resultado}</span>;
+  return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-300 font-medium">{resultado}</span>;
 }
 
 export default function MailingCrm() {
@@ -402,7 +402,7 @@ export default function MailingCrm() {
 
   const fld = (key: keyof Row, label: string, span = 1) => (
     <div className={`col-span-${span}`}>
-      <label className="text-xs text-gray-500 mb-1 block">{label}</label>
+      <label className="text-xs text-gray-400 mb-1 block">{label}</label>
       <Input
         value={(editRow[key] as string) ?? ""}
         onChange={e => setEditRow(p => ({ ...p, [key]: e.target.value }))}
@@ -412,53 +412,35 @@ export default function MailingCrm() {
   );
 
   return (
-    <div className="p-4 space-y-4 bg-gray-50 min-h-screen">
-      <PageHeader title="Mailing CRM" />
-      {/* Cabeçalho */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">Mailing / CRM</h1>
-          <p className="text-gray-500 text-sm">{total} registros encontrados</p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <Button variant="outline" size="sm" onClick={() => !importando && fileRef.current?.click()} disabled={importando} className="gap-1.5 border-blue-400 text-blue-600 hover:bg-blue-50">
-            <Upload className="w-3.5 h-3.5" /> {importando ? importProgress || "Importando..." : "Importar Excel"}
+    <div className="p-4 space-y-4 bg-gray-800 min-h-screen">
+      <PageHeader title="Mailing CRM" actions={
+        <div className="flex gap-1.5 flex-wrap items-center">
+          <Button variant="outline" size="sm" onClick={() => !importando && fileRef.current?.click()} disabled={importando} className="gap-1 border-blue-400 text-blue-300 hover:bg-blue-400/20 bg-transparent text-[10px] h-6 px-2">
+            <Upload className="w-3 h-3" /> {importando ? "..." : "Importar"}
           </Button>
           <input ref={fileRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleImport} />
           {!isPromotor && (
-            <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5 border-green-500 text-green-600 hover:bg-green-50">
-              <Download className="w-3.5 h-3.5" /> Exportar Excel
+            <Button variant="outline" size="sm" onClick={handleExport} className="gap-1 border-green-400 text-green-300 hover:bg-green-400/20 bg-transparent text-[10px] h-6 px-2">
+              <Download className="w-3 h-3" /> Exportar
             </Button>
           )}
-          <Button
-            variant="outline" size="sm"
-            onClick={() => setConfirmLimpeza('falecidos')}
-            className="gap-1.5 border-red-400 text-red-600 hover:bg-red-50"
-          >
-            🪦 Remover Falecidos {contagem?.falecidos ? `(${contagem.falecidos})` : ''}
+          <Button variant="outline" size="sm" onClick={() => setConfirmLimpeza('falecidos')} className="gap-1 border-red-400 text-red-300 hover:bg-red-400/20 bg-transparent text-[10px] h-6 px-2">
+            Falecidos {contagem?.falecidos ? `(${contagem.falecidos})` : ''}
           </Button>
-          <Button
-            variant="outline" size="sm"
-            onClick={() => setConfirmLimpeza('acima78')}
-            className="gap-1.5 border-orange-400 text-orange-600 hover:bg-orange-50"
-          >
-            👴 Remover +78 anos {contagem?.acima78 ? `(${contagem.acima78})` : ''}
+          <Button variant="outline" size="sm" onClick={() => setConfirmLimpeza('acima78')} className="gap-1 border-orange-400 text-orange-300 hover:bg-orange-400/20 bg-transparent text-[10px] h-6 px-2">
+            +78 anos {contagem?.acima78 ? `(${contagem.acima78})` : ''}
           </Button>
-          <Button
-            variant="outline" size="sm"
-            onClick={() => setConfirmDedup(true)}
-            className="gap-1.5 border-purple-400 text-purple-600 hover:bg-purple-50"
-          >
-            🔄 Deduplicar CPF {contagemDup?.registrosAfetados ? `(${contagemDup.registrosAfetados})` : ''}
+          <Button variant="outline" size="sm" onClick={() => setConfirmDedup(true)} className="gap-1 border-purple-400 text-purple-300 hover:bg-purple-400/20 bg-transparent text-[10px] h-6 px-2">
+            Deduplicar {contagemDup?.registrosAfetados ? `(${contagemDup.registrosAfetados})` : ''}
           </Button>
-          <Button size="sm" onClick={openNew} className="bg-blue-600 hover:bg-blue-700 text-white gap-1.5">
-            + Novo Registro
+          <Button size="sm" onClick={openNew} className="gap-1 bg-blue-600 hover:bg-blue-500 text-white text-[10px] h-6 px-2">
+            + Novo
           </Button>
         </div>
-      </div>
+      } />
 
       {/* Filtros */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+      <div className="bg-gray-900 rounded-xl border border-gray-700-sm border border-gray-700 p-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
         <Input
           placeholder="🔍 Nome ou CPF..."
           value={search}
@@ -517,10 +499,10 @@ export default function MailingCrm() {
       </div>
 
       {/* Tabela estilo Consignado — linhas largas */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-gray-900 rounded-xl border border-gray-700-sm border border-gray-700 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-blue-50 border-b border-blue-100 text-xs text-blue-700 uppercase tracking-wide">
+            <tr className="bg-blue-900/20 border-b border-blue-100 text-xs text-blue-700 uppercase tracking-wide">
               <th className="px-3 py-2.5 text-left font-semibold">Cliente</th>
               <th className="px-3 py-2.5 text-left font-semibold">Telefones</th>
               <th className="px-3 py-2.5 text-left font-semibold">Localização / C/C</th>
@@ -539,7 +521,7 @@ export default function MailingCrm() {
               return (
                 <tr
                   key={r.id}
-                  className={`border-b border-gray-100 hover:bg-blue-50/40 transition-colors ${i % 2 === 0 ? "bg-white" : "bg-blue-50/20"}`}
+                  className={`border-b border-gray-100 hover:bg-blue-900/30/40 transition-colors ${i % 2 === 0 ? "bg-white" : "bg-blue-900/20/20"}`}
                 >
                   {/* Coluna 1: Cliente */}
                   {(() => {
@@ -550,7 +532,7 @@ export default function MailingCrm() {
                     return (
                       <td className="px-3 py-2.5 min-w-[180px]">
                         <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                          <span className="font-semibold text-gray-800 text-[13px]">{r.nome ?? "—"}</span>
+                          <span className="font-semibold text-white text-[13px]">{r.nome ?? "—"}</span>
                           {r.sexo && (
                             <span className={`text-[9px] px-1 py-0.5 rounded font-bold ${r.sexo === "M" ? "bg-blue-100 text-blue-700" : "bg-pink-100 text-pink-700"}`}>
                               {r.sexo}
@@ -567,7 +549,7 @@ export default function MailingCrm() {
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-gray-500">
+                        <div className="text-[11px] text-gray-400">
                           {r.cpf && <span className="font-mono">{formatCpf(r.cpf)}</span>}
                         </div>
                         <div className="flex items-center gap-1.5 mt-0.5">
@@ -614,17 +596,17 @@ export default function MailingCrm() {
                   {/* Coluna 3: Localização */}
                   <td className="px-3 py-2.5 min-w-[130px]">
                     <div className="flex items-center gap-1">
-                      {r.cidade && <span className="text-[12px] text-gray-700 font-medium">{r.cidade}</span>}
-                      {r.sgUf && <span className="text-[10px] px-1 py-0.5 rounded bg-gray-100 text-gray-600 font-bold">{r.sgUf}</span>}
+                      {r.cidade && <span className="text-[12px] text-gray-200 font-medium">{r.cidade}</span>}
+                      {r.sgUf && <span className="text-[10px] px-1 py-0.5 rounded bg-gray-100 text-gray-300 font-bold">{r.sgUf}</span>}
                     </div>
                     {r.dtInclusao && <div className="text-[10px] text-gray-400">Incl: {r.dtInclusao}</div>}
                     {r.prfDepe && <div className="text-[10px] text-gray-400">Prf: {r.prfDepe}</div>}
-                    {r.nrCc && <div className="text-[10px] text-gray-500 font-mono">C/C: {r.nrCc}</div>}
+                    {r.nrCc && <div className="text-[10px] text-gray-400 font-mono">C/C: {r.nrCc}</div>}
                   </td>
 
                   {/* Coluna 4: Contato / Datas */}
                   <td className="px-3 py-2.5 min-w-[140px]">
-                    {r.dataContato && <div className="text-[11px] text-gray-700">Contato: {r.dataContato}</div>}
+                    {r.dataContato && <div className="text-[11px] text-gray-200">Contato: {r.dataContato}</div>}
                     {r.dataInserido && <div className="text-[10px] text-gray-400">Inserido: {r.dataInserido}</div>}
                   </td>
 
@@ -666,7 +648,7 @@ export default function MailingCrm() {
 
       {/* Paginação */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center justify-between text-sm text-gray-400">
           <span>Página {page + 1} de {totalPages} — {total} registros</span>
           <div className="flex gap-1">
             <Button size="sm" variant="outline" disabled={page === 0} onClick={() => setPage(0)} className="h-7 px-2 text-xs">«</Button>
@@ -681,7 +663,7 @@ export default function MailingCrm() {
       <Dialog open={confirmDedup} onOpenChange={o => !o && setConfirmDedup(false)}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>🔄 Deduplicar CPFs</DialogTitle></DialogHeader>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-300">
             Foram encontrados <strong>{contagemDup?.duplicados ?? 0} CPF(s)</strong> com registros duplicados
             ({contagemDup?.registrosAfetados ?? 0} registro(s) serão removidos).
             <br /><br />
@@ -709,7 +691,7 @@ export default function MailingCrm() {
               {confirmLimpeza === 'falecidos' ? '🪦 Remover Falecidos' : '👴 Remover maiores de 78 anos'}
             </DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-300">
             {confirmLimpeza === 'falecidos'
               ? `Isso irá excluir permanentemente ${contagem?.falecidos ?? 0} registro(s) identificados como falecidos (campo NÃO PERTUBE contém indicação de óbito). Esta ação não pode ser desfeita.`
               : `Isso irá excluir permanentemente ${contagem?.acima78 ?? 0} registro(s) com mais de 78 anos calculados pela data de nascimento. Esta ação não pode ser desfeita.`
@@ -735,7 +717,7 @@ export default function MailingCrm() {
       <Dialog open={confirmDel !== null} onOpenChange={o => !o && setConfirmDel(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Confirmar exclusão</DialogTitle></DialogHeader>
-          <p className="text-sm text-gray-600">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-300">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDel(null)}>Cancelar</Button>
             <Button variant="destructive" onClick={() => confirmDel && deletar.mutate({ id: confirmDel })} disabled={deletar.isPending}>
@@ -771,22 +753,22 @@ export default function MailingCrm() {
               return (
                 <div key={n} className="col-span-2 grid grid-cols-2 gap-1">
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">DDD {n}</label>
+                    <label className="text-xs text-gray-400 mb-1 block">DDD {n}</label>
                     <Input value={(editRow[`ddd${pad}` as keyof Row] as string) ?? ""} onChange={e => setEditRow(p => ({ ...p, [`ddd${pad}`]: e.target.value }))} className="h-8 text-sm" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-500 mb-1 block">Telefone {n}</label>
+                    <label className="text-xs text-gray-400 mb-1 block">Telefone {n}</label>
                     <Input value={(editRow[`tel${pad}` as keyof Row] as string) ?? ""} onChange={e => setEditRow(p => ({ ...p, [`tel${pad}`]: e.target.value }))} className="h-8 text-sm" />
                   </div>
                 </div>
               );
             })}
             <div className="col-span-4">
-              <label className="text-xs text-gray-500 mb-1 block">Observação</label>
+              <label className="text-xs text-gray-400 mb-1 block">Observação</label>
               <textarea
                 value={(editRow.observacao as string) ?? ""}
                 onChange={e => setEditRow(p => ({ ...p, observacao: e.target.value }))}
-                className="w-full border border-gray-200 rounded-md text-sm p-2 h-20 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-700 rounded-md text-sm p-2 h-20 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
             </div>
           </div>

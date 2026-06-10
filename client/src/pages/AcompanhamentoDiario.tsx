@@ -139,10 +139,6 @@ export default function AcompanhamentoDiario() {
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-6 py-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-xl font-bold">Acompanhamento Diário</h1>
-            <p className="text-xs text-gray-400">Produção por agente — Febraban BB</p>
-          </div>
 
           <div className="flex items-center gap-3 flex-wrap">
             {/* Seletor de mês */}
@@ -231,7 +227,7 @@ export default function AcompanhamentoDiario() {
       )}
 
       {!isLoading && agentes.length === 0 && (
-        <div className="flex items-center justify-center py-20 text-gray-500">
+        <div className="flex items-center justify-center py-20 text-gray-400">
           Nenhum dado encontrado para {MESES[mes-1]}/{ano} — {empresa === 'TODAS' ? 'BMF + FLEX' : empresa}
         </div>
       )}
@@ -317,7 +313,7 @@ export default function AcompanhamentoDiario() {
                         </Badge>
                       </td>
                       <td className="px-2 py-2 text-center text-gray-300">{a.diasComProducao}</td>
-                      <td className="px-2 py-2 text-center text-gray-500">{a.diasSemProducao}</td>
+                      <td className="px-2 py-2 text-center text-gray-400">{a.diasSemProducao}</td>
                       <td className="px-2 py-2 text-center">
                         <span className={`font-bold ${a.aproveitamento >= 0.5 ? "text-green-400" : "text-red-400"}`}>
                           {pct(a.aproveitamento)}
@@ -334,7 +330,7 @@ export default function AcompanhamentoDiario() {
                         const label = isSab ? "Sábado" : isDom ? "Domingo" : null;
                         const zebraUtil = !isWkd ? (colIdx % 2 === 0 ? "bg-blue-950/20" : "") : "";
                         return (
-                          <td key={d} className={`px-1 py-2 text-center ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-white" : !isWkd ? "text-gray-700" : ""}`}>
+                          <td key={d} className={`px-1 py-2 text-center ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-white" : !isWkd ? "text-gray-200" : ""}`}>
                             {val > 0 ? (
                               <span className={isWkd ? "text-red-300" : "text-white"}>{fmt(val)}</span>
                             ) : label ? (
@@ -360,7 +356,7 @@ export default function AcompanhamentoDiario() {
                       const label = isSab ? "Sábado" : isDom ? "Domingo" : null;
                       const zebraUtil = !isWkd ? (colIdx % 2 === 0 ? "bg-blue-950/30" : "") : "";
                       return (
-                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-green-300" : !isWkd ? "text-gray-700" : ""}`}>
+                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-green-300" : !isWkd ? "text-gray-200" : ""}`}>
                           {val > 0 ? (
                             <span className={isWkd ? "text-red-300" : "text-green-300"}>{fmt(val)}</span>
                           ) : label ? (
@@ -377,11 +373,11 @@ export default function AcompanhamentoDiario() {
           </div>
 
           {/* Legenda */}
-          <div className="flex flex-wrap gap-4 text-xs text-gray-500 pb-4">
+          <div className="flex flex-wrap gap-4 text-xs text-gray-400 pb-4">
             <span><span className="text-green-400 font-bold">Verde</span> = aproveitamento ≥ 50%</span>
             <span><span className="text-red-400 font-bold">Vermelho</span> = aproveitamento &lt; 50%</span>
-            <span><span className="text-gray-600">—</span> = fim de semana</span>
-            <span><span className="text-gray-700">·</span> = sem produção</span>
+            <span><span className="text-gray-300">—</span> = fim de semana</span>
+            <span><span className="text-gray-200">·</span> = sem produção</span>
             <span>Dias C/ = dias úteis com produção | Dias S/ = dias úteis sem produção</span>
           </div>
         </div>

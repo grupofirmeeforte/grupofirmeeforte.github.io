@@ -145,7 +145,7 @@ export default function UniformesCrachas() {
       "Devolvido": "bg-blue-100 text-blue-800",
       "Extraviado": "bg-red-100 text-red-800",
     };
-    return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cores[s ?? ""] ?? "bg-gray-100 text-gray-600"}`}>{s ?? "-"}</span>;
+    return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cores[s ?? ""] ?? "bg-gray-100 text-gray-300"}`}>{s ?? "-"}</span>;
   };
 
   // Resumo por tipo
@@ -163,10 +163,6 @@ export default function UniformesCrachas() {
           <div className="flex items-center gap-3">
             <div className="bg-indigo-600 w-10 h-10 rounded-lg flex items-center justify-center">
               <Shirt className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Controle de Uniformes e Crachás</h1>
-              <p className="text-sm text-slate-500">Entrega e controle de itens por agente</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -190,7 +186,7 @@ export default function UniformesCrachas() {
         )}
 
         {/* Filtros */}
-        <div className="bg-white rounded-lg shadow p-4 mb-4">
+        <div className="bg-gray-900 rounded-lg border border-gray-700 p-4 mb-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Input placeholder="Chave J..." value={filtros.chaveJ} onChange={e => setFiltros(f => ({ ...f, chaveJ: e.target.value }))} />
             <Input placeholder="Nome do agente..." value={filtros.nomeAgente} onChange={e => setFiltros(f => ({ ...f, nomeAgente: e.target.value }))} />
@@ -206,7 +202,7 @@ export default function UniformesCrachas() {
         </div>
 
         {/* Tabela */}
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-x-auto">
           {isLoading ? (
             <div className="p-8 text-center text-slate-400">Carregando...</div>
           ) : itens.length === 0 ? (
@@ -280,7 +276,7 @@ export default function UniformesCrachas() {
       {/* Modal Formulário */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={fecharForm}>
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-slate-900">{editando ? "Editar Registro" : "Novo Uniforme / Crachá"}</h2>
               <button onClick={fecharForm} className="p-2 rounded-lg hover:bg-slate-100"><X className="w-5 h-5" /></button>

@@ -142,30 +142,17 @@ export default function NaoPerturbe() {
   const totalPaginas = Math.ceil(total / 50);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <PageHeader title="Não Perturbe" />
-
-      {/* Header */}
-      <div className="bg-white border-b shadow-sm px-6 py-4">
-        <div className="flex items-center gap-3">
-          <button onClick={() => setLocation("/")} className="text-gray-500 hover:text-gray-700">
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <ShieldAlert className="w-6 h-6 text-red-500" />
-          <div>
-            <h1 className="text-lg font-bold text-gray-800">Lista Não Perturbe</h1>
-            <p className="text-xs text-gray-500">Clientes que solicitaram não ser contatados</p>
-          </div>
-          <div className="ml-auto flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setModalImportar(true)} className="gap-2">
-              <FileSpreadsheet className="w-4 h-4" /> Importar Planilha BB
-            </Button>
-            <Button size="sm" onClick={() => setModalAdicionar(true)} className="gap-2 bg-red-600 hover:bg-red-700 text-white">
-              <Plus className="w-4 h-4" /> Adicionar
-            </Button>
-          </div>
+    <div className="min-h-screen bg-gray-950 text-white">
+      <PageHeader title="Não Perturbe" actions={
+        <div className="flex gap-1.5 flex-wrap items-center">
+          <Button variant="outline" size="sm" onClick={() => setModalImportar(true)} className="gap-1 border-blue-400 text-blue-300 hover:bg-blue-400/20 bg-transparent text-[10px] h-6 px-2">
+            <FileSpreadsheet className="w-3 h-3" /> Importar BB
+          </Button>
+          <Button size="sm" onClick={() => setModalAdicionar(true)} className="gap-1 bg-red-600 hover:bg-red-700 text-white text-[10px] h-6 px-2">
+            <Plus className="w-3 h-3" /> Adicionar
+          </Button>
         </div>
-      </div>
+      } />
 
       <div className="px-6 py-4 space-y-4">
         {/* Stats */}
@@ -174,8 +161,8 @@ export default function NaoPerturbe() {
             <CardContent className="p-4 flex items-center gap-3">
               <PhoneOff className="w-8 h-8 text-red-500" />
               <div>
-                <p className="text-2xl font-bold text-gray-800">{contagem?.total ?? 0}</p>
-                <p className="text-xs text-gray-500">Registros na lista</p>
+                <p className="text-2xl font-bold text-white">{contagem?.total ?? 0}</p>
+                <p className="text-xs text-gray-400">Registros na lista</p>
               </div>
             </CardContent>
           </Card>
@@ -195,7 +182,7 @@ export default function NaoPerturbe() {
         {/* Tabela */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base text-gray-800">
+            <CardTitle className="text-base text-white">
               {total} registro{total !== 1 ? "s" : ""} na lista
             </CardTitle>
           </CardHeader>
@@ -203,15 +190,15 @@ export default function NaoPerturbe() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="text-left px-3 py-2 text-gray-600 font-semibold">Nome</th>
-                    <th className="text-left px-3 py-2 text-gray-600 font-semibold">CPF</th>
-                    <th className="text-left px-3 py-2 text-gray-600 font-semibold">Município/UF</th>
-                    <th className="text-left px-3 py-2 text-gray-600 font-semibold">Ocupação</th>
-                    <th className="text-left px-3 py-2 text-gray-600 font-semibold">Inclusão</th>
-                    <th className="text-left px-3 py-2 text-gray-600 font-semibold">Reclamação</th>
-                    <th className="text-left px-3 py-2 text-gray-600 font-semibold">Origem</th>
-                    <th className="text-center px-3 py-2 text-gray-600 font-semibold">Ação</th>
+                  <tr className="border-b border-gray-700 bg-gray-800">
+                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Nome</th>
+                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">CPF</th>
+                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Município/UF</th>
+                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Ocupação</th>
+                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Inclusão</th>
+                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Reclamação</th>
+                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Origem</th>
+                    <th className="text-center px-3 py-2 text-gray-300 font-semibold">Ação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -222,23 +209,23 @@ export default function NaoPerturbe() {
                       {busca ? "Nenhum resultado encontrado" : "Lista vazia — importe a planilha BB ou adicione manualmente"}
                     </td></tr>
                   ) : rows.map(row => (
-                    <tr key={row.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <tr key={row.id} className="border-b border-gray-100 hover:bg-gray-800">
                       <td className="px-3 py-2">
                         <div className="flex items-center gap-2">
                           <ShieldAlert className="w-3.5 h-3.5 text-red-500 shrink-0" />
-                          <span className="font-medium text-gray-800 text-xs">{row.nome || "—"}</span>
+                          <span className="font-medium text-white text-xs">{row.nome || "—"}</span>
                         </div>
                         {row.telefoneFormatado && row.telefoneFormatado !== '' && (
                           <div className="text-xs text-gray-400 ml-5">{row.telefoneFormatado}</div>
                         )}
                       </td>
-                      <td className="px-3 py-2 text-xs text-gray-600 font-mono">{row.cpf || "—"}</td>
-                      <td className="px-3 py-2 text-xs text-gray-600">
+                      <td className="px-3 py-2 text-xs text-gray-300 font-mono">{row.cpf || "—"}</td>
+                      <td className="px-3 py-2 text-xs text-gray-300">
                         {row.municipio ? `${row.municipio}${row.uf ? `/${row.uf}` : ""}` : "—"}
                       </td>
-                      <td className="px-3 py-2 text-xs text-gray-600 max-w-[150px] truncate" title={row.ocupacao ?? ""}>{row.ocupacao || "—"}</td>
-                      <td className="px-3 py-2 text-xs text-gray-500">{row.dataInclusao || new Date(row.createdAt).toLocaleDateString("pt-BR")}</td>
-                      <td className="px-3 py-2 text-xs text-gray-500 max-w-[120px] truncate" title={row.reclamacao ?? ""}>{row.reclamacao || row.motivo || "—"}</td>
+                      <td className="px-3 py-2 text-xs text-gray-300 max-w-[150px] truncate" title={row.ocupacao ?? ""}>{row.ocupacao || "—"}</td>
+                      <td className="px-3 py-2 text-xs text-gray-400">{row.dataInclusao || new Date(row.createdAt).toLocaleDateString("pt-BR")}</td>
+                      <td className="px-3 py-2 text-xs text-gray-400 max-w-[120px] truncate" title={row.reclamacao ?? ""}>{row.reclamacao || row.motivo || "—"}</td>
                       <td className="px-3 py-2">
                         <Badge
                           variant={row.origem === "manual" ? "outline" : "secondary"}
@@ -270,7 +257,7 @@ export default function NaoPerturbe() {
             {totalPaginas > 1 && (
               <div className="flex justify-center gap-2 p-4">
                 <Button variant="outline" size="sm" disabled={pagina === 1} onClick={() => setPagina(p => p - 1)}>Anterior</Button>
-                <span className="text-gray-500 text-sm flex items-center px-2">{pagina} / {totalPaginas}</span>
+                <span className="text-gray-400 text-sm flex items-center px-2">{pagina} / {totalPaginas}</span>
                 <Button variant="outline" size="sm" disabled={pagina === totalPaginas} onClick={() => setPagina(p => p + 1)}>Próxima</Button>
               </div>
             )}
@@ -286,7 +273,7 @@ export default function NaoPerturbe() {
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">Telefone (opcional)</label>
+              <label className="text-sm text-gray-300 mb-1 block">Telefone (opcional)</label>
               <Input
                 placeholder="(77) 99999-0000"
                 value={novoTel}
@@ -294,7 +281,7 @@ export default function NaoPerturbe() {
               />
             </div>
             <div>
-              <label className="text-sm text-gray-600 mb-1 block">Motivo (opcional)</label>
+              <label className="text-sm text-gray-300 mb-1 block">Motivo (opcional)</label>
               <Input
                 placeholder="Ex: Solicitou não ser contatado"
                 value={novoMotivo}
@@ -322,7 +309,7 @@ export default function NaoPerturbe() {
             <DialogTitle>Importar Planilha Não Perturbe (BB)</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+            <div className="bg-blue-900/20 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
               <p className="font-semibold mb-1">Formato esperado (planilha BB):</p>
               <p>Colunas: <strong>NOME, CPF, Reclamação, INCLUSÃO, Município, UF, OCUPAÇÃO, NÃO PERTUBE</strong></p>
               <p className="mt-1 text-xs text-blue-600">A importação usa upsert por CPF — registros existentes serão atualizados automaticamente.</p>
@@ -340,7 +327,7 @@ export default function NaoPerturbe() {
               <input ref={xlsxRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleXlsxUpload} />
             </div>
             {importarPlanilhaBB.isPending && (
-              <p className="text-sm text-center text-gray-500">Processando registros, aguarde...</p>
+              <p className="text-sm text-center text-gray-400">Processando registros, aguarde...</p>
             )}
           </div>
           <DialogFooter>

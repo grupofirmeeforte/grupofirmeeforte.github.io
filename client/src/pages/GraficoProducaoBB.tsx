@@ -49,15 +49,15 @@ type Periodo = "bimestre" | "trimestre" | "semestre" | "ano";
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-xs max-w-[220px]">
-      <p className="font-bold text-gray-700 mb-2">{label}</p>
+    <div className="bg-white border border-gray-700 rounded-lg shadow-lg p-3 text-xs max-w-[220px]">
+      <p className="font-bold text-gray-200 mb-2">{label}</p>
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center justify-between gap-3 mb-1">
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full inline-block" style={{ background: p.fill || p.color }} />
-            <span className="text-gray-600 truncate max-w-[110px]">{p.name}</span>
+            <span className="text-gray-300 truncate max-w-[110px]">{p.name}</span>
           </span>
-          <span className="font-semibold text-gray-800">{fmtK(p.value)}</span>
+          <span className="font-semibold text-white">{fmtK(p.value)}</span>
         </div>
       ))}
     </div>
@@ -92,7 +92,7 @@ function GraficoPorChaveJ({ periodo, empresa }: { periodo: Periodo; empresa: str
   return (
     <div>
       {/* Ranking de agentes — valor do último período */}
-      <div className="mb-1 text-xs text-gray-400 text-right pr-1">Valores referentes a: <span className="font-semibold text-gray-600">{ultimoLabel}</span></div>
+      <div className="mb-1 text-xs text-gray-400 text-right pr-1">Valores referentes a: <span className="font-semibold text-gray-300">{ultimoLabel}</span></div>
       <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
         {top10.map((s, i) => {
           const idxUltimo = labels.indexOf(ultimoLabel);
@@ -100,7 +100,7 @@ function GraficoPorChaveJ({ periodo, empresa }: { periodo: Periodo; empresa: str
           return (
           <div key={s.name} className="rounded-lg border p-2 text-center" style={{ borderColor: CORES_AGENTES[i % CORES_AGENTES.length] + "44", background: CORES_AGENTES[i % CORES_AGENTES.length] + "0d" }}>
             <p className="text-[10px] font-bold uppercase tracking-wide truncate" style={{ color: CORES_AGENTES[i % CORES_AGENTES.length] }}>{s.name}</p>
-            <p className="text-sm font-bold text-gray-800 mt-0.5">{fmtK(valorUltimoPeriodo)}</p>
+            <p className="text-sm font-bold text-white mt-0.5">{fmtK(valorUltimoPeriodo)}</p>
           </div>
           );
         })}
@@ -139,7 +139,7 @@ function GraficoPorTipo({ periodo, empresa }: { periodo: Periodo; empresa: strin
     <div>
       {/* Cards de totais */}
       <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center">
+        <div className="rounded-lg border border-blue-200 bg-blue-900/20 p-3 text-center">
           <p className="text-[10px] font-bold uppercase tracking-wide text-blue-600">Financ. Novo</p>
           <p className="text-lg font-bold text-blue-800">{fmtK(totalNovo)}</p>
           <p className="text-xs text-blue-500">{totalGeral > 0 ? ((totalNovo / totalGeral) * 100).toFixed(1) : 0}%</p>
@@ -170,7 +170,7 @@ function GraficoPorTipo({ periodo, empresa }: { periodo: Periodo; empresa: strin
 
       {/* Linha de evolução do total */}
       <div className="mt-6">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Evolução do Volume Total (Valor Líquido)</p>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Evolução do Volume Total (Valor Líquido)</p>
         <ResponsiveContainer width="100%" height={180}>
           <LineChart data={chartData} margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -213,40 +213,14 @@ export default function GraficoProducaoBBPage() {
   const [periodoTipo, setPeriodoTipo] = useState<Periodo>("trimestre");
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <PageHeader title="Gráfico Produção BB" />
-
-      {/* Cabeçalho */}
-      <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-gray-950 text-white">
+      <PageHeader title="Gráfico Produção BB" actions={
+        <div className="flex gap-1.5 items-center flex-wrap">
           <Button size="sm" onClick={() => navigate("/febraban")} className="gap-1 rounded-full font-semibold" style={{background:'linear-gradient(135deg,#1d4ed8 0%,#1e40af 100%)',color:'#fff',border:'1.5px solid #3b82f6',boxShadow:'0 2px 12px rgba(59,130,246,0.35)'}}>
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
+            <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-              <BarChart2 className="w-5 h-5 text-blue-600" />
-              Gráficos de Produção BB
-            </h1>
-            <p className="text-xs text-gray-500 mt-0.5">Baseado no valor líquido (troco) — Contratadas a partir de 2026</p>
-          </div>
         </div>
-        {/* Filtro de empresa */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500">Empresa:</span>
-          <Select value={empresa} onValueChange={setEmpresa}>
-            <SelectTrigger className="w-36 h-8 text-xs">
-              <SelectValue placeholder="Todas" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="__all__">Todas</SelectItem>
-              {empresas.map(e => (
-                <SelectItem key={e} value={e}>{e}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      } />
 
       <div className="p-6 space-y-6">
 
@@ -254,7 +228,7 @@ export default function GraficoProducaoBBPage() {
         <Card>
           <CardHeader className="pb-3 border-b">
             <div className="flex items-center justify-between flex-wrap gap-3">
-              <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
+              <CardTitle className="text-base font-bold text-white flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-blue-600" />
                 Produção por ChaveJ — Valor Líquido (Contratadas)
               </CardTitle>
@@ -282,7 +256,7 @@ export default function GraficoProducaoBBPage() {
         <Card>
           <CardHeader className="pb-3 border-b">
             <div className="flex items-center justify-between flex-wrap gap-3">
-              <CardTitle className="text-base font-bold text-gray-800 flex items-center gap-2">
+              <CardTitle className="text-base font-bold text-white flex items-center gap-2">
                 <PieChart className="w-4 h-4 text-orange-600" />
                 Produção por Tipo de Operação — Financ. Novo / Troco-Refin / Cancelados
               </CardTitle>
