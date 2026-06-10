@@ -256,8 +256,8 @@ export const supervisoresRouter = router({
           pix: agente?.pix || null,
           empresa: agente?.empresa || null,
           valor: String(sup.total),
-          dataPagto: input.dtPagto,
-          dataVencer: input.dtPagto,
+          dataPagto: null,              // preenchido pelo financeiro ao pagar
+          dataVencer: input.dtPagto,      // data de vencimento
           origem: 'sistema',
           pago: false,
         };
