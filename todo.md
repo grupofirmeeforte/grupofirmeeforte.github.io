@@ -700,3 +700,8 @@
 - [ ] Consórcio: comissão só aparece quando paga ao agente (sobre o valor pago × percentual); sem comissão = sem percentual exibido
 - [x] Arquivo Morto em Auditoria: upload de Excel/PDF organizados por módulo e mês/ano, somente CEO
 - [x] Consórcio: comissão só aparece quando paga ao agente (sobre o valor pago × percentual); sem comissão = sem percentual exibido
+
+## CORREÇÃO DEMONSTRATIVO MENSAL - PAGAMENTOS
+- [x] Alterar filtro do demonstrativo para usar dataPagto (data de pagamento) em vez de mesAno (mês de referência)
+- [x] Adicionar categorias no demonstrativo: Salários, Energia, Água, Internet (além de Comissões, Aluguéis, Outros)
+- [x] Para itens não pagos (sem dataPagto), usar mesAno como fallback para exibição

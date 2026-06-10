@@ -489,12 +489,18 @@ export default function PagamentosPage() {
               placeholder="MM/AAAA" className="bg-gray-900 border-gray-600 text-white w-24 h-6 text-xs" />
           </div>
           {resumo && (
-            <div className="flex gap-4 flex-wrap text-xs">
+            <div className="flex gap-3 flex-wrap text-[11px]">
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">Comissões:</span>
                 <span className="text-red-400 font-medium">R$ {resumo.comissoes.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
                 <span className="text-gray-500">/</span>
                 <span className="text-green-400 font-medium">R$ {resumo.comissoes.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">Salários:</span>
+                <span className="text-red-400 font-medium">R$ {resumo.salarios.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                <span className="text-gray-500">/</span>
+                <span className="text-green-400 font-medium">R$ {resumo.salarios.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">Aluguéis:</span>
@@ -503,12 +509,30 @@ export default function PagamentosPage() {
                 <span className="text-green-400 font-medium">R$ {resumo.alugueis.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
               <div className="flex items-center gap-1">
+                <span className="text-gray-400">Energia:</span>
+                <span className="text-red-400 font-medium">R$ {resumo.energia.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                <span className="text-gray-500">/</span>
+                <span className="text-green-400 font-medium">R$ {resumo.energia.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">Água:</span>
+                <span className="text-red-400 font-medium">R$ {resumo.agua.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                <span className="text-gray-500">/</span>
+                <span className="text-green-400 font-medium">R$ {resumo.agua.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400">Internet:</span>
+                <span className="text-red-400 font-medium">R$ {resumo.internet.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                <span className="text-gray-500">/</span>
+                <span className="text-green-400 font-medium">R$ {resumo.internet.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+              </div>
+              <div className="flex items-center gap-1">
                 <span className="text-gray-400">Outros:</span>
                 <span className="text-red-400 font-medium">R$ {resumo.outros.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
                 <span className="text-gray-500">/</span>
                 <span className="text-green-400 font-medium">R$ {resumo.outros.pago.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
               </div>
-              <div className="flex items-center gap-1 border-l border-gray-600 pl-4">
+              <div className="flex items-center gap-1 border-l border-gray-600 pl-3">
                 <span className="text-white font-bold">TOTAL:</span>
                 <span className="text-red-400 font-bold">R$ {resumo.total.aPagar.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
                 <span className="text-gray-500">/</span>
@@ -517,7 +541,7 @@ export default function PagamentosPage() {
             </div>
           )}
         </div>
-        <div className="text-[10px] text-gray-500 mt-1">Vermelho = a pagar | Verde = pago</div>
+        <div className="text-[10px] text-gray-500 mt-1">Vermelho = a pagar | Verde = pago | Filtro por data de pagamento</div>
       </div>
 
       {totalPages > 1 && (

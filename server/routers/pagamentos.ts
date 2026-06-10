@@ -448,52 +448,111 @@ export const pagamentosRouter = {
         .orderBy(asc(pagamentos.empresa), asc(pagamentos.nomeFavorecido));
     }),
 
-  // Resumo mensal: totais por tipo (a pagar vs pago)
+  // Resumo mensal: totais por tipo — filtra pela DATA DE PAGAMENTO (mês em que foi pago)
+  // Para itens não pagos, usa mesAno como referência
   resumoMensal: publicProcedure
     .input(z.object({ mesAno: z.string() }))
     .query(async ({ input }) => {
       const db = await getDb();
-      if (!db) return { comissoes: { aPagar: 0, pago: 0 }, alugueis: { aPagar: 0, pago: 0 }, outros: { aPagar: 0, pago: 0 }, total: { aPagar: 0, pago: 0 } };
+      const empty = { comissoes: { aPagar: 0, pago: 0 }, salarios: { aPagar: 0, pago: 0 }, alugueis: { aPagar: 0, pago: 0 }, energia: { aPagar: 0, pago: 0 }, agua: { aPagar: 0, pago: 0 }, internet: { aPagar: 0, pago: 0 }, outros: { aPagar: 0, pago: 0 }, total: { aPagar: 0, pago: 0 } };
+      if (!db) return empty;
 
-      const pagRows = await db.select({
+      // Extrair mês e ano do input (formato MM/AAAA)
+      const [mesStr, anoStr] = input.mesAno.split('/');
+      if (!mesStr || !anoStr) return empty;
+      const mes = mesStr.padStart(2, '0');
+      const ano = anoStr;
+
+      // Pagamentos PAGOS neste mês: dataPagto contém o mês/ano (formato DD/MM/AAAA)
+      // Usa SUBSTRING para extrair MM/AAAA da dataPagto
+      const pagPagos = await db.select({
         tipoPagto: pagamentos.tipoPagto,
-        pago: pagamentos.pago,
-        total: sql<string>`COALESCE(SUM(valor), 0)`,
+        total: sql<string>`COALESCE(SUM(CAST(valor AS DECIMAL(12,2))), 0)`,
       }).from(pagamentos)
-        .where(eq(pagamentos.mesAno, input.mesAno))
-        .groupBy(pagamentos.tipoPagto, pagamentos.pago);
+        .where(and(
+          eq(pagamentos.pago, true),
+          sql`SUBSTRING(${pagamentos.dataPagto}, 4, 7) = ${`${mes}/${ano}`}`
+        ))
+        .groupBy(pagamentos.tipoPagto);
 
-      const despRows = await db.select({
+      // Pagamentos NÃO PAGOS deste mês de referência (mesAno)
+      const pagNaoPagos = await db.select({
+        tipoPagto: pagamentos.tipoPagto,
+        total: sql<string>`COALESCE(SUM(CAST(valor AS DECIMAL(12,2))), 0)`,
+      }).from(pagamentos)
+        .where(and(
+          eq(pagamentos.pago, false),
+          eq(pagamentos.mesAno, input.mesAno)
+        ))
+        .groupBy(pagamentos.tipoPagto);
+
+      // Despesas fixas PAGAS neste mês
+      const despPagas = await db.select({
         tipoPagto: despesasFixas.tipoPagto,
-        pago: despesasFixas.pago,
-        total: sql<string>`COALESCE(SUM(valor), 0)`,
+        total: sql<string>`COALESCE(SUM(CAST(valor AS DECIMAL(12,2))), 0)`,
       }).from(despesasFixas)
-        .where(eq(despesasFixas.mesAno, input.mesAno))
-        .groupBy(despesasFixas.tipoPagto, despesasFixas.pago);
+        .where(and(
+          eq(despesasFixas.pago, true),
+          sql`SUBSTRING(${despesasFixas.dataPagto}, 4, 7) = ${`${mes}/${ano}`}`
+        ))
+        .groupBy(despesasFixas.tipoPagto);
 
-      const allRows = [...pagRows, ...despRows];
+      // Despesas fixas NÃO PAGAS deste mês de referência
+      const despNaoPagas = await db.select({
+        tipoPagto: despesasFixas.tipoPagto,
+        total: sql<string>`COALESCE(SUM(CAST(valor AS DECIMAL(12,2))), 0)`,
+      }).from(despesasFixas)
+        .where(and(
+          eq(despesasFixas.pago, false),
+          eq(despesasFixas.mesAno, input.mesAno)
+        ))
+        .groupBy(despesasFixas.tipoPagto);
+
+      // Categorizar
       let comissoesPago = 0, comissoesAPagar = 0;
+      let salariosPago = 0, salariosAPagar = 0;
       let alugueisPago = 0, alugueisAPagar = 0;
+      let energiaPago = 0, energiaAPagar = 0;
+      let aguaPago = 0, aguaAPagar = 0;
+      let internetPago = 0, internetAPagar = 0;
       let outrosPago = 0, outrosAPagar = 0;
 
-      for (const row of allRows) {
-        const val = parseFloat(String(row.total)) || 0;
-        const isPago = row.pago === true || (row.pago as any) === 1;
-        const tipo = (row.tipoPagto || '').toLowerCase();
-        if (tipo.includes('comiss')) {
+      const categorizar = (tipo: string, val: number, isPago: boolean) => {
+        const t = (tipo || '').toLowerCase();
+        if (t.includes('comiss')) {
           if (isPago) comissoesPago += val; else comissoesAPagar += val;
-        } else if (tipo.includes('aluguel')) {
+        } else if (t.includes('sal') && (t.includes('rio') || t.includes('ário') || t === 'salário' || t === 'salario')) {
+          if (isPago) salariosPago += val; else salariosAPagar += val;
+        } else if (t.includes('aluguel')) {
           if (isPago) alugueisPago += val; else alugueisAPagar += val;
+        } else if (t.includes('energia') || t.includes('energ')) {
+          if (isPago) energiaPago += val; else energiaAPagar += val;
+        } else if (t.includes('agua') || t.includes('água')) {
+          if (isPago) aguaPago += val; else aguaAPagar += val;
+        } else if (t.includes('internet')) {
+          if (isPago) internetPago += val; else internetAPagar += val;
         } else {
           if (isPago) outrosPago += val; else outrosAPagar += val;
         }
-      }
+      };
+
+      for (const row of pagPagos) categorizar(row.tipoPagto || '', parseFloat(String(row.total)) || 0, true);
+      for (const row of pagNaoPagos) categorizar(row.tipoPagto || '', parseFloat(String(row.total)) || 0, false);
+      for (const row of despPagas) categorizar(row.tipoPagto || '', parseFloat(String(row.total)) || 0, true);
+      for (const row of despNaoPagas) categorizar(row.tipoPagto || '', parseFloat(String(row.total)) || 0, false);
+
+      const totalAPagar = comissoesAPagar + salariosAPagar + alugueisAPagar + energiaAPagar + aguaAPagar + internetAPagar + outrosAPagar;
+      const totalPago = comissoesPago + salariosPago + alugueisPago + energiaPago + aguaPago + internetPago + outrosPago;
 
       return {
         comissoes: { aPagar: comissoesAPagar, pago: comissoesPago },
+        salarios: { aPagar: salariosAPagar, pago: salariosPago },
         alugueis: { aPagar: alugueisAPagar, pago: alugueisPago },
+        energia: { aPagar: energiaAPagar, pago: energiaPago },
+        agua: { aPagar: aguaAPagar, pago: aguaPago },
+        internet: { aPagar: internetAPagar, pago: internetPago },
         outros: { aPagar: outrosAPagar, pago: outrosPago },
-        total: { aPagar: comissoesAPagar + alugueisAPagar + outrosAPagar, pago: comissoesPago + alugueisPago + outrosPago },
+        total: { aPagar: totalAPagar, pago: totalPago },
       };
     }),
 
