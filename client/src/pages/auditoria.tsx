@@ -1487,6 +1487,7 @@ function ArquivoMortoAba() {
   const [uploadMesAno, setUploadMesAno] = useState("");
   const [uploadDescricao, setUploadDescricao] = useState("");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -1751,8 +1752,20 @@ function ArquivoMortoAba() {
             <div>
               <Label>Arquivo *</Label>
               <div
-                className="mt-1 border-2 border-dashed border-amber-300 rounded-lg p-4 text-center cursor-pointer hover:bg-amber-50 transition-colors"
+                className={`mt-1 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${dragOver ? 'border-amber-500 bg-amber-100' : 'border-amber-300 hover:bg-amber-50'}`}
                 onClick={() => fileRef.current?.click()}
+                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); }}
+                onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); }}
+                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(false); }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDragOver(false);
+                  const files = e.dataTransfer.files;
+                  if (files && files.length > 0) {
+                    setUploadFile(files[0]);
+                  }
+                }}
               >
                 {uploadFile ? (
                   <div className="flex items-center justify-center gap-2 text-sm text-gray-700">
@@ -1763,7 +1776,7 @@ function ArquivoMortoAba() {
                 ) : (
                   <div className="text-gray-400 text-sm">
                     <Upload className="w-6 h-6 mx-auto mb-1 text-amber-400" />
-                    Clique para selecionar o arquivo (Excel, PDF, CSV...)
+                    {dragOver ? 'Solte o arquivo aqui!' : 'Arraste o arquivo aqui ou clique para selecionar (Excel, PDF, CSV...)'}
                   </div>
                 )}
               </div>
