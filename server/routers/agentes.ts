@@ -4,6 +4,11 @@ import { agentes, certificacoes } from "../../drizzle/schema";
 import { protectedProcedure, router } from "../_core/trpc";
 import { getDb } from "../db";
 
+/** Converte string para Title Case (Primeira Letra Maiúscula) */
+function toTitleCase(str: string): string {
+  return str.toLowerCase().replace(/(?:^|\s|-)\S/g, (c) => c.toUpperCase());
+}
+
 // Schema de validação para Agente
 const agenteSchema = z.object({
   numCadastro: z.string().optional(),
@@ -221,7 +226,9 @@ export const agentesRouter = router({
       const numCadastro = input.numCadastro || (await generateNumCadastro(db));
 
       const dataToInsert: any = { ...input, numCadastro };
-      // Manter datas como string YYYY-MM-DD (sem conversão)
+      // Normalizar nomes: nomeAgente TUDO MAIÚSCULO, favorecido Title Case
+      if (dataToInsert.nomeAgente) dataToInsert.nomeAgente = dataToInsert.nomeAgente.toUpperCase();
+      if (dataToInsert.favorecido) dataToInsert.favorecido = toTitleCase(dataToInsert.favorecido);
       
       const result = await db.insert(agentes).values(dataToInsert as any);
 
@@ -249,7 +256,9 @@ export const agentesRouter = router({
 
       const updateData: Record<string, unknown> = { ...input.data };
 
-      // Manter datas como string (YYYY-MM-DD) sem conversão para evitar fuso horário
+      // Normalizar nomes: nomeAgente TUDO MAIÚSCULO, favorecido Title Case
+      if (updateData.nomeAgente && typeof updateData.nomeAgente === 'string') updateData.nomeAgente = updateData.nomeAgente.toUpperCase();
+      if (updateData.favorecido && typeof updateData.favorecido === 'string') updateData.favorecido = toTitleCase(updateData.favorecido);
 
       await db
         .update(agentes)
