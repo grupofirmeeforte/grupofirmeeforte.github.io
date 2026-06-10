@@ -335,21 +335,23 @@ export const pagamentosRouter = {
         .where(condPag.length > 0 ? and(...condPag) : undefined)
         .orderBy(desc(pagamentos.id));
 
-      // Buscar tipo de conta atualizado do cadastro do agente
+      // Buscar dados atualizados do cadastro do agente (tipo conta, nome, favorecido)
       const chaveJs = Array.from(new Set(rowsPagRaw.filter(r => r.chaveJ).map(r => r.chaveJ!)));
-      const agenteTipoMap: Record<string, string> = {};
+      const agenteDataMap: Record<string, { tipo: string | null; nomeAgente: string | null; favorecido: string | null }> = {};
       if (chaveJs.length > 0) {
         const chunks: string[][] = [];
         for (let i = 0; i < chaveJs.length; i += 50) chunks.push(chaveJs.slice(i, i + 50));
         for (const chunk of chunks) {
-          const agRows = await db.select({ chaveJ: agentes.chaveJ, tipo: agentes.tipo }).from(agentes).where(inArray(agentes.chaveJ, chunk));
-          for (const a of agRows) { if (a.chaveJ && a.tipo) agenteTipoMap[a.chaveJ] = a.tipo; }
+          const agRows = await db.select({ chaveJ: agentes.chaveJ, tipo: agentes.tipo, nomeAgente: agentes.nomeAgente, favorecido: agentes.favorecido }).from(agentes).where(inArray(agentes.chaveJ, chunk));
+          for (const a of agRows) { if (a.chaveJ) agenteDataMap[a.chaveJ] = { tipo: a.tipo, nomeAgente: a.nomeAgente, favorecido: a.favorecido }; }
         }
       }
-      // Sobrescrever tipoConta com o valor do cadastro do agente (fonte de verdade)
+      // Sobrescrever tipoConta e adicionar nomeAgente/favorecido do cadastro
       const rowsPag = rowsPagRaw.map(p => ({
         ...p,
-        tipoConta: (p.chaveJ && agenteTipoMap[p.chaveJ]) ? agenteTipoMap[p.chaveJ] : p.tipoConta,
+        tipoConta: (p.chaveJ && agenteDataMap[p.chaveJ]?.tipo) ? agenteDataMap[p.chaveJ].tipo : p.tipoConta,
+        nomeAgente: (p.chaveJ && agenteDataMap[p.chaveJ]?.nomeAgente) ? agenteDataMap[p.chaveJ].nomeAgente : null,
+        favorecidoAgente: (p.chaveJ && agenteDataMap[p.chaveJ]?.favorecido) ? agenteDataMap[p.chaveJ].favorecido : null,
       }));
 
       // Buscar despesas fixas
