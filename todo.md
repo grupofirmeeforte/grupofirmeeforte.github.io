@@ -705,3 +705,6 @@
 - [x] Alterar filtro do demonstrativo para usar dataPagto (data de pagamento) em vez de mesAno (mês de referência)
 - [x] Adicionar categorias no demonstrativo: Salários, Energia, Água, Internet (além de Comissões, Aluguéis, Outros)
 - [x] Para itens não pagos (sem dataPagto), usar mesAno como fallback para exibição
+
+## BUG FIX - PAGAMENTO "PAGO" INCORRETO
+- [x] Investigar bug: pagamento enviado por supervisora aparece como "Pago" — código do enviarParaPagto confirmado correto (dataPagto: null, pago: false). Badge depende de dataPagto preenchido no banco.
