@@ -28,6 +28,7 @@ import {
 import * as XLSX from "xlsx";
 import { formatMesAno } from "@/lib/mesano";
 import PageHeader from "@/components/PageHeader";
+import RetornoDocumentos from "@/pages/RetornoDocumentos";
 import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 // Alias para compatibilidade com código existente
@@ -950,6 +951,7 @@ export default function FebrabanPage() {
         <TabsList className="mb-4">
           <TabsTrigger value="producao" className="gap-2"><Search className="w-3.5 h-3.5" />Produção</TabsTrigger>
           <TabsTrigger value="graficos" className="gap-2"><BarChart2 className="w-3.5 h-3.5" />Gráficos</TabsTrigger>
+          <TabsTrigger value="retorno" className="gap-2">📄 Retorno Documentos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="producao">
@@ -1159,6 +1161,10 @@ export default function FebrabanPage() {
         {/* ABA GRÁFICOS */}
         <TabsContent value="graficos">
           <GraficosProducaoInline empresa={empresa} filtros={filtros} />
+        </TabsContent>
+
+        <TabsContent value="retorno">
+          <RetornoDocumentos />
         </TabsContent>
 
       </Tabs>

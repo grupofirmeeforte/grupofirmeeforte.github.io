@@ -39,6 +39,7 @@ import { extratosBancariosRouter } from "./routers/extratosBancarios";
 import { contratosRouter } from "./routers/contratos";
 import { naoPerturbeRouter } from "./routers/naoPerturbe";
 import { arquivoMortoRouter } from "./routers/arquivoMorto";
+import { retornoDocumentosRouter } from "./routers/retornoDocumentos";
 import { agenciasBbRouter } from "./routers/agenciasBb";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago, updateAuditLogSaidaPorChaveJ } from "./db";
@@ -454,6 +455,7 @@ export const appRouter = router({
   despesasFixas: despesasFixasRouter,
   auditoria: auditoriaRouter,
   febraban: febrabanRouter,
+  retornoDocumentos: retornoDocumentosRouter,
   feriados: feriadosRouter,
   consorcio: consorcioRouter,
   contaCorrenteProd: contaCorrenteRouter,
