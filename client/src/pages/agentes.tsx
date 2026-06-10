@@ -462,7 +462,7 @@ export default function AgentesPage() {
                       <TableCell className="min-w-[180px]">
                         {(agente.banco || agente.agencia || agente.conta) ? (
                           <div className="font-medium text-sm text-gray-900">
-                            {agente.banco}{agente.agencia ? ` · Ag ${agente.agencia}` : ''}{agente.conta ? ` · Cc ${agente.conta}` : ''}
+                            {agente.banco}{agente.agencia ? ` · Ag ${agente.agencia}` : ''}{agente.conta ? ` · ${agente.tipo === 'Conta Poupança' ? 'Cp' : 'Cc'} ${agente.conta}` : ''}
                           </div>
                         ) : <span className="text-xs text-slate-400">-</span>}
                         {/* Favorecido */}

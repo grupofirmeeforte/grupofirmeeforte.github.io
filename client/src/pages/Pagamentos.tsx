@@ -586,7 +586,7 @@ export default function PagamentosPage() {
                 {/* Coluna Dados Bancários */}
                 <td className="px-2 py-1.5 whitespace-nowrap text-[10px]">
                   <div className="text-gray-300">
-                    {row.banco || "-"}{row.agencia ? ` · Ag ${row.agencia}` : ""}{row.conta ? ` · Cc ${row.conta}` : ""}
+                    {row.banco || "-"}{row.agencia ? ` · Ag ${row.agencia}` : ""}{row.conta ? ` · ${row.tipoConta === 'Conta Poupança' ? 'Cp' : 'Cc'} ${row.conta}` : ""}
                     {row.tipoConta && <span className="ml-1 text-gray-400">({row.tipoConta})</span>}
                   </div>
                   {row.cpfCnpj && <div className="text-gray-400 font-mono">{row.cpfCnpj}</div>}
