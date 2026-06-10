@@ -475,14 +475,19 @@ export const pagamentosRouter = {
         ))
         .groupBy(pagamentos.tipoPagto);
 
-      // Pagamentos NÃO PAGOS deste mês de referência (mesAno)
+      // Pagamentos NÃO PAGOS: usa dataVencer (data prevista para pagamento) no mês selecionado
+      // Se não tem dataVencer, usa mesAno como fallback
       const pagNaoPagos = await db.select({
         tipoPagto: pagamentos.tipoPagto,
         total: sql<string>`COALESCE(SUM(CAST(valor AS DECIMAL(12,2))), 0)`,
       }).from(pagamentos)
         .where(and(
           eq(pagamentos.pago, false),
-          eq(pagamentos.mesAno, input.mesAno)
+          sql`(
+            (${pagamentos.dataVencer} IS NOT NULL AND ${pagamentos.dataVencer} != '' AND SUBSTRING(${pagamentos.dataVencer}, 4, 7) = ${`${mes}/${ano}`})
+            OR
+            (${pagamentos.dataVencer} IS NULL OR ${pagamentos.dataVencer} = '') AND ${pagamentos.mesAno} = ${input.mesAno}
+          )`
         ))
         .groupBy(pagamentos.tipoPagto);
 
@@ -497,14 +502,18 @@ export const pagamentosRouter = {
         ))
         .groupBy(despesasFixas.tipoPagto);
 
-      // Despesas fixas NÃO PAGAS deste mês de referência
+      // Despesas fixas NÃO PAGAS: usa dataVencer no mês selecionado, fallback para mesAno
       const despNaoPagas = await db.select({
         tipoPagto: despesasFixas.tipoPagto,
         total: sql<string>`COALESCE(SUM(CAST(valor AS DECIMAL(12,2))), 0)`,
       }).from(despesasFixas)
         .where(and(
           eq(despesasFixas.pago, false),
-          eq(despesasFixas.mesAno, input.mesAno)
+          sql`(
+            (${despesasFixas.dataVencer} IS NOT NULL AND ${despesasFixas.dataVencer} != '' AND SUBSTRING(${despesasFixas.dataVencer}, 4, 7) = ${`${mes}/${ano}`})
+            OR
+            (${despesasFixas.dataVencer} IS NULL OR ${despesasFixas.dataVencer} = '') AND ${despesasFixas.mesAno} = ${input.mesAno}
+          )`
         ))
         .groupBy(despesasFixas.tipoPagto);
 
