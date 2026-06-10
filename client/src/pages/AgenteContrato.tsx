@@ -513,7 +513,7 @@ export default function AgenteContrato() {
     <div className="min-h-screen bg-gray-100 print:bg-white">
       {/* Barra de ações */}
       <div className="print:hidden">
-        <PageHeader onBack={() => navigate("/agentes")} />
+        <PageHeader title="Contrato do Agente" onBack={() => navigate("/agentes")} />
         {tipoContrato && (
           <div className="bg-white border-b px-6 py-2 flex items-center gap-3">
             <Button size="sm" onClick={() => window.print()} className="bg-orange-600 hover:bg-orange-700 text-white">

@@ -218,7 +218,7 @@ export default function Ourocap() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader />
+      <PageHeader title="Ourocap" />
       <div className="max-w-[1400px] mx-auto px-4 py-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h1 className="text-2xl font-bold text-blue-900">OuroCap — Títulos de Capitalização</h1>

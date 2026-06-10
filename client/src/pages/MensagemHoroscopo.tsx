@@ -29,7 +29,7 @@ export default function MensagemHoroscopo() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <PageHeader onBack={() => navigate("/")} />
+      <PageHeader title="Horóscopo" onBack={() => navigate("/")} />
       {/* Header */}
       <div className="shadow-lg" style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5986 60%, #c8960c 100%)' }}>
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">

@@ -413,7 +413,7 @@ export default function MailingCrm() {
 
   return (
     <div className="p-4 space-y-4 bg-gray-50 min-h-screen">
-      <PageHeader />
+      <PageHeader title="Mailing CRM" />
       {/* Cabeçalho */}
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div>

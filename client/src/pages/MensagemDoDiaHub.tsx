@@ -616,7 +616,7 @@ export default function MensagemDoDiaHub() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader />
+      <PageHeader title="Mensagem do Dia" />
 
       {/* Cabeçalho */}
       <div className="bg-white border-b px-6 py-4">

@@ -121,7 +121,7 @@ export default function CaixaRecados() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <PageHeader onBack={() => setLocation("/")} />
+      <PageHeader title="Caixa de Recados" onBack={() => setLocation("/")} />
       <div className="bg-white border-b shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-2">
           <MessageSquare className="w-5 h-5 text-blue-700" />

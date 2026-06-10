@@ -111,7 +111,7 @@ export default function AcompanhamentoDiario() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-      <PageHeader />
+      <PageHeader title="Acompanhamento Diário" />
         <div className="text-gray-400">Carregando...</div>
       </div>
     );
@@ -135,7 +135,7 @@ export default function AcompanhamentoDiario() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <PageHeader />
+      <PageHeader title="Acompanhamento Diário" />
       {/* Header */}
       <div className="bg-gray-900 border-b border-gray-800 px-6 py-4">
         <div className="flex items-center justify-between flex-wrap gap-3">

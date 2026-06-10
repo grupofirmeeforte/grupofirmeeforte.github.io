@@ -275,7 +275,7 @@ export default function ContratosPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white">
-      <PageHeader />
+      <PageHeader title="Contratos" />
 
       <div className="w-[90%] mx-auto px-4 py-6">
         {/* Cards de estatísticas */}

@@ -111,7 +111,7 @@ export default function AgentesPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <PageHeader onBack={() => navigate("/")} />
+      <PageHeader title="Agentes" onBack={() => navigate("/")} />
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-5xl font-bold">Agentes</h1>

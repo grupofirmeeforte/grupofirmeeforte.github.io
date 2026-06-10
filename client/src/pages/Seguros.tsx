@@ -236,7 +236,7 @@ export default function Seguros() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader />
+      <PageHeader title="Seguros" />
       <div className="max-w-[1600px] mx-auto px-4 py-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h1 className="text-2xl font-bold text-blue-900">Seguros — Apólices e Operações</h1>

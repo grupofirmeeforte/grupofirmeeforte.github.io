@@ -185,7 +185,7 @@ export default function ExtratosBancarios() {
 
   return (
     <div className="min-h-screen bg-[#0a1628]">
-      <PageHeader />
+      <PageHeader title="Extratos Bancários" />
 
       {/* Abas */}
       <div className="px-4 pt-4">

@@ -143,7 +143,7 @@ export default function NaoPerturbe() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader />
+      <PageHeader title="Não Perturbe" />
 
       {/* Header */}
       <div className="bg-white border-b shadow-sm px-6 py-4">

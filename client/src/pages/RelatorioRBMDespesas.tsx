@@ -51,7 +51,7 @@ export default function RelatorioRBMDespesas() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <PageHeader />
+      <PageHeader title="Relatório RBM Despesas" />
 
       {/* Barra de filtros */}
       <div className="bg-white border-b border-gray-200 px-4 py-2 flex flex-wrap items-center gap-3">

@@ -17,7 +17,7 @@ export default function MensagemMinutosSabedoria() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50">
-      <PageHeader onBack={() => navigate("/")} />
+      <PageHeader title="Minutos de Sabedoria" onBack={() => navigate("/")} />
       {/* Header */}
       <div
         className="shadow-lg"

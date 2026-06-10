@@ -319,7 +319,7 @@ export default function Consorcio() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader />
+      <PageHeader title="Consórcio" />
       {/* Header */}
       <div className="bg-white border-b px-4 py-3 flex items-center gap-3">
         <div>

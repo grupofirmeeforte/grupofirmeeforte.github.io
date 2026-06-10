@@ -166,7 +166,7 @@ export default function DocumentacaoAgentes() {
   if (agenteSelecionado) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <PageHeader />
+        <PageHeader title="Documentação Agentes" />
         {/* Header */}
         <div className="bg-white border-b px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -416,7 +416,7 @@ export default function DocumentacaoAgentes() {
   // ── VISÃO: Lista de agentes ──
   return (
     <div className="min-h-screen bg-gray-50">
-      <PageHeader />
+      <PageHeader title="Documentação Agentes" />
       {/* Header */}
       <div className="bg-white border-b px-6 py-4">
         <div>

@@ -17,7 +17,7 @@ export default function MensagemMotivacional() {
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)' }}>
-      <PageHeader onBack={() => navigate("/")} />
+      <PageHeader title="Motivacional" onBack={() => navigate("/")} />
       {/* Header */}
       <div
         className="shadow-lg"

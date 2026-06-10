@@ -53,7 +53,7 @@ export default function MensagemVersiculos() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50">
-      <PageHeader onBack={() => navigate("/")} />
+      <PageHeader title="Versículos" onBack={() => navigate("/")} />
       <div className="shadow-lg" style={{ background: 'linear-gradient(135deg, #002776 0%, #003d99 60%, #c8960c 100%)' }}>
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">

@@ -111,7 +111,7 @@ export default function PainelAgente() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <PageHeader onBack={() => navigate("/")} />
+      <PageHeader title="Painel do Agente" onBack={() => navigate("/")} />
       {/* Modal Meta Inicial */}
       <Dialog open={modalMetaInicial} onOpenChange={setModalMetaInicial}>
         <DialogContent className="bg-slate-800 border-slate-700 text-white">

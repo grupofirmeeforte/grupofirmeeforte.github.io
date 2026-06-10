@@ -194,7 +194,7 @@ export default function ContasLojas() {
 
   return (
     <div className="p-4 md:p-6 min-h-screen bg-gray-950 text-white">
-      <PageHeader />
+      <PageHeader title="Contas Lojas" />
       {/* Cabeçalho */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>

@@ -278,7 +278,7 @@ export default function AuditoriaPage() {
 
   return (
     <div className="space-y-6 p-6">
-      <PageHeader />
+      <PageHeader title="Auditoria" />
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
