@@ -714,10 +714,3 @@
 
 ## CORREÇÃO VISUAL - EXTRATOS
 - [x] Escurecer texto das tabelas de Extratos (text-gray-200 → text-gray-700) para melhor legibilidade no fundo branco
-
-## PADRONIZAÇÃO DE NOMES
-- [x] Nome do Agente (nomeAgente): sempre TUDO MAIÚSCULO em todas as telas e banco
-- [x] Nome do Favorecido (nomeFavorecido): Inicial maiúscula e restante minúsculo (Title Case)
-- [x] Atualizar registros existentes no banco de dados
-- [x] Normalizar ao salvar/importar no backend
-- [x] Exibição padronizada no frontend (Cálculo, Pagamentos, Extratos, Cadastro)
