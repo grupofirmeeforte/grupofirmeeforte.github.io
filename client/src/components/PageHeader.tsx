@@ -1,3 +1,4 @@
+import React from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from "@/_core/hooks/useAuth";
 import { ArrowLeft } from "lucide-react";
@@ -10,8 +11,9 @@ interface PageHeaderProps {
   compact?: boolean;
   onBack?: () => void;
   title?: string;
+  actions?: React.ReactNode;
 }
-export default function PageHeader({ onBack, compact, title }: PageHeaderProps) {
+export default function PageHeader({ onBack, compact, title, actions }: PageHeaderProps) {
   const [, navigate] = useLocation();
   const { user } = useAuth();
 
@@ -59,6 +61,7 @@ export default function PageHeader({ onBack, compact, title }: PageHeaderProps) 
           </div>
         )}
         <div className="flex items-center gap-3">
+          {actions}
           <Button
             variant="outline"
             onClick={handleBack}

@@ -409,18 +409,12 @@ export default function PagamentosPage() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-      <PageHeader title="Pagamentos" />
-      <div className="bg-gray-900 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-white">Pagamentos</h1>
-          <span className="text-sm text-gray-400">{total} registro{total !== 1 ? "s" : ""} (pagamentos + despesas fixas)</span>
-        </div>
+      <PageHeader title="Pagamentos" actions={
         <div className="flex gap-2">
-          <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white">Exportar Excel</Button>
-          <Button onClick={abrirNovo} size="sm" className="bg-blue-700 hover:bg-blue-600 text-white">+ Novo Lançamento</Button>
-          
+          <Button onClick={exportarExcel} size="sm" className="bg-green-700 hover:bg-green-600 text-white text-xs">Exportar Excel</Button>
+          <Button onClick={abrirNovo} size="sm" className="bg-blue-700 hover:bg-blue-600 text-white text-xs">+ Novo Lançamento</Button>
         </div>
-      </div>
+      } />
 
       <div className="bg-gray-900 border-b border-gray-700 px-6 py-3 flex flex-wrap gap-3 items-end">
         <div>
@@ -541,7 +535,7 @@ export default function PagamentosPage() {
             </div>
           )}
         </div>
-        <div className="text-[10px] text-gray-500 mt-1">Vermelho = a pagar | Verde = pago | Filtro por data de pagamento</div>
+        <div className="text-[10px] text-gray-500 mt-1">Vermelho = a pagar | Verde = pago | Filtro por data de pagamento &nbsp;—&nbsp; {total} registro{total !== 1 ? "s" : ""}</div>
       </div>
 
       {totalPages > 1 && (
