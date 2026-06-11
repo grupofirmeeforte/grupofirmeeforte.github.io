@@ -726,29 +726,29 @@ export default function TabelaComissao() {
                 Colunas ({colsVisiveis.length}/{ALL_ATIVOS.length})
               </Button>
               {showColSelector && (
-                <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-700 rounded-xl shadow-xl p-3 w-52">
+                <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl p-3 w-52">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold text-gray-300 uppercase tracking-wide">Ativos visíveis</span>
-                    <button onClick={() => setShowColSelector(false)} className="text-gray-400 hover:text-gray-300">
+                    <span className="text-xs font-semibold text-gray-700 uppercase tracking-wide">Ativos visíveis</span>
+                    <button onClick={() => setShowColSelector(false)} className="text-gray-500 hover:text-gray-700">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                   <div className="space-y-1">
                     {ALL_ATIVOS.map((col, i) => (
-                      <label key={col} className="flex items-center gap-2 cursor-pointer hover:bg-blue-900/30 rounded px-1.5 py-1">
+                      <label key={col} className="flex items-center gap-2 cursor-pointer hover:bg-blue-50 rounded px-1.5 py-1">
                         <input
                           type="checkbox"
                           checked={colsVisiveis.includes(col)}
                           onChange={() => toggleCol(col)}
                           className="accent-blue-600"
                         />
-                        <span className="text-sm text-gray-200">Ativo {String(i + 1).padStart(2, '0')}</span>
+                        <span className="text-sm text-gray-800">Ativo {String(i + 1).padStart(2, '0')}</span>
                       </label>
                     ))}
                   </div>
-                  <div className="flex gap-1 mt-2 pt-2 border-t">
+                  <div className="flex gap-1 mt-2 pt-2 border-t border-gray-200">
                     <button onClick={() => { setColsVisiveis([...ALL_ATIVOS]); localStorage.setItem('tabela_comissao_cols', JSON.stringify([...ALL_ATIVOS])); }} className="text-xs text-blue-600 hover:underline">Todos</button>
-                    <span className="text-gray-300">|</span>
+                    <span className="text-gray-400">|</span>
                     <button onClick={() => { setColsVisiveis([]); localStorage.setItem('tabela_comissao_cols', '[]'); }} className="text-xs text-red-500 hover:underline">Nenhum</button>
                   </div>
                 </div>
