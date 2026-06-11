@@ -351,7 +351,7 @@ export const pagamentosRouter = {
         ...p,
         tipoConta: (p.chaveJ && agenteDataMap[p.chaveJ]?.tipo) ? agenteDataMap[p.chaveJ].tipo : p.tipoConta,
         nomeAgente: (p.chaveJ && agenteDataMap[p.chaveJ]?.nomeAgente) ? agenteDataMap[p.chaveJ].nomeAgente : null,
-        favorecidoAgente: (p.chaveJ && agenteDataMap[p.chaveJ]?.favorecido) ? agenteDataMap[p.chaveJ].favorecido : null,
+        favorecidoAgente: p.nomeFavorecido || ((p.chaveJ && agenteDataMap[p.chaveJ]?.favorecido) ? agenteDataMap[p.chaveJ].favorecido : null),
       }));
 
       // Buscar despesas fixas
