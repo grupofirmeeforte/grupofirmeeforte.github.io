@@ -160,7 +160,7 @@ function PainelFiltros({ filtroChaveJ, setFiltroChaveJ, filtroNome, setFiltroNom
                   onMouseDown={() => handleSelecionarAgente(s.nomeAgente ?? '', s.chaveJ ?? '')}
                   className="w-full text-left px-3 py-2 hover:bg-indigo-50 text-sm border-b last:border-b-0"
                 >
-                  <span className="font-medium text-white">{s.nomeAgente}</span>
+                  <span className="font-medium text-gray-900">{s.nomeAgente}</span>
                   <span className="ml-2 text-xs text-indigo-500 font-mono">{s.chaveJ}</span>
                 </button>
               ))}
