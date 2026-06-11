@@ -555,7 +555,8 @@ export default function ContratosPage() {
                         </td>
                         {/* Operador + Convênio + Linha */}
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
-                          <div className="text-purple-300 text-[11px] truncate" title={r.nomeOperador ?? ''}>{r.nomeOperador ?? r.chaveJOperador ?? '—'}</div>
+                          <div className="text-purple-300 text-[11px] truncate" title={r.nomeOperador ?? ''}>{r.nomeOperador ?? '—'}</div>
+                          {r.chaveJOperador && <div className="text-yellow-400 font-mono text-[10px] font-bold">{r.chaveJOperador}</div>}
                           <div className="text-slate-400 text-[10px] truncate" title={r.nomeConvenio ?? ''}>{r.nomeConvenio ?? '—'}</div>
                           <div className="text-purple-200 text-[9px] whitespace-normal break-words" title={r.linhaCredito ?? ''}>{r.linhaCredito ?? '—'}</div>
                         </td>
