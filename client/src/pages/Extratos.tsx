@@ -148,7 +148,7 @@ function PainelFiltros({ filtroChaveJ, setFiltroChaveJ, filtroNome, setFiltroNom
             onFocus={() => setShowSugestoes(true)}
             onBlur={() => setTimeout(() => setShowSugestoes(false), 150)}
             placeholder="Digite o nome..."
-            className="w-56 h-8 text-sm"
+            className="w-56 h-8 text-sm text-gray-900"
             autoComplete="off"
           />
           {showSugestoes && sugestoes && sugestoes.length > 0 && (
