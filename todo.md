@@ -714,3 +714,7 @@
 
 ## CORREÇÃO VISUAL - EXTRATOS
 - [x] Escurecer texto das tabelas de Extratos (text-gray-200 → text-gray-700) para melhor legibilidade no fundo branco
+
+## PADRONIZAÇÃO DE CORES DE NOMES
+- [x] Nome do Agente (nomeAgente): sempre AZUL (text-blue-600) em todas as 23 páginas
+- [x] Nome do Favorecido (nomeFavorecido): sempre VERDE (text-green-700) em todas as 23 páginas

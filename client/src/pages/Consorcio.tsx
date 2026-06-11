@@ -459,8 +459,8 @@ export default function Consorcio() {
                 </td>
                 {/* Coluna Operação */}
                 <td className="px-2 py-1.5 border-r border-gray-700">
-                  <div className="font-mono text-[11px] text-gray-200 font-medium">{row.proposta ?? "-"}</div>
-                  <div className="text-[10px] text-gray-400 whitespace-nowrap">{row.data ?? ""}</div>
+                  <div className="font-mono text-[11px] text-gray-700 font-medium">{row.proposta ?? "-"}</div>
+                  <div className="text-[10px] text-gray-700 whitespace-nowrap">{row.data ?? ""}</div>
                   {row.segmento && (
                     <span className={`text-[9px] px-1 py-0.5 rounded font-medium ${row.segmento === "IMOVEL" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
                       {row.segmento}
@@ -470,18 +470,18 @@ export default function Consorcio() {
                 {/* Coluna Valores */}
                 <td className="px-2 py-1.5 border-r border-gray-700 text-right whitespace-nowrap">
                   <div className="font-bold text-blue-800 text-[12px]">{fmtMoeda(row.valorBem)}</div>
-                  <div className="text-[10px] text-gray-400">RBM: {fmtMoeda(row.rbm)}</div>
-                  {row.parcLiberada && <div className="text-[10px] text-gray-400">Parc: {row.parcLiberada}</div>}
+                  <div className="text-[10px] text-gray-700">RBM: {fmtMoeda(row.rbm)}</div>
+                  {row.parcLiberada && <div className="text-[10px] text-gray-700">Parc: {row.parcLiberada}</div>}
                 </td>
                 {/* Coluna Comissão */}
                 <td className="px-2 py-1.5 border-r border-gray-700 text-right whitespace-nowrap">
                   {parseFloat(row.comissao ?? '0') > 0 ? (
                     <>
                       <div className="font-bold text-green-700 text-[12px]">{fmtMoeda(row.comissao)}</div>
-                      <div className="text-[10px] text-gray-400">{fmtPct(row.pctComissao2)}</div>
+                      <div className="text-[10px] text-gray-700">{fmtPct(row.pctComissao2)}</div>
                     </>
                   ) : (
-                    <span className="text-[11px] text-gray-300">-</span>
+                    <span className="text-[11px] text-gray-700">-</span>
                   )}
                 </td>
                 <td className="px-2 py-1.5 whitespace-nowrap">
