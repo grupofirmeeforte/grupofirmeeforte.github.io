@@ -351,7 +351,7 @@ export default function AgentesPage() {
                           >
                             {copiedId === `chave-${agente.id}` ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
                           </button>
-                          <span className="text-xs text-gray-400 font-mono ml-1">{'*'.repeat(6)}</span>
+                          <span className="text-xs text-gray-700 font-mono ml-1">{'*'.repeat(6)}</span>
                           <button
                             title="Copiar Senha"
                             onClick={() => copyToClipboard(agente.senha || '', `senha-${agente.id}`)}
@@ -411,18 +411,18 @@ export default function AgentesPage() {
                         </div>
                         {/* Linha 3: Nome + Data Nascimento */}
                         <div className="font-medium text-sm text-gray-900 leading-tight mt-0.5">
-                          {agente.nomeAgente}{agente.dataNascimento ? <span className="font-normal text-gray-400 text-xs ml-1">· {formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '')}</span> : ''}
+                          {agente.nomeAgente}{agente.dataNascimento ? <span className="font-normal text-gray-700 text-xs ml-1">· {formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '')}</span> : ''}
                         </div>
                         {/* Linha 4: Empresa + Email + CEP */}
-                        <div className="text-xs text-gray-400 mt-0.5">{agente.empresa || '-'}{agente.email ? <span className="text-blue-500 ml-1">{agente.email}</span> : ''}{(agente as any).cep ? <span className="text-gray-400 ml-1">· CEP {(agente as any).cep}</span> : ''}</div>
+                        <div className="text-xs text-gray-700 mt-0.5">{agente.empresa || '-'}{agente.email ? <span className="text-blue-700 ml-1">{agente.email}</span> : ''}{(agente as any).cep ? <span className="text-gray-700 ml-1">· CEP {(agente as any).cep}</span> : ''}</div>
                         {/* Linha 5: Endereço + Cidade/UF */}
-                        <div className="text-xs text-gray-400">{(agente as any).endereco ? `${(agente as any).endereco}${(agente as any).numero ? `, ${(agente as any).numero}` : ''}${(agente as any).bairro ? ` - ${(agente as any).bairro}` : ''} · ` : ''}{agente.cidade ? `${agente.cidade}${agente.uf ? `/${agente.uf}` : ''}` : (agente.uf || '')}</div>
+                        <div className="text-xs text-gray-700">{(agente as any).endereco ? `${(agente as any).endereco}${(agente as any).numero ? `, ${(agente as any).numero}` : ''}${(agente as any).bairro ? ` - ${(agente as any).bairro}` : ''} · ` : ''}{agente.cidade ? `${agente.cidade}${agente.uf ? `/${agente.uf}` : ''}` : (agente.uf || '')}</div>
                       </TableCell>
                       {/* Função / Certificações unificadas */}
                       <TableCell className="min-w-[200px]">
                         {/* Admissão */}
                         {agente.dataAdmissao && (
-                          <div className="text-xs text-gray-400 mb-0.5">Adm: {formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '')}</div>
+                          <div className="text-xs text-gray-700 mb-0.5">Adm: {formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '')}</div>
                         )}
                         {/* Cargo · Área · Vínculo */}
                         <div className="font-medium text-sm text-gray-900">
@@ -433,7 +433,7 @@ export default function AgentesPage() {
                           {(() => {
                             const key = agente.chaveJ?.trim().toUpperCase();
                             const c = key && statusCerts ? statusCerts[key]?.consig : undefined;
-                            if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-400">CONSIG: -</span>;
+                            if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-700">CONSIG: -</span>;
                             if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">CONSIG: {(c.dias ?? 0) === 0 ? 'Vencido' : `Venc. há ${Math.abs(c.dias ?? 0)}d`}</Badge>;
                             if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">CONSIG: {c.dias}d</Badge>;
                             return <Badge className="bg-green-100 text-green-800 border-0 text-xs">CONSIG: {c.dias}d</Badge>;
@@ -441,7 +441,7 @@ export default function AgentesPage() {
                           {(() => {
                             const key = agente.chaveJ?.trim().toUpperCase();
                             const c = key && statusCerts ? statusCerts[key]?.lgpd : undefined;
-                            if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-400">PLDFT: -</span>;
+                            if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-700">PLDFT: -</span>;
                             if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">PLDFT: {(c.dias ?? 0) === 0 ? 'Vencido' : `Venc. há ${Math.abs(c.dias ?? 0)}d`}</Badge>;
                             if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">PLDFT: {c.dias}d</Badge>;
                             return <Badge className="bg-green-100 text-green-800 border-0 text-xs">PLDFT: {c.dias}d</Badge>;
@@ -455,7 +455,7 @@ export default function AgentesPage() {
                           ? <div className="text-sm font-mono text-white">{agente.cpfAgente}</div>
                           : <span className="text-xs text-slate-400">-</span>}
                         {agente.celular && (
-                          <div className="text-xs text-gray-400 mt-0.5">{agente.celular}</div>
+                          <div className="text-xs text-gray-700 mt-0.5">{agente.celular}</div>
                         )}
                       </TableCell>
                       {/* Dados bancários compactos */}
@@ -467,7 +467,7 @@ export default function AgentesPage() {
                         ) : <span className="text-xs text-slate-400">-</span>}
                         {/* Favorecido */}
                         {((agente as any).favProprio || agente.favorecido) && (
-                          <div className="text-[10px] text-slate-600 mt-0.5 flex items-center gap-1">
+                          <div className="text-[10px] text-slate-800 mt-0.5 flex items-center gap-1">
                             <span className="font-medium">Fav:</span>
                             {(agente as any).favProprio
                               ? <span className="text-emerald-700 font-medium">{agente.nomeAgente} <span className="text-[9px] bg-emerald-100 text-emerald-700 rounded px-1 font-semibold">próprio</span></span>
@@ -476,7 +476,7 @@ export default function AgentesPage() {
                           </div>
                         )}
                         {agente.pix && (
-                          <div className="text-xs text-blue-600 mt-0.5">PIX: {agente.pix}</div>
+                          <div className="text-xs text-blue-700 mt-0.5">PIX: {agente.pix}</div>
                         )}
                       </TableCell>
                       <TableCell className="text-right space-x-1">
