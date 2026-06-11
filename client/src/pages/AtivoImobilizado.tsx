@@ -209,10 +209,10 @@ export default function AtivoImobilizado() {
     const cores: Record<string, string> = {
       "Ativo": "bg-green-100 text-green-800",
       "Em Manutenção": "bg-yellow-100 text-yellow-800",
-      "Baixado": "bg-gray-100 text-gray-300",
+      "Baixado": "bg-gray-100 text-gray-700",
       "Extraviado": "bg-red-100 text-red-800",
     };
-    return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cores[s ?? ""] ?? "bg-gray-100 text-gray-300"}`}>{s ?? "-"}</span>;
+    return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cores[s ?? ""] ?? "bg-gray-100 text-gray-700"}`}>{s ?? "-"}</span>;
   };
 
   return (
@@ -417,7 +417,7 @@ export default function AtivoImobilizado() {
       {fotoVisualizando && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setFotoVisualizando(null)}>
           <div className="relative max-w-2xl w-full" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setFotoVisualizando(null)} className="absolute -top-10 right-0 text-white hover:text-gray-300">
+            <button onClick={() => setFotoVisualizando(null)} className="absolute -top-10 right-0 text-white hover:text-gray-700">
               <X className="w-8 h-8" />
             </button>
             <img
