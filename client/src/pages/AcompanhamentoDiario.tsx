@@ -112,7 +112,7 @@ export default function AcompanhamentoDiario() {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
       <PageHeader title="Acompanhamento Diário" />
-        <div className="text-gray-400">Carregando...</div>
+        <div className="text-gray-800">Carregando...</div>
       </div>
     );
   }
@@ -124,7 +124,7 @@ export default function AcompanhamentoDiario() {
         <div className="bg-gray-900 border border-gray-700 rounded-2xl p-10 flex flex-col items-center gap-4 max-w-sm text-center">
           <Lock className="w-12 h-12 text-red-400" />
           <h2 className="text-xl font-bold text-white">Acesso Restrito</h2>
-          <p className="text-gray-400 text-sm">Você não tem permissão para acessar o Acompanhamento Diário.<br/>Solicite ao administrador.</p>
+          <p className="text-gray-800 text-sm">Você não tem permissão para acessar o Acompanhamento Diário.<br/>Solicite ao administrador.</p>
           <Button size="sm" onClick={() => navigate("/")} className="gap-1 bg-gray-800 hover:bg-gray-700 text-white border border-gray-600">
             <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
@@ -143,14 +143,14 @@ export default function AcompanhamentoDiario() {
           <div className="flex items-center gap-3 flex-wrap">
             {/* Seletor de mês */}
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={prevMes} className="text-gray-400 hover:text-white">
+              <Button variant="ghost" size="icon" onClick={prevMes} className="text-gray-800 hover:text-white">
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <div className="text-center min-w-[120px]">
                 <div className="font-bold text-lg">{MESES[mes - 1]}</div>
-                <div className="text-xs text-gray-400">{ano}</div>
+                <div className="text-xs text-gray-800">{ano}</div>
               </div>
-              <Button variant="ghost" size="icon" onClick={nextMes} className="text-gray-400 hover:text-white">
+              <Button variant="ghost" size="icon" onClick={nextMes} className="text-gray-800 hover:text-white">
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
@@ -164,7 +164,7 @@ export default function AcompanhamentoDiario() {
                   className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
                     ano === a
                       ? 'bg-orange-500 text-white'
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                      : 'bg-gray-800 text-gray-800 hover:bg-gray-700 hover:text-white'
                   }`}
                 >
                   {a}
@@ -183,7 +183,7 @@ export default function AcompanhamentoDiario() {
                         : e === "FLEX"
                         ? "bg-green-600 text-white shadow-lg"
                         : "bg-purple-600 text-white shadow-lg"
-                      : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                      : "bg-gray-800 text-gray-800 hover:bg-gray-700"
                   }`}>
                   {e}
                 </button>
@@ -198,15 +198,15 @@ export default function AcompanhamentoDiario() {
       {/* Resumo rápido */}
       <div className="px-6 py-3 bg-gray-900/50 border-b border-gray-800 flex flex-wrap gap-6 text-sm">
         <div>
-          <span className="text-gray-400">Total do mês: </span>
+          <span className="text-gray-800">Total do mês: </span>
           <span className="font-bold text-green-400">{fmt(totalGeral)}</span>
         </div>
         <div>
-          <span className="text-gray-400">Agentes: </span>
+          <span className="text-gray-800">Agentes: </span>
           <span className="font-bold">{agentes.length}</span>
         </div>
         <div>
-          <span className="text-gray-400">Dias úteis: </span>
+          <span className="text-gray-800">Dias úteis: </span>
           <span className="font-bold">{diasUteisTotal}</span>
           {diasUteisRestantes !== null && (
             <span className="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
@@ -215,19 +215,19 @@ export default function AcompanhamentoDiario() {
           )}
         </div>
         <div>
-          <span className="text-gray-400">Ranking ≥50%: </span>
+          <span className="text-gray-800">Ranking ≥50%: </span>
           <span className="font-bold text-yellow-400">{ranking.length}</span>
         </div>
       </div>
 
       {isLoading && (
-        <div className="flex items-center justify-center py-20 text-gray-400">
+        <div className="flex items-center justify-center py-20 text-gray-800">
           Carregando...
         </div>
       )}
 
       {!isLoading && agentes.length === 0 && (
-        <div className="flex items-center justify-center py-20 text-gray-400">
+        <div className="flex items-center justify-center py-20 text-gray-800">
           Nenhum dado encontrado para {MESES[mes-1]}/{ano} — {empresa === 'TODAS' ? 'BMF + FLEX' : empresa}
         </div>
       )}
@@ -244,10 +244,10 @@ export default function AcompanhamentoDiario() {
               <div className="flex flex-wrap gap-2">
                 {ranking.map((a, i) => (
                   <div key={a.chaveJ} className="flex items-center gap-2 bg-gray-800 rounded-lg px-3 py-1.5">
-                    <span className={`text-xs font-bold ${i === 0 ? "text-yellow-400" : i === 1 ? "text-gray-300" : i === 2 ? "text-amber-600" : "text-gray-400"}`}>
+                    <span className={`text-xs font-bold ${i === 0 ? "text-yellow-400" : i === 1 ? "text-gray-800" : i === 2 ? "text-amber-600" : "text-gray-800"}`}>
                       #{i+1}
                     </span>
-                    <span className="text-xs text-gray-300">{a.nome}</span>
+                    <span className="text-xs text-gray-800">{a.nome}</span>
                     <Badge className="text-[10px] bg-green-900 text-green-300 border-0">{pct(a.aproveitamento)}</Badge>
                     <span className="text-xs text-green-400 font-bold">{fmt(a.total)}</span>
                   </div>
@@ -263,12 +263,12 @@ export default function AcompanhamentoDiario() {
                 <thead>
                   {/* Linha de dias da semana */}
                   <tr className="border-b border-gray-700">
-                    <th className="sticky left-0 bg-gray-900 z-10 px-3 py-2 text-left text-gray-400 font-medium min-w-[140px]">Agente</th>
-                    <th className="px-2 py-2 text-gray-400 font-medium min-w-[60px]">Situação</th>
-                    <th className="px-2 py-2 text-gray-400 font-medium min-w-[50px]">Dias C/</th>
-                    <th className="px-2 py-2 text-gray-400 font-medium min-w-[50px]">Dias S/</th>
-                    <th className="px-2 py-2 text-gray-400 font-medium min-w-[55px]">Aprov.</th>
-                    <th className="px-2 py-2 text-gray-400 font-medium min-w-[55px]">Média/DU</th>
+                    <th className="sticky left-0 bg-gray-900 z-10 px-3 py-2 text-left text-gray-800 font-medium min-w-[140px]">Agente</th>
+                    <th className="px-2 py-2 text-gray-800 font-medium min-w-[60px]">Situação</th>
+                    <th className="px-2 py-2 text-gray-800 font-medium min-w-[50px]">Dias C/</th>
+                    <th className="px-2 py-2 text-gray-800 font-medium min-w-[50px]">Dias S/</th>
+                    <th className="px-2 py-2 text-gray-800 font-medium min-w-[55px]">Aprov.</th>
+                    <th className="px-2 py-2 text-gray-800 font-medium min-w-[55px]">Média/DU</th>
                     <th className="px-2 py-2 text-green-400 font-bold min-w-[80px]">Total</th>
                     {dias.map((d, colIdx) => {
                       const dow = new Date(ano, mes - 1, d).getDay();
@@ -290,8 +290,8 @@ export default function AcompanhamentoDiario() {
                             </>
                           ) : (
                             <>
-                              <div className="text-gray-400">{d}</div>
-                              <div className="text-[9px] text-gray-400">{getDayOfWeek(ano, mes, d)}</div>
+                              <div className="text-gray-800">{d}</div>
+                              <div className="text-[9px] text-gray-800">{getDayOfWeek(ano, mes, d)}</div>
                             </>
                           )}
                         </th>
@@ -305,21 +305,21 @@ export default function AcompanhamentoDiario() {
                     <tr key={a.chaveJ} className={`border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors ${idx % 2 === 0 ? "" : "bg-gray-900/30"}`}>
                       <td className="sticky left-0 bg-gray-900 z-10 px-3 py-2">
                         <div className="font-mono text-blue-300 text-[10px]">{a.chaveJ}</div>
-                        <div className="text-gray-300 truncate max-w-[130px]" title={a.nome}>{a.nome}</div>
+                        <div className="text-gray-800 truncate max-w-[130px]" title={a.nome}>{a.nome}</div>
                       </td>
                       <td className="px-2 py-2 text-center">
                         <Badge className={`text-[9px] border-0 ${a.situacao === "Ativo" ? "bg-green-900 text-green-300" : "bg-red-900 text-red-300"}`}>
                           {a.situacao}
                         </Badge>
                       </td>
-                      <td className="px-2 py-2 text-center text-gray-300">{a.diasComProducao}</td>
-                      <td className="px-2 py-2 text-center text-gray-400">{a.diasSemProducao}</td>
+                      <td className="px-2 py-2 text-center text-gray-800">{a.diasComProducao}</td>
+                      <td className="px-2 py-2 text-center text-gray-800">{a.diasSemProducao}</td>
                       <td className="px-2 py-2 text-center">
                         <span className={`font-bold ${a.aproveitamento >= 0.5 ? "text-green-400" : "text-red-400"}`}>
                           {pct(a.aproveitamento)}
                         </span>
                       </td>
-                      <td className="px-2 py-2 text-center text-gray-300">{fmt(a.mediaPorDiaUtil)}</td>
+                      <td className="px-2 py-2 text-center text-gray-800">{fmt(a.mediaPorDiaUtil)}</td>
                       <td className="px-2 py-2 text-center font-bold text-green-400">{fmt(a.total)}</td>
                       {dias.map((d, colIdx) => {
                         const val = a.producaoPorDia[d] ?? 0;
@@ -330,7 +330,7 @@ export default function AcompanhamentoDiario() {
                         const label = isSab ? "Sábado" : isDom ? "Domingo" : null;
                         const zebraUtil = !isWkd ? (colIdx % 2 === 0 ? "bg-blue-950/20" : "") : "";
                         return (
-                          <td key={d} className={`px-1 py-2 text-center ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-white" : !isWkd ? "text-gray-200" : ""}`}>
+                          <td key={d} className={`px-1 py-2 text-center ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-white" : !isWkd ? "text-gray-800" : ""}`}>
                             {val > 0 ? (
                               <span className={isWkd ? "text-red-300" : "text-white"}>{fmt(val)}</span>
                             ) : label ? (
@@ -344,7 +344,7 @@ export default function AcompanhamentoDiario() {
                   ))}
                   {/* Linha de totais por dia */}
                   <tr className="border-t-2 border-gray-600 bg-gray-800/50 font-bold">
-                    <td className="sticky left-0 bg-gray-800 z-10 px-3 py-2 text-gray-300">TOTAL DIA</td>
+                    <td className="sticky left-0 bg-gray-800 z-10 px-3 py-2 text-gray-800">TOTAL DIA</td>
                     <td colSpan={5} />
                     <td className="px-2 py-2 text-center text-green-400">{fmt(totalGeral)}</td>
                     {dias.map((d, colIdx) => {
@@ -356,7 +356,7 @@ export default function AcompanhamentoDiario() {
                       const label = isSab ? "Sábado" : isDom ? "Domingo" : null;
                       const zebraUtil = !isWkd ? (colIdx % 2 === 0 ? "bg-blue-950/30" : "") : "";
                       return (
-                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-green-300" : !isWkd ? "text-gray-200" : ""}`}>
+                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-green-300" : !isWkd ? "text-gray-800" : ""}`}>
                           {val > 0 ? (
                             <span className={isWkd ? "text-red-300" : "text-green-300"}>{fmt(val)}</span>
                           ) : label ? (
@@ -373,11 +373,11 @@ export default function AcompanhamentoDiario() {
           </div>
 
           {/* Legenda */}
-          <div className="flex flex-wrap gap-4 text-xs text-gray-400 pb-4">
+          <div className="flex flex-wrap gap-4 text-xs text-gray-800 pb-4">
             <span><span className="text-green-400 font-bold">Verde</span> = aproveitamento ≥ 50%</span>
             <span><span className="text-red-400 font-bold">Vermelho</span> = aproveitamento &lt; 50%</span>
-            <span><span className="text-gray-300">—</span> = fim de semana</span>
-            <span><span className="text-gray-200">·</span> = sem produção</span>
+            <span><span className="text-gray-800">—</span> = fim de semana</span>
+            <span><span className="text-gray-800">·</span> = sem produção</span>
             <span>Dias C/ = dias úteis com produção | Dias S/ = dias úteis sem produção</span>
           </div>
         </div>

@@ -127,7 +127,7 @@ export default function Home() {
             <span className="text-yellow-400 text-xs font-semibold tracking-widest uppercase">Sistema de Gestão</span>
           </div>
           <h1 className="text-4xl font-bold mb-2 text-white drop-shadow-lg">Grupo Firme & Forte</h1>
-          <p className="text-slate-300 mb-8 text-sm">Coban — Banco do Brasil</p>
+          <p className="text-slate-800 mb-8 text-sm">Coban — Banco do Brasil</p>
           <Button
             onClick={() => window.location.href = getLoginUrl()}
             className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold px-8 py-3 text-base shadow-lg"
@@ -405,7 +405,7 @@ export default function Home() {
                           );
                         })
                       ) : (
-                        <span className="text-xs text-slate-400 italic">Em breve...</span>
+                        <span className="text-xs text-slate-800 italic">Em breve...</span>
                       )}
                     </div>
                   </div>
@@ -543,7 +543,7 @@ export default function Home() {
                   : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
                 .filter(m => !m.ceoOnly || isCEO);
               if (subsVisiveis.length === 0) return (
-                <div className="text-center py-8 text-slate-400">
+                <div className="text-center py-8 text-slate-800">
                   <p className="text-lg font-medium">Em breve</p>
                   <p className="text-sm mt-1">Este módulo está em desenvolvimento.</p>
                 </div>
@@ -595,7 +595,7 @@ export default function Home() {
                   {e === 'primavera' ? '🌸 Primavera' : e === 'verao' ? '☀️ Verão' : e === 'outono' ? '🍂 Outono' : '❄️ Inverno'}
                 </button>
               ))}
-              <button onClick={() => setTesteEstacaoAberto(false)} className="text-xs text-gray-500 hover:text-gray-300 mt-1">Fechar</button>
+              <button onClick={() => setTesteEstacaoAberto(false)} className="text-xs text-gray-500 hover:text-gray-800 mt-1">Fechar</button>
             </div>
           )}
           {testeEstacaoForcar && (

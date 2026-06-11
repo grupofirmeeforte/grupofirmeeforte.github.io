@@ -62,13 +62,13 @@ function tipoBadge(situacao: string | null | undefined, troco: string | number |
 }
 
 function situacaoBadge(s: string | null | undefined) {
-  if (!s) return <span className="text-gray-400">-</span>;
+  if (!s) return <span className="text-gray-800">-</span>;
   const colors: Record<string, string> = {
     "Contratada": "bg-green-100 text-green-800",
     "Cancelada": "bg-red-100 text-red-800",
     "Pendente": "bg-yellow-100 text-yellow-800",
   };
-  const cls = colors[s] || "bg-gray-100 text-gray-200";
+  const cls = colors[s] || "bg-gray-100 text-gray-800";
   return <span className={`px-2 py-0.5 rounded text-xs font-medium ${cls}`}>{s}</span>;
 }
 
@@ -102,12 +102,12 @@ function GrafTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-gray-700 rounded-lg shadow-lg p-3 text-xs max-w-[220px]">
-      <p className="font-bold text-gray-200 mb-2">{label}</p>
+      <p className="font-bold text-gray-800 mb-2">{label}</p>
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center justify-between gap-3 mb-1">
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full inline-block" style={{ background: p.fill || p.color }} />
-            <span className="text-gray-300 truncate max-w-[110px]">{p.name}</span>
+            <span className="text-gray-800 truncate max-w-[110px]">{p.name}</span>
           </span>
           <span className="font-semibold text-white">{fmtK(p.value)}</span>
         </div>
@@ -165,7 +165,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
       <div className="flex items-center gap-4 flex-wrap">
         {empresa === '__all__' && (
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold text-gray-300">Empresa:</span>
+            <span className="text-sm font-semibold text-gray-800">Empresa:</span>
             <div className="flex gap-2 flex-wrap">
               <Button size="sm" variant={empresaSel === '__all__' ? 'default' : 'outline'}
                 className={`text-xs h-7 px-3 ${empresaSel === '__all__' ? 'bg-gray-800 text-white' : ''}`}
@@ -181,7 +181,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
         {/* Seletor de ano — controla os dois gráficos */}
         {anosDisponiveis.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-300">Ano:</span>
+            <span className="text-sm font-semibold text-gray-800">Ano:</span>
             <div className="flex gap-1 flex-wrap">
               {anosDisponiveis.map(ano => (
                 <Button key={ano} size="sm"
@@ -213,9 +213,9 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
         </CardHeader>
         <CardContent className="pt-4">
           {loadChaveJ ? (
-            <div className="flex items-center justify-center py-16 text-gray-400">Carregando...</div>
+            <div className="flex items-center justify-center py-16 text-gray-800">Carregando...</div>
           ) : !labelsChaveJ.length ? (
-            <div className="flex items-center justify-center py-16 text-gray-400">Nenhum dado disponível para 2026.</div>
+            <div className="flex items-center justify-center py-16 text-gray-800">Nenhum dado disponível para 2026.</div>
           ) : (
             <div>
               <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
@@ -227,8 +227,8 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
                       {labelsChaveJ.map((label, li) => (
                         s.data[li] > 0 ? (
                           <div key={label} className="flex justify-between items-center gap-1">
-                            <span className="text-[9px] text-gray-400 whitespace-nowrap">{label}</span>
-                            <span className="text-[9px] font-semibold text-gray-200 whitespace-nowrap">{fmtFull(s.data[li])}</span>
+                            <span className="text-[9px] text-gray-800 whitespace-nowrap">{label}</span>
+                            <span className="text-[9px] font-semibold text-gray-800 whitespace-nowrap">{fmtFull(s.data[li])}</span>
                           </div>
                         ) : null
                       ))}
@@ -277,9 +277,9 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
         </CardHeader>
         <CardContent className="pt-4">
           {loadTipo ? (
-            <div className="flex items-center justify-center py-16 text-gray-400">Carregando...</div>
+            <div className="flex items-center justify-center py-16 text-gray-800">Carregando...</div>
           ) : !chartDataTipo.length ? (
-            <div className="flex items-center justify-center py-16 text-gray-400">Nenhum dado disponível.</div>
+            <div className="flex items-center justify-center py-16 text-gray-800">Nenhum dado disponível.</div>
           ) : (
             <div>
               <div className="grid grid-cols-3 gap-3 mb-4">
@@ -289,7 +289,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
                   <div className="mt-1 space-y-0.5">
                     {chartDataTipo.map(r => r.novo > 0 ? (
                       <div key={r.periodo} className="flex justify-between items-center gap-1">
-                        <span className="text-[9px] text-gray-400 whitespace-nowrap">{r.periodo}</span>
+                        <span className="text-[9px] text-gray-800 whitespace-nowrap">{r.periodo}</span>
                         <span className="text-[9px] font-semibold text-blue-700 whitespace-nowrap">{fmtFull(r.novo)}</span>
                       </div>
                     ) : null)}
@@ -305,7 +305,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
                   <div className="mt-1 space-y-0.5">
                     {chartDataTipo.map(r => r.refin > 0 ? (
                       <div key={r.periodo} className="flex justify-between items-center gap-1">
-                        <span className="text-[9px] text-gray-400 whitespace-nowrap">{r.periodo}</span>
+                        <span className="text-[9px] text-gray-800 whitespace-nowrap">{r.periodo}</span>
                         <span className="text-[9px] font-semibold text-orange-700 whitespace-nowrap">{fmtFull(r.refin)}</span>
                       </div>
                     ) : null)}
@@ -321,7 +321,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
                   <div className="mt-1 space-y-0.5">
                     {chartDataTipo.map(r => r.cancelado > 0 ? (
                       <div key={r.periodo} className="flex justify-between items-center gap-1">
-                        <span className="text-[9px] text-gray-400 whitespace-nowrap">{r.periodo}</span>
+                        <span className="text-[9px] text-gray-800 whitespace-nowrap">{r.periodo}</span>
                         <span className="text-[9px] font-semibold text-red-700 whitespace-nowrap">{fmtFull(r.cancelado)}</span>
                       </div>
                     ) : null)}
@@ -345,7 +345,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
                 </BarChart>
               </ResponsiveContainer>
               <div className="mt-4">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Evolução do Volume Total Contratado</p>
+                <p className="text-xs font-semibold text-gray-800 uppercase tracking-wide mb-2">Evolução do Volume Total Contratado</p>
                 <ResponsiveContainer width="100%" height={160}>
                   <LineChart data={chartDataTipo} margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -826,7 +826,7 @@ export default function FebrabanPage() {
           </Button>
         </div>
       } />
-      <div className="px-2 text-xs text-gray-400">{total != null ? `${total.toLocaleString("pt-BR")} registros` : "Carregando..."}</div>
+      <div className="px-2 text-xs text-gray-800">{total != null ? `${total.toLocaleString("pt-BR")} registros` : "Carregando..."}</div>
       {/* Painel de Resumo por Empresa */}
       {resumo && resumo.empresas.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
@@ -841,48 +841,48 @@ export default function FebrabanPage() {
               <div className="grid grid-cols-6 divide-x">
                 {/* Dia anterior */}
                 <div className="px-3 py-2 text-center">
-                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Dia Anterior</div>
-                  <div className="text-[10px] text-gray-400 mb-0.5">{emp.ontemStr}</div>
+                  <div className="text-[10px] text-gray-800 font-medium uppercase tracking-wide leading-tight">Dia Anterior</div>
+                  <div className="text-[10px] text-gray-800 mb-0.5">{emp.ontemStr}</div>
                   <div className="text-sm font-bold text-white">
                     {emp.diaAnterior.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdDiaAnterior} op.</div>
+                  <div className="text-[10px] text-gray-800 mt-0.5">{emp.qtdDiaAnterior} op.</div>
                 </div>
                 {/* Dia atual */}
                 <div className="px-3 py-2 text-center">
-                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Dia Atual</div>
-                  <div className="text-[10px] text-gray-400 mb-0.5">{emp.hojeStr}</div>
+                  <div className="text-[10px] text-gray-800 font-medium uppercase tracking-wide leading-tight">Dia Atual</div>
+                  <div className="text-[10px] text-gray-800 mb-0.5">{emp.hojeStr}</div>
                   <div className="text-sm font-bold text-blue-700">
                     {emp.diaAtual.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdDiaAtual} op.</div>
+                  <div className="text-[10px] text-gray-800 mt-0.5">{emp.qtdDiaAtual} op.</div>
                 </div>
                 {/* Líquido Contratado */}
                 <div className="px-3 py-2 text-center">
-                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Contratado</div>
-                  <div className="text-[10px] text-gray-400 mb-0.5">no mês</div>
+                  <div className="text-[10px] text-gray-800 font-medium uppercase tracking-wide leading-tight">Contratado</div>
+                  <div className="text-[10px] text-gray-800 mb-0.5">no mês</div>
                   <div className="text-sm font-bold text-green-700">
                     {emp.contratado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdContratado} op.</div>
+                  <div className="text-[10px] text-gray-800 mt-0.5">{emp.qtdContratado} op.</div>
                 </div>
                 {/* Líquido Pendente */}
                 <div className="px-3 py-2 text-center">
-                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Pendente</div>
-                  <div className="text-[10px] text-gray-400 mb-0.5">no mês</div>
+                  <div className="text-[10px] text-gray-800 font-medium uppercase tracking-wide leading-tight">Pendente</div>
+                  <div className="text-[10px] text-gray-800 mb-0.5">no mês</div>
                   <div className="text-sm font-bold text-orange-600">
                     {emp.pendente.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdPendente} op.</div>
+                  <div className="text-[10px] text-gray-800 mt-0.5">{emp.qtdPendente} op.</div>
                 </div>
                 {/* Líquido do Ano */}
                 <div className="px-3 py-2 text-center">
-                  <div className="text-[10px] text-gray-400 font-medium uppercase tracking-wide leading-tight">Ano {emp.anoFull}</div>
-                  <div className="text-[10px] text-gray-400 mb-0.5">contratado</div>
+                  <div className="text-[10px] text-gray-800 font-medium uppercase tracking-wide leading-tight">Ano {emp.anoFull}</div>
+                  <div className="text-[10px] text-gray-800 mb-0.5">contratado</div>
                   <div className="text-sm font-bold text-purple-700">
                     {emp.ano.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
-                  <div className="text-[10px] text-gray-400 mt-0.5">{emp.qtdAno} op.</div>
+                  <div className="text-[10px] text-gray-800 mt-0.5">{emp.qtdAno} op.</div>
                 </div>
                 {/* SRCC */}
                 <div className="px-3 py-2 text-center bg-orange-50">
@@ -927,7 +927,7 @@ export default function FebrabanPage() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
             <div className="relative col-span-2 md:col-span-1">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-800" />
               <Input
                 placeholder="Proposta ou Operador..."
                 value={search}
@@ -977,10 +977,10 @@ export default function FebrabanPage() {
                 const labels: Record<string, string> = { todos: "Todos", sim: "Pagos", nao: "Não Pagos", srcc: "SRCC" };
                 const active = filtroPago === opt;
                 const colors: Record<string, string> = {
-                  todos: active ? "bg-gray-700 text-white" : "bg-white text-gray-300 hover:bg-gray-800",
-                  sim: active ? "bg-green-600 text-white" : "bg-white text-gray-300 hover:bg-green-50",
-                  nao: active ? "bg-red-600 text-white" : "bg-white text-gray-300 hover:bg-red-50",
-                  srcc: active ? "bg-orange-500 text-white" : "bg-white text-gray-300 hover:bg-orange-50",
+                  todos: active ? "bg-gray-700 text-white" : "bg-white text-gray-800 hover:bg-gray-800",
+                  sim: active ? "bg-green-600 text-white" : "bg-white text-gray-800 hover:bg-green-50",
+                  nao: active ? "bg-red-600 text-white" : "bg-white text-gray-800 hover:bg-red-50",
+                  srcc: active ? "bg-orange-500 text-white" : "bg-white text-gray-800 hover:bg-orange-50",
                 };
                 return (
                   <button
@@ -1004,7 +1004,7 @@ export default function FebrabanPage() {
           {/* Paginador no TOPO */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-4 py-2 border-b bg-gray-800">
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-800">
                 Página {page + 1} de {totalPages} ({total?.toLocaleString("pt-BR")} registros)
               </span>
               <div className="flex gap-2">
@@ -1019,26 +1019,26 @@ export default function FebrabanPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-800 border-b">
                 <tr>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">EMPRESA</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">MÊS/ANO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">PROPOSTA</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">LINHA</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">SITUAÇÃO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">OPERADOR</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">SOLICITAÇÃO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">PRAZO</th>
-                  <th className="px-3 py-2 text-right font-semibold text-gray-200">TROCO</th>
-                  <th className="px-3 py-2 text-right font-semibold text-gray-200">FINANCIADO</th>
-                  <th className="px-3 py-2 text-center font-semibold text-gray-200">TIPO</th>
-                  <th className="px-3 py-2 text-center font-semibold text-gray-200">PAGO</th>
-                  <th className="px-3 py-2 text-center font-semibold text-gray-200">AÇÕES</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-800">EMPRESA</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-800">MÊS/ANO</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-800">PROPOSTA</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-800">LINHA</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-800">SITUAÇÃO</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-800">OPERADOR</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-800">SOLICITAÇÃO</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-800">PRAZO</th>
+                  <th className="px-3 py-2 text-right font-semibold text-gray-800">TROCO</th>
+                  <th className="px-3 py-2 text-right font-semibold text-gray-800">FINANCIADO</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-800">TIPO</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-800">PAGO</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-800">AÇÕES</th>
                 </tr>
               </thead>
               <tbody>
                 {!rows ? (
-                  <tr><td colSpan={13} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                  <tr><td colSpan={13} className="text-center py-8 text-gray-800">Carregando...</td></tr>
                 ) : rows.length === 0 ? (
-                  <tr><td colSpan={13} className="text-center py-8 text-gray-400">Nenhum registro encontrado.</td></tr>
+                  <tr><td colSpan={13} className="text-center py-8 text-gray-800">Nenhum registro encontrado.</td></tr>
                 ) : (
                   rows.map((row) => (
                     <tr key={row.id} className={`border-b transition-colors ${rows.indexOf(row) % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}`}>
@@ -1055,7 +1055,7 @@ export default function FebrabanPage() {
                       <td className="px-3 py-2 text-center">{tipoBadge(row.situacao, row.troco, row.financiado)}</td>
                       <td className="px-3 py-2 text-center">
                         {row.situacao && row.situacao.toLowerCase().includes("cancel") ? (
-                          <span className="px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-300 border border-gray-300">Cancelado</span>
+                          <span className="px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-800 border border-gray-300">Cancelado</span>
                         ) : row.pago === 2 ? (
                           <button
                             onClick={() => handleTogglePago(row as FebRow)}
@@ -1106,7 +1106,7 @@ export default function FebrabanPage() {
           {/* Paginação */}
           {totalPages > 1 && (
             <div className="flex justify-between items-center px-4 py-3 border-t">
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-gray-800">
                 Página {page + 1} de {totalPages} ({total?.toLocaleString("pt-BR")} registros)
               </span>
               <div className="flex gap-2">

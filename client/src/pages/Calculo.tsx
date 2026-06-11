@@ -505,7 +505,7 @@ export default function Calculo() {
           </Button>
         </div>
       } />
-      <div className="px-3 py-1 text-[10px] text-gray-400">{registros.length} registro(s){selecionados.size > 0 && <span className="ml-2 text-purple-400 font-medium">· {selecionados.size} selecionado(s)</span>}</div>
+      <div className="px-3 py-1 text-[10px] text-gray-800">{registros.length} registro(s){selecionados.size > 0 && <span className="ml-2 text-purple-400 font-medium">· {selecionados.size} selecionado(s)</span>}</div>
 
       {/* Filtros + Painel Supervisores */}
       <div className="bg-gray-900 border-b border-gray-700 border-slate-200 px-3 py-2">
@@ -523,7 +523,7 @@ export default function Calculo() {
                   <option key={m} value={m ?? ""}>{fmtMesRef(m)}</option>
                 ))}
               </select>
-              <span className="text-[10px] text-slate-400 whitespace-nowrap">Mês ant.: <strong className="text-slate-600">{getMesAnterior()}</strong></span>
+              <span className="text-[10px] text-slate-800 whitespace-nowrap">Mês ant.: <strong className="text-slate-600">{getMesAnterior()}</strong></span>
             </div>
           </div>
           <div className="flex flex-col">
@@ -814,7 +814,7 @@ export default function Calculo() {
                         <span className={`text-[9px] font-semibold px-1 py-0.5 rounded-full border ${
                           r.situacao === 'Ativo' ? 'bg-green-100 text-green-800 border-green-300'
                           : r.situacao === 'Inativo' ? 'bg-red-100 text-red-700 border-red-300'
-                          : 'bg-gray-100 text-gray-300 border-gray-300'
+                          : 'bg-gray-100 text-gray-800 border-gray-300'
                         }`}>{r.situacao}</span>
                       )}
                       {r.mesRef && <span className="text-[9px] text-purple-500 font-mono">{fmtMesRef(r.mesRef)}</span>}
@@ -827,7 +827,7 @@ export default function Calculo() {
                       <div className="text-[10px] text-orange-600 font-semibold leading-tight">{(r as any).nivelAgente}</div>
                     )}
                     <div className="text-[10px] text-slate-500">{r.empresa || ''}{r.cidade ? ` · ${r.cidade}` : ''}</div>
-                    {r.tipoPagamento && <div className="text-[9px] text-slate-400 mt-0.5">{r.tipoPagamento}</div>}
+                    {r.tipoPagamento && <div className="text-[9px] text-slate-800 mt-0.5">{r.tipoPagamento}</div>}
                   </td>
                   {/* Célula compacta RBM */}
                   <td className="px-2 py-1 border-b border-slate-200 align-top text-right">
@@ -856,7 +856,7 @@ export default function Calculo() {
                   <td className="px-2 py-1 border-b border-slate-200 align-top text-right">
                     {/* Comissão Total em destaque */}
                     <div className="font-bold text-pink-700 text-xs">{r.comissaoTotal ? fmtMoeda(r.comissaoTotal) : '-'}</div>
-                    {r.percentual && parseFloat(String(r.percentual)) !== 0 && <div className="text-[10px] text-slate-400">{fmtPerc(r.percentual)}</div>}
+                    {r.percentual && parseFloat(String(r.percentual)) !== 0 && <div className="text-[10px] text-slate-800">{fmtPerc(r.percentual)}</div>}
                     {r.comissaoConsig && parseFloat(String(r.comissaoConsig)) !== 0 && <div className="text-[10px] text-slate-500">Consig: {fmtMoeda(r.comissaoConsig)}</div>}
                     {r.comissaoConsorcio && parseFloat(String(r.comissaoConsorcio)) !== 0 && <div className="text-[10px] text-slate-500">Consórc: {fmtMoeda(r.comissaoConsorcio)}</div>}
                     {r.comissaoOurocap && parseFloat(String(r.comissaoOurocap)) !== 0 && <div className="text-[10px] text-slate-500">Ouro: {fmtMoeda(r.comissaoOurocap)}</div>}
@@ -873,7 +873,7 @@ export default function Calculo() {
                         {r.vrLiquidoSrcc && <div className="text-[10px] text-emerald-600 font-semibold">= {fmtMoeda(r.vrLiquidoSrcc)}</div>}
                       </>
                     )}
-                    {r.qtdeContas && String(r.qtdeContas) !== '0' && <div className="text-[10px] text-slate-400">Contas: {r.qtdeContas}</div>}
+                    {r.qtdeContas && String(r.qtdeContas) !== '0' && <div className="text-[10px] text-slate-800">Contas: {r.qtdeContas}</div>}
                     {/* Dt Pagto editável */}
                     <div className="mt-0.5">
                       {editandoDtPagto === r.id ? (
@@ -904,7 +904,7 @@ export default function Calculo() {
                           className="cursor-pointer hover:bg-purple-100 rounded px-1 py-0.5 min-w-[6rem] inline-block text-blue-600 font-medium border border-transparent hover:border-purple-300 text-[10px]"
                           title={selecionados.size > 1 && selecionados.has(r.id) ? `Clique para editar e aplicar em ${selecionados.size} linhas selecionadas` : "Clique para editar"}
                         >
-                          {r.dtPagto || <span className="text-slate-300 italic">DD/MM/AAAA</span>}
+                          {r.dtPagto || <span className="text-slate-800 italic">DD/MM/AAAA</span>}
                         </span>
                       )}
                     </div>
@@ -912,7 +912,7 @@ export default function Calculo() {
                   {/* Célula compacta Ajustes */}
                   <td className="px-2 py-1 border-b border-slate-200 align-top text-right">
                     {/* Créditos/Débitos editável */}
-                    <div className="text-[9px] text-slate-400 mb-0.5">Créd/Déb</div>
+                    <div className="text-[9px] text-slate-800 mb-0.5">Créd/Déb</div>
                     {editandoCreditoDebito === r.id ? (
                       <input
                         ref={creditoDebitoInputRef}
@@ -936,7 +936,7 @@ export default function Calculo() {
                       >
                         {r.creditosDebitos && parseFloat(String(r.creditosDebitos)) !== 0
                           ? fmtMoeda(r.creditosDebitos)
-                          : <span className="text-slate-300 italic text-[10px]">0,00</span>}
+                          : <span className="text-slate-800 italic text-[10px]">0,00</span>}
                       </span>
                     )}
                     {r.ajudaCusto && parseFloat(String(r.ajudaCusto)) !== 0 && <div className="text-[10px] text-slate-500">Aj.Custo: {fmtMoeda(r.ajudaCusto)}</div>}
@@ -1114,7 +1114,7 @@ export default function Calculo() {
               </thead>
               <tbody>
                 {registrosFiltradosEnvio.length === 0 ? (
-                  <tr><td colSpan={7} className="px-2 py-4 text-center text-slate-400">Nenhum registro com os filtros atuais</td></tr>
+                  <tr><td colSpan={7} className="px-2 py-4 text-center text-slate-800">Nenhum registro com os filtros atuais</td></tr>
                 ) : (
                   registrosFiltradosEnvio.map((r: any, idx: number) => (
                     <tr key={r.id} className={idx % 2 === 0 ? "bg-white" : "bg-slate-50"}>

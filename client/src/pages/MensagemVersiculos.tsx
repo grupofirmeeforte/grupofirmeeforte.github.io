@@ -91,7 +91,7 @@ export default function MensagemVersiculos() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-slate-400 text-xs mt-6">
+        <p className="text-center text-slate-800 text-xs mt-6">
           O versículo muda automaticamente a cada novo dia
         </p>
       </div>

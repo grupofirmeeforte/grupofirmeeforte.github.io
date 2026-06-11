@@ -242,7 +242,7 @@ export default function Seguros() {
         {/* Filtros */}
         <div className="flex flex-wrap gap-3 mb-4 bg-gray-900 rounded-lg p-3 shadow-sm border">
           <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-            <Search className="w-4 h-4 text-gray-400" />
+            <Search className="w-4 h-4 text-gray-800" />
             <Input placeholder="Buscar contrato, agente, chave J..." value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} className="h-8" />
           </div>
           <Select value={empresa} onValueChange={v => { setEmpresa(v); setPage(0); }}>
@@ -274,9 +274,9 @@ export default function Seguros() {
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan={COLUNAS_SEGUROS.length + 1} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                <tr><td colSpan={COLUNAS_SEGUROS.length + 1} className="text-center py-8 text-gray-800">Carregando...</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td colSpan={COLUNAS_SEGUROS.length + 1} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
+                <tr><td colSpan={COLUNAS_SEGUROS.length + 1} className="text-center py-8 text-gray-800">Nenhum registro encontrado</td></tr>
               ) : rows.map((row, i) => (
                 <tr key={row.id} className={i % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}>
                   {COLUNAS_SEGUROS.map(c => {
@@ -301,7 +301,7 @@ export default function Seguros() {
 
         {/* Paginação */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-3 text-sm text-gray-300">
+          <div className="flex items-center justify-between mt-3 text-sm text-gray-800">
             <span>{total} registros no total</span>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>Anterior</Button>
@@ -319,8 +319,8 @@ export default function Seguros() {
             <DialogTitle>Importar Seguros</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
-            <p className="text-sm text-gray-300">Arquivo: <strong>{importFileName}</strong></p>
-            <p className="text-sm text-gray-300">{importRows.length} registros encontrados</p>
+            <p className="text-sm text-gray-800">Arquivo: <strong>{importFileName}</strong></p>
+            <p className="text-sm text-gray-800">{importRows.length} registros encontrados</p>
             <div>
               <label className="text-sm font-medium">Modo de importação:</label>
               <Select value={importModo} onValueChange={v => setImportModo(v as any)}>
@@ -350,7 +350,7 @@ export default function Seguros() {
       <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Confirmar exclusão</DialogTitle></DialogHeader>
-          <p className="text-sm text-gray-300">Deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-800">Deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
             <Button variant="destructive" onClick={() => deleteId && excluirMut.mutate({ id: deleteId })}>Excluir</Button>

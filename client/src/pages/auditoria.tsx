@@ -233,7 +233,7 @@ export default function AuditoriaPage() {
       'Auditoria': 'bg-gray-100 text-white',
       'dashboard': 'bg-slate-100 text-slate-700',
     };
-    return map[m] ?? 'bg-gray-100 text-gray-300';
+    return map[m] ?? 'bg-gray-100 text-gray-800';
   };
 
   const acaoBadge = (acao: string | null | undefined) => {
@@ -243,7 +243,7 @@ export default function AuditoriaPage() {
     if (a.includes('edit') || a.includes('atualiz')) return 'bg-yellow-100 text-yellow-800';
     if (a.includes('cri') || a.includes('adicion') || a.includes('insert')) return 'bg-blue-100 text-blue-800';
     if (a.includes('delet') || a.includes('remov') || a.includes('exclu')) return 'bg-red-100 text-red-800';
-    return 'bg-gray-100 text-gray-300';
+    return 'bg-gray-100 text-gray-800';
   };
 
   const fmtDuracao = (entrada: any, saida: any) => {
@@ -288,25 +288,25 @@ export default function AuditoriaPage() {
       <div className="flex gap-1 border-b border-gray-700">
         <button
           onClick={() => setAba('logs')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'logs' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'logs' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-800 hover:text-gray-800'}`}
         >
           <ClipboardList className="w-4 h-4" /> Logs de Acesso
         </button>
         <button
           onClick={() => setAba('feriados')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'feriados' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'feriados' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-800 hover:text-gray-800'}`}
         >
           <CalendarDays className="w-4 h-4" /> Feriados
         </button>
         <button
           onClick={() => setAba('credito-despesas')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'credito-despesas' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'credito-despesas' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-800 hover:text-gray-800'}`}
         >
           <BarChart2 className="w-4 h-4" /> Crédito x Despesas
         </button>
         <button
           onClick={() => setAba('permissoes')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'permissoes' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'permissoes' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-800 hover:text-gray-800'}`}
         >
           <Shield className="w-4 h-4" /> Permissões
         </button>
@@ -364,7 +364,7 @@ export default function AuditoriaPage() {
                   <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                   <span className="font-semibold text-sm text-emerald-800">Sessões Ativas ({sessoesAtivas.length})</span>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => refetchSessoes()} className="h-7 gap-1 text-xs text-gray-400">
+                <Button variant="ghost" size="sm" onClick={() => refetchSessoes()} className="h-7 gap-1 text-xs text-gray-800">
                   <RefreshCw className="w-3 h-3" /> Atualizar
                 </Button>
               </div>
@@ -372,9 +372,9 @@ export default function AuditoriaPage() {
                 {sessoesAtivas.map((s: any) => (
                   <div key={s.id} className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
                     <span className="font-mono text-[11px] text-blue-700 font-semibold">{s.chaveJ}</span>
-                    <span className="text-[11px] text-gray-200">{s.nomeAgente}</span>
+                    <span className="text-[11px] text-gray-800">{s.nomeAgente}</span>
                     {s.modulo && <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">{s.modulo}</span>}
-                    <span className="text-[10px] text-gray-400">{tempoOnline(s.ultimoAcesso)}</span>
+                    <span className="text-[10px] text-gray-800">{tempoOnline(s.ultimoAcesso)}</span>
                     {isCeo && (
                       <button
                         onClick={() => desconectarSessao.mutate({ sessaoId: s.id })}
@@ -394,8 +394,8 @@ export default function AuditoriaPage() {
           <div className="bg-white border border-gray-700 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-400" />
-                <span className="text-sm font-medium text-gray-200">Filtros</span>
+                <Filter className="w-4 h-4 text-gray-800" />
+                <span className="text-sm font-medium text-gray-800">Filtros</span>
                 {temFiltroAtivo && <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full">ativos</span>}
               </div>
               {temFiltroAtivo && (
@@ -449,7 +449,7 @@ export default function AuditoriaPage() {
 
           {/* Barra de ações e paginação topo */}
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-gray-800">
               {totalCount != null ? <><strong>{totalCount}</strong> registro{totalCount !== 1 ? 's' : ''}</> : 'Carregando...'}
               {temFiltroAtivo && <span className="text-blue-600 ml-1">(filtrado)</span>}
             </p>
@@ -481,15 +481,15 @@ export default function AuditoriaPage() {
               </thead>
               <tbody>
                 {loadingLogs ? (
-                  <tr><td colSpan={5} className="text-center py-6 text-gray-400">Carregando...</td></tr>
+                  <tr><td colSpan={5} className="text-center py-6 text-gray-800">Carregando...</td></tr>
                 ) : logs && logs.length > 0 ? (
                   logs.map((log: any, idx: number) => (
                     <tr key={log.id} className={idx % 2 === 0 ? 'bg-white hover:bg-blue-900/30' : 'bg-blue-900/20/30 hover:bg-blue-100/40'}>
                       {/* Coluna Agente */}
                       <td className="px-2 py-1">
                         <div className="font-mono text-[10px] text-blue-700 font-semibold leading-tight">{log.chaveJ}</div>
-                        <div className="text-[10px] text-gray-200 leading-tight truncate max-w-[170px]" title={log.nomeAgente}>{log.nomeAgente}</div>
-                        {log.ipAddress && <div className="text-[9px] text-gray-400 leading-tight">{log.ipAddress}</div>}
+                        <div className="text-[10px] text-gray-800 leading-tight truncate max-w-[170px]" title={log.nomeAgente}>{log.nomeAgente}</div>
+                        {log.ipAddress && <div className="text-[9px] text-gray-800 leading-tight">{log.ipAddress}</div>}
                       </td>
                       {/* Coluna Módulo/Ação */}
                       <td className="px-2 py-1">
@@ -509,24 +509,24 @@ export default function AuditoriaPage() {
                       {/* Coluna Horário */}
                       <td className="px-2 py-1 whitespace-nowrap">
                         <div className="text-[10px] text-white leading-tight">{new Date(log.horarioEntrada).toLocaleDateString('pt-BR')}</div>
-                        <div className="text-[9px] text-gray-400 leading-tight">{new Date(log.horarioEntrada).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
+                        <div className="text-[9px] text-gray-800 leading-tight">{new Date(log.horarioEntrada).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</div>
                       </td>
                       {/* Coluna Duração */}
                       <td className="px-2 py-1 whitespace-nowrap">
                         {fmtDuracao(log.horarioEntrada, log.horarioSaida)
                           ? <span className="text-[10px] text-emerald-700 font-medium">{fmtDuracao(log.horarioEntrada, log.horarioSaida)}</span>
-                          : <span className="text-[9px] text-gray-400">andamento</span>
+                          : <span className="text-[9px] text-gray-800">andamento</span>
                         }
                       </td>
                       {/* Coluna Descrição */}
                       <td className="px-2 py-1">
-                        <div className="text-[10px] text-gray-300 truncate max-w-[320px]" title={log.descricao || ''}>{log.descricao || '-'}</div>
-                        <div className="text-[9px] text-gray-400 font-mono leading-tight">{log.numeroEntrada}</div>
+                        <div className="text-[10px] text-gray-800 truncate max-w-[320px]" title={log.descricao || ''}>{log.descricao || '-'}</div>
+                        <div className="text-[9px] text-gray-800 font-mono leading-tight">{log.numeroEntrada}</div>
                       </td>
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={5} className="text-center py-6 text-gray-400">Nenhum registro encontrado</td></tr>
+                  <tr><td colSpan={5} className="text-center py-6 text-gray-800">Nenhum registro encontrado</td></tr>
                 )}
               </tbody>
             </table>
@@ -534,7 +534,7 @@ export default function AuditoriaPage() {
 
           {/* Paginação rodapé */}
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-400">Página {page + 1} de {Math.max(1, totalPages)}</p>
+            <p className="text-sm text-gray-800">Página {page + 1} de {Math.max(1, totalPages)}</p>
             <div className="flex gap-1">
               <Button onClick={() => setPage(0)} disabled={page === 0} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronFirst className="w-4 h-4" /></Button>
               <Button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} variant="outline" size="sm" className="h-8 w-8 p-0"><ChevronLeft className="w-4 h-4" /></Button>
@@ -550,14 +550,14 @@ export default function AuditoriaPage() {
       {aba === 'feriados' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-400">{feriadosList ? `${feriadosList.length} feriados em ${filtroAno}` : 'Carregando...'}</p>
+            <p className="text-sm text-gray-800">{feriadosList ? `${feriadosList.length} feriados em ${filtroAno}` : 'Carregando...'}</p>
             <Button onClick={abrirCriar} className="gap-2 bg-blue-700 hover:bg-blue-800 text-white">
               <Plus className="w-4 h-4" /> Novo Feriado
             </Button>
           </div>
           {/* Paginação topo feriados (navegação por ano) */}
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-400">Ano: {filtroAno}</p>
+            <p className="text-sm text-gray-800">Ano: {filtroAno}</p>
             <div className="flex gap-1">
               <Button onClick={() => setFiltroAno(a => a - 1)} variant="outline" size="sm"><ChevronLeft className="w-4 h-4" /></Button>
               <span className="px-3 py-1 text-sm font-semibold border rounded-md bg-white">{filtroAno}</span>
@@ -614,7 +614,7 @@ export default function AuditoriaPage() {
 
           {/* Paginação rodapé feriados */}
           <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-400">Ano: {filtroAno}</p>
+            <p className="text-sm text-gray-800">Ano: {filtroAno}</p>
             <div className="flex gap-1">
               <Button onClick={() => setFiltroAno(a => a - 1)} variant="outline" size="sm"><ChevronLeft className="w-4 h-4" /></Button>
               <span className="px-3 py-1 text-sm font-semibold border rounded-md bg-white">{filtroAno}</span>
@@ -637,7 +637,7 @@ export default function AuditoriaPage() {
                   </TableHeader>
                   <TableBody>
                     {loadingFeriados ? (
-                      <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-400">Carregando...</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-800">Carregando...</TableCell></TableRow>
                     ) : feriadosList && feriadosList.length > 0 ? (
                       feriadosList.map((f: Feriado, idx: number) => (
                         <TableRow key={f.id} className={idx % 2 === 0 ? 'bg-blue-900/20/30' : ''}>
@@ -649,7 +649,7 @@ export default function AuditoriaPage() {
                             </span>
                           </TableCell>
                           <TableCell>{f.estado ?? '—'}</TableCell>
-                          <TableCell className="text-sm text-gray-300">{f.cidade ?? '—'}</TableCell>
+                          <TableCell className="text-sm text-gray-800">{f.cidade ?? '—'}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex gap-1 justify-end">
                               <Button size="sm" variant="ghost" onClick={() => abrirEditar(f)} className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-900/30">
@@ -663,7 +663,7 @@ export default function AuditoriaPage() {
                         </TableRow>
                       ))
                     ) : (
-                      <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-400">Nenhum feriado encontrado para {filtroAno}</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-800">Nenhum feriado encontrado para {filtroAno}</TableCell></TableRow>
                     )}
                   </TableBody>
                 </Table>
@@ -730,7 +730,7 @@ export default function AuditoriaPage() {
           {/* Filtros */}
           <div className="flex flex-wrap gap-3 items-end">
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-300">Mês/Ano</label>
+              <label className="text-xs font-medium text-gray-800">Mês/Ano</label>
               <Select value={cdMesAno || 'todos'} onValueChange={v => setCdMesAno(v === 'todos' ? '' : v)}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Todos" />
@@ -744,7 +744,7 @@ export default function AuditoriaPage() {
               </Select>
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-gray-300">Chave J</label>
+              <label className="text-xs font-medium text-gray-800">Chave J</label>
               <Input
                 placeholder="Filtrar por Chave J"
                 value={cdChaveJ}
@@ -752,7 +752,7 @@ export default function AuditoriaPage() {
                 className="w-44"
               />
             </div>
-            <p className="text-sm text-gray-400 ml-auto">{cdDados ? `${cdDados.length} registro(s)` : ''}</p>
+            <p className="text-sm text-gray-800 ml-auto">{cdDados ? `${cdDados.length} registro(s)` : ''}</p>
           </div>
 
           {/* Tabela */}
@@ -798,9 +798,9 @@ export default function AuditoriaPage() {
               </thead>
               <tbody>
                 {cdLoading ? (
-                  <tr><td colSpan={28} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                  <tr><td colSpan={28} className="text-center py-8 text-gray-800">Carregando...</td></tr>
                 ) : !cdDados || cdDados.length === 0 ? (
-                  <tr><td colSpan={28} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
+                  <tr><td colSpan={28} className="text-center py-8 text-gray-800">Nenhum registro encontrado</td></tr>
                 ) : (
                   cdDados.map((row, i) => (
                     <tr key={i} className={`${i % 2 === 0 ? 'bg-white' : 'bg-gray-800'} hover:bg-blue-900/30 transition-colors`}>
@@ -873,7 +873,7 @@ function DespesasInternasAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any)
     <button
       onClick={() => setAba('despesas-internas')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'despesas-internas' ? 'bg-white border border-b-white border-gray-700 text-red-700' : 'text-gray-400 hover:text-gray-200'
+        aba === 'despesas-internas' ? 'bg-white border border-b-white border-gray-700 text-red-700' : 'text-gray-800 hover:text-gray-800'
       }`}
     >
       <Wallet className="w-4 h-4" /> Despesas Internas
@@ -978,7 +978,7 @@ function DespesasInternasAba() {
           </div>
           <div className="text-center">
             <h2 className="text-xl font-bold text-gray-900">Área Restrita</h2>
-            <p className="text-gray-400 text-sm mt-1">Informe a senha CEO para acessar as Despesas Internas</p>
+            <p className="text-gray-800 text-sm mt-1">Informe a senha CEO para acessar as Despesas Internas</p>
           </div>
           <div className="w-full space-y-2">
             <Label className="text-sm font-medium">Senha CEO</Label>
@@ -994,7 +994,7 @@ function DespesasInternasAba() {
               <button
                 type="button"
                 onClick={() => setMostrarSenha(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-800 hover:text-gray-800"
               >
                 {mostrarSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -1023,12 +1023,12 @@ function DespesasInternasAba() {
           </div>
           <div>
             <h2 className="text-lg font-bold text-gray-900">Despesas Internas</h2>
-            <p className="text-xs text-gray-400">Acesso restrito — Diretoria</p>
+            <p className="text-xs text-gray-800">Acesso restrito — Diretoria</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-gray-300">Filtrar por Mês</label>
+            <label className="text-xs font-medium text-gray-800">Filtrar por Mês</label>
             <Input
               placeholder="MM/AAAA"
               value={filtroMes}
@@ -1057,7 +1057,7 @@ function DespesasInternasAba() {
 
       {/* Tabela */}
       {isLoading ? (
-        <div className="text-center py-12 text-gray-400">Carregando...</div>
+        <div className="text-center py-12 text-gray-800">Carregando...</div>
       ) : (
         <Card>
           <CardContent className="p-0">
@@ -1077,7 +1077,7 @@ function DespesasInternasAba() {
                 </TableHeader>
                 <TableBody>
                   {(despesas ?? []).length === 0 ? (
-                    <TableRow><TableCell colSpan={8} className="text-center py-10 text-gray-400">Nenhuma despesa lançada</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={8} className="text-center py-10 text-gray-800">Nenhuma despesa lançada</TableCell></TableRow>
                   ) : (
                     (despesas ?? []).map((d: DespesaInterna) => (
                       <TableRow key={d.id} className="hover:bg-red-50">
@@ -1085,11 +1085,11 @@ function DespesasInternasAba() {
                         <TableCell>
                           <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">{d.categoria}</span>
                         </TableCell>
-                        <TableCell className="text-sm text-gray-200 max-w-[180px] truncate">{d.descricao ?? '—'}</TableCell>
-                        <TableCell className="text-sm text-gray-300">{d.dataLancamento ?? '—'}</TableCell>
-                        <TableCell className="text-sm text-gray-300">{d.lancadoPor ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-800 max-w-[180px] truncate">{d.descricao ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-800">{d.dataLancamento ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-800">{d.lancadoPor ?? '—'}</TableCell>
                         <TableCell className="text-right font-bold text-red-700">{fmt(d.valor)}</TableCell>
-                        <TableCell className="text-sm text-gray-400 max-w-[120px] truncate">{d.observacao ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-800 max-w-[120px] truncate">{d.observacao ?? '—'}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex gap-1 justify-end">
                             <Button size="sm" variant="ghost" onClick={() => abrirEditar(d)} className="h-7 w-7 p-0 text-blue-600 hover:bg-blue-900/30">
@@ -1107,9 +1107,9 @@ function DespesasInternasAba() {
               </Table>
             </div>
             <div className="border-t bg-red-50 px-4 py-3 flex items-center justify-between">
-              <span className="text-sm text-gray-400">{(despesas ?? []).length} registro(s)</span>
+              <span className="text-sm text-gray-800">{(despesas ?? []).length} registro(s)</span>
               <div className="text-right">
-                <p className="text-xs text-gray-400">Total do Período</p>
+                <p className="text-xs text-gray-800">Total do Período</p>
                 <p className="font-bold text-red-700 text-lg">{fmt(totalMes)}</p>
               </div>
             </div>
@@ -1190,7 +1190,7 @@ function BloqueiosAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => voi
     <button
       onClick={() => setAba('bloqueios')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'bloqueios' ? 'bg-white border border-b-white border-gray-700 text-red-700' : 'text-gray-400 hover:text-gray-200'
+        aba === 'bloqueios' ? 'bg-white border border-b-white border-gray-700 text-red-700' : 'text-gray-800 hover:text-gray-800'
       }`}
     >
       <Lock className="w-4 h-4" /> Bloqueios
@@ -1221,14 +1221,14 @@ function BloqueiosAba() {
             <RefreshCw className="w-3 h-3 mr-1" /> Atualizar
           </Button>
         </div>
-        <p className="text-xs text-gray-400 mb-4">
+        <p className="text-xs text-gray-800 mb-4">
           Agentes são bloqueados automaticamente após 3 tentativas de login com senha incorreta. Clique em <strong>Desbloquear</strong> para liberar o acesso.
         </p>
 
         {isLoading ? (
-          <div className="text-center py-8 text-gray-400">Carregando...</div>
+          <div className="text-center py-8 text-gray-800">Carregando...</div>
         ) : (bloqueados as any[]).length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 gap-2 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-10 gap-2 text-gray-800">
             <CheckCircle2 className="w-10 h-10 text-green-400" />
             <p className="text-sm font-medium text-green-600">Nenhum agente bloqueado no momento</p>
           </div>
@@ -1253,10 +1253,10 @@ function BloqueiosAba() {
                         {b.attempts} tentativas
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-300">
+                    <td className="px-4 py-3 text-xs text-gray-800">
                       {b.updatedAt ? new Date(b.updatedAt).toLocaleString('pt-BR') : '-'}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-300">
+                    <td className="px-4 py-3 text-xs text-gray-800">
                       {b.blockedUntil ? new Date(b.blockedUntil).toLocaleString('pt-BR') : '-'}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -1298,7 +1298,7 @@ function BackupAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => void }
     <button
       onClick={() => setAba('backup')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'backup' ? 'bg-white border border-b-white border-gray-700 text-emerald-700' : 'text-gray-400 hover:text-gray-200'
+        aba === 'backup' ? 'bg-white border border-b-white border-gray-700 text-emerald-700' : 'text-gray-800 hover:text-gray-800'
       }`}
     >
       <DatabaseBackup className="w-4 h-4" /> Backup
@@ -1354,7 +1354,7 @@ function BackupAba() {
           <DatabaseBackup className="w-7 h-7 text-emerald-600" />
           <div>
             <h2 className="text-xl font-bold text-white">Backup do Sistema</h2>
-            <p className="text-sm text-gray-400">Exportação completa de todas as tabelas do banco de dados</p>
+            <p className="text-sm text-gray-800">Exportação completa de todas as tabelas do banco de dados</p>
           </div>
         </div>
 
@@ -1365,10 +1365,10 @@ function BackupAba() {
               <Download className="w-5 h-5 text-emerald-700" />
               <h3 className="font-semibold text-emerald-800">Download Manual</h3>
             </div>
-            <p className="text-sm text-gray-300 mb-4">
+            <p className="text-sm text-gray-800 mb-4">
               Gera um arquivo ZIP com todas as tabelas em formato Excel (.xlsx). Faça o download agora e guarde em local seguro.
             </p>
-            <div className="text-xs text-gray-400 mb-4 space-y-1">
+            <div className="text-xs text-gray-800 mb-4 space-y-1">
               <p>• Agentes • Febraban • Consignados • Contas Correntes</p>
               <p>• Consórcios • OuroCap • Seguros • BB Dental</p>
               <p>• Despesas Fixas • Despesas Internas • Certificações</p>
@@ -1393,13 +1393,13 @@ function BackupAba() {
               <Mail className="w-5 h-5 text-blue-700" />
               <h3 className="font-semibold text-blue-800">Enviar por E-mail</h3>
             </div>
-            <p className="text-sm text-gray-300 mb-2">
+            <p className="text-sm text-gray-800 mb-2">
               Envia o backup completo para o e-mail cadastrado do sistema.
             </p>
             <div className="bg-white border border-blue-200 rounded-lg px-3 py-2 mb-4 text-sm font-mono text-blue-800">
               ultramare@gmail.com
             </div>
-            <p className="text-xs text-gray-400 mb-4">
+            <p className="text-xs text-gray-800 mb-4">
               O arquivo ZIP será enviado como anexo. Certifique-se de que as configurações de SMTP estão ativas no sistema.
             </p>
             <Button
@@ -1424,9 +1424,9 @@ function BackupAba() {
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
             <div className="text-sm">
-              <span className="font-semibold text-gray-200">Último backup gerado:</span>{' '}
-              <span className="text-gray-300">{ultimoBackup.dataHora}</span>
-              <span className="text-gray-400 ml-2">• {ultimoBackup.tabelas} tabelas • {ultimoBackup.tamanhoKB} KB</span>
+              <span className="font-semibold text-gray-800">Último backup gerado:</span>{' '}
+              <span className="text-gray-800">{ultimoBackup.dataHora}</span>
+              <span className="text-gray-800 ml-2">• {ultimoBackup.tabelas} tabelas • {ultimoBackup.tamanhoKB} KB</span>
             </div>
           </div>
         )}
@@ -1455,7 +1455,7 @@ function ArquivoMortoAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => 
     <button
       onClick={() => setAba('arquivo-morto')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'arquivo-morto' ? 'bg-white border border-b-white border-gray-700 text-amber-700' : 'text-gray-400 hover:text-gray-200'
+        aba === 'arquivo-morto' ? 'bg-white border border-b-white border-gray-700 text-amber-700' : 'text-gray-800 hover:text-gray-800'
       }`}
     >
       <FolderArchive className="w-4 h-4" /> Arquivo Morto
@@ -1580,7 +1580,7 @@ function ArquivoMortoAba() {
     const t = (tipo ?? "").toLowerCase();
     if (["xlsx", "xls", "csv"].includes(t)) return <FileSpreadsheet className="w-4 h-4 text-green-600" />;
     if (t === "pdf") return <FileText className="w-4 h-4 text-red-500" />;
-    return <File className="w-4 h-4 text-gray-400" />;
+    return <File className="w-4 h-4 text-gray-800" />;
   }
 
   const rows = data?.rows ?? [];
@@ -1595,7 +1595,7 @@ function ArquivoMortoAba() {
           <FolderArchive className="w-7 h-7 text-amber-600" />
           <div>
             <h2 className="text-xl font-bold text-white">Arquivo Morto</h2>
-            <p className="text-sm text-gray-400">Armazenamento de arquivos originais (Excel, PDF) por módulo e mês/ano</p>
+            <p className="text-sm text-gray-800">Armazenamento de arquivos originais (Excel, PDF) por módulo e mês/ano</p>
           </div>
         </div>
         <Button
@@ -1609,7 +1609,7 @@ function ArquivoMortoAba() {
       {/* Filtros */}
       <div className="bg-white border border-gray-700 rounded-xl p-3 flex flex-wrap gap-2">
         <div className="relative">
-          <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-800" />
           <input
             className="pl-8 h-9 w-52 text-sm border border-gray-700 rounded-md px-3 focus:outline-none focus:ring-1 focus:ring-amber-400"
             placeholder="Nome do arquivo..."
@@ -1650,10 +1650,10 @@ function ArquivoMortoAba() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={7} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+              <tr><td colSpan={7} className="text-center py-8 text-gray-800">Carregando...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={7} className="text-center py-10 text-gray-400">
-                <FolderArchive className="w-10 h-10 mx-auto mb-2 text-gray-300" />
+              <tr><td colSpan={7} className="text-center py-10 text-gray-800">
+                <FolderArchive className="w-10 h-10 mx-auto mb-2 text-gray-800" />
                 Nenhum arquivo encontrado. Clique em "Enviar Arquivo" para adicionar.
               </td></tr>
             ) : rows.map((row, i) => (
@@ -1663,15 +1663,15 @@ function ArquivoMortoAba() {
                     {getFileIcon(row.tipoArquivo)}
                     <span className="font-medium text-white text-xs">{row.nomeArquivo}</span>
                   </div>
-                  {row.descricao && <div className="text-[10px] text-gray-400 mt-0.5">{row.descricao}</div>}
+                  {row.descricao && <div className="text-[10px] text-gray-800 mt-0.5">{row.descricao}</div>}
                 </td>
                 <td className="px-3 py-2">
                   <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-medium">{row.modulo}</span>
                 </td>
-                <td className="px-3 py-2 text-xs text-gray-300">{row.mesAno ?? "-"}</td>
-                <td className="px-3 py-2 text-xs text-gray-400">{fmtTamanho(row.tamanho)}</td>
-                <td className="px-3 py-2 text-xs text-gray-400">{row.uploadadoPor ?? "-"}</td>
-                <td className="px-3 py-2 text-xs text-gray-400">
+                <td className="px-3 py-2 text-xs text-gray-800">{row.mesAno ?? "-"}</td>
+                <td className="px-3 py-2 text-xs text-gray-800">{fmtTamanho(row.tamanho)}</td>
+                <td className="px-3 py-2 text-xs text-gray-800">{row.uploadadoPor ?? "-"}</td>
+                <td className="px-3 py-2 text-xs text-gray-800">
                   {row.createdAt ? new Date(row.createdAt).toLocaleDateString("pt-BR") : "-"}
                 </td>
                 <td className="px-3 py-2">
@@ -1701,7 +1701,7 @@ function ArquivoMortoAba() {
       {/* Paginação */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-2 py-2 text-sm">
-          <span className="text-gray-400">Página {page + 1} de {totalPages} — {total} arquivos</span>
+          <span className="text-gray-800">Página {page + 1} de {totalPages} — {total} arquivos</span>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>Anterior</Button>
             <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}>Próxima</Button>
@@ -1764,13 +1764,13 @@ function ArquivoMortoAba() {
                 }}
               >
                 {uploadFile ? (
-                  <div className="flex items-center justify-center gap-2 text-sm text-gray-200">
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-800">
                     {getFileIcon(uploadFile.name.split(".").pop())}
                     <span className="font-medium">{uploadFile.name}</span>
-                    <span className="text-gray-400">({fmtTamanho(uploadFile.size)})</span>
+                    <span className="text-gray-800">({fmtTamanho(uploadFile.size)})</span>
                   </div>
                 ) : (
-                  <div className="text-gray-400 text-sm">
+                  <div className="text-gray-800 text-sm">
                     <Upload className="w-6 h-6 mx-auto mb-1 text-amber-400" />
                     {dragOver ? 'Solte o arquivo aqui!' : 'Arraste o arquivo aqui ou clique para selecionar (Excel, PDF, CSV...)'}
                   </div>

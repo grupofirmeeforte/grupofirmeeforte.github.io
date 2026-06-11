@@ -119,7 +119,7 @@ export default function MeuPin() {
                 </>
               ) : (
                 <>
-                  <AlertCircle className="w-5 h-5 text-gray-400 shrink-0" />
+                  <AlertCircle className="w-5 h-5 text-gray-800 shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-gray-700">Nenhum PIN cadastrado</p>
                     <p className="text-xs text-gray-500">Cadastre um PIN para agilizar seu acesso.</p>
@@ -182,7 +182,7 @@ export default function MeuPin() {
                   onChange={(e) => setSenhaConfirmacao(e.target.value)}
                   autoComplete="off"
                 />
-                <p className="text-xs text-gray-400 mt-1">Por segurança, confirme sua senha para salvar o PIN.</p>
+                <p className="text-xs text-gray-800 mt-1">Por segurança, confirme sua senha para salvar o PIN.</p>
               </div>
 
               {error && (

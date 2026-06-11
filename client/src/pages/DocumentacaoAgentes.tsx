@@ -42,7 +42,7 @@ function formatBytes(bytes: number) {
 function getFileIcon(tipo: string) {
   if (tipo?.startsWith('image/')) return <ImageIcon className="w-5 h-5 text-blue-500" />;
   if (tipo === 'application/pdf') return <FileText className="w-5 h-5 text-red-500" />;
-  return <File className="w-5 h-5 text-gray-400" />;
+  return <File className="w-5 h-5 text-gray-800" />;
 }
 
 export default function DocumentacaoAgentes() {
@@ -173,13 +173,13 @@ export default function DocumentacaoAgentes() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-mono text-blue-700 font-bold text-lg">{agenteSelecionado.chaveJ}</span>
-                <span className="text-gray-400">—</span>
+                <span className="text-gray-800">—</span>
                 <span className="font-semibold text-white text-lg">{agenteSelecionado.nomeAgente}</span>
                 {agenteSelecionado.empresa && (
-                  <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{agenteSelecionado.empresa}</span>
+                  <span className="text-xs text-gray-800 bg-gray-100 px-2 py-0.5 rounded">{agenteSelecionado.empresa}</span>
                 )}
               </div>
-              <p className="text-sm text-gray-400">Documentos do agente</p>
+              <p className="text-sm text-gray-800">Documentos do agente</p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -212,7 +212,7 @@ export default function DocumentacaoAgentes() {
               ))}
             </SelectContent>
           </Select>
-          <span className="text-sm text-gray-400">{docsFiltrados.length} documento(s)</span>
+          <span className="text-sm text-gray-800">{docsFiltrados.length} documento(s)</span>
         </div>
 
         {/* Tabela de documentos */}
@@ -232,11 +232,11 @@ export default function DocumentacaoAgentes() {
                 </thead>
                 <tbody>
                   {loadingDocs ? (
-                    <tr><td colSpan={6} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                    <tr><td colSpan={6} className="text-center py-8 text-gray-800">Carregando...</td></tr>
                   ) : docsFiltrados.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center py-12">
-                        <div className="flex flex-col items-center gap-2 text-gray-400">
+                        <div className="flex flex-col items-center gap-2 text-gray-800">
                           <FolderOpen className="w-10 h-10" />
                           <p className="font-medium">Nenhum documento encontrado</p>
                           <p className="text-sm">Clique em "Adicionar Documento" para começar</p>
@@ -247,7 +247,7 @@ export default function DocumentacaoAgentes() {
                     docsFiltrados.map((doc, i) => (
                       <tr key={doc.id} className={i % 2 === 0 ? 'bg-gray-900' : 'bg-gray-800'}>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${CORES_TIPO[doc.tipoDocumento] ?? 'bg-gray-100 text-gray-200'}`}>
+                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${CORES_TIPO[doc.tipoDocumento] ?? 'bg-gray-100 text-gray-800'}`}>
                             {doc.tipoDocumento}
                           </span>
                         </td>
@@ -257,9 +257,9 @@ export default function DocumentacaoAgentes() {
                             <span className="truncate max-w-[200px]" title={doc.arquivoNome ?? ''}>{doc.arquivoNome ?? '—'}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-gray-300">{doc.descricao ?? '—'}</td>
-                        <td className="px-4 py-3 text-gray-400">{doc.tamanho ? formatBytes(doc.tamanho) : '—'}</td>
-                        <td className="px-4 py-3 text-gray-400 whitespace-nowrap">
+                        <td className="px-4 py-3 text-gray-800">{doc.descricao ?? '—'}</td>
+                        <td className="px-4 py-3 text-gray-800">{doc.tamanho ? formatBytes(doc.tamanho) : '—'}</td>
+                        <td className="px-4 py-3 text-gray-800 whitespace-nowrap">
                           {doc.createdAt ? new Date(doc.createdAt).toLocaleDateString('pt-BR') : '—'}
                         </td>
                         <td className="px-4 py-3">
@@ -296,7 +296,7 @@ export default function DocumentacaoAgentes() {
             </DialogHeader>
             <div className="space-y-4 py-2">
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-1">
+                <label className="block text-sm font-medium text-gray-800 mb-1">
                   Tipo de Documento <span className="text-red-500">*</span>
                 </label>
                 <Select value={uploadForm.tipoDocumento} onValueChange={v => setUploadForm(p => ({ ...p, tipoDocumento: v }))}>
@@ -307,19 +307,19 @@ export default function DocumentacaoAgentes() {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-1">Descrição</label>
+                <label className="block text-sm font-medium text-gray-800 mb-1">Descrição</label>
                 <Input placeholder="Ex: RG frente e verso..." value={uploadForm.descricao}
                   onChange={e => setUploadForm(p => ({ ...p, descricao: e.target.value }))} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-1">Observação</label>
+                <label className="block text-sm font-medium text-gray-800 mb-1">Observação</label>
                 <Input placeholder="Observações adicionais..." value={uploadForm.observacao}
                   onChange={e => setUploadForm(p => ({ ...p, observacao: e.target.value }))} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-1">
+                <label className="block text-sm font-medium text-gray-800 mb-1">
                   Arquivo <span className="text-red-500">*</span>
-                  <span className="text-gray-400 font-normal ml-1">(PDF, JPG, PNG — máx. 10MB)</span>
+                  <span className="text-gray-800 font-normal ml-1">(PDF, JPG, PNG — máx. 10MB)</span>
                 </label>
                 <div
                   className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${arquivoSelecionado ? 'border-green-400 bg-green-50' : 'border-gray-300 hover:border-blue-400 hover:bg-blue-900/30'}`}
@@ -329,11 +329,11 @@ export default function DocumentacaoAgentes() {
                     <div className="flex items-center justify-center gap-2 text-green-700">
                       {getFileIcon(arquivoSelecionado.type)}
                       <span className="font-medium truncate max-w-[200px]">{arquivoSelecionado.name}</span>
-                      <span className="text-sm text-gray-400">({formatBytes(arquivoSelecionado.size)})</span>
+                      <span className="text-sm text-gray-800">({formatBytes(arquivoSelecionado.size)})</span>
                     </div>
                   ) : (
-                    <div className="text-gray-400">
-                      <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                    <div className="text-gray-800">
+                      <Upload className="w-8 h-8 mx-auto mb-2 text-gray-800" />
                       <p className="text-sm">Clique para selecionar o arquivo</p>
                     </div>
                   )}
@@ -368,14 +368,14 @@ export default function DocumentacaoAgentes() {
           return (
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2 text-sm">
-                <span className={`px-2 py-1 rounded text-xs font-semibold ${CORES_TIPO[docVisualizar.tipoDocumento] ?? 'bg-gray-100 text-gray-200'}`}>
+                <span className={`px-2 py-1 rounded text-xs font-semibold ${CORES_TIPO[docVisualizar.tipoDocumento] ?? 'bg-gray-100 text-gray-800'}`}>
                   {docVisualizar.tipoDocumento}
                 </span>
-                {docVisualizar.descricao && <span className="text-gray-400">{docVisualizar.descricao}</span>}
+                {docVisualizar.descricao && <span className="text-gray-800">{docVisualizar.descricao}</span>}
               </div>
               <div className="border rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center" style={{ minHeight: 400 }}>
                 {carregando ? (
-                  <div className="text-center text-gray-400 py-8">
+                  <div className="text-center text-gray-800 py-8">
                     <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-2" />
                     <p>Carregando arquivo...</p>
                   </div>
@@ -385,7 +385,7 @@ export default function DocumentacaoAgentes() {
                 ) : docVisualizar.arquivoTipo === 'application/pdf' ? (
                   <iframe src={urlFinal} className="w-full" style={{ height: '60vh' }} title={docVisualizar.arquivoNome} />
                 ) : (
-                  <div className="text-center text-gray-400 py-8">
+                  <div className="text-center text-gray-800 py-8">
                     <File className="w-12 h-12 mx-auto mb-2" />
                     <p>Pré-visualização não disponível</p>
                     <a href={urlFinal} target="_blank" rel="noopener noreferrer"
@@ -394,7 +394,7 @@ export default function DocumentacaoAgentes() {
                 )}
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-gray-800">
                   {docVisualizar.createdAt ? new Date(docVisualizar.createdAt).toLocaleDateString('pt-BR') : '—'}
                 </span>
                 {!carregando && (
@@ -420,7 +420,7 @@ export default function DocumentacaoAgentes() {
       {/* Filtro */}
       <div className="px-6 py-3 bg-gray-900 border-b border-gray-700 flex gap-3 items-center">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-800" />
           <Input
             placeholder="Buscar por Chave J ou Nome..."
             value={filtroBusca}
@@ -429,12 +429,12 @@ export default function DocumentacaoAgentes() {
           />
           {filtroBusca && (
             <button onClick={() => setFiltroBusca('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-              <X className="w-4 h-4 text-gray-400" />
+              <X className="w-4 h-4 text-gray-800" />
             </button>
           )}
         </div>
-        <span className="text-sm text-gray-400">{agentesComDocs.length} agente(s)</span>
-        <span className="text-xs text-gray-400">
+        <span className="text-sm text-gray-800">{agentesComDocs.length} agente(s)</span>
+        <span className="text-xs text-gray-800">
           <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1 align-middle" />
           Com documentos
         </span>
@@ -457,11 +457,11 @@ export default function DocumentacaoAgentes() {
               </thead>
               <tbody>
                 {loadingAgentes ? (
-                  <tr><td colSpan={6} className="text-center py-8 text-gray-400">Carregando agentes...</td></tr>
+                  <tr><td colSpan={6} className="text-center py-8 text-gray-800">Carregando agentes...</td></tr>
                 ) : agentesComDocs.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="text-center py-12">
-                      <div className="flex flex-col items-center gap-2 text-gray-400">
+                      <div className="flex flex-col items-center gap-2 text-gray-800">
                         <Search className="w-10 h-10" />
                         <p className="font-medium">Nenhum agente encontrado</p>
                       </div>
@@ -483,19 +483,19 @@ export default function DocumentacaoAgentes() {
                           <span className="ml-2 inline-block w-2 h-2 rounded-full bg-green-500 align-middle" title="Tem documentos" />
                         )}
                       </td>
-                      <td className="px-4 py-3 text-gray-300">{agente.empresa ?? '—'}</td>
-                      <td className="px-4 py-3 text-gray-400">{agente.situacao ?? '—'}</td>
+                      <td className="px-4 py-3 text-gray-800">{agente.empresa ?? '—'}</td>
+                      <td className="px-4 py-3 text-gray-800">{agente.situacao ?? '—'}</td>
                       <td className="px-4 py-3 text-center">
                         {agente.qtdDocumentos > 0 ? (
                           <span className="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full">
                             {agente.qtdDocumentos} doc{agente.qtdDocumentos !== 1 ? 's' : ''}
                           </span>
                         ) : (
-                          <span className="text-gray-400 text-xs">—</span>
+                          <span className="text-gray-800 text-xs">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <ChevronRight className="w-4 h-4 text-gray-400 mx-auto" />
+                        <ChevronRight className="w-4 h-4 text-gray-800 mx-auto" />
                       </td>
                     </tr>
                   ))

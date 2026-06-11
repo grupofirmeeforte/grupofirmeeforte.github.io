@@ -34,7 +34,7 @@ function PosicaoIcon({ pos }: { pos: number }) {
   if (pos === 1) return <span className="text-2xl">🥇</span>;
   if (pos === 2) return <span className="text-2xl">🥈</span>;
   if (pos === 3) return <span className="text-2xl">🥉</span>;
-  return <span className="text-lg font-bold text-slate-400">#{pos}</span>;
+  return <span className="text-lg font-bold text-slate-800">#{pos}</span>;
 }
 
 export default function PainelAgente() {
@@ -120,19 +120,19 @@ export default function PainelAgente() {
               <Target className="w-5 h-5" /> Defina sua meta para {painel?.mesAtual}!
             </DialogTitle>
           </DialogHeader>
-          <p className="text-slate-300 text-sm">Você ainda não definiu sua meta para este mês. Que tal definir agora e se desafiar a conquistá-la?</p>
+          <p className="text-slate-800 text-sm">Você ainda não definiu sua meta para este mês. Que tal definir agora e se desafiar a conquistá-la?</p>
           <div className="space-y-2">
-            <Label className="text-slate-300">Valor da meta (R$)</Label>
+            <Label className="text-slate-800">Valor da meta (R$)</Label>
             <Input
               value={metaInput}
               onChange={e => setMetaInput(e.target.value)}
               placeholder="Ex: 5000"
-              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+              className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-800"
               autoFocus
             />
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setModalMetaInicial(false)} className="border-slate-600 text-slate-300 bg-transparent hover:bg-slate-700">
+            <Button variant="outline" onClick={() => setModalMetaInicial(false)} className="border-slate-600 text-slate-800 bg-transparent hover:bg-slate-700">
               Agora não
             </Button>
             <Button
@@ -160,7 +160,7 @@ export default function PainelAgente() {
         <div className="flex items-center justify-center py-32">
           <div className="text-center">
             <BarChart2 className="w-16 h-16 text-yellow-400 animate-pulse mx-auto mb-4" />
-            <p className="text-slate-400">Carregando seu painel...</p>
+            <p className="text-slate-800">Carregando seu painel...</p>
           </div>
         </div>
       ) : (
@@ -175,13 +175,13 @@ export default function PainelAgente() {
                   <User className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <p className="text-slate-400 text-sm">Bem-vindo de volta,</p>
+                  <p className="text-slate-800 text-sm">Bem-vindo de volta,</p>
                   <h2 className="text-2xl font-bold text-white">{(painel?.agente?.nomeAgente ?? 'Agente').split(' ')[0]}</h2>
                   <div className="flex items-center gap-2 mt-1">
                     {painel?.agente?.nivel && (
                       <Badge className="bg-amber-600 text-white text-xs">{painel.agente.nivel}</Badge>
                     )}
-                    <span className="text-slate-400 text-xs">{painel?.agente?.cidade}</span>
+                    <span className="text-slate-800 text-xs">{painel?.agente?.cidade}</span>
                   </div>
                 </div>
               </CardContent>
@@ -206,34 +206,34 @@ export default function PainelAgente() {
             {/* Produção */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-slate-800">
                   <TrendingUp className="w-5 h-5 text-green-400" />
                   Produção — {painel?.mesAtual}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="text-3xl font-black text-green-400">{fmt(comissaoAtual)}</div>
-                <p className="text-xs text-slate-400 italic">* Consignado inclui SRCC</p>
+                <p className="text-xs text-slate-800 italic">* Consignado inclui SRCC</p>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="bg-slate-700/50 rounded-lg p-2">
-                    <div className="text-slate-400 text-xs">Consignado *</div>
+                    <div className="text-slate-800 text-xs">Consignado *</div>
                     <div className="font-semibold text-white">{fmt((painel?.producaoMes?.vrLiquidoC2 ?? 0) + (painel?.producaoMes?.vrLiquidoSrcc ?? 0))}</div>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-2">
-                    <div className="text-slate-400 text-xs">Consórcio</div>
+                    <div className="text-slate-800 text-xs">Consórcio</div>
                     <div className="font-semibold text-white">{fmt(painel?.producaoMes?.comissaoConsorcio ?? 0)}</div>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-2">
-                    <div className="text-slate-400 text-xs">Ourocap</div>
+                    <div className="text-slate-800 text-xs">Ourocap</div>
                     <div className="font-semibold text-white">{fmt(painel?.producaoMes?.comissaoOurocap ?? 0)}</div>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-2">
-                    <div className="text-slate-400 text-xs">C/C</div>
+                    <div className="text-slate-800 text-xs">C/C</div>
                     <div className="font-semibold text-white">{fmt(painel?.producaoMes?.comissaoCc ?? 0)}</div>
                   </div>
                   {(painel?.producaoMes?.comissaoSeguros ?? 0) > 0 && (
                     <div className="bg-slate-700/50 rounded-lg p-2">
-                      <div className="text-slate-400 text-xs">Seguros</div>
+                      <div className="text-slate-800 text-xs">Seguros</div>
                       <div className="font-semibold text-white">{fmt(painel?.producaoMes?.comissaoSeguros ?? 0)}</div>
                     </div>
                   )}
@@ -244,13 +244,13 @@ export default function PainelAgente() {
             {/* Meta */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center justify-between text-slate-200">
+                <CardTitle className="text-base flex items-center justify-between text-slate-800">
                   <span className="flex items-center gap-2"><Target className="w-5 h-5 text-amber-400" /> Meta do Mês</span>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => { setMetaInput(metaTotal > 0 ? String(metaTotal) : ''); setModalMeta(true); }}
-                    className="h-7 text-xs bg-transparent border-slate-600 text-slate-300 hover:bg-slate-700"
+                    className="h-7 text-xs bg-transparent border-slate-600 text-slate-800 hover:bg-slate-700"
                   >
                     <Edit2 className="w-3 h-3 mr-1" /> Definir
                   </Button>
@@ -265,7 +265,7 @@ export default function PainelAgente() {
                         <div className="text-5xl mb-2">🏆</div>
                         <div className="text-2xl font-black text-yellow-400 mb-1">PARABÉNS!</div>
                         <div className="text-green-400 font-bold text-lg mb-1">Você bateu sua meta!</div>
-                        <div className="text-slate-300 text-sm mb-3">{fmt(comissaoAtual)} de {fmt(metaTotal)}</div>
+                        <div className="text-slate-800 text-sm mb-3">{fmt(comissaoAtual)} de {fmt(metaTotal)}</div>
                         <div className="flex justify-center gap-2">
                           <Badge className="bg-yellow-500 text-black font-bold text-sm px-3 py-1">🥇 Meta Conquistada!</Badge>
                         </div>
@@ -278,10 +278,10 @@ export default function PainelAgente() {
                             <div className="text-3xl font-black" style={{ color: percMetaReal >= 70 ? '#facc15' : '#f87171' }}>
                               {percMetaReal.toFixed(1)}%
                             </div>
-                            <div className="text-slate-400 text-xs">de {fmt(metaTotal)}</div>
+                            <div className="text-slate-800 text-xs">de {fmt(metaTotal)}</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-slate-300 text-sm font-semibold">Falta</div>
+                            <div className="text-slate-800 text-sm font-semibold">Falta</div>
                             <div className="text-red-400 font-black text-xl">{fmt(Math.max(0, metaTotal - comissaoAtual))}</div>
                           </div>
                         </div>
@@ -290,7 +290,7 @@ export default function PainelAgente() {
                           className="h-4 bg-slate-700"
                           style={{ '--progress-color': percMetaReal >= 70 ? '#facc15' : '#f87171' } as React.CSSProperties}
                         />
-                        <p className="text-xs text-slate-400 text-center">
+                        <p className="text-xs text-slate-800 text-center">
                           {percMetaReal >= 70 ? '🔥 Quase lá! Continue assim!' : percMetaReal >= 40 ? '💪 Bom ritmo! Você consegue!' : '🎯 Foco na meta! Você é capaz!'}
                         </p>
                       </>
@@ -299,7 +299,7 @@ export default function PainelAgente() {
                 ) : (
                   <div className="text-center py-6">
                     <Target className="w-10 h-10 text-slate-600 mx-auto mb-2" />
-                    <p className="text-slate-400 text-sm">Nenhuma meta definida</p>
+                    <p className="text-slate-800 text-sm">Nenhuma meta definida</p>
                     <Button
                       size="sm"
                       onClick={() => setModalMeta(true)}
@@ -316,7 +316,7 @@ export default function PainelAgente() {
           {/* Ranking + Posição */}
           <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center justify-between text-slate-200">
+              <CardTitle className="text-base flex items-center justify-between text-slate-800">
                 <span className="flex items-center gap-2"><Trophy className="w-5 h-5 text-yellow-400" /> 🏆 Top 10 do Mês</span>
                 <div className="flex items-center gap-2">
                   {painel?.ranking?.posicao && painel.ranking.posicao > 0 && (
@@ -339,9 +339,9 @@ export default function PainelAgente() {
             </CardHeader>
             <CardContent>
               {rankLoading ? (
-                <div className="text-center py-8 text-slate-400">Carregando ranking...</div>
+                <div className="text-center py-8 text-slate-800">Carregando ranking...</div>
               ) : !ranking || ranking.length === 0 ? (
-                <div className="text-center py-8 text-slate-400">Nenhum dado disponível para este mês.</div>
+                <div className="text-center py-8 text-slate-800">Nenhum dado disponível para este mês.</div>
               ) : (
                 <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
                   {(() => {
@@ -363,7 +363,7 @@ export default function PainelAgente() {
                         <div className={`font-semibold text-sm truncate ${r.isMe ? 'text-yellow-300' : 'text-white'}`}>
                           {toTitleCase(r.nomeAgente ?? '')} {r.isMe && <span className="text-xs text-yellow-400">(você)</span>}
                         </div>
-                        <div className="text-xs text-slate-400">{r.cidade}</div>
+                        <div className="text-xs text-slate-800">{r.cidade}</div>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <div className={`font-bold text-sm ${r.isMe ? 'text-yellow-300' : 'text-green-400'}`}>
@@ -383,7 +383,7 @@ export default function PainelAgente() {
             {/* Conquistas */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-slate-800">
                   <Medal className="w-5 h-5 text-purple-400" /> Conquistas
                 </CardTitle>
               </CardHeader>
@@ -391,7 +391,7 @@ export default function PainelAgente() {
                 {!painel?.conquistas || painel.conquistas.length === 0 ? (
                   <div className="text-center py-6">
                     <Medal className="w-10 h-10 text-slate-600 mx-auto mb-2" />
-                    <p className="text-slate-400 text-sm">Nenhuma conquista ainda. Continue acessando!</p>
+                    <p className="text-slate-800 text-sm">Nenhuma conquista ainda. Continue acessando!</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
@@ -412,7 +412,7 @@ export default function PainelAgente() {
             {/* Documentos vencendo */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-slate-800">
                   <AlertTriangle className="w-5 h-5 text-red-400" /> Documentos Vencendo
                 </CardTitle>
               </CardHeader>
@@ -468,7 +468,7 @@ export default function PainelAgente() {
           {painel?.historico && painel.historico.length > 0 && (
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-slate-800">
                   <Calendar className="w-5 h-5 text-blue-400" /> Histórico de Produção
                 </CardTitle>
               </CardHeader>
@@ -476,7 +476,7 @@ export default function PainelAgente() {
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                   {painel.historico.map((h, i) => (
                     <div key={h.mesRef ?? (h as any).mes_ref} className="bg-slate-700/50 rounded-lg p-3 text-center">
-                      <div className="text-slate-400 text-xs mb-1">{h.mesRef ?? (h as any).mes_ref}</div>
+                      <div className="text-slate-800 text-xs mb-1">{h.mesRef ?? (h as any).mes_ref}</div>
                       <div className="text-green-400 font-bold text-sm">{fmt(Number(h.total))}</div>
                       {i > 0 && painel.historico[i - 1] && (
                         <div className="flex items-center justify-center mt-1">
@@ -484,7 +484,7 @@ export default function PainelAgente() {
                             ? <ChevronUp className="w-3 h-3 text-green-400" />
                             : Number(h.total) < Number(painel.historico[i - 1].total)
                               ? <ChevronDown className="w-3 h-3 text-red-400" />
-                              : <Minus className="w-3 h-3 text-slate-400" />
+                              : <Minus className="w-3 h-3 text-slate-800" />
                           }
                         </div>
                       )}
@@ -508,7 +508,7 @@ export default function PainelAgente() {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <Label className="text-slate-300">Meta Total (R$)</Label>
+              <Label className="text-slate-800">Meta Total (R$)</Label>
               <Input
                 value={metaInput}
                 onChange={e => setMetaInput(e.target.value)}
@@ -518,7 +518,7 @@ export default function PainelAgente() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalMeta(false)} className="border-slate-600 text-slate-300 bg-transparent">
+            <Button variant="outline" onClick={() => setModalMeta(false)} className="border-slate-600 text-slate-800 bg-transparent">
               Cancelar
             </Button>
             <Button onClick={handleSalvarMeta} className="bg-amber-600 hover:bg-amber-700 text-white" disabled={salvarMeta.isPending}>

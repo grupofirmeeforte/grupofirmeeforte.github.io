@@ -56,7 +56,7 @@ export default function ChangePasswordPage() {
             <h1 className="text-2xl font-bold text-gray-900">Trocar Senha</h1>
           </div>
 
-          <p className="text-gray-300 text-center mb-6">
+          <p className="text-gray-800 text-center mb-6">
             Você precisa trocar sua senha para continuar usando o sistema.
           </p>
 
@@ -69,7 +69,7 @@ export default function ChangePasswordPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-200 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Senha Atual
               </label>
               <Input
@@ -82,7 +82,7 @@ export default function ChangePasswordPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-200 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Nova Senha
               </label>
               <Input
@@ -95,7 +95,7 @@ export default function ChangePasswordPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-200 mb-2">
+              <label className="block text-sm font-medium text-gray-800 mb-2">
                 Confirmar Nova Senha
               </label>
               <Input
