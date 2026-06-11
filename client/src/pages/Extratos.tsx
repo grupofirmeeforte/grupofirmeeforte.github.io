@@ -449,7 +449,7 @@ function PerspectivadeGanho() {
                 }}
                 onFocus={() => nomeBusca.length >= 2 && setMostrarSugestoes(true)}
                 onBlur={() => setTimeout(() => setMostrarSugestoes(false), 200)}
-                className="h-8 text-sm bg-white"
+                className="h-8 text-sm bg-white text-gray-900 placeholder:text-gray-500"
               />
               {/* Sugestões de autocomplete */}
               {mostrarSugestoes && nomeBusca.length >= 2 && (
