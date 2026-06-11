@@ -117,24 +117,30 @@ function extrairDadosContrato(texto: string) {
 
   // Operador
   const nomeOperador = campo(/\bOperador\b\s*\n([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÀÈÌÒÙÄËÏÖÜ][^\n]+)/i);
-  // ChaveJ: estrutura real do PDF é "Chave" -> "CPF Operador" -> "Nome Operador" -> "JH016470"
-  // Procura pela linha "Chave" e pega o primeiro valor que parece uma ChaveJ (letras + dígitos)
+  // ChaveJ: PDF tem linhas vazias entre cada campo
+  // Estrutura: "Chave" -> "" -> "CPF Operador" -> "" -> "NOME OPERADOR" -> "" -> "JH016470"
+  // Ignora linhas vazias e palavras-chave, pega o primeiro valor que parece ChaveJ
   let chaveJOperador: string | null = null;
   {
     const linhas = texto.split('\n');
     const idxChave = linhas.findIndex(l => l.trim() === 'Chave');
     if (idxChave >= 0) {
-      for (let j = idxChave + 1; j < Math.min(idxChave + 6, linhas.length); j++) {
+      // Busca nas próximas 15 linhas (por causa das linhas vazias)
+      for (let j = idxChave + 1; j < Math.min(idxChave + 15, linhas.length); j++) {
         const val = linhas[j].trim();
-        if (/^[A-Z]{1,3}\d{4,}/i.test(val)) {
+        // Ignora linhas vazias e palavras-chave do PDF
+        if (!val || /^(CPF|Operador|Chave|Correspondente|Loja|Nome|Dados)/i.test(val)) continue;
+        // Verifica se parece uma ChaveJ: 1-3 letras seguidas de 4+ dígitos
+        if (/^[A-Z]{1,3}\d{4,}$/i.test(val)) {
           chaveJOperador = val.toUpperCase();
           break;
         }
       }
     }
-    // Fallback: regex simples
+    // Fallback: busca qualquer padrão ChaveJ no texto todo
     if (!chaveJOperador) {
-      chaveJOperador = campo(/\bChave\b[^\n]*\n[^\n]*\n([A-Z]{1,3}\d{4,})/i);
+      const m = texto.match(/\b([A-Z]{1,3}\d{6,9})\b/);
+      if (m) chaveJOperador = m[1].toUpperCase();
     }
   }
 
