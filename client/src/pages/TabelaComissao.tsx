@@ -252,6 +252,8 @@ export default function TabelaComissao() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [savingCell, setSavingCell] = useState<string | null>(null);
   const [showColSelector, setShowColSelector] = useState(false);
+  // Percentuais de preenchimento automático por coluna de ativo (apenas frontend, não salva no banco)
+  const [pctAutoAtivo, setPctAutoAtivo] = useState<Record<string, string>>({});
   const ALL_ATIVOS = ['ativo01','ativo02','ativo03','ativo04','ativo05','ativo06','ativo07','ativo08','ativo09','ativo10','ativo11','ativo12','ativo13','ativo14','ativo15','ativo16','ativo17','ativo18','ativo19','ativo20'] as const;
   const [colsVisiveis, setColsVisiveis] = useState<string[]>(() => {
     try {
@@ -771,7 +773,7 @@ export default function TabelaComissao() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                {/* Linha de nomes personalizados (só CEO) */}
+                {/* Linha de nomes personalizados + campo % auto (só CEO) */}
                 {isAdminOuCeo && (
                   <tr style={{background:'#1a1a2e'}}>
                     <th className="px-2 py-1 w-8"></th>
@@ -781,6 +783,7 @@ export default function TabelaComissao() {
                     <th className="px-3 py-1"></th>
                     {ALL_ATIVOS.map((col, i) => colsVisiveis.includes(col) && (
                       <th key={`nome-${col}`} className="px-1 py-1 text-center">
+                        {/* Nome personalizado do ativo */}
                         <input
                           type="text"
                           defaultValue={(nomesAtivos as Record<string, string>)[col] || ''}
@@ -795,6 +798,38 @@ export default function TabelaComissao() {
                           className="w-full text-center text-[10px] font-medium bg-transparent border border-gray-600 rounded px-1 py-0.5 text-yellow-300 placeholder-gray-500 focus:outline-none focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400/30"
                           style={{minWidth:'50px', maxWidth:'80px'}}
                         />
+                        {/* Campo % auto: preenche toda a coluna com REC% × valor */}
+                        <div className="flex items-center gap-0.5 mt-0.5 justify-center">
+                          <input
+                            type="text"
+                            value={pctAutoAtivo[col] || ''}
+                            onChange={(e) => setPctAutoAtivo(prev => ({ ...prev, [col]: e.target.value }))}
+                            placeholder="%"
+                            title="Digite um % para preencher toda a coluna com REC% × esse valor"
+                            className="text-center text-[9px] font-bold bg-blue-900/40 border border-blue-500/50 rounded px-0.5 py-0.5 text-cyan-300 placeholder-blue-400/60 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30"
+                            style={{width:'36px'}}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                const pctStr = pctAutoAtivo[col] || '';
+                                const pctVal = parseFloat(pctStr.replace(',','.').replace('%',''));
+                                if (isNaN(pctVal) || pctVal <= 0) return;
+                                // Para cada linha visível, calcula REC% × pctVal / 100 e salva
+                                filteredRows.forEach((row: any) => {
+                                  const recRaw = row.receboPct;
+                                  if (!recRaw) return;
+                                  const recNum = parseFloat(String(recRaw).replace(',','.').replace('%',''));
+                                  if (isNaN(recNum) || recNum <= 0) return;
+                                  // recNum já está em % (ex: 1.96), resultado deve ser decimal (ex: 0.0098)
+                                  const resultado = (recNum * pctVal / 100) / 100;
+                                  const resultadoStr = resultado.toFixed(4);
+                                  handleCellSave(row.id, col as any, resultadoStr);
+                                });
+                                toast.success(`Coluna ${col} preenchida com ${pctVal.toFixed(2).replace('.',',')}% do Rec%`);
+                              }
+                              if (e.key === 'Escape') setPctAutoAtivo(prev => ({ ...prev, [col]: '' }));
+                            }}
+                          />
+                        </div>
                       </th>
                     ))}
                     <th className="px-3 py-1"></th>
