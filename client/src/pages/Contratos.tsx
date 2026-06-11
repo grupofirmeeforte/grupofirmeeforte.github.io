@@ -311,7 +311,7 @@ export default function ContratosPage() {
                 <div className="mt-2 border-t border-slate-700 pt-2 space-y-1 max-h-40 overflow-y-auto">
                   {stats.contatosPorOperador.map((op: { nome: string; qtd: number }) => (
                     <div key={op.nome} className="flex justify-between items-center text-xs">
-                      <span className="text-slate-100 truncate max-w-[160px]" title={op.nome}>{op.nome}</span>
+                      <span className="text-slate-300 truncate max-w-[160px]" title={op.nome}>{op.nome}</span>
                       <span className="text-yellow-300 font-bold ml-2 shrink-0">{op.qtd}</span>
                     </div>
                   ))}
@@ -405,7 +405,7 @@ export default function ContratosPage() {
               {uploading && (
                 <div className="mt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-slate-100 text-sm">Processando {progresso.atual} de {progresso.total}...</span>
+                    <span className="text-slate-300 text-sm">Processando {progresso.atual} de {progresso.total}...</span>
                     <span className="text-emerald-400 text-sm">{Math.round((progresso.atual / progresso.total) * 100)}%</span>
                   </div>
                   <div className="w-full bg-slate-700 rounded-full h-2">
@@ -475,12 +475,12 @@ export default function ContratosPage() {
                 <Button
                   variant={apenasElegiveis ? 'default' : 'outline'}
                   onClick={() => { setApenasElegiveis(!apenasElegiveis); setPage(1); }}
-                  className={`flex-1 text-xs ${apenasElegiveis ? 'bg-emerald-600 hover:bg-emerald-700' : 'border-slate-600 text-slate-100'}`}
+                  className={`flex-1 text-xs ${apenasElegiveis ? 'bg-emerald-600 hover:bg-emerald-700' : 'border-slate-600 text-slate-300'}`}
                 >
                   <TrendingUp className="w-3 h-3 mr-1" />
                   {apenasElegiveis ? 'Elegíveis' : 'Todos'}
                 </Button>
-                <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-100 px-3">
+                <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-300 px-3">
                   <RefreshCw className="w-4 h-4" />
                 </Button>
               </div>
@@ -589,12 +589,12 @@ export default function ContratosPage() {
                             <span className="text-yellow-300 font-bold text-[12px]">{r.taxaMensalJuros ? `${parseFloat(String(r.taxaMensalJuros)).toFixed(2)}%` : '—'}</span>
                             <span className="text-slate-400 text-[10px]">{r.prazoMeses ? `${r.prazoMeses}m` : ''}</span>
                           </div>
-                          <div className="text-slate-100 text-[10px]">{formatarMoeda(r.valorParcela)}</div>
+                          <div className="text-slate-300 text-[10px]">{formatarMoeda(r.valorParcela)}</div>
                           <div className="text-slate-500 text-[9px]">{r.dataPrimeiraParcela ?? '—'}</div>
                         </td>
                         {/* Mailing: Cidade + Telefones (com edição inline) */}
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
-                          {(r as any).cidade && <div className="text-slate-100 text-[10px] truncate" title={(r as any).cidade}>{(r as any).cidade}</div>}
+                          {(r as any).cidade && <div className="text-slate-300 text-[10px] truncate" title={(r as any).cidade}>{(r as any).cidade}</div>}
                           {editTelId === r.id ? (
                             <div className="flex flex-col gap-1 mt-0.5">
                               <Input
@@ -610,7 +610,7 @@ export default function ContratosPage() {
                               />
                               <div className="flex gap-1">
                                 <button onClick={() => salvarTelInline(r.id)} className="text-emerald-400 hover:text-emerald-300"><Check className="w-3 h-3" /></button>
-                                <button onClick={() => setEditTelId(null)} className="text-slate-500 hover:text-slate-100"><X className="w-3 h-3" /></button>
+                                <button onClick={() => setEditTelId(null)} className="text-slate-500 hover:text-slate-300"><X className="w-3 h-3" /></button>
                               </div>
                             </div>
                           ) : (
@@ -662,11 +662,11 @@ export default function ContratosPage() {
             {/* Paginação */}
             {(data?.total ?? 0) >= 50 && (
               <div className="flex justify-center gap-2 mt-4">
-                <Button variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="border-slate-600 text-slate-100">
+                <Button variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="border-slate-600 text-slate-300">
                   Anterior
                 </Button>
                 <span className="px-4 py-2 text-slate-400 text-sm">Pág. {page}</span>
-                <Button variant="outline" onClick={() => setPage(p => p + 1)} className="border-slate-600 text-slate-100">
+                <Button variant="outline" onClick={() => setPage(p => p + 1)} className="border-slate-600 text-slate-300">
                   Próxima
                 </Button>
               </div>
@@ -712,7 +712,7 @@ export default function ContratosPage() {
                 onChange={e => { setFiltroLinha(e.target.value); setPage(1); }}
                 className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
-              <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-100">
+              <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-300">
                 <RefreshCw className="w-4 h-4 mr-1" /> Atualizar
               </Button>
             </div>
@@ -766,26 +766,26 @@ export default function ContratosPage() {
                               {r.taxaMensalJuros ? `${parseFloat(String(r.taxaMensalJuros)).toFixed(2)}% a.m.` : '—'}
                             </p>
                             <p className="text-slate-400 text-xs">Taxa contratada</p>
-                            <p className="text-slate-100 text-sm mt-1">{r.prazoMeses}m · {formatarMoeda(r.valorParcela)}/mês</p>
+                            <p className="text-slate-300 text-sm mt-1">{r.prazoMeses}m · {formatarMoeda(r.valorParcela)}/mês</p>
                           </div>
                         </div>
 
                         <div className="mt-3 pt-3 border-t border-slate-700 flex flex-wrap gap-3 items-center">
                           <div>
                             <p className="text-slate-400 text-xs">Convênio</p>
-                            <p className="text-white text-sm">{r.nomeConvenio ?? '—'}</p>
+                            <p className="text-slate-200 text-sm">{r.nomeConvenio ?? '—'}</p>
                           </div>
                           <div>
                             <p className="text-slate-400 text-xs">Operador</p>
-                            <p className="text-white text-sm">{r.nomeOperador ?? r.chaveJOperador ?? '—'}</p>
+                            <p className="text-slate-200 text-sm">{r.nomeOperador ?? r.chaveJOperador ?? '—'}</p>
                           </div>
                           <div>
                             <p className="text-slate-400 text-xs">1ª Parcela</p>
-                            <p className="text-white text-sm">{r.dataPrimeiraParcela ?? '—'}</p>
+                            <p className="text-slate-200 text-sm">{r.dataPrimeiraParcela ?? '—'}</p>
                           </div>
                           <div>
                             <p className="text-slate-400 text-xs">Últ. Parcela</p>
-                            <p className="text-white text-sm">{r.dataUltimaParcela ?? '—'}</p>
+                            <p className="text-slate-200 text-sm">{r.dataUltimaParcela ?? '—'}</p>
                             <p className="text-amber-400 text-xs font-semibold mt-0.5">
                               {(() => {
                                 if (!r.dataUltimaParcela) return '';
@@ -892,7 +892,7 @@ export default function ContratosPage() {
               </div>
             </div>
             <div className="flex gap-3 mt-5 justify-end">
-              <Button variant="outline" className="border-slate-600 text-slate-100" onClick={() => setEditandoId(null)}>Cancelar</Button>
+              <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => setEditandoId(null)}>Cancelar</Button>
               <Button className="bg-blue-600 hover:bg-blue-700" onClick={salvarEdicao} disabled={atualizarMutation.isPending}>
                 {atualizarMutation.isPending ? 'Salvando...' : 'Salvar'}
               </Button>
@@ -927,7 +927,7 @@ export default function ContratosPage() {
               </div>
             </div>
             <div className="flex gap-3 mt-5 justify-end">
-              <Button variant="outline" className="border-slate-600 text-slate-100" onClick={() => setEditandoCrmId(null)}>Cancelar</Button>
+              <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => setEditandoCrmId(null)}>Cancelar</Button>
               <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={salvarCrm} disabled={atualizarCrmMutation.isPending}>
                 {atualizarCrmMutation.isPending ? 'Salvando...' : 'Salvar'}
               </Button>
@@ -952,7 +952,7 @@ export default function ContratosPage() {
               onKeyDown={e => e.key === 'Enter' && confirmarExclusao()}
             />
             <div className="flex gap-3 justify-end">
-              <Button variant="outline" className="border-slate-600 text-slate-100" onClick={() => { setDeletandoId(null); setSenhaCeo(''); }}>Cancelar</Button>
+              <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => { setDeletandoId(null); setSenhaCeo(''); }}>Cancelar</Button>
               <Button className="bg-red-700 hover:bg-red-800" onClick={confirmarExclusao} disabled={!senhaCeo || deletarMutation.isPending}>
                 {deletarMutation.isPending ? 'Excluindo...' : 'Excluir'}
               </Button>

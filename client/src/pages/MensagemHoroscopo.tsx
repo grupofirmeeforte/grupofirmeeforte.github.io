@@ -78,7 +78,7 @@ export default function MensagemHoroscopo() {
               <div className="flex flex-col items-center gap-4 py-8">
                 <div className="animate-spin w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full" />
                 <p className="text-slate-400 text-sm">Buscando e traduzindo horóscopo...</p>
-                <p className="text-slate-100 text-xs">Isso pode levar alguns segundos na primeira vez</p>
+                <p className="text-slate-300 text-xs">Isso pode levar alguns segundos na primeira vez</p>
               </div>
             )}
 
@@ -103,7 +103,7 @@ export default function MensagemHoroscopo() {
                 <p className="text-slate-700 text-base leading-relaxed whitespace-pre-line">
                   {horoscopo.texto}
                 </p>
-                <p className="text-xs text-slate-100 mt-6 text-right">Fonte: Horóscopo Diário</p>
+                <p className="text-xs text-slate-300 mt-6 text-right">Fonte: Horóscopo Diário</p>
               </div>
             )}
           </CardContent>

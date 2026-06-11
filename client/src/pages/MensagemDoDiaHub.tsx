@@ -168,7 +168,7 @@ function AbaMinutosSabedoria() {
                 <div className="w-16 h-1 rounded-full" style={{ background: 'linear-gradient(90deg, #c8960c, #6d28d9)' }} />
               </div>
               <p className="text-xs text-slate-400 italic mb-2">C. Torres Pastorino — <em>Minutos de Sabedoria</em></p>
-              {total != null && total > 0 && <p className="text-xs text-slate-100 mt-1">{total} pensamento{total !== 1 ? 's' : ''} disponíve{total !== 1 ? 'is' : 'l'}</p>}
+              {total != null && total > 0 && <p className="text-xs text-slate-300 mt-1">{total} pensamento{total !== 1 ? 's' : ''} disponíve{total !== 1 ? 'is' : 'l'}</p>}
             </>
           ) : (
             <div className="flex flex-col items-center gap-4 py-8">
@@ -578,7 +578,7 @@ function AbaHoroscopo() {
             <div className="flex flex-col items-center gap-4 py-8">
               <div className="animate-spin w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full" />
               <p className="text-slate-400 text-sm">Buscando e traduzindo horóscopo...</p>
-              <p className="text-slate-100 text-xs">Isso pode levar alguns segundos na primeira vez</p>
+              <p className="text-slate-300 text-xs">Isso pode levar alguns segundos na primeira vez</p>
             </div>
           )}
           {signoSelecionado && error && !isLoading && (
@@ -595,7 +595,7 @@ function AbaHoroscopo() {
               </div>
               <div className="w-full h-0.5 rounded-full mb-5" style={{ background: 'linear-gradient(90deg, #1e3a5f, #c8960c)' }} />
               <p className="text-slate-700 text-base leading-relaxed whitespace-pre-line">{horoscopo.texto}</p>
-              <p className="text-xs text-slate-100 mt-6 text-right">Fonte: Horóscopo Diário</p>
+              <p className="text-xs text-slate-300 mt-6 text-right">Fonte: Horóscopo Diário</p>
             </div>
           )}
         </CardContent>
@@ -633,7 +633,7 @@ export default function MensagemDoDiaHub() {
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   ativa
                     ? 'border-blue-600 text-blue-700 bg-blue-900/20'
-                    : 'border-transparent text-gray-400 hover:text-white hover:border-gray-300'
+                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />

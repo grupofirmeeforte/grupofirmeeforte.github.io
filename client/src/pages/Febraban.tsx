@@ -68,7 +68,7 @@ function situacaoBadge(s: string | null | undefined) {
     "Cancelada": "bg-red-100 text-red-800",
     "Pendente": "bg-yellow-100 text-yellow-800",
   };
-  const cls = colors[s] || "bg-gray-100 text-white";
+  const cls = colors[s] || "bg-gray-100 text-gray-200";
   return <span className={`px-2 py-0.5 rounded text-xs font-medium ${cls}`}>{s}</span>;
 }
 
@@ -102,12 +102,12 @@ function GrafTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-gray-700 rounded-lg shadow-lg p-3 text-xs max-w-[220px]">
-      <p className="font-bold text-white mb-2">{label}</p>
+      <p className="font-bold text-gray-200 mb-2">{label}</p>
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center justify-between gap-3 mb-1">
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full inline-block" style={{ background: p.fill || p.color }} />
-            <span className="text-gray-100 truncate max-w-[110px]">{p.name}</span>
+            <span className="text-gray-300 truncate max-w-[110px]">{p.name}</span>
           </span>
           <span className="font-semibold text-white">{fmtK(p.value)}</span>
         </div>
@@ -165,7 +165,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
       <div className="flex items-center gap-4 flex-wrap">
         {empresa === '__all__' && (
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold text-gray-100">Empresa:</span>
+            <span className="text-sm font-semibold text-gray-300">Empresa:</span>
             <div className="flex gap-2 flex-wrap">
               <Button size="sm" variant={empresaSel === '__all__' ? 'default' : 'outline'}
                 className={`text-xs h-7 px-3 ${empresaSel === '__all__' ? 'bg-gray-800 text-white' : ''}`}
@@ -181,7 +181,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
         {/* Seletor de ano — controla os dois gráficos */}
         {anosDisponiveis.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-100">Ano:</span>
+            <span className="text-sm font-semibold text-gray-300">Ano:</span>
             <div className="flex gap-1 flex-wrap">
               {anosDisponiveis.map(ano => (
                 <Button key={ano} size="sm"
@@ -228,7 +228,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
                         s.data[li] > 0 ? (
                           <div key={label} className="flex justify-between items-center gap-1">
                             <span className="text-[9px] text-gray-400 whitespace-nowrap">{label}</span>
-                            <span className="text-[9px] font-semibold text-white whitespace-nowrap">{fmtFull(s.data[li])}</span>
+                            <span className="text-[9px] font-semibold text-gray-200 whitespace-nowrap">{fmtFull(s.data[li])}</span>
                           </div>
                         ) : null
                       ))}
@@ -977,10 +977,10 @@ export default function FebrabanPage() {
                 const labels: Record<string, string> = { todos: "Todos", sim: "Pagos", nao: "Não Pagos", srcc: "SRCC" };
                 const active = filtroPago === opt;
                 const colors: Record<string, string> = {
-                  todos: active ? "bg-gray-700 text-white" : "bg-white text-gray-100 hover:bg-gray-800",
-                  sim: active ? "bg-green-600 text-white" : "bg-white text-gray-100 hover:bg-green-50",
-                  nao: active ? "bg-red-600 text-white" : "bg-white text-gray-100 hover:bg-red-50",
-                  srcc: active ? "bg-orange-500 text-white" : "bg-white text-gray-100 hover:bg-orange-50",
+                  todos: active ? "bg-gray-700 text-white" : "bg-white text-gray-300 hover:bg-gray-800",
+                  sim: active ? "bg-green-600 text-white" : "bg-white text-gray-300 hover:bg-green-50",
+                  nao: active ? "bg-red-600 text-white" : "bg-white text-gray-300 hover:bg-red-50",
+                  srcc: active ? "bg-orange-500 text-white" : "bg-white text-gray-300 hover:bg-orange-50",
                 };
                 return (
                   <button
@@ -1019,19 +1019,19 @@ export default function FebrabanPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-800 border-b">
                 <tr>
-                  <th className="px-3 py-2 text-left font-semibold text-white">EMPRESA</th>
-                  <th className="px-3 py-2 text-left font-semibold text-white">MÊS/ANO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-white">PROPOSTA</th>
-                  <th className="px-3 py-2 text-left font-semibold text-white">LINHA</th>
-                  <th className="px-3 py-2 text-left font-semibold text-white">SITUAÇÃO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-white">OPERADOR</th>
-                  <th className="px-3 py-2 text-left font-semibold text-white">SOLICITAÇÃO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-white">PRAZO</th>
-                  <th className="px-3 py-2 text-right font-semibold text-white">TROCO</th>
-                  <th className="px-3 py-2 text-right font-semibold text-white">FINANCIADO</th>
-                  <th className="px-3 py-2 text-center font-semibold text-white">TIPO</th>
-                  <th className="px-3 py-2 text-center font-semibold text-white">PAGO</th>
-                  <th className="px-3 py-2 text-center font-semibold text-white">AÇÕES</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-200">EMPRESA</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-200">MÊS/ANO</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-200">PROPOSTA</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-200">LINHA</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-200">SITUAÇÃO</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-200">OPERADOR</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-200">SOLICITAÇÃO</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-200">PRAZO</th>
+                  <th className="px-3 py-2 text-right font-semibold text-gray-200">TROCO</th>
+                  <th className="px-3 py-2 text-right font-semibold text-gray-200">FINANCIADO</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-200">TIPO</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-200">PAGO</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-200">AÇÕES</th>
                 </tr>
               </thead>
               <tbody>
@@ -1055,7 +1055,7 @@ export default function FebrabanPage() {
                       <td className="px-3 py-2 text-center">{tipoBadge(row.situacao, row.troco, row.financiado)}</td>
                       <td className="px-3 py-2 text-center">
                         {row.situacao && row.situacao.toLowerCase().includes("cancel") ? (
-                          <span className="px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-100 border border-gray-300">Cancelado</span>
+                          <span className="px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-300 border border-gray-300">Cancelado</span>
                         ) : row.pago === 2 ? (
                           <button
                             onClick={() => handleTogglePago(row as FebRow)}

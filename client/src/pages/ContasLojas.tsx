@@ -288,7 +288,7 @@ export default function ContasLojas() {
                         </svg>
                         {conta.arquivoNome ? conta.arquivoNome.slice(0, 20) + (conta.arquivoNome.length > 20 ? "…" : "") : "Ver arquivo"}
                       </a>
-                    ) : <span className="text-gray-100 text-xs">-</span>}
+                    ) : <span className="text-gray-300 text-xs">-</span>}
                   </td>
                   <td className="px-3 py-2 text-gray-400 text-xs max-w-[120px] truncate" title={conta.observacao ?? ""}>
                     {conta.observacao || "-"}
@@ -304,7 +304,7 @@ export default function ContasLojas() {
                       ) : (
                         <Button size="sm" variant="outline"
                           onClick={() => marcarPagoMutation.mutate({ id: conta.id, pago: false, dataPagto: undefined })}
-                          className="h-6 px-2 text-xs bg-gray-700 border-gray-600 text-gray-100 hover:bg-gray-600">
+                          className="h-6 px-2 text-xs bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600">
                           Desmarcar
                         </Button>
                       )}
@@ -334,7 +334,7 @@ export default function ContasLojas() {
             </div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setMarcandoPagoId(null)}
-                className="border-gray-600 text-gray-100">Cancelar</Button>
+                className="border-gray-600 text-gray-300">Cancelar</Button>
               <Button onClick={() => marcarPagoMutation.mutate({ id: marcandoPagoId, pago: true, dataPagto: dataPagtoInput || undefined })}
                 className="bg-green-600 hover:bg-green-500 text-white">
                 Confirmar
@@ -424,7 +424,7 @@ export default function ContasLojas() {
             </div>
             <div className="flex gap-2 justify-end mt-6">
               <Button variant="outline" onClick={() => setShowModal(false)}
-                className="border-gray-600 text-gray-100">Cancelar</Button>
+                className="border-gray-600 text-gray-300">Cancelar</Button>
               <Button onClick={salvar} disabled={uploading || criarMutation.isPending || editarMutation.isPending}
                 className="bg-blue-600 hover:bg-blue-900/300 text-white">
                 {uploading ? "Enviando arquivo..." : (criarMutation.isPending || editarMutation.isPending) ? "Salvando..." : "Salvar"}
@@ -441,7 +441,7 @@ export default function ContasLojas() {
             <h2 className="text-lg font-bold text-white mb-2">Confirmar Exclusão</h2>
             <p className="text-gray-400 text-sm mb-5">Tem certeza que deseja excluir esta conta? Esta ação não pode ser desfeita.</p>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setDeletandoId(null)} className="border-gray-600 text-gray-100">Cancelar</Button>
+              <Button variant="outline" onClick={() => setDeletandoId(null)} className="border-gray-600 text-gray-300">Cancelar</Button>
               <Button onClick={() => deletarMutation.mutate({ id: deletandoId! })}
                 className="bg-red-600 hover:bg-red-500 text-white">Excluir</Button>
             </div>

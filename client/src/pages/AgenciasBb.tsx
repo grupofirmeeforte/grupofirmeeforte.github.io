@@ -35,7 +35,7 @@ export default function AgenciasBb() {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Building2 className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm text-gray-100">{total.toLocaleString("pt-BR")} agências cadastradas</span>
+            <span className="text-sm text-gray-300">{total.toLocaleString("pt-BR")} agências cadastradas</span>
           </div>
         </div>
 
@@ -59,7 +59,7 @@ export default function AgenciasBb() {
               {busca && (
                 <button
                   onClick={limpar}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -118,7 +118,7 @@ export default function AgenciasBb() {
                   <span className="font-mono text-yellow-400 font-semibold">
                     {String(ag.prefixo).padStart(4, "0")}
                   </span>
-                  <span className="text-white">{ag.nome}</span>
+                  <span className="text-gray-200">{ag.nome}</span>
                 </div>
               ))}
             </div>

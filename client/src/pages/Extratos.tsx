@@ -43,7 +43,7 @@ function BuscaAgentesSugestoes({ termo, onSelect }: {
           onMouseDown={e => { e.preventDefault(); onSelect(ag.chaveJ ?? '', ag.nomeAgente ?? ''); }}
         >
           <span className="font-medium text-blue-700 shrink-0">{ag.chaveJ}</span>
-          <span className="text-white truncate">{ag.nomeAgente}</span>
+          <span className="text-gray-200 truncate">{ag.nomeAgente}</span>
           {ag.empresa && <span className="text-xs text-gray-400 ml-auto shrink-0">{ag.empresa}</span>}
         </button>
       ))}
@@ -237,7 +237,7 @@ function ExtratoConsignado() {
       ) : rows.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-            <FileText className="w-12 h-12 text-gray-100" />
+            <FileText className="w-12 h-12 text-gray-300" />
             <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
             <p className="text-gray-400 text-sm">Verifique se há produção importada para o mês de referência.</p>
           </CardContent>
@@ -249,14 +249,14 @@ function ExtratoConsignado() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-800">
-                    <TableHead className="font-semibold text-white">Nome</TableHead>
-                    <TableHead className="font-semibold text-white">Nº Operação</TableHead>
-                    <TableHead className="font-semibold text-white text-center">Parcelas</TableHead>
-                    <TableHead className="font-semibold text-white">Convênio</TableHead>
-                    <TableHead className="font-semibold text-white text-right">Juros</TableHead>
-                    <TableHead className="font-semibold text-white text-right">Valor Líquido</TableHead>
-                    <TableHead className="font-semibold text-white text-right">Percentual</TableHead>
-                    <TableHead className="font-semibold text-white text-right">Comissão</TableHead>
+                    <TableHead className="font-semibold text-gray-200">Nome</TableHead>
+                    <TableHead className="font-semibold text-gray-200">Nº Operação</TableHead>
+                    <TableHead className="font-semibold text-gray-200 text-center">Parcelas</TableHead>
+                    <TableHead className="font-semibold text-gray-200">Convênio</TableHead>
+                    <TableHead className="font-semibold text-gray-200 text-right">Juros</TableHead>
+                    <TableHead className="font-semibold text-gray-200 text-right">Valor Líquido</TableHead>
+                    <TableHead className="font-semibold text-gray-200 text-right">Percentual</TableHead>
+                    <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -538,16 +538,16 @@ function PerspectivadeGanho() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  <TableHead className="font-semibold text-white uppercase text-xs tracking-wide">Proposta</TableHead>
-                  <TableHead className="font-semibold text-white uppercase text-xs tracking-wide">Data</TableHead>
-                  <TableHead className="font-semibold text-white uppercase text-xs tracking-wide">Cliente / CPF</TableHead>
-                  <TableHead className="font-semibold text-white uppercase text-xs tracking-wide">Situação</TableHead>
-                  <TableHead className="font-semibold text-white uppercase text-xs tracking-wide">Produto</TableHead>
-                  <TableHead className="font-semibold text-white uppercase text-xs tracking-wide text-right">Taxa</TableHead>
-                  <TableHead className="font-semibold text-white uppercase text-xs tracking-wide text-right">Prazo</TableHead>
-                  <TableHead className="font-semibold text-white uppercase text-xs tracking-wide text-right">Valor</TableHead>
-                  <TableHead className="font-semibold text-white uppercase text-xs tracking-wide text-center">Fontes</TableHead>
-                  <TableHead className="font-semibold text-white uppercase text-xs tracking-wide">Telefone</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Data</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Cliente / CPF</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Situação</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Taxa</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Prazo</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Valor</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-center">Fontes</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Telefone</TableHead>
                   <TableHead className="font-semibold text-amber-600 uppercase text-xs tracking-wide text-right bg-amber-50">% / Comissão</TableHead>
                 </TableRow>
               </TableHeader>
@@ -618,7 +618,7 @@ function PerspectivadeGanho() {
                           </button>
                         )}
                       </TableCell>
-                      <TableCell className="text-xs text-gray-100 max-w-[130px] truncate" title={row.produtoConsig ?? row.linha ?? ''}>
+                      <TableCell className="text-xs text-gray-300 max-w-[130px] truncate" title={row.produtoConsig ?? row.linha ?? ''}>
                         <span className="text-blue-600 font-medium">{row.produtoConsig || row.linha || '—'}</span>
                       </TableCell>
                       <TableCell className="text-right text-sm text-gray-700">
@@ -751,7 +751,7 @@ function ExtratoCC() {
         <div className="text-center py-16 text-gray-400">Carregando...</div>
       ) : rows.length === 0 ? (
         <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-          <CreditCard className="w-12 h-12 text-gray-100" />
+          <CreditCard className="w-12 h-12 text-gray-300" />
           <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
         </CardContent></Card>
       ) : (
@@ -760,10 +760,10 @@ function ExtratoCC() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  <TableHead className="font-semibold text-white">Agência</TableHead>
-                  <TableHead className="font-semibold text-white">Chave J</TableHead>
-                  <TableHead className="font-semibold text-white">Nome</TableHead>
-                  <TableHead className="font-semibold text-white text-right">Comissão</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Agência</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Chave J</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -822,7 +822,7 @@ function ExtratoConsorcio() {
         <div className="text-center py-16 text-gray-400">Carregando...</div>
       ) : rows.length === 0 ? (
         <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-          <Users className="w-12 h-12 text-gray-100" />
+          <Users className="w-12 h-12 text-gray-300" />
           <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
         </CardContent></Card>
       ) : (
@@ -831,13 +831,13 @@ function ExtratoConsorcio() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  {isAdminOuSuporte && <TableHead className="font-semibold text-white">Agente</TableHead>}
-                  <TableHead className="font-semibold text-white">Proposta</TableHead>
-                  <TableHead className="font-semibold text-white">Empresa</TableHead>
-                  <TableHead className="font-semibold text-white text-center">Parc. Liberada</TableHead>
-                  <TableHead className="font-semibold text-white">Segmento</TableHead>
-                  <TableHead className="font-semibold text-white text-right">Valor Bem</TableHead>
-                  <TableHead className="font-semibold text-white text-right">Comissão</TableHead>
+                  {isAdminOuSuporte && <TableHead className="font-semibold text-gray-200">Agente</TableHead>}
+                  <TableHead className="font-semibold text-gray-200">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Empresa</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-center">Parc. Liberada</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Segmento</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Valor Bem</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -901,7 +901,7 @@ function ExtratoOurocap() {
         <div className="text-center py-16 text-gray-400">Carregando...</div>
       ) : rows.length === 0 ? (
         <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-          <Star className="w-12 h-12 text-gray-100" />
+          <Star className="w-12 h-12 text-gray-300" />
           <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
         </CardContent></Card>
       ) : (
@@ -910,9 +910,9 @@ function ExtratoOurocap() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  <TableHead className="font-semibold text-white">Nº Operação</TableHead>
-                  <TableHead className="font-semibold text-white text-right">Valor Líquido</TableHead>
-                  <TableHead className="font-semibold text-white text-right">Comissão</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Nº Operação</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Valor Líquido</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -975,7 +975,7 @@ function ExtratoSeguros() {
         <div className="text-center py-16 text-gray-400">Carregando...</div>
       ) : rows.length === 0 ? (
         <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-          <Shield className="w-12 h-12 text-gray-100" />
+          <Shield className="w-12 h-12 text-gray-300" />
           <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
         </CardContent></Card>
       ) : (
@@ -984,19 +984,19 @@ function ExtratoSeguros() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  <TableHead className="font-semibold text-white">Nome</TableHead>
-                  <TableHead className="font-semibold text-white">Contrato</TableHead>
-                  <TableHead className="font-semibold text-white">Banco</TableHead>
-                  <TableHead className="font-semibold text-white text-right">Valor Empréstimo</TableHead>
-                  <TableHead className="font-semibold text-white text-right">Comissão</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Contrato</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Banco</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Valor Empréstimo</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
                   <TableRow key={row.id} className="hover:bg-gray-800">
                     <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
-                    <TableCell className="font-mono text-sm text-white">{row.nrContrato || '—'}</TableCell>
-                    <TableCell className="text-white text-sm">{row.banco || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-200">{row.nrContrato || '—'}</TableCell>
+                    <TableCell className="text-gray-200 text-sm">{row.banco || '—'}</TableCell>
                     <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.vrEmprestimo ?? 0)))}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissaoAgente ?? 0)))}</TableCell>
                   </TableRow>
@@ -1047,7 +1047,7 @@ function ExtratoBBDental() {
         <div className="text-center py-16 text-gray-400">Carregando...</div>
       ) : rows.length === 0 ? (
         <Card><CardContent className="flex flex-col items-center justify-center py-16 gap-3">
-          <Smile className="w-12 h-12 text-gray-100" />
+          <Smile className="w-12 h-12 text-gray-300" />
           <p className="text-gray-400 font-medium">Nenhuma operação encontrada para {mesRef}</p>
         </CardContent></Card>
       ) : (
@@ -1056,19 +1056,19 @@ function ExtratoBBDental() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  <TableHead className="font-semibold text-white">Nome</TableHead>
-                  <TableHead className="font-semibold text-white">Proposta</TableHead>
-                  <TableHead className="font-semibold text-white">Produto</TableHead>
-                  <TableHead className="font-semibold text-white text-right">Valor Produto</TableHead>
-                  <TableHead className="font-semibold text-white text-right">Comissão</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-200">Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Valor Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
                   <TableRow key={row.id} className="hover:bg-gray-800">
                     <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
-                    <TableCell className="font-mono text-sm text-white">{row.proposta || '—'}</TableCell>
-                    <TableCell className="text-white text-sm">{row.produto || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-200">{row.proposta || '—'}</TableCell>
+                    <TableCell className="text-gray-200 text-sm">{row.produto || '—'}</TableCell>
                     <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.vrProduto ?? 0)))}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                   </TableRow>
@@ -1112,7 +1112,7 @@ function ConteudoAbaPlaceholder({ aba }: { aba: Aba }) {
           <div className={`w-16 h-16 rounded-2xl ${info.cor} flex items-center justify-center`}>
             <Icon className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-xl font-semibold text-white">{info.label}</h2>
+          <h2 className="text-xl font-semibold text-gray-200">{info.label}</h2>
           <p className="text-gray-400 text-sm">Módulo em desenvolvimento. Em breve disponível.</p>
         </CardContent>
       </Card>
@@ -1286,7 +1286,7 @@ function MinhaTabela() {
                       <TableHead key={k} className={`font-bold text-xs uppercase py-2 px-3 text-center min-w-[100px] ${
                         k === colunaAnterior ? 'text-amber-300 bg-amber-900' :
                         k === colunaVigente  ? 'text-green-300 bg-green-900' :
-                        'text-gray-100 bg-gray-700'
+                        'text-gray-300 bg-gray-700'
                       }`}>
                         {labelAtivo(k)}
                         {k === colunaAnterior && <><br/><span className="text-[9px] font-normal text-amber-200">tabela atual</span></>}
@@ -1314,7 +1314,7 @@ function MinhaTabela() {
                         <TableCell key={k} className={`font-bold text-xs py-1 px-3 text-center whitespace-nowrap ${
                           k === colunaAnterior ? 'text-amber-700 bg-amber-50' :
                           k === colunaVigente  ? 'text-green-700 bg-green-50' :
-                          'text-white'
+                          'text-gray-200'
                         }`}>
                           {fmtPct(row[k])}
                         </TableCell>
@@ -1364,7 +1364,7 @@ export default function ExtratosPage() {
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   ativa
                     ? 'border-blue-600 text-blue-700 bg-blue-900/20'
-                    : 'border-transparent text-gray-400 hover:text-white hover:border-gray-300'
+                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />

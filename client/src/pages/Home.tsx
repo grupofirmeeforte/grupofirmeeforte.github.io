@@ -127,7 +127,7 @@ export default function Home() {
             <span className="text-yellow-400 text-xs font-semibold tracking-widest uppercase">Sistema de Gestão</span>
           </div>
           <h1 className="text-4xl font-bold mb-2 text-white drop-shadow-lg">Grupo Firme & Forte</h1>
-          <p className="text-slate-100 mb-8 text-sm">Coban — Banco do Brasil</p>
+          <p className="text-slate-300 mb-8 text-sm">Coban — Banco do Brasil</p>
           <Button
             onClick={() => window.location.href = getLoginUrl()}
             className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-bold px-8 py-3 text-base shadow-lg"
@@ -595,7 +595,7 @@ export default function Home() {
                   {e === 'primavera' ? '🌸 Primavera' : e === 'verao' ? '☀️ Verão' : e === 'outono' ? '🍂 Outono' : '❄️ Inverno'}
                 </button>
               ))}
-              <button onClick={() => setTesteEstacaoAberto(false)} className="text-xs text-gray-500 hover:text-gray-100 mt-1">Fechar</button>
+              <button onClick={() => setTesteEstacaoAberto(false)} className="text-xs text-gray-500 hover:text-gray-300 mt-1">Fechar</button>
             </div>
           )}
           {testeEstacaoForcar && (

@@ -297,9 +297,9 @@ export default function DespesasFixasPage() {
       {/* Paginação Topo */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 py-2 bg-gray-900 border-b border-gray-800">
-          <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-100">Anterior</Button>
+          <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Anterior</Button>
           <span className="text-[10px] text-gray-400">Pág. {page} / {totalPages}</span>
-          <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-100">Próxima</Button>
+          <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Próxima</Button>
         </div>
       )}
       {/* Tabela */}
@@ -338,7 +338,7 @@ export default function DespesasFixasPage() {
                   </td>
                   {/* Coluna Dados Bancários */}
                   <td className="px-2 py-1.5 whitespace-nowrap text-[10px]">
-                    <div className="text-gray-100">
+                    <div className="text-gray-300">
                       {row.banco || "-"}{row.agencia ? ` · Ag ${row.agencia}` : ""}{row.conta ? ` · ${row.tipoConta === 'Conta Poupança' ? 'Cp' : 'Cc'} ${row.conta}` : ""}
                       {row.tipoConta && <span className="ml-1 text-gray-400">({row.tipoConta})</span>}
                     </div>
@@ -381,9 +381,9 @@ export default function DespesasFixasPage() {
       {/* Paginação */}
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 py-3 bg-gray-900 border-t border-gray-800">
-          <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-100">Anterior</Button>
+          <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Anterior</Button>
           <span className="text-[10px] text-gray-400">Pág. {page} / {totalPages}</span>
-          <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-100">Próxima</Button>
+          <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Próxima</Button>
         </div>
       )}
 
@@ -450,7 +450,7 @@ export default function DespesasFixasPage() {
               )}
             </div>
             <div className="flex justify-end gap-2 px-4 py-3 border-t border-gray-700">
-              <Button onClick={() => setModal(m => ({ ...m, open: false }))} size="sm" variant="outline" className="h-7 px-3 text-xs bg-gray-800 border-gray-600 text-gray-100">Cancelar</Button>
+              <Button onClick={() => setModal(m => ({ ...m, open: false }))} size="sm" variant="outline" className="h-7 px-3 text-xs bg-gray-800 border-gray-600 text-gray-300">Cancelar</Button>
               <Button onClick={salvarModal} size="sm" disabled={editarMutation.isPending || criarMutation.isPending} className="h-7 px-4 text-xs bg-purple-700 hover:bg-purple-600 text-white">
                 {editarMutation.isPending || criarMutation.isPending ? "Salvando..." : "Salvar"}
               </Button>

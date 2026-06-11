@@ -244,10 +244,10 @@ export default function AcompanhamentoDiario() {
               <div className="flex flex-wrap gap-2">
                 {ranking.map((a, i) => (
                   <div key={a.chaveJ} className="flex items-center gap-2 bg-gray-800 rounded-lg px-3 py-1.5">
-                    <span className={`text-xs font-bold ${i === 0 ? "text-yellow-400" : i === 1 ? "text-gray-100" : i === 2 ? "text-amber-600" : "text-gray-400"}`}>
+                    <span className={`text-xs font-bold ${i === 0 ? "text-yellow-400" : i === 1 ? "text-gray-300" : i === 2 ? "text-amber-600" : "text-gray-400"}`}>
                       #{i+1}
                     </span>
-                    <span className="text-xs text-gray-100">{a.nome}</span>
+                    <span className="text-xs text-gray-300">{a.nome}</span>
                     <Badge className="text-[10px] bg-green-900 text-green-300 border-0">{pct(a.aproveitamento)}</Badge>
                     <span className="text-xs text-green-400 font-bold">{fmt(a.total)}</span>
                   </div>
@@ -305,21 +305,21 @@ export default function AcompanhamentoDiario() {
                     <tr key={a.chaveJ} className={`border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors ${idx % 2 === 0 ? "" : "bg-gray-900/30"}`}>
                       <td className="sticky left-0 bg-gray-900 z-10 px-3 py-2">
                         <div className="font-mono text-blue-300 text-[10px]">{a.chaveJ}</div>
-                        <div className="text-gray-100 truncate max-w-[130px]" title={a.nome}>{a.nome}</div>
+                        <div className="text-gray-300 truncate max-w-[130px]" title={a.nome}>{a.nome}</div>
                       </td>
                       <td className="px-2 py-2 text-center">
                         <Badge className={`text-[9px] border-0 ${a.situacao === "Ativo" ? "bg-green-900 text-green-300" : "bg-red-900 text-red-300"}`}>
                           {a.situacao}
                         </Badge>
                       </td>
-                      <td className="px-2 py-2 text-center text-gray-100">{a.diasComProducao}</td>
+                      <td className="px-2 py-2 text-center text-gray-300">{a.diasComProducao}</td>
                       <td className="px-2 py-2 text-center text-gray-400">{a.diasSemProducao}</td>
                       <td className="px-2 py-2 text-center">
                         <span className={`font-bold ${a.aproveitamento >= 0.5 ? "text-green-400" : "text-red-400"}`}>
                           {pct(a.aproveitamento)}
                         </span>
                       </td>
-                      <td className="px-2 py-2 text-center text-gray-100">{fmt(a.mediaPorDiaUtil)}</td>
+                      <td className="px-2 py-2 text-center text-gray-300">{fmt(a.mediaPorDiaUtil)}</td>
                       <td className="px-2 py-2 text-center font-bold text-green-400">{fmt(a.total)}</td>
                       {dias.map((d, colIdx) => {
                         const val = a.producaoPorDia[d] ?? 0;
@@ -330,7 +330,7 @@ export default function AcompanhamentoDiario() {
                         const label = isSab ? "Sábado" : isDom ? "Domingo" : null;
                         const zebraUtil = !isWkd ? (colIdx % 2 === 0 ? "bg-blue-950/20" : "") : "";
                         return (
-                          <td key={d} className={`px-1 py-2 text-center ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-white" : !isWkd ? "text-white" : ""}`}>
+                          <td key={d} className={`px-1 py-2 text-center ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-white" : !isWkd ? "text-gray-200" : ""}`}>
                             {val > 0 ? (
                               <span className={isWkd ? "text-red-300" : "text-white"}>{fmt(val)}</span>
                             ) : label ? (
@@ -344,7 +344,7 @@ export default function AcompanhamentoDiario() {
                   ))}
                   {/* Linha de totais por dia */}
                   <tr className="border-t-2 border-gray-600 bg-gray-800/50 font-bold">
-                    <td className="sticky left-0 bg-gray-800 z-10 px-3 py-2 text-gray-100">TOTAL DIA</td>
+                    <td className="sticky left-0 bg-gray-800 z-10 px-3 py-2 text-gray-300">TOTAL DIA</td>
                     <td colSpan={5} />
                     <td className="px-2 py-2 text-center text-green-400">{fmt(totalGeral)}</td>
                     {dias.map((d, colIdx) => {
@@ -356,7 +356,7 @@ export default function AcompanhamentoDiario() {
                       const label = isSab ? "Sábado" : isDom ? "Domingo" : null;
                       const zebraUtil = !isWkd ? (colIdx % 2 === 0 ? "bg-blue-950/30" : "") : "";
                       return (
-                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-green-300" : !isWkd ? "text-white" : ""}`}>
+                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-green-300" : !isWkd ? "text-gray-200" : ""}`}>
                           {val > 0 ? (
                             <span className={isWkd ? "text-red-300" : "text-green-300"}>{fmt(val)}</span>
                           ) : label ? (
@@ -376,8 +376,8 @@ export default function AcompanhamentoDiario() {
           <div className="flex flex-wrap gap-4 text-xs text-gray-400 pb-4">
             <span><span className="text-green-400 font-bold">Verde</span> = aproveitamento ≥ 50%</span>
             <span><span className="text-red-400 font-bold">Vermelho</span> = aproveitamento &lt; 50%</span>
-            <span><span className="text-gray-100">—</span> = fim de semana</span>
-            <span><span className="text-white">·</span> = sem produção</span>
+            <span><span className="text-gray-300">—</span> = fim de semana</span>
+            <span><span className="text-gray-200">·</span> = sem produção</span>
             <span>Dias C/ = dias úteis com produção | Dias S/ = dias úteis sem produção</span>
           </div>
         </div>

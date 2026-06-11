@@ -671,7 +671,7 @@ export default function Consorcio() {
               <div className="grid grid-cols-6 gap-2 items-end">
                 {/* % Demais */}
                 <div>
-                  <Label className="text-xs text-gray-100">% Demais</Label>
+                  <Label className="text-xs text-gray-300">% Demais</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,65" value={cfgPadraoDemais1} onChange={e => setCfgPadraoDemais1(e.target.value)} />
                     <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
@@ -679,7 +679,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Demais De */}
                 <div>
-                  <Label className="text-xs text-gray-100">Parc. Demais De</Label>
+                  <Label className="text-xs text-gray-300">Parc. Demais De</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoDemaisParc1} onChange={e => setCfgPadraoDemaisParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -687,7 +687,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Demais Até */}
                 <div>
-                  <Label className="text-xs text-gray-100">Até</Label>
+                  <Label className="text-xs text-gray-300">Até</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoDemaisParc1Ate} onChange={e => setCfgPadraoDemaisParc1Ate(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -695,7 +695,7 @@ export default function Consorcio() {
                 </div>
                 {/* % Imóvel */}
                 <div>
-                  <Label className="text-xs text-gray-100">% Imóvel</Label>
+                  <Label className="text-xs text-gray-300">% Imóvel</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,20" value={cfgPadraoDemais2} onChange={e => setCfgPadraoDemais2(e.target.value)} />
                     <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
@@ -703,7 +703,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Imóvel De */}
                 <div>
-                  <Label className="text-xs text-gray-100">Parc. Imóvel De</Label>
+                  <Label className="text-xs text-gray-300">Parc. Imóvel De</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoImovelParc1} onChange={e => setCfgPadraoImovelParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -711,7 +711,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Imóvel Até */}
                 <div>
-                  <Label className="text-xs text-gray-100">Até</Label>
+                  <Label className="text-xs text-gray-300">Até</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-300" value={cfgPadraoImovelParc2} onChange={e => setCfgPadraoImovelParc2(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -726,7 +726,7 @@ export default function Consorcio() {
               <div className="grid grid-cols-6 gap-2 items-end">
                 {/* % Demais */}
                 <div>
-                  <Label className="text-xs text-gray-100">% Demais</Label>
+                  <Label className="text-xs text-gray-300">% Demais</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 1,00" value={cfgEspecialDemais1} onChange={e => setCfgEspecialDemais1(e.target.value)} />
                     <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
@@ -734,7 +734,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Demais De */}
                 <div>
-                  <Label className="text-xs text-gray-100">Parc. Demais De</Label>
+                  <Label className="text-xs text-gray-300">Parc. Demais De</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialDemaisParc1} onChange={e => setCfgEspecialDemaisParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -742,7 +742,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Demais Até */}
                 <div>
-                  <Label className="text-xs text-gray-100">Até</Label>
+                  <Label className="text-xs text-gray-300">Até</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialDemaisParc1Ate} onChange={e => setCfgEspecialDemaisParc1Ate(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -750,7 +750,7 @@ export default function Consorcio() {
                 </div>
                 {/* % Imóvel */}
                 <div>
-                  <Label className="text-xs text-gray-100">% Imóvel</Label>
+                  <Label className="text-xs text-gray-300">% Imóvel</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,75" value={cfgEspecialDemais2} onChange={e => setCfgEspecialDemais2(e.target.value)} />
                     <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
@@ -758,7 +758,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Imóvel De */}
                 <div>
-                  <Label className="text-xs text-gray-100">Parc. Imóvel De</Label>
+                  <Label className="text-xs text-gray-300">Parc. Imóvel De</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialImovelParc1} onChange={e => setCfgEspecialImovelParc1(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -766,7 +766,7 @@ export default function Consorcio() {
                 </div>
                 {/* Parc. Imóvel Até */}
                 <div>
-                  <Label className="text-xs text-gray-100">Até</Label>
+                  <Label className="text-xs text-gray-300">Até</Label>
                   <select className="w-full h-9 border rounded px-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" value={cfgEspecialImovelParc2} onChange={e => setCfgEspecialImovelParc2(e.target.value)}>
                     <option value="">--</option>
                     {Array.from({length: 10}, (_, i) => i + 1).map(n => <option key={n} value={String(n)}>{n}</option>)}
@@ -774,7 +774,7 @@ export default function Consorcio() {
                 </div>
               </div>
               <div className="mt-3">
-                <Label className="text-xs text-gray-100">Agentes com comissão especial (ChaveJ, um por linha)</Label>
+                <Label className="text-xs text-gray-300">Agentes com comissão especial (ChaveJ, um por linha)</Label>
                 <textarea
                   className="w-full mt-1 p-2 border rounded text-xs font-mono resize-none focus:outline-none focus:ring-2 focus:ring-blue-300"
                   rows={4}
@@ -818,7 +818,7 @@ export default function Consorcio() {
           <DialogHeader>
             <DialogTitle>Confirmar Exclusão</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-100">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-300">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
             <Button variant="destructive" onClick={() => deleteId && excluirMutation.mutate({ id: deleteId })} disabled={excluirMutation.isPending}>

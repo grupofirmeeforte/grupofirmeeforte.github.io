@@ -405,7 +405,7 @@ export default function TabelaComissao() {
   };
 
   function getConvenioColor(convenio: string | null) {
-    if (!convenio) return { row: 'bg-white hover:bg-gray-800', badge: 'bg-gray-100 text-white border border-gray-300' };
+    if (!convenio) return { row: 'bg-white hover:bg-gray-800', badge: 'bg-gray-100 text-gray-200 border border-gray-300' };
     const upper = convenio.toUpperCase();
     for (const [key, val] of Object.entries(CONVENIO_COLORS)) {
       if (upper.includes(key)) return val;
@@ -677,7 +677,7 @@ export default function TabelaComissao() {
               className="max-w-xs"
             />
             {busca && (
-              <button onClick={() => setBusca('')} className="text-gray-400 hover:text-gray-100">
+              <button onClick={() => setBusca('')} className="text-gray-400 hover:text-gray-300">
                 <X className="w-4 h-4" />
               </button>
             )}
@@ -728,8 +728,8 @@ export default function TabelaComissao() {
               {showColSelector && (
                 <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-700 rounded-xl shadow-xl p-3 w-52">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold text-gray-100 uppercase tracking-wide">Ativos visíveis</span>
-                    <button onClick={() => setShowColSelector(false)} className="text-gray-400 hover:text-gray-100">
+                    <span className="text-xs font-semibold text-gray-300 uppercase tracking-wide">Ativos visíveis</span>
+                    <button onClick={() => setShowColSelector(false)} className="text-gray-400 hover:text-gray-300">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -742,13 +742,13 @@ export default function TabelaComissao() {
                           onChange={() => toggleCol(col)}
                           className="accent-blue-600"
                         />
-                        <span className="text-sm text-white">Ativo {String(i + 1).padStart(2, '0')}</span>
+                        <span className="text-sm text-gray-200">Ativo {String(i + 1).padStart(2, '0')}</span>
                       </label>
                     ))}
                   </div>
                   <div className="flex gap-1 mt-2 pt-2 border-t">
                     <button onClick={() => { setColsVisiveis([...ALL_ATIVOS]); localStorage.setItem('tabela_comissao_cols', JSON.stringify([...ALL_ATIVOS])); }} className="text-xs text-blue-600 hover:underline">Todos</button>
-                    <span className="text-gray-100">|</span>
+                    <span className="text-gray-300">|</span>
                     <button onClick={() => { setColsVisiveis([]); localStorage.setItem('tabela_comissao_cols', '[]'); }} className="text-xs text-red-500 hover:underline">Nenhum</button>
                   </div>
                 </div>
@@ -956,11 +956,11 @@ export default function TabelaComissao() {
                           <div className="flex items-center gap-1 mb-0.5">
                             <span className="text-gray-400 text-xs">Mín:</span>
                             {isAdminOuCeo ? (
-                              <span className="text-xs text-gray-100">
+                              <span className="text-xs text-gray-300">
                                 <EditableCell value={row.valorMinimo} onSave={(v) => handleCellSave(row.id, 'valorMinimo', v)} isSaving={savingCell === `${row.id}-valorMinimo`} />
                               </span>
                             ) : (
-                              <span className="text-xs text-gray-100">{row.valorMinimo || '-'}</span>
+                              <span className="text-xs text-gray-300">{row.valorMinimo || '-'}</span>
                             )}
                           </div>
                           {/* Prazo */}
@@ -1033,48 +1033,48 @@ export default function TabelaComissao() {
 
           <div className="grid grid-cols-2 gap-4 py-2">
              <div>
-              <label className="text-sm font-medium text-white mb-1 block">Empresa</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Empresa</label>
               <Input value={form.empresa || ''} onChange={e => setField('empresa', e.target.value)} placeholder="BMF, FLEX..." />
             </div>
             <div>
-              <label className="text-sm font-medium text-white mb-1 block">Código <span className="text-gray-400 text-xs">(até 5 códigos separados por /)</span></label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Código <span className="text-gray-400 text-xs">(até 5 códigos separados por /)</span></label>
               <Input value={form.codigo || ''} onChange={e => setField('codigo', e.target.value.slice(0,24))} placeholder="2880/2881/2882" maxLength={24} />
             </div>
             <div className="col-span-2">
-              <label className="text-sm font-medium text-white mb-1 block">Convênio</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Convênio</label>
               <Input value={form.convenio || ''} onChange={e => setField('convenio', e.target.value)} placeholder="CONSIGNADO INSS, FEDERAL..." />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-white mb-1 block">Tx Juros De</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Tx Juros De</label>
               <Input value={form.txJurosDe || ''} onChange={e => setField('txJurosDe', e.target.value)} placeholder="0.0185" />
             </div>
             <div>
-              <label className="text-sm font-medium text-white mb-1 block">Tx Juros Até</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Tx Juros Até</label>
               <Input value={form.txJurosAte || ''} onChange={e => setField('txJurosAte', e.target.value)} placeholder="acima ou 0.0199" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-white mb-1 block">Valor Mínimo</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Valor Mínimo</label>
               <Input value={form.valorMinimo || ''} onChange={e => setField('valorMinimo', e.target.value)} placeholder=">=$1.000,00" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-white mb-1 block">Meses De</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Meses De</label>
               <Input value={form.mesesDe || ''} onChange={e => setField('mesesDe', e.target.value)} placeholder="48" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-white mb-1 block">Meses Até</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Meses Até</label>
               <Input value={form.mesesAte || ''} onChange={e => setField('mesesAte', e.target.value)} placeholder="60" />
             </div>
 
             <div className="col-span-2">
-              <label className="text-sm font-medium text-white mb-2 block">Valores dos Ativos</label>
+              <label className="text-sm font-medium text-gray-200 mb-2 block">Valores dos Ativos</label>
               <div className="grid grid-cols-5 gap-2">
                 {['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10', 'ativo11', 'ativo12', 'ativo13', 'ativo14', 'ativo15', 'ativo16', 'ativo17', 'ativo18', 'ativo19', 'ativo20'].map((key) => (
                   <div key={key}>
-                    <label className="text-xs font-medium text-gray-100 mb-1 block">{key.replace('ativo', 'Ativo ')}</label>
+                    <label className="text-xs font-medium text-gray-300 mb-1 block">{key.replace('ativo', 'Ativo ')}</label>
                     <Input value={form[key as keyof FormData] || ''} onChange={e => setField(key as keyof FormData, e.target.value)} placeholder="0.0065" />
                   </div>
                 ))}

@@ -305,7 +305,7 @@ export default function Certificacoes() {
                     {(c.dataCertif || c.ventoCertif || c.situacaoCertif) ? (
                       <div className="space-y-0.5">
                         <div className={`text-xs font-semibold ${situacaoColor(c.situacaoCertif)}`}>{c.situacaoCertif || '-'}</div>
-                        <div className="text-[11px] text-gray-100">
+                        <div className="text-[11px] text-gray-300">
                           {c.dataCertif && <span>Certif: {fmtDate(c.dataCertif)}</span>}
                           {c.ventoCertif && <span className="ml-1">· Venc: {fmtDate(c.ventoCertif)}</span>}
                         </div>
@@ -323,7 +323,7 @@ export default function Certificacoes() {
                     {(c.dataCertif2 || c.ventoCertif3 || c.situacaoCertif3) ? (
                       <div className="space-y-0.5">
                         <div className={`text-xs font-semibold ${situacaoColor(c.situacaoCertif3)}`}>{c.situacaoCertif3 || '-'}</div>
-                        <div className="text-[11px] text-gray-100">
+                        <div className="text-[11px] text-gray-300">
                           {c.dataCertif2 && <span>Certif: {fmtDate(c.dataCertif2)}</span>}
                           {c.ventoCertif3 && <span className="ml-1">· Venc: {fmtDate(c.ventoCertif3)}</span>}
                         </div>
