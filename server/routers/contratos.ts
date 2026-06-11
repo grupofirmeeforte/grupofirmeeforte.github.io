@@ -7,7 +7,7 @@ import { eq, desc, like, and, sql, or } from "drizzle-orm";
 import { storagePut } from "../storage";
 import { PDFParse } from 'pdf-parse';
 
-// ─── Extração de dados do PDF ────────────────────────────────────────────────
+// ─── Extração de dados do PDF (v2) ──────────────────────────────────────────
 function extrairDadosContrato(texto: string) {
   const num = (s: string | null | undefined): number | null => {
     if (!s) return null;
