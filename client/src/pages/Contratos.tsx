@@ -33,6 +33,7 @@ export default function ContratosPage() {
   const [filtroEmpresa, setFiltroEmpresa] = useState('');
   const [filtroLinha, setFiltroLinha] = useState('');
   const [filtroAgencia, setFiltroAgencia] = useState('');
+  const [filtroNumeroProposta, setFiltroNumeroProposta] = useState('');
   const [showContatosDetalhe, setShowContatosDetalhe] = useState(false);
   const [apenasElegiveis, setApenasElegiveis] = useState(false);
   const [substituirDuplicatas, setSubstituirDuplicatas] = useState(true);
@@ -58,6 +59,7 @@ export default function ContratosPage() {
     cidade: filtroCidade || undefined,
     empresa: filtroEmpresa || undefined,
     linhaCredito: filtroLinha || undefined,
+    numeroProposta: filtroNumeroProposta || undefined,
     apenasElegiveis,
     page,
     pageSize: 50,
@@ -455,6 +457,12 @@ export default function ContratosPage() {
                 placeholder="Linha de crédito..."
                 value={filtroLinha}
                 onChange={e => { setFiltroLinha(e.target.value); setPage(1); }}
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
+              />
+              <Input
+                placeholder="Nº Contrato..."
+                value={filtroNumeroProposta}
+                onChange={e => { setFiltroNumeroProposta(e.target.value); setPage(1); }}
                 className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
               <div className="relative">
