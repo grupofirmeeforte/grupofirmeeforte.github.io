@@ -62,7 +62,7 @@ export const reajustesRouter = {
       }
 
       // Buscar dados dos agentes (nivel e favorecido)
-      const chaveJs = [...new Set(calcs.map(c => c.chaveJ).filter(Boolean))] as string[];
+      const chaveJs = Array.from(new Set(calcs.map(c => c.chaveJ).filter(Boolean))) as string[];
       const agentesData = chaveJs.length > 0
         ? await db.select({ chaveJ: agentes.chaveJ, nivel: agentes.nivel, favorecido: agentes.favorecido })
             .from(agentes)
