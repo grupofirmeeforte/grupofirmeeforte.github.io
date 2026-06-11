@@ -205,7 +205,7 @@ export default function ContasLojas() {
       {/* Filtros */}
       <div className="flex flex-wrap gap-3 mb-5 p-4 bg-gray-900/60 rounded-xl border border-gray-800">
         <div>
-          <label className="text-xs text-gray-800 block mb-1">Loja</label>
+          <label className="text-xs text-gray-400 block mb-1">Loja</label>
           <select value={filtroLoja} onChange={e => setFiltroLoja(e.target.value)}
             className="bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-sm text-white min-w-[140px]">
             <option value="">Todas</option>
@@ -213,7 +213,7 @@ export default function ContasLojas() {
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-800 block mb-1">Tipo</label>
+          <label className="text-xs text-gray-400 block mb-1">Tipo</label>
           <select value={filtroTipo} onChange={e => setFiltroTipo(e.target.value)}
             className="bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-sm text-white min-w-[130px]">
             <option value="">Todos</option>
@@ -221,17 +221,17 @@ export default function ContasLojas() {
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-800 block mb-1">Mês/Ano</label>
+          <label className="text-xs text-gray-400 block mb-1">Mês/Ano</label>
           <Input value={filtroMesAno} onChange={e => setFiltroMesAno(maskMesAno(e.target.value))}
             placeholder="MM/AAAA" maxLength={7}
             className="bg-gray-800 border-gray-700 text-white w-28 h-8 text-sm" />
         </div>
         <div>
-          <label className="text-xs text-gray-800 block mb-1">Status</label>
+          <label className="text-xs text-gray-400 block mb-1">Status</label>
           <div className="flex gap-1">
             {(["todos", "nao_pago", "pago"] as const).map(v => (
               <button key={v} onClick={() => setFiltroPago(v)}
-                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${filtroPago === v ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-800 hover:bg-gray-700"}`}>
+                className={`px-3 py-1.5 rounded text-xs font-medium transition-colors ${filtroPago === v ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
                 {v === "todos" ? "Todos" : v === "pago" ? "Pago" : "Pendente"}
               </button>
             ))}
@@ -241,9 +241,9 @@ export default function ContasLojas() {
 
       {/* Tabela */}
       {isLoading ? (
-        <div className="text-center py-16 text-gray-800">Carregando...</div>
+        <div className="text-center py-16 text-gray-400">Carregando...</div>
       ) : contas.length === 0 ? (
-        <div className="text-center py-16 text-gray-800">
+        <div className="text-center py-16 text-gray-400">
           <div className="text-4xl mb-3">📄</div>
           <p>Nenhuma conta encontrada. Clique em "+ Nova Conta" para começar.</p>
         </div>
@@ -278,7 +278,7 @@ export default function ContasLojas() {
                   </td>
                   <td className="px-3 py-2">{conta.vencimento || "-"}</td>
                   <td className="px-3 py-2">{conta.dataPagto || "-"}</td>
-                  <td className="px-3 py-2 text-gray-800 text-xs">{conta.pagoPor || "-"}</td>
+                  <td className="px-3 py-2 text-gray-400 text-xs">{conta.pagoPor || "-"}</td>
                   <td className="px-3 py-2">
                     {conta.arquivoUrl ? (
                       <a href={conta.arquivoUrl} target="_blank" rel="noopener noreferrer"
@@ -288,9 +288,9 @@ export default function ContasLojas() {
                         </svg>
                         {conta.arquivoNome ? conta.arquivoNome.slice(0, 20) + (conta.arquivoNome.length > 20 ? "…" : "") : "Ver arquivo"}
                       </a>
-                    ) : <span className="text-gray-800 text-xs">-</span>}
+                    ) : <span className="text-gray-300 text-xs">-</span>}
                   </td>
-                  <td className="px-3 py-2 text-gray-800 text-xs max-w-[120px] truncate" title={conta.observacao ?? ""}>
+                  <td className="px-3 py-2 text-gray-400 text-xs max-w-[120px] truncate" title={conta.observacao ?? ""}>
                     {conta.observacao || "-"}
                   </td>
                   <td className="px-3 py-2">
@@ -304,7 +304,7 @@ export default function ContasLojas() {
                       ) : (
                         <Button size="sm" variant="outline"
                           onClick={() => marcarPagoMutation.mutate({ id: conta.id, pago: false, dataPagto: undefined })}
-                          className="h-6 px-2 text-xs bg-gray-700 border-gray-600 text-gray-800 hover:bg-gray-600">
+                          className="h-6 px-2 text-xs bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600">
                           Desmarcar
                         </Button>
                       )}
@@ -327,14 +327,14 @@ export default function ContasLojas() {
           <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm shadow-2xl">
             <h2 className="text-lg font-bold text-white mb-4">Confirmar Pagamento</h2>
             <div className="mb-4">
-              <label className="text-xs text-gray-800 block mb-1">Data do Pagamento</label>
+              <label className="text-xs text-gray-400 block mb-1">Data do Pagamento</label>
               <Input value={dataPagtoInput} onChange={e => setDataPagtoInput(maskData(e.target.value))}
                 placeholder="DD/MM/AAAA" maxLength={10}
                 className="bg-gray-800 border-gray-700 text-white" />
             </div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setMarcandoPagoId(null)}
-                className="border-gray-600 text-gray-800">Cancelar</Button>
+                className="border-gray-600 text-gray-300">Cancelar</Button>
               <Button onClick={() => marcarPagoMutation.mutate({ id: marcandoPagoId, pago: true, dataPagto: dataPagtoInput || undefined })}
                 className="bg-green-600 hover:bg-green-500 text-white">
                 Confirmar
@@ -351,17 +351,17 @@ export default function ContasLojas() {
             <h2 className="text-lg font-bold text-white mb-5">{editando ? "Editar Conta" : "Nova Conta"}</h2>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
-                <label className="text-xs text-gray-800 block mb-1">Loja *</label>
+                <label className="text-xs text-gray-400 block mb-1">Loja *</label>
                 <Input value={form.loja} onChange={e => setForm(p => ({ ...p, loja: e.target.value }))}
                   placeholder="Nome da loja" className="bg-gray-800 border-gray-700 text-white" />
               </div>
               <div className="col-span-2">
-                <label className="text-xs text-gray-800 block mb-1">Tipo de Despesa *</label>
+                <label className="text-xs text-gray-400 block mb-1">Tipo de Despesa *</label>
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {TIPOS_COMUNS.map(t => (
                     <button key={t} type="button"
                       onClick={() => setForm(p => ({ ...p, tipo: t, tipoCustom: "" }))}
-                      className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${form.tipo === t ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-800 hover:bg-gray-700 border border-gray-700"}`}>
+                      className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${form.tipo === t ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700 border border-gray-700"}`}>
                       {t}
                     </button>
                   ))}
@@ -372,27 +372,27 @@ export default function ContasLojas() {
                 )}
               </div>
               <div>
-                <label className="text-xs text-gray-800 block mb-1">Mês/Ano</label>
+                <label className="text-xs text-gray-400 block mb-1">Mês/Ano</label>
                 <Input value={form.mesAno} onChange={e => setForm(p => ({ ...p, mesAno: maskMesAno(e.target.value) }))}
                   placeholder="MM/AAAA" maxLength={7} className="bg-gray-800 border-gray-700 text-white" />
               </div>
               <div>
-                <label className="text-xs text-gray-800 block mb-1">Valor</label>
+                <label className="text-xs text-gray-400 block mb-1">Valor</label>
                 <Input value={form.valor} onChange={e => setForm(p => ({ ...p, valor: maskValor(e.target.value) }))}
                   placeholder="0,00" className="bg-gray-800 border-gray-700 text-white" />
               </div>
               <div>
-                <label className="text-xs text-gray-800 block mb-1">Vencimento</label>
+                <label className="text-xs text-gray-400 block mb-1">Vencimento</label>
                 <Input value={form.vencimento} onChange={e => setForm(p => ({ ...p, vencimento: maskData(e.target.value) }))}
                   placeholder="DD/MM/AAAA" maxLength={10} className="bg-gray-800 border-gray-700 text-white" />
               </div>
               <div className="col-span-2">
-                <label className="text-xs text-gray-800 block mb-1">Observação</label>
+                <label className="text-xs text-gray-400 block mb-1">Observação</label>
                 <Input value={form.observacao} onChange={e => setForm(p => ({ ...p, observacao: e.target.value }))}
                   placeholder="Observação opcional" className="bg-gray-800 border-gray-700 text-white" />
               </div>
               <div className="col-span-2">
-                <label className="text-xs text-gray-800 block mb-1">Arquivo (PDF, imagem)</label>
+                <label className="text-xs text-gray-400 block mb-1">Arquivo (PDF, imagem)</label>
                 {arquivoAtual && (
                   <div className="flex items-center gap-2 mb-2 p-2 bg-gray-800 rounded border border-gray-700">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400">
@@ -408,7 +408,7 @@ export default function ContasLojas() {
                   {arquivoSelecionado ? (
                     <p className="text-blue-400 text-sm">{arquivoSelecionado.name}</p>
                   ) : (
-                    <p className="text-gray-800 text-sm">Clique para selecionar ou arraste o arquivo aqui<br/><span className="text-xs">PDF, JPG, PNG — máx. 16MB</span></p>
+                    <p className="text-gray-400 text-sm">Clique para selecionar ou arraste o arquivo aqui<br/><span className="text-xs">PDF, JPG, PNG — máx. 16MB</span></p>
                   )}
                 </div>
                 <input ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp"
@@ -424,7 +424,7 @@ export default function ContasLojas() {
             </div>
             <div className="flex gap-2 justify-end mt-6">
               <Button variant="outline" onClick={() => setShowModal(false)}
-                className="border-gray-600 text-gray-800">Cancelar</Button>
+                className="border-gray-600 text-gray-300">Cancelar</Button>
               <Button onClick={salvar} disabled={uploading || criarMutation.isPending || editarMutation.isPending}
                 className="bg-blue-600 hover:bg-blue-900/300 text-white">
                 {uploading ? "Enviando arquivo..." : (criarMutation.isPending || editarMutation.isPending) ? "Salvando..." : "Salvar"}
@@ -439,9 +439,9 @@ export default function ContasLojas() {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm shadow-2xl">
             <h2 className="text-lg font-bold text-white mb-2">Confirmar Exclusão</h2>
-            <p className="text-gray-800 text-sm mb-5">Tem certeza que deseja excluir esta conta? Esta ação não pode ser desfeita.</p>
+            <p className="text-gray-400 text-sm mb-5">Tem certeza que deseja excluir esta conta? Esta ação não pode ser desfeita.</p>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setDeletandoId(null)} className="border-gray-600 text-gray-800">Cancelar</Button>
+              <Button variant="outline" onClick={() => setDeletandoId(null)} className="border-gray-600 text-gray-300">Cancelar</Button>
               <Button onClick={() => deletarMutation.mutate({ id: deletandoId! })}
                 className="bg-red-600 hover:bg-red-500 text-white">Excluir</Button>
             </div>

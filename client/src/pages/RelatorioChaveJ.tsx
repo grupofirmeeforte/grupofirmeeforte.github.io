@@ -9,11 +9,11 @@ import { usePermissao } from "@/hooks/usePermissao";
 import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const moeda = (v: number) =>
-  v === 0 ? <span className="text-gray-800">R$ -</span> :
+  v === 0 ? <span className="text-gray-300">R$ -</span> :
   <span>R$ {v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>;
 
 const qtdCell = (v: number) =>
-  v === 0 ? <span className="text-gray-800">-</span> : <span>{v}</span>;
+  v === 0 ? <span className="text-gray-300">-</span> : <span>{v}</span>;
 
 type TipoOP = "NOVO" | "REFIN" | "CANC";
 
@@ -185,9 +185,9 @@ export default function RelatorioChaveJ() {
 
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={16} className="text-center py-12 text-gray-800">Carregando...</td></tr>
+              <tr><td colSpan={16} className="text-center py-12 text-gray-400">Carregando...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={16} className="text-center py-12 text-gray-800">Nenhum dado encontrado para {ano}.</td></tr>
+              <tr><td colSpan={16} className="text-center py-12 text-gray-400">Nenhum dado encontrado para {ano}.</td></tr>
             ) : (
               Object.entries(grupos).map(([chaveJ, tipoRows], gi) => {
                 const bgBase = gi % 2 === 0 ? "bg-white" : "bg-blue-50/30";

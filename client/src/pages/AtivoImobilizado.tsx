@@ -86,7 +86,7 @@ function FotoTooltip({ fotoUrl, fotoKey }: { fotoUrl: string; fotoKey?: string |
                 className="w-64 h-64 object-contain"
               />
             ) : (
-              <div className="w-64 h-64 flex items-center justify-center text-slate-800 text-sm">Carregando...</div>
+              <div className="w-64 h-64 flex items-center justify-center text-slate-400 text-sm">Carregando...</div>
             )}
           </div>
           <button
@@ -209,10 +209,10 @@ export default function AtivoImobilizado() {
     const cores: Record<string, string> = {
       "Ativo": "bg-green-100 text-green-800",
       "Em Manutenção": "bg-yellow-100 text-yellow-800",
-      "Baixado": "bg-gray-100 text-gray-800",
+      "Baixado": "bg-gray-100 text-gray-300",
       "Extraviado": "bg-red-100 text-red-800",
     };
-    return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cores[s ?? ""] ?? "bg-gray-100 text-gray-800"}`}>{s ?? "-"}</span>;
+    return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cores[s ?? ""] ?? "bg-gray-100 text-gray-300"}`}>{s ?? "-"}</span>;
   };
 
   return (
@@ -253,9 +253,9 @@ export default function AtivoImobilizado() {
         {/* Tabela */}
         <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-x-auto">
           {isLoading ? (
-            <div className="p-8 text-center text-slate-800">Carregando...</div>
+            <div className="p-8 text-center text-slate-400">Carregando...</div>
           ) : ativos.length === 0 ? (
-            <div className="p-8 text-center text-slate-800">Nenhum ativo cadastrado</div>
+            <div className="p-8 text-center text-slate-400">Nenhum ativo cadastrado</div>
           ) : (
             <table className="w-full border-collapse">
               <thead>
@@ -278,7 +278,7 @@ export default function AtivoImobilizado() {
                             {uploadingId === a.id ? (
                               <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
                             ) : (
-                              <Camera className="w-4 h-4 text-slate-800" />
+                              <Camera className="w-4 h-4 text-slate-400" />
                             )}
                           </div>
                         </label>
@@ -344,7 +344,7 @@ export default function AtivoImobilizado() {
                   <span className="text-xs text-amber-600 font-medium">Adicionar foto</span>
                 </label>
               )}
-              <p className="text-xs text-slate-800">Foto do bem (máx. 5MB)</p>
+              <p className="text-xs text-slate-400">Foto do bem (máx. 5MB)</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -417,7 +417,7 @@ export default function AtivoImobilizado() {
       {fotoVisualizando && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setFotoVisualizando(null)}>
           <div className="relative max-w-2xl w-full" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setFotoVisualizando(null)} className="absolute -top-10 right-0 text-white hover:text-gray-800">
+            <button onClick={() => setFotoVisualizando(null)} className="absolute -top-10 right-0 text-white hover:text-gray-300">
               <X className="w-8 h-8" />
             </button>
             <img

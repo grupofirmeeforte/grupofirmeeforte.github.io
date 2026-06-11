@@ -595,10 +595,10 @@ export default function Consignado() {
       {mostrarTotalizador && (
         <div className="px-6 py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b">
           <div className="mb-4">
-            <h2 className="text-sm font-semibold text-gray-800 mb-3">📊 Totalizador por Empresa e Mês/Ano</h2>
+            <h2 className="text-sm font-semibold text-gray-200 mb-3">📊 Totalizador por Empresa e Mês/Ano</h2>
             <div className="grid grid-cols-4 gap-3 items-end">
               <div>
-                <label className="text-xs font-medium text-gray-800 mb-1 block">Empresa</label>
+                <label className="text-xs font-medium text-gray-300 mb-1 block">Empresa</label>
                 <select
                   value={empresaTotalizador}
                   onChange={(e) => setEmpresaTotalizador(e.target.value)}
@@ -613,7 +613,7 @@ export default function Consignado() {
                 </select>
               </div>
               <div>
-                <label className="text-xs font-medium text-gray-800 mb-1 block">Mês/Ano (MMYY)</label>
+                <label className="text-xs font-medium text-gray-300 mb-1 block">Mês/Ano (MMYY)</label>
                 <select
                   value={mesAnoTotalizador}
                   onChange={(e) => setMesAnoTotalizador(e.target.value)}
@@ -642,16 +642,16 @@ export default function Consignado() {
           {totalizador && (mesAnoTotalizador || empresaTotalizador) && (
             <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-green-200">
               <div className="bg-gray-900 rounded-lg p-3 shadow-sm">
-                <p className="text-xs text-gray-800 mb-1">Total Vr. Líquido</p>
+                <p className="text-xs text-gray-300 mb-1">Total Vr. Líquido</p>
                 <p className="text-lg font-bold text-green-700">{moeda(String(totalizador.totalVrLiquido))}</p>
               </div>
               <div className="bg-gray-900 rounded-lg p-3 shadow-sm">
-                <p className="text-xs text-gray-800 mb-1">Total Comissão</p>
+                <p className="text-xs text-gray-300 mb-1">Total Comissão</p>
                 <p className="text-lg font-bold text-blue-700">{moeda(String(totalizador.totalComissao))}</p>
               </div>
               <div className="bg-gray-900 rounded-lg p-3 shadow-sm">
-                <p className="text-xs text-gray-800 mb-1">Registros</p>
-                <p className="text-lg font-bold text-gray-800">{totalizador.registros}</p>
+                <p className="text-xs text-gray-300 mb-1">Registros</p>
+                <p className="text-lg font-bold text-gray-200">{totalizador.registros}</p>
               </div>
             </div>
           )}
@@ -682,7 +682,7 @@ export default function Consignado() {
           </Select>
 
           <div className="relative flex-1 min-w-48">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-800" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               placeholder="Buscar por agente, ChaveJ, convênio, nº operação..."
               value={filtroBusca}
@@ -710,7 +710,7 @@ export default function Consignado() {
             </Button>
           )}
 
-          <span className="text-sm text-gray-800 ml-auto">{registrosFiltrados.length} registro(s)</span>
+          <span className="text-sm text-gray-400 ml-auto">{registrosFiltrados.length} registro(s)</span>
         </div>
       </div>
 
@@ -727,7 +727,7 @@ export default function Consignado() {
       {/* Tabela */}
       <div className="px-6 py-4 overflow-x-auto">
         {isLoading ? (
-          <div className="text-center py-12 text-gray-800">Carregando...</div>
+          <div className="text-center py-12 text-gray-400">Carregando...</div>
         ) : (
           <table className="w-full text-xs border-collapse min-w-[600px]">
             <thead>
@@ -752,7 +752,7 @@ export default function Consignado() {
             <tbody>
               {registrosFiltrados.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-center py-10 text-gray-800">
+                  <td colSpan={6} className="text-center py-10 text-gray-400">
                     <p className="font-medium">Nenhum registro encontrado</p>
                     <p className="text-xs mt-1">Importe uma planilha ou cadastre manualmente</p>
                   </td>
@@ -782,24 +782,24 @@ export default function Consignado() {
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <span className="font-mono text-[11px] text-blue-700 font-semibold">{strVal(r.chaveJ)}</span>
                       <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{strVal(r.empresa)}</span>
-                      <span className="text-[9px] text-gray-800">{mesNumParaStr(r.mes)}</span>
+                      <span className="text-[9px] text-gray-400">{mesNumParaStr(r.mes)}</span>
                     </div>
                     <div className="text-[11px] text-white font-medium whitespace-nowrap">{strVal(r.nomeAgente)}</div>
                     {(r as any).favorecido && (
                       <div className="text-[10px] text-blue-600 font-medium leading-tight">Fav: {(r as any).favorecido}</div>
                     )}
-                    {r.supervisor && <div className="text-[10px] text-gray-800">Sup: {r.supervisor}</div>}
+                    {r.supervisor && <div className="text-[10px] text-gray-400">Sup: {r.supervisor}</div>}
                   </td>
                   {/* Coluna Operação + Produto */}
                   <td className="px-2 py-1.5 border-b border-gray-100">
-                    <div className="text-[11px] text-gray-800 font-medium">{strVal(r.convenio)}</div>
-                    <div className={`font-mono text-[10px] ${r.isDuplicate ? 'text-red-700 font-bold' : 'text-gray-800'}`}>
+                    <div className="text-[11px] text-gray-200 font-medium">{strVal(r.convenio)}</div>
+                    <div className={`font-mono text-[10px] ${r.isDuplicate ? 'text-red-700 font-bold' : 'text-gray-400'}`}>
                       {strVal(r.nrOperacao)}{r.isDuplicate && <span className="ml-1">⚠️</span>}
                     </div>
-                    {r.dtContratacao && <div className="text-[10px] text-gray-800">{strVal(r.dtContratacao)}</div>}
-                    <div className="text-[10px] text-gray-800 font-medium mt-0.5">{strVal(r.produto)}</div>
-                    {r.descricaoProduto && <div className="text-[10px] text-gray-800 max-w-[150px] truncate" title={r.descricaoProduto}>{r.descricaoProduto}</div>}
-                    <div className="text-[10px] text-gray-800">
+                    {r.dtContratacao && <div className="text-[10px] text-gray-400">{strVal(r.dtContratacao)}</div>}
+                    <div className="text-[10px] text-gray-300 font-medium mt-0.5">{strVal(r.produto)}</div>
+                    {r.descricaoProduto && <div className="text-[10px] text-gray-400 max-w-[150px] truncate" title={r.descricaoProduto}>{r.descricaoProduto}</div>}
+                    <div className="text-[10px] text-gray-400">
                       {r.juros ? `Juros: ${pctJuros(r.juros)}` : ''}{r.prefixoBB ? ` · BB: ${r.prefixoBB}` : ''}
                     </div>
                     {r.restricaoSRCC && <div className="text-[10px] text-orange-600">SRCC: {r.restricaoSRCC}</div>}
@@ -807,9 +807,9 @@ export default function Consignado() {
                   {/* Coluna Valores */}
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
                     <div className="font-bold text-blue-800 text-[12px]">{moeda(r.valorLiquido)}</div>
-                    <div className="text-[10px] text-gray-800">Bruto: {moeda(r.valorBruto)}</div>
-                    <div className="text-[10px] text-gray-800">RBM: {moeda(r.rbm)}</div>
-                    {r.parcela != null && <div className="text-[10px] text-gray-800">Parc: {r.parcela}</div>}
+                    <div className="text-[10px] text-gray-400">Bruto: {moeda(r.valorBruto)}</div>
+                    <div className="text-[10px] text-gray-400">RBM: {moeda(r.rbm)}</div>
+                    {r.parcela != null && <div className="text-[10px] text-gray-400">Parc: {r.parcela}</div>}
                   </td>
                   {/* Coluna Comissão */}
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
@@ -834,7 +834,7 @@ export default function Consignado() {
                       return null;
                     })()}
                     {r.tabela && r.tabela !== 'NULL' && r.tabela !== '0' && (
-                      <div className="text-[10px] text-gray-800">{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
+                      <div className="text-[10px] text-gray-400">{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
                     )}
                   </td>
                   <td className="px-2 py-1.5 border-b border-gray-100">
@@ -863,76 +863,76 @@ export default function Consignado() {
           <div className="grid grid-cols-3 gap-3 py-2">
             {/* Linha 1 */}
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Empresa</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Empresa</label>
               <Input value={form.empresa || ''} readOnly className="bg-blue-900/20 text-blue-800 font-medium cursor-default" placeholder="auto: busca pelo ChaveJ" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Mês (MM/AAAA)</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Mês (MM/AAAA)</label>
               <Input value={form.mes || ''} onChange={e => setField('mes', e.target.value)} placeholder="05/2026" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">ChaveJ</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">ChaveJ</label>
               <Input value={form.chaveJ || ''} onChange={e => setField('chaveJ', e.target.value)} placeholder="J1234567" />
             </div>
             {/* Linha 2 */}
             <div className="col-span-2">
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Nome Agente</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Nome Agente</label>
               <Input value={form.nomeAgente || ''} readOnly className="bg-blue-900/20 text-blue-800 font-medium cursor-default" placeholder="auto: busca pelo ChaveJ" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Convênio</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Convênio</label>
               <Input value={form.convenio || ''} onChange={e => setField('convenio', e.target.value)} placeholder="INSS / SIAPE..." />
             </div>
             {/* Linha 3 */}
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Nr. Operação</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Nr. Operação</label>
               <Input value={form.nrOperacao || ''} onChange={e => setField('nrOperacao', e.target.value)} />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Valor Bruto</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Valor Bruto</label>
               <Input value={form.valorBruto || ''} onChange={e => setField('valorBruto', e.target.value)} placeholder="0.00" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Vr. Líquido</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Vr. Líquido</label>
               <Input value={form.valorLiquido || ''} onChange={e => setField('valorLiquido', e.target.value)} placeholder="0.00" />
             </div>
             {/* Linha 4 */}
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">RBM</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">RBM</label>
               <Input value={form.rbm || ''} onChange={e => setField('rbm', e.target.value)} placeholder="0.00" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Parcela</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Parcela</label>
               <Input type="number" value={form.parcela ?? ''} onChange={e => setForm(prev => ({ ...prev, parcela: e.target.value === '' ? undefined : Number(e.target.value) }))} placeholder="0" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Prefixo BB</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Prefixo BB</label>
               <Input value={form.prefixoBB || ''} onChange={e => setField('prefixoBB', e.target.value)} />
             </div>
             {/* Linha 5 */}
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Dt. Contratação</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Dt. Contratação</label>
               <Input type="date" value={form.dtContratacao || ''} onChange={e => setField('dtContratacao', e.target.value)} />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Produto</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Produto</label>
               <Input value={form.produto || ''} onChange={e => setField('produto', e.target.value)} />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Descrição Produto</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Descrição Produto</label>
               <Input value={form.descricaoProduto || ''} onChange={e => setField('descricaoProduto', e.target.value)} />
             </div>
             {/* Linha 6 */}
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Juros</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Juros</label>
               <Input value={form.juros || ''} onChange={e => setField('juros', e.target.value)} placeholder="0.0195" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Restrição SRCC</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Restrição SRCC</label>
               <Input value={form.restricaoSRCC || ''} onChange={e => setField('restricaoSRCC', e.target.value)} placeholder="Sim / Não" />
             </div>
             <div>
-              <label className="text-xs font-medium text-gray-800 mb-1 block">Supervisor</label>
+              <label className="text-xs font-medium text-gray-300 mb-1 block">Supervisor</label>
               <Input value={form.supervisor || ''} readOnly className="bg-blue-900/20 text-blue-800 font-medium cursor-default" placeholder="auto: busca pelo ChaveJ" />
             </div>
           </div>
@@ -955,7 +955,7 @@ export default function Consignado() {
             </DialogTitle>
           </DialogHeader>
           <div className="py-2 space-y-3">
-            <p className="text-sm text-gray-800">
+            <p className="text-sm text-gray-300">
               Escolha como deseja enviar os registros para a aba <strong>Cálculo</strong>:
             </p>
             <div className="bg-blue-900/20 rounded-md p-3 text-xs text-blue-800">
@@ -1005,7 +1005,7 @@ export default function Consignado() {
           <DialogHeader>
             <DialogTitle>Confirmar Exclusão</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-800">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-300">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmandoExclusao(null)}>Cancelar</Button>
             <Button variant="destructive" onClick={() => confirmandoExclusao && excluir.mutate({ id: confirmandoExclusao })} disabled={excluir.isPending}>

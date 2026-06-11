@@ -284,7 +284,7 @@ export default function ContratosPage() {
             <CardContent className="p-4 flex items-center gap-3">
               <FileText className="w-8 h-8 text-blue-400" />
               <div>
-                <p className="text-slate-800 text-xs">Total Contratos</p>
+                <p className="text-slate-400 text-xs">Total Contratos</p>
                 <p className="text-2xl font-bold text-white">{stats?.total ?? 0}</p>
               </div>
             </CardContent>
@@ -293,7 +293,7 @@ export default function ContratosPage() {
             <CardContent className="p-4 flex items-center gap-3">
               <TrendingUp className="w-8 h-8 text-emerald-400" />
               <div>
-                <p className="text-slate-800 text-xs">Elegíveis Refin</p>
+                <p className="text-slate-400 text-xs">Elegíveis Refin</p>
                 <p className="text-2xl font-bold text-emerald-400">{stats?.elegiveis ?? 0}</p>
               </div>
             </CardContent>
@@ -303,7 +303,7 @@ export default function ContratosPage() {
               <div className="flex items-center gap-3 mb-1">
                 <Phone className="w-8 h-8 text-yellow-400 shrink-0" />
                 <div>
-                  <p className="text-slate-800 text-xs">Contatos Realizados</p>
+                  <p className="text-slate-400 text-xs">Contatos Realizados</p>
                   <p className="text-2xl font-bold text-yellow-400">{stats?.totalContatos ?? 0}</p>
                 </div>
               </div>
@@ -311,7 +311,7 @@ export default function ContratosPage() {
                 <div className="mt-2 border-t border-slate-700 pt-2 space-y-1 max-h-40 overflow-y-auto">
                   {stats.contatosPorOperador.map((op: { nome: string; qtd: number }) => (
                     <div key={op.nome} className="flex justify-between items-center text-xs">
-                      <span className="text-slate-800 truncate max-w-[160px]" title={op.nome}>{op.nome}</span>
+                      <span className="text-slate-300 truncate max-w-[160px]" title={op.nome}>{op.nome}</span>
                       <span className="text-yellow-300 font-bold ml-2 shrink-0">{op.qtd}</span>
                     </div>
                   ))}
@@ -326,7 +326,7 @@ export default function ContratosPage() {
             <CardContent className="p-4 flex items-center gap-3">
               <AlertCircle className="w-8 h-8 text-red-400" />
               <div>
-                <p className="text-slate-800 text-xs">Com Erro</p>
+                <p className="text-slate-400 text-xs">Com Erro</p>
                 <p className="text-2xl font-bold text-red-400">{stats?.comErro ?? 0}</p>
               </div>
             </CardContent>
@@ -342,7 +342,7 @@ export default function ContratosPage() {
               className={`px-4 py-2 rounded-t text-sm font-medium transition-colors ${
                 aba === a
                   ? 'bg-emerald-600 text-white'
-                  : 'text-slate-800 hover:text-white'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               {a === 'upload' && '📤 Upload'}
@@ -387,9 +387,9 @@ export default function ContratosPage() {
                   }
                 }}
               >
-                <Upload className="w-12 h-12 text-slate-800 mx-auto mb-4" />
+                <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
                 <p className="text-white font-medium text-lg mb-1">Arraste os PDFs aqui ou clique para selecionar</p>
-                <p className="text-slate-800 text-sm">Suporta múltiplos arquivos — contratos BB Consignado</p>
+                <p className="text-slate-400 text-sm">Suporta múltiplos arquivos — contratos BB Consignado</p>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -405,7 +405,7 @@ export default function ContratosPage() {
               {uploading && (
                 <div className="mt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-slate-800 text-sm">Processando {progresso.atual} de {progresso.total}...</span>
+                    <span className="text-slate-300 text-sm">Processando {progresso.atual} de {progresso.total}...</span>
                     <span className="text-emerald-400 text-sm">{Math.round((progresso.atual / progresso.total) * 100)}%</span>
                   </div>
                   <div className="w-full bg-slate-700 rounded-full h-2">
@@ -425,44 +425,44 @@ export default function ContratosPage() {
           <div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 mb-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-800" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   placeholder="Nome do cliente..."
                   value={busca}
                   onChange={e => { setBusca(e.target.value); setPage(1); }}
-                  className="pl-9 bg-slate-800 border-slate-600 text-white placeholder:text-slate-800"
+                  className="pl-9 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
                 />
               </div>
               <Input
                 placeholder="Nome do agente..."
                 value={filtroAgente}
                 onChange={e => { setFiltroAgente(e.target.value); setPage(1); }}
-                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-800"
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
               <Input
                 placeholder="Cidade..."
                 value={filtroCidade}
                 onChange={e => { setFiltroCidade(e.target.value); setPage(1); }}
-                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-800"
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
               <Input
                 placeholder="Empresa..."
                 value={filtroEmpresa}
                 onChange={e => { setFiltroEmpresa(e.target.value); setPage(1); }}
-                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-800"
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
               <Input
                 placeholder="Linha de crédito..."
                 value={filtroLinha}
                 onChange={e => { setFiltroLinha(e.target.value); setPage(1); }}
-                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-800"
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
               <div className="relative">
                 <Input
                   placeholder="Nº Agência BB..."
                   value={filtroAgencia}
                   onChange={e => { setFiltroAgencia(e.target.value.replace(/\D/g, '')); setPage(1); }}
-                  className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-800 font-mono"
+                  className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400 font-mono"
                   maxLength={4}
                 />
                 {filtroAgencia && agenciasBbData?.agencias?.[0] && (
@@ -475,12 +475,12 @@ export default function ContratosPage() {
                 <Button
                   variant={apenasElegiveis ? 'default' : 'outline'}
                   onClick={() => { setApenasElegiveis(!apenasElegiveis); setPage(1); }}
-                  className={`flex-1 text-xs ${apenasElegiveis ? 'bg-emerald-600 hover:bg-emerald-700' : 'border-slate-600 text-slate-800'}`}
+                  className={`flex-1 text-xs ${apenasElegiveis ? 'bg-emerald-600 hover:bg-emerald-700' : 'border-slate-600 text-slate-300'}`}
                 >
                   <TrendingUp className="w-3 h-3 mr-1" />
                   {apenasElegiveis ? 'Elegíveis' : 'Todos'}
                 </Button>
-                <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-800 px-3">
+                <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-300 px-3">
                   <RefreshCw className="w-4 h-4" />
                 </Button>
               </div>
@@ -497,9 +497,9 @@ export default function ContratosPage() {
             </div>
 
             {isLoading ? (
-              <div className="text-center py-12 text-slate-800">Carregando contratos...</div>
+              <div className="text-center py-12 text-slate-400">Carregando contratos...</div>
             ) : rows.length === 0 ? (
-              <div className="text-center py-12 text-slate-800">
+              <div className="text-center py-12 text-slate-400">
                 <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
                 <p>Nenhum contrato encontrado.</p>
                 <Button className="mt-4 bg-emerald-600 hover:bg-emerald-700" onClick={() => setAba('upload')}>
@@ -517,9 +517,9 @@ export default function ContratosPage() {
                       <th className="px-2 py-1 text-left text-cyan-400 border-b border-cyan-800/40 border-l border-slate-700">Ag. / Conta</th>
                       <th className="px-2 py-1 text-left text-yellow-400 border-b border-yellow-800/40 border-l border-slate-700">Contrato</th>
                       <th className="px-2 py-1 text-left text-cyan-400 border-b border-cyan-800/40 border-l border-slate-700">Mailing</th>
-                      <th className="px-2 py-1 text-center text-slate-800 border-b border-slate-700 border-l border-slate-700">&nbsp;</th>
+                      <th className="px-2 py-1 text-center text-slate-400 border-b border-slate-700 border-l border-slate-700">&nbsp;</th>
                     </tr>
-                    <tr className="bg-slate-900 text-slate-800 text-[10px] uppercase">
+                    <tr className="bg-slate-900 text-slate-400 text-[10px] uppercase">
                       <th className="px-2 py-1.5 text-left w-[160px]">Nº / Empresa</th>
                       <th className="px-2 py-1.5 text-left w-[240px] border-l border-slate-700">Operador / Convênio</th>
                       <th className="px-2 py-1.5 text-left w-[180px] border-l border-slate-700">Nome / CPF / Nasc.</th>
@@ -548,14 +548,14 @@ export default function ContratosPage() {
                         {/* Operador + Convênio + Linha */}
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
                           <div className="text-purple-300 text-[11px] truncate" title={r.nomeOperador ?? ''}>{r.nomeOperador ?? r.chaveJOperador ?? '—'}</div>
-                          <div className="text-slate-800 text-[10px] truncate" title={r.nomeConvenio ?? ''}>{r.nomeConvenio ?? '—'}</div>
+                          <div className="text-slate-400 text-[10px] truncate" title={r.nomeConvenio ?? ''}>{r.nomeConvenio ?? '—'}</div>
                           <div className="text-purple-200 text-[9px] whitespace-normal break-words" title={r.linhaCredito ?? ''}>{r.linhaCredito ?? '—'}</div>
                         </td>
                         {/* Cliente + CPF + Nasc */}
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
                           <div className="text-white font-medium text-[11px] truncate" title={r.nomeCliente ?? ''}>{r.nomeCliente ?? '—'}</div>
                           <div className="flex items-center gap-1 flex-wrap">
-                            <span className="text-slate-800 font-mono text-[10px] truncate">{r.cpfCliente ?? '—'}</span>
+                            <span className="text-slate-400 font-mono text-[10px] truncate">{r.cpfCliente ?? '—'}</span>
                             {r.cpfCliente && (
                               <button
                                 title="Copiar CPF"
@@ -587,14 +587,14 @@ export default function ContratosPage() {
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
                           <div className="flex gap-2 items-baseline">
                             <span className="text-yellow-300 font-bold text-[12px]">{r.taxaMensalJuros ? `${parseFloat(String(r.taxaMensalJuros)).toFixed(2)}%` : '—'}</span>
-                            <span className="text-slate-800 text-[10px]">{r.prazoMeses ? `${r.prazoMeses}m` : ''}</span>
+                            <span className="text-slate-400 text-[10px]">{r.prazoMeses ? `${r.prazoMeses}m` : ''}</span>
                           </div>
-                          <div className="text-slate-800 text-[10px]">{formatarMoeda(r.valorParcela)}</div>
+                          <div className="text-slate-300 text-[10px]">{formatarMoeda(r.valorParcela)}</div>
                           <div className="text-slate-500 text-[9px]">{r.dataPrimeiraParcela ?? '—'}</div>
                         </td>
                         {/* Mailing: Cidade + Telefones (com edição inline) */}
                         <td className="px-2 py-1.5 border-l border-slate-700 border-r border-slate-700/50">
-                          {(r as any).cidade && <div className="text-slate-800 text-[10px] truncate" title={(r as any).cidade}>{(r as any).cidade}</div>}
+                          {(r as any).cidade && <div className="text-slate-300 text-[10px] truncate" title={(r as any).cidade}>{(r as any).cidade}</div>}
                           {editTelId === r.id ? (
                             <div className="flex flex-col gap-1 mt-0.5">
                               <Input
@@ -610,7 +610,7 @@ export default function ContratosPage() {
                               />
                               <div className="flex gap-1">
                                 <button onClick={() => salvarTelInline(r.id)} className="text-emerald-400 hover:text-emerald-300"><Check className="w-3 h-3" /></button>
-                                <button onClick={() => setEditTelId(null)} className="text-slate-500 hover:text-slate-800"><X className="w-3 h-3" /></button>
+                                <button onClick={() => setEditTelId(null)} className="text-slate-500 hover:text-slate-300"><X className="w-3 h-3" /></button>
                               </div>
                             </div>
                           ) : (
@@ -631,7 +631,7 @@ export default function ContratosPage() {
                                     );
                                   })}
                                   {(r as any).telefones.length > 2 && <span className="text-slate-500 text-[9px]">+{(r as any).telefones.length - 2}</span>}
-                                  <span className="text-slate-600 text-[9px] group-hover/tel:text-slate-800 flex items-center gap-0.5"><Pencil className="w-2.5 h-2.5" /> editar</span>
+                                  <span className="text-slate-600 text-[9px] group-hover/tel:text-slate-400 flex items-center gap-0.5"><Pencil className="w-2.5 h-2.5" /> editar</span>
                                 </div>
                               ) : (
                                 <span className="text-slate-600 text-[10px] flex items-center gap-1 group-hover/tel:text-cyan-400">
@@ -662,11 +662,11 @@ export default function ContratosPage() {
             {/* Paginação */}
             {(data?.total ?? 0) >= 50 && (
               <div className="flex justify-center gap-2 mt-4">
-                <Button variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="border-slate-600 text-slate-800">
+                <Button variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="border-slate-600 text-slate-300">
                   Anterior
                 </Button>
-                <span className="px-4 py-2 text-slate-800 text-sm">Pág. {page}</span>
-                <Button variant="outline" onClick={() => setPage(p => p + 1)} className="border-slate-600 text-slate-800">
+                <span className="px-4 py-2 text-slate-400 text-sm">Pág. {page}</span>
+                <Button variant="outline" onClick={() => setPage(p => p + 1)} className="border-slate-600 text-slate-300">
                   Próxima
                 </Button>
               </div>
@@ -680,39 +680,39 @@ export default function ContratosPage() {
             {/* Filtros CRM — mesmos do Relatório */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-800" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   placeholder="Nome do cliente..."
                   value={busca}
                   onChange={e => { setBusca(e.target.value); setPage(1); }}
-                  className="pl-9 bg-slate-800 border-slate-600 text-white placeholder:text-slate-800"
+                  className="pl-9 bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
                 />
               </div>
               <Input
                 placeholder="Nome do agente..."
                 value={filtroAgente}
                 onChange={e => { setFiltroAgente(e.target.value); setPage(1); }}
-                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-800"
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
               <Input
                 placeholder="Cidade..."
                 value={filtroCidade}
                 onChange={e => { setFiltroCidade(e.target.value); setPage(1); }}
-                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-800"
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
               <Input
                 placeholder="Empresa..."
                 value={filtroEmpresa}
                 onChange={e => { setFiltroEmpresa(e.target.value); setPage(1); }}
-                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-800"
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
               <Input
                 placeholder="Linha de crédito..."
                 value={filtroLinha}
                 onChange={e => { setFiltroLinha(e.target.value); setPage(1); }}
-                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-800"
+                className="bg-slate-800 border-slate-600 text-white placeholder:text-slate-400"
               />
-              <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-800">
+              <Button variant="outline" onClick={() => refetch()} className="border-slate-600 text-slate-300">
                 <RefreshCw className="w-4 h-4 mr-1" /> Atualizar
               </Button>
             </div>
@@ -724,11 +724,11 @@ export default function ContratosPage() {
             </div>
 
             {isLoading ? (
-              <div className="text-center py-12 text-slate-800">Carregando...</div>
+              <div className="text-center py-12 text-slate-400">Carregando...</div>
             ) : (
               <div className="grid gap-4">
                 {rows.length === 0 ? (
-                  <div className="text-center py-12 text-slate-800">
+                  <div className="text-center py-12 text-slate-400">
                     <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
                     <p>Nenhum cliente elegível para refinanciamento ainda.</p>
                   </div>
@@ -740,10 +740,10 @@ export default function ContratosPage() {
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <Badge className="bg-emerald-600 text-white text-xs">Elegível Refin</Badge>
-                              <span className="text-slate-800 text-xs font-mono">#{r.numeroProposta}</span>
+                              <span className="text-slate-400 text-xs font-mono">#{r.numeroProposta}</span>
                             </div>
                             <h3 className="text-white font-bold text-lg">{r.nomeCliente ?? '—'}</h3>
-                            <p className="text-slate-800 text-sm flex items-center gap-1.5">
+                            <p className="text-slate-400 text-sm flex items-center gap-1.5">
                               CPF: {r.cpfCliente ? r.cpfCliente.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '—'}
                               {r.cpfCliente && (
                                 <button
@@ -756,7 +756,7 @@ export default function ContratosPage() {
                               )}
                             </p>
                             {r.cidade && (
-                              <p className="text-slate-800 text-sm flex items-center gap-1">
+                              <p className="text-slate-400 text-sm flex items-center gap-1">
                                 <MapPin className="w-3 h-3" /> {r.cidade}
                               </p>
                             )}
@@ -765,27 +765,27 @@ export default function ContratosPage() {
                             <p className="text-yellow-300 font-bold text-xl">
                               {r.taxaMensalJuros ? `${parseFloat(String(r.taxaMensalJuros)).toFixed(2)}% a.m.` : '—'}
                             </p>
-                            <p className="text-slate-800 text-xs">Taxa contratada</p>
-                            <p className="text-slate-800 text-sm mt-1">{r.prazoMeses}m · {formatarMoeda(r.valorParcela)}/mês</p>
+                            <p className="text-slate-400 text-xs">Taxa contratada</p>
+                            <p className="text-slate-300 text-sm mt-1">{r.prazoMeses}m · {formatarMoeda(r.valorParcela)}/mês</p>
                           </div>
                         </div>
 
                         <div className="mt-3 pt-3 border-t border-slate-700 flex flex-wrap gap-3 items-center">
                           <div>
-                            <p className="text-slate-800 text-xs">Convênio</p>
-                            <p className="text-slate-800 text-sm">{r.nomeConvenio ?? '—'}</p>
+                            <p className="text-slate-400 text-xs">Convênio</p>
+                            <p className="text-slate-200 text-sm">{r.nomeConvenio ?? '—'}</p>
                           </div>
                           <div>
-                            <p className="text-slate-800 text-xs">Operador</p>
-                            <p className="text-slate-800 text-sm">{r.nomeOperador ?? r.chaveJOperador ?? '—'}</p>
+                            <p className="text-slate-400 text-xs">Operador</p>
+                            <p className="text-slate-200 text-sm">{r.nomeOperador ?? r.chaveJOperador ?? '—'}</p>
                           </div>
                           <div>
-                            <p className="text-slate-800 text-xs">1ª Parcela</p>
-                            <p className="text-slate-800 text-sm">{r.dataPrimeiraParcela ?? '—'}</p>
+                            <p className="text-slate-400 text-xs">1ª Parcela</p>
+                            <p className="text-slate-200 text-sm">{r.dataPrimeiraParcela ?? '—'}</p>
                           </div>
                           <div>
-                            <p className="text-slate-800 text-xs">Últ. Parcela</p>
-                            <p className="text-slate-800 text-sm">{r.dataUltimaParcela ?? '—'}</p>
+                            <p className="text-slate-400 text-xs">Últ. Parcela</p>
+                            <p className="text-slate-200 text-sm">{r.dataUltimaParcela ?? '—'}</p>
                             <p className="text-amber-400 text-xs font-semibold mt-0.5">
                               {(() => {
                                 if (!r.dataUltimaParcela) return '';
@@ -827,11 +827,11 @@ export default function ContratosPage() {
                           onClick={() => abrirEdicaoCrm(r)}
                         >
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-slate-800 text-xs">Resultado do contato</span>
+                            <span className="text-slate-400 text-xs">Resultado do contato</span>
                             {r.dataContatoCrm && (
                               <span className="text-slate-500 text-xs">· {r.dataContatoCrm}</span>
                             )}
-                            <span className="text-slate-600 text-xs group-hover:text-slate-800 transition-colors ml-auto">✏️ clique para anotar</span>
+                            <span className="text-slate-600 text-xs group-hover:text-slate-400 transition-colors ml-auto">✏️ clique para anotar</span>
                           </div>
                           {r.anotacaoCrm ? (
                             <p className="text-emerald-300 text-sm">{r.anotacaoCrm}</p>
@@ -866,7 +866,7 @@ export default function ContratosPage() {
                 ['telefoneManuais', 'Telefones (vírgula)'],
               ] as [keyof typeof editForm, string][]).map(([campo, label]) => (
                 <div key={campo} className={campo === 'telefoneManuais' ? 'col-span-2' : ''}>
-                  <label className="text-slate-800 text-xs mb-1 block">{label}</label>
+                  <label className="text-slate-400 text-xs mb-1 block">{label}</label>
                   <Input
                     value={editForm[campo]}
                     onChange={e => setEditForm(f => ({ ...f, [campo]: e.target.value }))}
@@ -877,7 +877,7 @@ export default function ContratosPage() {
               ))}
               {/* Campo Situação manual */}
               <div className="col-span-2">
-                <label className="text-slate-800 text-xs mb-1 block">Situação Manual</label>
+                <label className="text-slate-400 text-xs mb-1 block">Situação Manual</label>
                 <select
                   value={editForm.situacao}
                   onChange={e => setEditForm(f => ({ ...f, situacao: e.target.value }))}
@@ -892,7 +892,7 @@ export default function ContratosPage() {
               </div>
             </div>
             <div className="flex gap-3 mt-5 justify-end">
-              <Button variant="outline" className="border-slate-600 text-slate-800" onClick={() => setEditandoId(null)}>Cancelar</Button>
+              <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => setEditandoId(null)}>Cancelar</Button>
               <Button className="bg-blue-600 hover:bg-blue-700" onClick={salvarEdicao} disabled={atualizarMutation.isPending}>
                 {atualizarMutation.isPending ? 'Salvando...' : 'Salvar'}
               </Button>
@@ -908,7 +908,7 @@ export default function ContratosPage() {
             <h2 className="text-white font-bold text-lg mb-4">Resultado do Contato</h2>
             <div className="space-y-3">
               <div>
-                <label className="text-slate-800 text-xs mb-1 block">Data do contato</label>
+                <label className="text-slate-400 text-xs mb-1 block">Data do contato</label>
                 <Input
                   type="date"
                   value={crmForm.dataContatoCrm}
@@ -917,7 +917,7 @@ export default function ContratosPage() {
                 />
               </div>
               <div>
-                <label className="text-slate-800 text-xs mb-1 block">Anotação / Resultado</label>
+                <label className="text-slate-400 text-xs mb-1 block">Anotação / Resultado</label>
                 <textarea
                   value={crmForm.anotacaoCrm}
                   onChange={e => setCrmForm(f => ({ ...f, anotacaoCrm: e.target.value }))}
@@ -927,7 +927,7 @@ export default function ContratosPage() {
               </div>
             </div>
             <div className="flex gap-3 mt-5 justify-end">
-              <Button variant="outline" className="border-slate-600 text-slate-800" onClick={() => setEditandoCrmId(null)}>Cancelar</Button>
+              <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => setEditandoCrmId(null)}>Cancelar</Button>
               <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={salvarCrm} disabled={atualizarCrmMutation.isPending}>
                 {atualizarCrmMutation.isPending ? 'Salvando...' : 'Salvar'}
               </Button>
@@ -941,8 +941,8 @@ export default function ContratosPage() {
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-red-800 rounded-2xl p-6 w-full max-w-sm">
             <h2 className="text-red-400 font-bold text-lg mb-2">Confirmar Exclusão</h2>
-            <p className="text-slate-800 text-sm mb-4">Esta ação é irreversível. Digite sua senha para confirmar.</p>
-            <label className="text-slate-800 text-xs mb-1 block">Senha CEO</label>
+            <p className="text-slate-400 text-sm mb-4">Esta ação é irreversível. Digite sua senha para confirmar.</p>
+            <label className="text-slate-400 text-xs mb-1 block">Senha CEO</label>
             <Input
               type="password"
               value={senhaCeo}
@@ -952,7 +952,7 @@ export default function ContratosPage() {
               onKeyDown={e => e.key === 'Enter' && confirmarExclusao()}
             />
             <div className="flex gap-3 justify-end">
-              <Button variant="outline" className="border-slate-600 text-slate-800" onClick={() => { setDeletandoId(null); setSenhaCeo(''); }}>Cancelar</Button>
+              <Button variant="outline" className="border-slate-600 text-slate-300" onClick={() => { setDeletandoId(null); setSenhaCeo(''); }}>Cancelar</Button>
               <Button className="bg-red-700 hover:bg-red-800" onClick={confirmarExclusao} disabled={!senhaCeo || deletarMutation.isPending}>
                 {deletarMutation.isPending ? 'Excluindo...' : 'Excluir'}
               </Button>

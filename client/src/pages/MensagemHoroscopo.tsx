@@ -67,7 +67,7 @@ export default function MensagemHoroscopo() {
 
             {/* Estado inicial */}
             {!signoSelecionado && (
-              <div className="flex flex-col items-center gap-3 py-6 text-slate-800">
+              <div className="flex flex-col items-center gap-3 py-6 text-slate-400">
                 <Star className="w-12 h-12 text-yellow-200" />
                 <p className="text-sm">Escolha seu signo acima para ver o horóscopo de hoje</p>
               </div>
@@ -77,8 +77,8 @@ export default function MensagemHoroscopo() {
             {signoSelecionado && isLoading && (
               <div className="flex flex-col items-center gap-4 py-8">
                 <div className="animate-spin w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full" />
-                <p className="text-slate-800 text-sm">Buscando e traduzindo horóscopo...</p>
-                <p className="text-slate-800 text-xs">Isso pode levar alguns segundos na primeira vez</p>
+                <p className="text-slate-400 text-sm">Buscando e traduzindo horóscopo...</p>
+                <p className="text-slate-300 text-xs">Isso pode levar alguns segundos na primeira vez</p>
               </div>
             )}
 
@@ -96,14 +96,14 @@ export default function MensagemHoroscopo() {
                   <span className="text-4xl">{SIGNO_EMOJIS[signoSelecionado]}</span>
                   <div>
                     <h2 className="text-2xl font-bold text-slate-800">{signoSelecionado}</h2>
-                    <p className="text-xs text-slate-800 capitalize">{hoje}</p>
+                    <p className="text-xs text-slate-400 capitalize">{hoje}</p>
                   </div>
                 </div>
                 <div className="w-full h-0.5 rounded-full mb-5" style={{ background: 'linear-gradient(90deg, #1e3a5f, #c8960c)' }} />
                 <p className="text-slate-700 text-base leading-relaxed whitespace-pre-line">
                   {horoscopo.texto}
                 </p>
-                <p className="text-xs text-slate-800 mt-6 text-right">Fonte: Horóscopo Diário</p>
+                <p className="text-xs text-slate-300 mt-6 text-right">Fonte: Horóscopo Diário</p>
               </div>
             )}
           </CardContent>

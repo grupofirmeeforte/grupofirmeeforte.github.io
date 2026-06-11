@@ -127,7 +127,7 @@ function resultadoBadge(resultado?: string | null) {
     return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 font-medium">{resultado}</span>;
   if (r.includes("retornar") || r.includes("aguardando") || r.includes("pendente"))
     return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-medium">{resultado}</span>;
-  return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-800 font-medium">{resultado}</span>;
+  return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-300 font-medium">{resultado}</span>;
 }
 
 export default function MailingCrm() {
@@ -402,7 +402,7 @@ export default function MailingCrm() {
 
   const fld = (key: keyof Row, label: string, span = 1) => (
     <div className={`col-span-${span}`}>
-      <label className="text-xs text-gray-800 mb-1 block">{label}</label>
+      <label className="text-xs text-gray-400 mb-1 block">{label}</label>
       <Input
         value={(editRow[key] as string) ?? ""}
         onChange={e => setEditRow(p => ({ ...p, [key]: e.target.value }))}
@@ -513,9 +513,9 @@ export default function MailingCrm() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={7} className="text-center py-12 text-gray-800">Carregando...</td></tr>
+              <tr><td colSpan={7} className="text-center py-12 text-gray-400">Carregando...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={7} className="text-center py-12 text-gray-800">Nenhum registro encontrado.</td></tr>
+              <tr><td colSpan={7} className="text-center py-12 text-gray-400">Nenhum registro encontrado.</td></tr>
             ) : rowsFiltrados.map((r, i) => {
               const tels = fones(r as Row);
               return (
@@ -532,7 +532,7 @@ export default function MailingCrm() {
                     return (
                       <td className="px-3 py-2.5 min-w-[180px]">
                         <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                           <span className="font-semibold text-gray-900 text-[13px]">{r.nome ?? "—"}</span>
+                          <span className="font-semibold text-white text-[13px]">{r.nome ?? "—"}</span>
                           {r.sexo && (
                             <span className={`text-[9px] px-1 py-0.5 rounded font-bold ${r.sexo === "M" ? "bg-blue-100 text-blue-700" : "bg-pink-100 text-pink-700"}`}>
                               {r.sexo}
@@ -549,11 +549,11 @@ export default function MailingCrm() {
                             </span>
                           )}
                         </div>
-                         <div className="text-[11px] text-gray-800">
-                           {r.cpf && <span className="font-mono">{formatCpf(r.cpf)}</span>}
-                         </div>
+                        <div className="text-[11px] text-gray-400">
+                          {r.cpf && <span className="font-mono">{formatCpf(r.cpf)}</span>}
+                        </div>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                           {r.dtaNasc && <span className="text-[10px] text-gray-800">Nasc: {r.dtaNasc}</span>}
+                          {r.dtaNasc && <span className="text-[10px] text-gray-400">Nasc: {r.dtaNasc}</span>}
                           {r.idade != null && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 font-semibold">
                               {r.idade} anos
@@ -584,11 +584,11 @@ export default function MailingCrm() {
                             <div key={idx} className="text-[11px] text-green-700 font-mono font-medium">{t}</div>
                           ))}
                           {tels.length > 4 && (
-                            <div className="text-[10px] text-gray-800">+{tels.length - 4} mais</div>
+                            <div className="text-[10px] text-gray-400">+{tels.length - 4} mais</div>
                           )}
                         </div>
                       ) : (
-                        <span className="text-[11px] text-gray-800">—</span>
+                        <span className="text-[11px] text-gray-300">—</span>
                       );
                     })()}
                   </td>
@@ -596,25 +596,25 @@ export default function MailingCrm() {
                   {/* Coluna 3: Localização */}
                   <td className="px-3 py-2.5 min-w-[130px]">
                     <div className="flex items-center gap-1">
-                       {r.cidade && <span className="text-[12px] text-gray-900 font-medium">{r.cidade}</span>}
-                      {r.sgUf && <span className="text-[10px] px-1 py-0.5 rounded bg-gray-100 text-gray-800 font-bold">{r.sgUf}</span>}
+                      {r.cidade && <span className="text-[12px] text-gray-200 font-medium">{r.cidade}</span>}
+                      {r.sgUf && <span className="text-[10px] px-1 py-0.5 rounded bg-gray-100 text-gray-300 font-bold">{r.sgUf}</span>}
                     </div>
-                     {r.dtInclusao && <div className="text-[10px] text-gray-800">Incl: {r.dtInclusao}</div>}
-                     {r.prfDepe && <div className="text-[10px] text-gray-800">Prf: {r.prfDepe}</div>}
-                     {r.nrCc && <div className="text-[10px] text-gray-800 font-mono">C/C: {r.nrCc}</div>}
+                    {r.dtInclusao && <div className="text-[10px] text-gray-400">Incl: {r.dtInclusao}</div>}
+                    {r.prfDepe && <div className="text-[10px] text-gray-400">Prf: {r.prfDepe}</div>}
+                    {r.nrCc && <div className="text-[10px] text-gray-400 font-mono">C/C: {r.nrCc}</div>}
                   </td>
 
                   {/* Coluna 4: Contato / Datas */}
                   <td className="px-3 py-2.5 min-w-[140px]">
-                     {r.dataContato && <div className="text-[11px] text-gray-900">Contato: {r.dataContato}</div>}
-                     {r.dataInserido && <div className="text-[10px] text-gray-800">Inserido: {r.dataInserido}</div>}
+                    {r.dataContato && <div className="text-[11px] text-gray-200">Contato: {r.dataContato}</div>}
+                    {r.dataInserido && <div className="text-[10px] text-gray-400">Inserido: {r.dataInserido}</div>}
                   </td>
 
                   {/* Coluna 6: Resultado */}
                   <td className="px-3 py-2.5 min-w-[130px]">
                     {resultadoBadge(r.resultado)}
                     {r.observacao && (
-                      <div className="text-[10px] text-gray-800 mt-1 max-w-[150px] truncate" title={r.observacao}>
+                      <div className="text-[10px] text-gray-400 mt-1 max-w-[150px] truncate" title={r.observacao}>
                         {r.observacao}
                       </div>
                     )}
@@ -648,7 +648,7 @@ export default function MailingCrm() {
 
       {/* Paginação */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-800">
+        <div className="flex items-center justify-between text-sm text-gray-400">
           <span>Página {page + 1} de {totalPages} — {total} registros</span>
           <div className="flex gap-1">
             <Button size="sm" variant="outline" disabled={page === 0} onClick={() => setPage(0)} className="h-7 px-2 text-xs">«</Button>
@@ -663,7 +663,7 @@ export default function MailingCrm() {
       <Dialog open={confirmDedup} onOpenChange={o => !o && setConfirmDedup(false)}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>🔄 Deduplicar CPFs</DialogTitle></DialogHeader>
-          <p className="text-sm text-gray-800">
+          <p className="text-sm text-gray-300">
             Foram encontrados <strong>{contagemDup?.duplicados ?? 0} CPF(s)</strong> com registros duplicados
             ({contagemDup?.registrosAfetados ?? 0} registro(s) serão removidos).
             <br /><br />
@@ -691,7 +691,7 @@ export default function MailingCrm() {
               {confirmLimpeza === 'falecidos' ? '🪦 Remover Falecidos' : '👴 Remover maiores de 78 anos'}
             </DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-800">
+          <p className="text-sm text-gray-300">
             {confirmLimpeza === 'falecidos'
               ? `Isso irá excluir permanentemente ${contagem?.falecidos ?? 0} registro(s) identificados como falecidos (campo NÃO PERTUBE contém indicação de óbito). Esta ação não pode ser desfeita.`
               : `Isso irá excluir permanentemente ${contagem?.acima78 ?? 0} registro(s) com mais de 78 anos calculados pela data de nascimento. Esta ação não pode ser desfeita.`
@@ -717,7 +717,7 @@ export default function MailingCrm() {
       <Dialog open={confirmDel !== null} onOpenChange={o => !o && setConfirmDel(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Confirmar exclusão</DialogTitle></DialogHeader>
-          <p className="text-sm text-gray-800">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-300">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDel(null)}>Cancelar</Button>
             <Button variant="destructive" onClick={() => confirmDel && deletar.mutate({ id: confirmDel })} disabled={deletar.isPending}>
@@ -753,18 +753,18 @@ export default function MailingCrm() {
               return (
                 <div key={n} className="col-span-2 grid grid-cols-2 gap-1">
                   <div>
-                    <label className="text-xs text-gray-800 mb-1 block">DDD {n}</label>
+                    <label className="text-xs text-gray-400 mb-1 block">DDD {n}</label>
                     <Input value={(editRow[`ddd${pad}` as keyof Row] as string) ?? ""} onChange={e => setEditRow(p => ({ ...p, [`ddd${pad}`]: e.target.value }))} className="h-8 text-sm" />
                   </div>
                   <div>
-                    <label className="text-xs text-gray-800 mb-1 block">Telefone {n}</label>
+                    <label className="text-xs text-gray-400 mb-1 block">Telefone {n}</label>
                     <Input value={(editRow[`tel${pad}` as keyof Row] as string) ?? ""} onChange={e => setEditRow(p => ({ ...p, [`tel${pad}`]: e.target.value }))} className="h-8 text-sm" />
                   </div>
                 </div>
               );
             })}
             <div className="col-span-4">
-              <label className="text-xs text-gray-800 mb-1 block">Observação</label>
+              <label className="text-xs text-gray-400 mb-1 block">Observação</label>
               <textarea
                 value={(editRow.observacao as string) ?? ""}
                 onChange={e => setEditRow(p => ({ ...p, observacao: e.target.value }))}

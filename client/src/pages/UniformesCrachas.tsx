@@ -145,7 +145,7 @@ export default function UniformesCrachas() {
       "Devolvido": "bg-blue-100 text-blue-800",
       "Extraviado": "bg-red-100 text-red-800",
     };
-    return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cores[s ?? ""] ?? "bg-gray-100 text-gray-800"}`}>{s ?? "-"}</span>;
+    return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cores[s ?? ""] ?? "bg-gray-100 text-gray-300"}`}>{s ?? "-"}</span>;
   };
 
   // Resumo por tipo
@@ -204,9 +204,9 @@ export default function UniformesCrachas() {
         {/* Tabela */}
         <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-x-auto">
           {isLoading ? (
-            <div className="p-8 text-center text-slate-800">Carregando...</div>
+            <div className="p-8 text-center text-slate-400">Carregando...</div>
           ) : itens.length === 0 ? (
-            <div className="p-8 text-center text-slate-800">Nenhum registro encontrado</div>
+            <div className="p-8 text-center text-slate-400">Nenhum registro encontrado</div>
           ) : (
             <table className="w-full border-collapse">
               <thead>
@@ -231,7 +231,7 @@ export default function UniformesCrachas() {
                             {uploadingId === item.id ? (
                               <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                             ) : (
-                              <Camera className="w-4 h-4 text-slate-800" />
+                              <Camera className="w-4 h-4 text-slate-400" />
                             )}
                           </div>
                         </label>
@@ -296,7 +296,7 @@ export default function UniformesCrachas() {
                   <span className="text-xs text-indigo-600 font-medium">Adicionar foto</span>
                 </label>
               )}
-              <p className="text-xs text-slate-800">Foto do item (máx. 5MB)</p>
+              <p className="text-xs text-slate-400">Foto do item (máx. 5MB)</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -356,7 +356,7 @@ export default function UniformesCrachas() {
       {fotoVisualizando && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setFotoVisualizando(null)}>
           <div className="relative max-w-2xl w-full">
-            <button onClick={() => setFotoVisualizando(null)} className="absolute -top-10 right-0 text-white hover:text-gray-800">
+            <button onClick={() => setFotoVisualizando(null)} className="absolute -top-10 right-0 text-white hover:text-gray-300">
               <X className="w-8 h-8" />
             </button>
             <img src={fotoVisualizando} alt="foto do item" className="w-full rounded-xl shadow-2xl" />

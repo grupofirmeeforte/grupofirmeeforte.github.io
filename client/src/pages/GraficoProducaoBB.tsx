@@ -50,12 +50,12 @@ function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-gray-700 rounded-lg shadow-lg p-3 text-xs max-w-[220px]">
-      <p className="font-bold text-gray-800 mb-2">{label}</p>
+      <p className="font-bold text-gray-200 mb-2">{label}</p>
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center justify-between gap-3 mb-1">
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full inline-block" style={{ background: p.fill || p.color }} />
-            <span className="text-gray-800 truncate max-w-[110px]">{p.name}</span>
+            <span className="text-gray-300 truncate max-w-[110px]">{p.name}</span>
           </span>
           <span className="font-semibold text-white">{fmtK(p.value)}</span>
         </div>
@@ -86,13 +86,13 @@ function GraficoPorChaveJ({ periodo, empresa }: { periodo: Periodo; empresa: str
   // Último período disponível (para exibir nos cards)
   const ultimoLabel = labels[labels.length - 1];
 
-  if (isLoading) return <div className="flex items-center justify-center py-16 text-gray-800">Carregando...</div>;
-  if (!labels.length) return <div className="flex items-center justify-center py-16 text-gray-800">Nenhum dado disponível para o período selecionado.</div>;
+  if (isLoading) return <div className="flex items-center justify-center py-16 text-gray-400">Carregando...</div>;
+  if (!labels.length) return <div className="flex items-center justify-center py-16 text-gray-400">Nenhum dado disponível para o período selecionado.</div>;
 
   return (
     <div>
       {/* Ranking de agentes — valor do último período */}
-      <div className="mb-1 text-xs text-gray-800 text-right pr-1">Valores referentes a: <span className="font-semibold text-gray-800">{ultimoLabel}</span></div>
+      <div className="mb-1 text-xs text-gray-400 text-right pr-1">Valores referentes a: <span className="font-semibold text-gray-300">{ultimoLabel}</span></div>
       <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
         {top10.map((s, i) => {
           const idxUltimo = labels.indexOf(ultimoLabel);
@@ -126,8 +126,8 @@ function GraficoPorTipo({ periodo, empresa }: { periodo: Periodo; empresa: strin
   const { data, isLoading } = trpc.febraban.graficoPorTipo.useQuery({ periodo, empresa: empresa !== "__all__" ? empresa : undefined });
   const chartData = data?.data ?? [];
 
-  if (isLoading) return <div className="flex items-center justify-center py-16 text-gray-800">Carregando...</div>;
-  if (!chartData.length) return <div className="flex items-center justify-center py-16 text-gray-800">Nenhum dado disponível para o período selecionado.</div>;
+  if (isLoading) return <div className="flex items-center justify-center py-16 text-gray-400">Carregando...</div>;
+  if (!chartData.length) return <div className="flex items-center justify-center py-16 text-gray-400">Nenhum dado disponível para o período selecionado.</div>;
 
   // Totais por tipo
   const totalNovo = chartData.reduce((s, r) => s + r.novo, 0);
@@ -170,7 +170,7 @@ function GraficoPorTipo({ periodo, empresa }: { periodo: Periodo; empresa: strin
 
       {/* Linha de evolução do total */}
       <div className="mt-6">
-        <p className="text-xs font-semibold text-gray-800 uppercase tracking-wide mb-2">Evolução do Volume Total (Valor Líquido)</p>
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Evolução do Volume Total (Valor Líquido)</p>
         <ResponsiveContainer width="100%" height={180}>
           <LineChart data={chartData} margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

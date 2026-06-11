@@ -153,7 +153,7 @@ export default function CaixaRecados() {
                   <Send className="w-4 h-4 text-blue-600" />
                   Novo Recado
                 </CardTitle>
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-gray-400">
                   {isPromotor
                     ? "Envie uma mensagem para a equipe de gestão."
                     : "Envie uma mensagem para a gestão ou para um promotor específico."}
@@ -164,7 +164,7 @@ export default function CaixaRecados() {
                 {/* Seletor de tipo de destinatário — apenas para gestão */}
                 {euSouGestao && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-800 mb-1.5">Tipo de Destinatário</label>
+                    <label className="block text-sm font-medium text-gray-200 mb-1.5">Tipo de Destinatário</label>
                     <div className="flex gap-2">
                       <button
                         type="button"
@@ -172,7 +172,7 @@ export default function CaixaRecados() {
                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg border text-sm font-medium transition-all ${
                           tipoDestinatario === "cargo"
                             ? "bg-blue-900/20 border-blue-400 text-blue-700"
-                            : "bg-white border-gray-700 text-gray-800 hover:border-gray-300"
+                            : "bg-white border-gray-700 text-gray-400 hover:border-gray-300"
                         }`}
                       >
                         <Crown className="w-4 h-4" />
@@ -184,7 +184,7 @@ export default function CaixaRecados() {
                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg border text-sm font-medium transition-all ${
                           tipoDestinatario === "promotor"
                             ? "bg-orange-50 border-orange-400 text-orange-700"
-                            : "bg-white border-gray-700 text-gray-800 hover:border-gray-300"
+                            : "bg-white border-gray-700 text-gray-400 hover:border-gray-300"
                         }`}
                       >
                         <Users className="w-4 h-4" />
@@ -196,7 +196,7 @@ export default function CaixaRecados() {
 
                 {/* Seletor de destinatário — botões visuais (sem z-index issues) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-1.5">Destinatário *</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Destinatário *</label>
                   {tipoDestinatario === "cargo" || isPromotor ? (
                     <div className="grid grid-cols-2 gap-2">
                       {DESTINATARIOS_CARGO.map(d => {
@@ -208,7 +208,7 @@ export default function CaixaRecados() {
                             type="button"
                             onClick={() => setDestinatarioCargo(d.value)}
                             className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all text-left ${
-                              sel ? d.color + " shadow-sm" : "bg-white border-gray-700 text-gray-800 hover:border-gray-300"
+                              sel ? d.color + " shadow-sm" : "bg-white border-gray-700 text-gray-400 hover:border-gray-300"
                             }`}
                           >
                             <Icon className="w-4 h-4 shrink-0" />
@@ -221,11 +221,11 @@ export default function CaixaRecados() {
                   ) : (
                     <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                       {promotoresQuery.isLoading ? (
-                        <div className="flex items-center gap-2 text-sm text-gray-800 py-3">
+                        <div className="flex items-center gap-2 text-sm text-gray-400 py-3">
                           <RefreshCw className="w-4 h-4 animate-spin" /> Carregando promotores...
                         </div>
                       ) : !promotoresQuery.data?.length ? (
-                        <p className="text-sm text-gray-800 py-3">Nenhum promotor ativo encontrado.</p>
+                        <p className="text-sm text-gray-400 py-3">Nenhum promotor ativo encontrado.</p>
                       ) : (
                         promotoresQuery.data.map(p => {
                           const sel = destinatarioPromotorId === String(p.id);
@@ -237,7 +237,7 @@ export default function CaixaRecados() {
                               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all text-left ${
                                 sel
                                   ? "bg-orange-50 border-orange-400 text-orange-700 shadow-sm"
-                                  : "bg-white border-gray-700 text-gray-800 hover:border-gray-300"
+                                  : "bg-white border-gray-700 text-gray-300 hover:border-gray-300"
                               }`}
                             >
                               <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0 text-sm font-bold text-orange-600">
@@ -245,7 +245,7 @@ export default function CaixaRecados() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-semibold truncate">{p.nomeAgente}</p>
-                                <p className="text-xs text-gray-800 font-mono">{p.chaveJ}</p>
+                                <p className="text-xs text-gray-400 font-mono">{p.chaveJ}</p>
                               </div>
                               {sel && <CheckCheck className="w-4 h-4 text-orange-500 shrink-0" />}
                             </button>
@@ -257,7 +257,7 @@ export default function CaixaRecados() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-1.5">Assunto (opcional)</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Assunto (opcional)</label>
                   <Input
                     value={assunto}
                     onChange={(e) => setAssunto(e.target.value)}
@@ -267,7 +267,7 @@ export default function CaixaRecados() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-800 mb-1.5">Mensagem *</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Mensagem *</label>
                   <Textarea
                     value={mensagem}
                     onChange={(e) => setMensagem(e.target.value)}
@@ -276,7 +276,7 @@ export default function CaixaRecados() {
                     maxLength={2000}
                     className="resize-none"
                   />
-                  <p className="text-xs text-gray-800 mt-1 text-right">{mensagem.length}/2000</p>
+                  <p className="text-xs text-gray-400 mt-1 text-right">{mensagem.length}/2000</p>
                 </div>
 
                 <Button
@@ -354,12 +354,12 @@ export default function CaixaRecados() {
               </CardHeader>
               <CardContent>
                 {recadosQuery.isLoading ? (
-                  <div className="flex items-center justify-center py-12 text-gray-800">
+                  <div className="flex items-center justify-center py-12 text-gray-400">
                     <RefreshCw className="w-5 h-5 animate-spin mr-2" />
                     Carregando recados...
                   </div>
                 ) : !recadosQuery.data?.length ? (
-                  <div className="text-center py-12 text-gray-800">
+                  <div className="text-center py-12 text-gray-400">
                     <Inbox className="w-10 h-10 mx-auto mb-3 opacity-40" />
                     <p className="text-sm">Nenhum recado encontrado.</p>
                   </div>
@@ -387,18 +387,18 @@ export default function CaixaRecados() {
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className="font-semibold text-sm text-gray-900">{recado.remetenteNome}</span>
                                   {recado.remetenteChaveJ && (
-                                    <span className="text-xs text-gray-800 font-mono">{recado.remetenteChaveJ}</span>
+                                    <span className="text-xs text-gray-400 font-mono">{recado.remetenteChaveJ}</span>
                                   )}
                                   {!recado.lido && (
                                     <span className="w-2 h-2 rounded-full bg-blue-900/200 inline-block" title="Não lido" />
                                   )}
                                 </div>
                                 {recado.assunto && (
-                                  <p className="text-sm font-medium text-gray-800 mt-0.5">{recado.assunto}</p>
+                                  <p className="text-sm font-medium text-gray-200 mt-0.5">{recado.assunto}</p>
                                 )}
-                                <p className="text-sm text-gray-800 mt-1 whitespace-pre-wrap break-words">{recado.mensagem}</p>
+                                <p className="text-sm text-gray-300 mt-1 whitespace-pre-wrap break-words">{recado.mensagem}</p>
                                 <div className="flex items-center gap-3 mt-2 flex-wrap">
-                                  <span className="flex items-center gap-1 text-xs text-gray-800">
+                                  <span className="flex items-center gap-1 text-xs text-gray-400">
                                     <Clock className="w-3 h-3" />
                                     {formatDate(recado.createdAt)}
                                   </span>
@@ -409,7 +409,7 @@ export default function CaixaRecados() {
                                     </span>
                                   )}
                                   {recado.lido && recado.lidoEm && (
-                                    <span className="flex items-center gap-1 text-xs text-gray-800">
+                                    <span className="flex items-center gap-1 text-xs text-gray-400">
                                       <CheckCheck className="w-3 h-3 text-green-500" />
                                       Lido em {formatDate(recado.lidoEm)}
                                       {recado.lidoPor ? ` por ${recado.lidoPor}` : ""}
