@@ -117,7 +117,7 @@ function extrairDadosContrato(texto: string) {
 
   // Operador
   const nomeOperador = campo(/\bOperador\b\s*\n([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÀÈÌÒÙÄËÏÖÜ][^\n]+)/i);
-  const chaveJOperador = campo(/\bChave\b\s*\n([A-Z]\d+)/i);
+  const chaveJOperador = campo(/\bChave\b\s*\n([A-Z]{1,2}\d+)/i);
 
   // Agência e Conta do cliente (seção 2 - Dados do Cliente)
   // Aceita variações de codificação do acento: Agência, Agencia, Agência
