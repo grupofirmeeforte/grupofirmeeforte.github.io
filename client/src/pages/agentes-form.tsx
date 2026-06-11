@@ -437,7 +437,7 @@ export default function AgentesFormPage() {
                     <button
                       type="button"
                       onClick={() => setMostrarSenha(v => !v)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-900 hover:text-gray-600"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                       tabIndex={-1}
                     >
                       {mostrarSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -774,7 +774,7 @@ export default function AgentesFormPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {/* Favorecido: checkbox próprio + campo condicional */}
               <div className="col-span-1 md:col-span-3">
-                <Label className="text-sm font-medium text-gray-900">Favorecido</Label>
+                <Label className="text-sm font-medium text-gray-700">Favorecido</Label>
                 <div className="mt-2 flex items-center gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50">
                   <input
                     type="checkbox"
@@ -787,7 +787,7 @@ export default function AgentesFormPage() {
                     }))}
                     className="w-4 h-4 accent-blue-600 cursor-pointer"
                   />
-                  <label htmlFor="favProprio" className="text-sm text-gray-900 cursor-pointer select-none">
+                  <label htmlFor="favProprio" className="text-sm text-gray-700 cursor-pointer select-none">
                     Favorecido é o próprio agente
                   </label>
                 </div>
@@ -872,7 +872,7 @@ export default function AgentesFormPage() {
             <CardContent className="space-y-4">
               {/* Nível geral */}
               <div className="flex items-center gap-4 pb-4 border-b border-indigo-200">
-                <Label className="w-40 font-semibold text-slate-900">Nível Geral</Label>
+                <Label className="w-40 font-semibold text-slate-700">Nível Geral</Label>
                 <Select value={formData.permissoes} onValueChange={(v) => setFormData(prev => ({ ...prev, permissoes: v }))}>
                   <SelectTrigger className="w-48">
                     <SelectValue />
@@ -884,13 +884,13 @@ export default function AgentesFormPage() {
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
-                <span className="text-xs text-slate-900">Usado como padrão quando não há permissão específica por sub-aba</span>
+                <span className="text-xs text-slate-400">Usado como padrão quando não há permissão específica por sub-aba</span>
               </div>
 
               {/* Permissões por módulo e sub-aba */}
               {MODULOS_PERMISSOES.map(({ modulo, label, subabas }) => (
                 <div key={modulo} className="border border-slate-200 rounded-lg overflow-hidden">
-                  <div className="bg-slate-100 px-4 py-2 font-semibold text-slate-900 text-sm">{label}</div>
+                  <div className="bg-slate-100 px-4 py-2 font-semibold text-slate-700 text-sm">{label}</div>
                   <div className="divide-y divide-slate-100">
                     {subabas.map(({ key, label: subLabel }) => {
                       const nivel = (permissoesModulos[modulo]?.[key] ?? 'sem_acesso') as NivelPermissao;
@@ -909,7 +909,7 @@ export default function AgentesFormPage() {
                                 className={`px-3 py-1 rounded-full border text-xs font-medium transition-all ${
                                   nivel === n.value
                                     ? n.color + ' ring-2 ring-offset-1 ring-current'
-                                    : 'bg-white text-slate-900 border-slate-200 hover:border-slate-400'
+                                    : 'bg-white text-slate-400 border-slate-200 hover:border-slate-400'
                                 }`}
                               >
                                 {n.label}

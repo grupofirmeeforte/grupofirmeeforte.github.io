@@ -204,9 +204,9 @@ export default function UniformesCrachas() {
         {/* Tabela */}
         <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-x-auto">
           {isLoading ? (
-            <div className="p-8 text-center text-slate-900">Carregando...</div>
+            <div className="p-8 text-center text-slate-400">Carregando...</div>
           ) : itens.length === 0 ? (
-            <div className="p-8 text-center text-slate-900">Nenhum registro encontrado</div>
+            <div className="p-8 text-center text-slate-400">Nenhum registro encontrado</div>
           ) : (
             <table className="w-full border-collapse">
               <thead>
@@ -231,7 +231,7 @@ export default function UniformesCrachas() {
                             {uploadingId === item.id ? (
                               <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                             ) : (
-                              <Camera className="w-4 h-4 text-slate-900" />
+                              <Camera className="w-4 h-4 text-slate-400" />
                             )}
                           </div>
                         </label>
@@ -296,7 +296,7 @@ export default function UniformesCrachas() {
                   <span className="text-xs text-indigo-600 font-medium">Adicionar foto</span>
                 </label>
               )}
-              <p className="text-xs text-slate-900">Foto do item (máx. 5MB)</p>
+              <p className="text-xs text-slate-400">Foto do item (máx. 5MB)</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

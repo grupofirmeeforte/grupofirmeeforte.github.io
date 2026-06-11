@@ -405,7 +405,7 @@ export default function TabelaComissao() {
   };
 
   function getConvenioColor(convenio: string | null) {
-    if (!convenio) return { row: 'bg-white hover:bg-gray-800', badge: 'bg-gray-100 text-gray-900 border border-gray-300' };
+    if (!convenio) return { row: 'bg-white hover:bg-gray-800', badge: 'bg-gray-100 text-gray-200 border border-gray-300' };
     const upper = convenio.toUpperCase();
     for (const [key, val] of Object.entries(CONVENIO_COLORS)) {
       if (upper.includes(key)) return val;
@@ -619,7 +619,7 @@ export default function TabelaComissao() {
           </Button>
         </div>
       } />
-      <div className="px-6 py-1 text-xs text-gray-900">{filteredRows.length} registros</div>
+      <div className="px-6 py-1 text-xs text-gray-400">{filteredRows.length} registros</div>
 
       {/* Valores para Cálculo por Nível - Compacto — só para admin/CEO */}
       {isAdminOuCeo && <div className="px-4 py-2 bg-gray-900 border-b border-gray-700">
@@ -669,7 +669,7 @@ export default function TabelaComissao() {
       <div className="px-6 py-4 bg-gray-900 border-b border-gray-700">
         <div className="flex flex-wrap gap-3 items-center">
           <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-            <Search className="w-4 h-4 text-gray-900" />
+            <Search className="w-4 h-4 text-gray-400" />
             <Input
               placeholder="Buscar por empresa, convênio, juros..."
               value={busca}
@@ -677,7 +677,7 @@ export default function TabelaComissao() {
               className="max-w-xs"
             />
             {busca && (
-              <button onClick={() => setBusca('')} className="text-gray-900 hover:text-gray-300">
+              <button onClick={() => setBusca('')} className="text-gray-400 hover:text-gray-300">
                 <X className="w-4 h-4" />
               </button>
             )}
@@ -729,7 +729,7 @@ export default function TabelaComissao() {
                 <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-gray-700 rounded-xl shadow-xl p-3 w-52">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold text-gray-300 uppercase tracking-wide">Ativos visíveis</span>
-                    <button onClick={() => setShowColSelector(false)} className="text-gray-900 hover:text-gray-300">
+                    <button onClick={() => setShowColSelector(false)} className="text-gray-400 hover:text-gray-300">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -742,7 +742,7 @@ export default function TabelaComissao() {
                           onChange={() => toggleCol(col)}
                           className="accent-blue-600"
                         />
-                        <span className="text-sm text-gray-900">Ativo {String(i + 1).padStart(2, '0')}</span>
+                        <span className="text-sm text-gray-200">Ativo {String(i + 1).padStart(2, '0')}</span>
                       </label>
                     ))}
                   </div>
@@ -830,16 +830,16 @@ export default function TabelaComissao() {
               </thead>
               <tbody>
                 {isLoading ? (
-                  <tr><td colSpan={isAdminOuCeo ? 13 : ativoAgente ? 4 : 2} className="text-center py-8 text-gray-900">Carregando...</td></tr>
+                  <tr><td colSpan={isAdminOuCeo ? 13 : ativoAgente ? 4 : 2} className="text-center py-8 text-gray-400">Carregando...</td></tr>
                 ) : filteredRows.length === 0 ? (
-                  <tr><td colSpan={isAdminOuCeo ? 13 : ativoAgente ? 4 : 2} className="text-center py-8 text-gray-900">Nenhum registro encontrado</td></tr>
+                  <tr><td colSpan={isAdminOuCeo ? 13 : ativoAgente ? 4 : 2} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
                 ) : (
                   filteredRows.map((row, rowIdx) => {
                     const convColor = getConvenioColor(row.convenio);
                     return (
                       <tr key={row.id} className={`${convColor.row} transition-colors`}>
                         {/* Número de linha */}
-                        <td className="px-2 py-2 text-center text-xs text-gray-900 font-mono w-8 select-none">{rowIdx + 1}</td>
+                        <td className="px-2 py-2 text-center text-xs text-gray-400 font-mono w-8 select-none">{rowIdx + 1}</td>
                         {/* Coluna Convênio: Empresa · Código + badge */}
                         <td className="px-3 py-2" style={{width:'220px',maxWidth:'220px'}}>
                           <div className="flex items-center gap-1 text-xs mb-0.5">
@@ -872,7 +872,7 @@ export default function TabelaComissao() {
                                 );
                               })()
                             )}
-                            {(row as any).codigo && <span className="text-gray-900">· {(row as any).codigo}</span>}
+                            {(row as any).codigo && <span className="text-gray-400">· {(row as any).codigo}</span>}
                           </div>
                           <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${convColor.badge} max-w-full overflow-hidden`} style={{display:'block',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',maxWidth:'200px'}} title={row.convenio || '-'}>
                             {row.convenio || '-'}
@@ -918,7 +918,7 @@ export default function TabelaComissao() {
                                   </div>
                                 )}
                                 {ativos.length === 0 ? (
-                                  <span className="text-gray-900 text-xs">-</span>
+                                  <span className="text-gray-400 text-xs">-</span>
                                 ) : (
                                   <div className="grid gap-x-2 gap-y-0" style={{gridTemplateColumns:'repeat(2, minmax(0, 1fr))'}}>
                                     {ativos.map((a: any) => (
@@ -927,7 +927,7 @@ export default function TabelaComissao() {
                                         className="text-xs whitespace-nowrap"
                                         title={a.excede ? `⚠️ ${a.label} (${a.value}) é maior que o que você recebe!` : ''}
                                       >
-                                        <span className="text-gray-900">{a.label}:</span>
+                                        <span className="text-gray-400">{a.label}:</span>
                                         <span className={`font-medium ml-0.5 ${a.excede ? 'text-red-700 font-bold underline decoration-red-500' : 'text-red-600'}`}>{a.value}</span>
                                       </span>
                                     ))}
@@ -941,11 +941,11 @@ export default function TabelaComissao() {
                         <td className="px-3 py-2 whitespace-nowrap">
                           {/* Juros */}
                           <div className="flex items-center gap-1 mb-0.5">
-                            <span className="text-gray-900 text-xs">Juros:</span>
+                            <span className="text-gray-400 text-xs">Juros:</span>
                             {isAdminOuCeo ? (
                               <span className="inline-flex items-center gap-1 text-sm font-bold text-emerald-600">
                                 <EditableCell value={row.txJurosDe} onSave={(v) => handleCellSave(row.id, 'txJurosDe', v)} isSaving={savingCell === `${row.id}-txJurosDe`} format="percent" />
-                                <span className="text-gray-900 font-normal text-xs">→</span>
+                                <span className="text-gray-400 font-normal text-xs">→</span>
                                 <EditableCell value={row.txJurosAte} onSave={(v) => handleCellSave(row.id, 'txJurosAte', v)} isSaving={savingCell === `${row.id}-txJurosAte`} format="percent" />
                               </span>
                             ) : (
@@ -954,7 +954,7 @@ export default function TabelaComissao() {
                           </div>
                           {/* Valor Mínimo */}
                           <div className="flex items-center gap-1 mb-0.5">
-                            <span className="text-gray-900 text-xs">Mín:</span>
+                            <span className="text-gray-400 text-xs">Mín:</span>
                             {isAdminOuCeo ? (
                               <span className="text-xs text-gray-300">
                                 <EditableCell value={row.valorMinimo} onSave={(v) => handleCellSave(row.id, 'valorMinimo', v)} isSaving={savingCell === `${row.id}-valorMinimo`} />
@@ -965,11 +965,11 @@ export default function TabelaComissao() {
                           </div>
                           {/* Prazo */}
                           <div className="flex items-center gap-1">
-                            <span className="text-gray-900 text-xs">Prazo:</span>
+                            <span className="text-gray-400 text-xs">Prazo:</span>
                             {isAdminOuCeo ? (
                               <span className="inline-flex items-center gap-1 text-sm font-bold text-blue-600">
                                 <EditableCell value={row.mesesDe} onSave={(v) => handleCellSave(row.id, 'mesesDe', v)} isSaving={savingCell === `${row.id}-mesesDe`} />
-                                <span className="text-gray-900 font-normal text-xs">→</span>
+                                <span className="text-gray-400 font-normal text-xs">→</span>
                                 <EditableCell value={row.mesesAte} onSave={(v) => handleCellSave(row.id, 'mesesAte', v)} isSaving={savingCell === `${row.id}-mesesAte`} />
                               </span>
                             ) : (
@@ -1033,44 +1033,44 @@ export default function TabelaComissao() {
 
           <div className="grid grid-cols-2 gap-4 py-2">
              <div>
-              <label className="text-sm font-medium text-gray-900 mb-1 block">Empresa</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Empresa</label>
               <Input value={form.empresa || ''} onChange={e => setField('empresa', e.target.value)} placeholder="BMF, FLEX..." />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-900 mb-1 block">Código <span className="text-gray-900 text-xs">(até 5 códigos separados por /)</span></label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Código <span className="text-gray-400 text-xs">(até 5 códigos separados por /)</span></label>
               <Input value={form.codigo || ''} onChange={e => setField('codigo', e.target.value.slice(0,24))} placeholder="2880/2881/2882" maxLength={24} />
             </div>
             <div className="col-span-2">
-              <label className="text-sm font-medium text-gray-900 mb-1 block">Convênio</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Convênio</label>
               <Input value={form.convenio || ''} onChange={e => setField('convenio', e.target.value)} placeholder="CONSIGNADO INSS, FEDERAL..." />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-900 mb-1 block">Tx Juros De</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Tx Juros De</label>
               <Input value={form.txJurosDe || ''} onChange={e => setField('txJurosDe', e.target.value)} placeholder="0.0185" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-900 mb-1 block">Tx Juros Até</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Tx Juros Até</label>
               <Input value={form.txJurosAte || ''} onChange={e => setField('txJurosAte', e.target.value)} placeholder="acima ou 0.0199" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-900 mb-1 block">Valor Mínimo</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Valor Mínimo</label>
               <Input value={form.valorMinimo || ''} onChange={e => setField('valorMinimo', e.target.value)} placeholder=">=$1.000,00" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-900 mb-1 block">Meses De</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Meses De</label>
               <Input value={form.mesesDe || ''} onChange={e => setField('mesesDe', e.target.value)} placeholder="48" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-900 mb-1 block">Meses Até</label>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Meses Até</label>
               <Input value={form.mesesAte || ''} onChange={e => setField('mesesAte', e.target.value)} placeholder="60" />
             </div>
 
             <div className="col-span-2">
-              <label className="text-sm font-medium text-gray-900 mb-2 block">Valores dos Ativos</label>
+              <label className="text-sm font-medium text-gray-200 mb-2 block">Valores dos Ativos</label>
               <div className="grid grid-cols-5 gap-2">
                 {['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10', 'ativo11', 'ativo12', 'ativo13', 'ativo14', 'ativo15', 'ativo16', 'ativo17', 'ativo18', 'ativo19', 'ativo20'].map((key) => (
                   <div key={key}>

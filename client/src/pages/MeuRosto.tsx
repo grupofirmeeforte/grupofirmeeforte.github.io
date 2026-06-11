@@ -137,10 +137,10 @@ export default function MeuRosto() {
             ) : (
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                  <Camera className="w-6 h-6 text-gray-900" />
+                  <Camera className="w-6 h-6 text-gray-400" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Nenhum rosto cadastrado</p>
+                  <p className="font-medium text-gray-700">Nenhum rosto cadastrado</p>
                   <p className="text-sm text-gray-500">Cadastre seu rosto para ativar o login facial</p>
                 </div>
               </div>
@@ -167,7 +167,7 @@ export default function MeuRosto() {
 
               {!cameraAtiva && estado !== "processando" && estado !== "sucesso" && estado !== "erro" && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-gray-800 to-gray-900">
-                  <Camera className="w-16 h-16 text-gray-900" />
+                  <Camera className="w-16 h-16 text-gray-400" />
                   <p className="text-gray-300 text-sm text-center px-4">
                     Clique em "Abrir Câmera" para começar
                   </p>

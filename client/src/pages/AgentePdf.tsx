@@ -71,7 +71,7 @@ export default function AgentePdf() {
               {ag.numCadastro && <span>Cadastro: <strong>{ag.numCadastro}</strong></span>}
             </div>
           </div>
-          <div className="text-right text-xs text-gray-900">
+          <div className="text-right text-xs text-gray-400">
             <div>Emitido em: {new Date().toLocaleDateString('pt-BR')}</div>
             {ag.situacao && (
               <div className={`mt-1 inline-block px-2 py-0.5 rounded text-xs font-semibold ${
@@ -125,7 +125,7 @@ export default function AgentePdf() {
         </Secao>
 
         {/* Rodapé */}
-        <div className="mt-8 pt-4 border-t border-gray-200 text-xs text-gray-900 text-center">
+        <div className="mt-8 pt-4 border-t border-gray-200 text-xs text-gray-400 text-center">
           Documento gerado pelo Sistema de Gestão — Grupo Firme &amp; Forte · {new Date().toLocaleString('pt-BR')}
         </div>
       </div>

@@ -61,7 +61,7 @@ export default function MensagemSalmos() {
               <h2 className="text-3xl font-bold text-amber-700">Salmo {salmo.numero}</h2>
               <p className="text-slate-500 font-medium mt-1">{salmo.titulo}</p>
             </div>
-            <blockquote className="text-lg font-serif text-slate-900 leading-relaxed italic text-center border-l-4 border-amber-400 pl-6 py-2">
+            <blockquote className="text-lg font-serif text-slate-700 leading-relaxed italic text-center border-l-4 border-amber-400 pl-6 py-2">
               {salmo.texto}
             </blockquote>
             <div className="mt-8 flex justify-center">
@@ -82,7 +82,7 @@ export default function MensagemSalmos() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-slate-900 text-xs mt-6">
+        <p className="text-center text-slate-400 text-xs mt-6">
           O salmo muda automaticamente a cada novo dia
         </p>
       </div>

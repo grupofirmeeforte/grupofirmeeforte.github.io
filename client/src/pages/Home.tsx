@@ -405,7 +405,7 @@ export default function Home() {
                           );
                         })
                       ) : (
-                        <span className="text-xs text-slate-900 italic">Em breve...</span>
+                        <span className="text-xs text-slate-400 italic">Em breve...</span>
                       )}
                     </div>
                   </div>
@@ -446,7 +446,7 @@ export default function Home() {
                         <div className="space-y-0.5 max-h-20 overflow-y-auto">
                           {certListas.vencidas.map((a, i) => (
                             <div key={i} className="flex items-center justify-between text-xs">
-                              <span className="text-slate-900 truncate max-w-[100px]">{a.nome}</span>
+                              <span className="text-slate-700 truncate max-w-[100px]">{a.nome}</span>
                               <span className="text-red-500 font-medium ml-1 shrink-0">{a.tipo}</span>
                             </div>
                           ))}
@@ -459,7 +459,7 @@ export default function Home() {
                         <div className="space-y-0.5 max-h-20 overflow-y-auto">
                           {certListas.aVencer.map((a, i) => (
                             <div key={i} className="flex items-center justify-between text-xs">
-                              <span className="text-slate-900 truncate max-w-[90px]">{a.nome}</span>
+                              <span className="text-slate-700 truncate max-w-[90px]">{a.nome}</span>
                               <span className="text-amber-600 font-medium ml-1 shrink-0">{a.tipo}·{a.dias}d</span>
                             </div>
                           ))}
@@ -543,7 +543,7 @@ export default function Home() {
                   : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
                 .filter(m => !m.ceoOnly || isCEO);
               if (subsVisiveis.length === 0) return (
-                <div className="text-center py-8 text-slate-900">
+                <div className="text-center py-8 text-slate-400">
                   <p className="text-lg font-medium">Em breve</p>
                   <p className="text-sm mt-1">Este módulo está em desenvolvimento.</p>
                 </div>

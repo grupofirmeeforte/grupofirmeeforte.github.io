@@ -69,7 +69,7 @@ function maskMesAno(value: string): string {
 function FormField({ label, value, onChange, placeholder, isMesAno }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string; isMesAno?: boolean }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <label className="text-[10px] text-gray-900 font-medium">{label}</label>
+      <label className="text-[10px] text-gray-400 font-medium">{label}</label>
       <input
         type="text"
         value={value}
@@ -252,7 +252,7 @@ export default function DespesasFixasPage() {
   const totalValor = rows.reduce((acc, r) => acc + (r.valor ? parseFloat(r.valor) : 0), 0);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-900">
+    <div className="min-h-screen bg-gray-950 text-gray-100">
       <PageHeader title="Despesas Fixas" actions={
         <div className="flex gap-1.5 items-center">
           <Button onClick={abrirNovo} size="sm" className="bg-purple-700 hover:bg-purple-600 text-white text-[10px] h-6 px-2">+ Novo</Button>
@@ -267,28 +267,28 @@ export default function DespesasFixasPage() {
       <div className="bg-gray-900 border-b border-gray-800 px-3 py-2">
         <div className="flex flex-wrap gap-2">
           <div>
-            <label className="text-[10px] text-gray-900 block mb-0.5">Mês/Ano</label>
+            <label className="text-[10px] text-gray-400 block mb-0.5">Mês/Ano</label>
             <select value={filtroMesAno} onChange={e => { setFiltroMesAno(e.target.value); setPage(1); }} className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-28">
               <option value="">Todos</option>
               {meses.map(m => <option key={m} value={m}>{m}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-[10px] text-gray-900 block mb-0.5">Empresa</label>
+            <label className="text-[10px] text-gray-400 block mb-0.5">Empresa</label>
             <select value={filtroEmpresa} onChange={e => { setFiltroEmpresa(e.target.value); setPage(1); }} className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-24">
               <option value="">Todas</option>
               {empresas.map(e => <option key={e} value={e}>{e}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-[10px] text-gray-900 block mb-0.5">Tipo Pagto</label>
+            <label className="text-[10px] text-gray-400 block mb-0.5">Tipo Pagto</label>
             <select value={filtroTipo} onChange={e => { setFiltroTipo(e.target.value); setPage(1); }} className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-32">
               <option value="">Todos</option>
               {TIPOS_PAGTO.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-[10px] text-gray-900 block mb-0.5">Nome</label>
+            <label className="text-[10px] text-gray-400 block mb-0.5">Nome</label>
             <input type="text" value={filtroNome} onChange={e => { setFiltroNome(e.target.value); setPage(1); }} placeholder="Nome..." className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-1.5 py-1 w-36" />
           </div>
         </div>
@@ -298,7 +298,7 @@ export default function DespesasFixasPage() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 py-2 bg-gray-900 border-b border-gray-800">
           <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Anterior</Button>
-          <span className="text-[10px] text-gray-900">Pág. {page} / {totalPages}</span>
+          <span className="text-[10px] text-gray-400">Pág. {page} / {totalPages}</span>
           <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Próxima</Button>
         </div>
       )}
@@ -318,7 +318,7 @@ export default function DespesasFixasPage() {
           </thead>
           <tbody>
             {rows.length === 0 ? (
-              <tr><td colSpan={5} className="text-center py-10 text-gray-900">Nenhum registro encontrado.</td></tr>
+              <tr><td colSpan={5} className="text-center py-10 text-gray-400">Nenhum registro encontrado.</td></tr>
             ) : rows.map((row, i) => {
               const sel = selecionados.has(row.id);
               return (
@@ -331,24 +331,24 @@ export default function DespesasFixasPage() {
                     <div className="flex items-center gap-1.5 mb-0.5">
                       {row.chaveResp && <span className="font-mono text-[10px] text-purple-300 font-semibold">{row.chaveResp}</span>}
                       {row.tipoPagto && <span className="text-[9px] px-1 py-0.5 rounded bg-purple-900/50 text-purple-300 border border-purple-700">{row.tipoPagto}</span>}
-                      {row.mesAno && <span className="text-[9px] text-gray-900">{row.mesAno}</span>}
+                      {row.mesAno && <span className="text-[9px] text-gray-400">{row.mesAno}</span>}
                     </div>
                     <div className="text-[11px] text-white font-medium truncate max-w-[200px]" title={row.nome ?? ""}>{row.nome || "-"}</div>
-                    <div className="text-[10px] text-gray-900">{row.empresa || ""}{row.cidadeUF ? ` · ${row.cidadeUF}` : ""}</div>
+                    <div className="text-[10px] text-gray-400">{row.empresa || ""}{row.cidadeUF ? ` · ${row.cidadeUF}` : ""}</div>
                   </td>
                   {/* Coluna Dados Bancários */}
                   <td className="px-2 py-1.5 whitespace-nowrap text-[10px]">
                     <div className="text-gray-300">
                       {row.banco || "-"}{row.agencia ? ` · Ag ${row.agencia}` : ""}{row.conta ? ` · ${row.tipoConta === 'Conta Poupança' ? 'Cp' : 'Cc'} ${row.conta}` : ""}
-                      {row.tipoConta && <span className="ml-1 text-gray-900">({row.tipoConta})</span>}
+                      {row.tipoConta && <span className="ml-1 text-gray-400">({row.tipoConta})</span>}
                     </div>
-                    {row.cpfCnpj && <div className="text-gray-900 font-mono">{row.cpfCnpj}</div>}
+                    {row.cpfCnpj && <div className="text-gray-400 font-mono">{row.cpfCnpj}</div>}
                     {row.pix && <div className="text-blue-400 truncate max-w-[180px]" title={row.pix}>PIX: {row.pix}</div>}
                   </td>
                   {/* Coluna Pagamento */}
                   <td className="px-2 py-1.5 text-right whitespace-nowrap">
                     <div className="font-bold text-green-400 text-sm">{formatCurrency(row.valor)}</div>
-                    <div className="text-[10px] text-gray-900">Vence: {row.dataVencer || "-"}</div>
+                    <div className="text-[10px] text-gray-400">Vence: {row.dataVencer || "-"}</div>
                   </td>
                   <td className="px-1.5 py-1 text-center whitespace-nowrap">
                     <div className="flex gap-1 justify-center">
@@ -369,7 +369,7 @@ export default function DespesasFixasPage() {
           {rows.length > 0 && (
             <tfoot>
               <tr className="bg-gray-800 font-semibold border-t-2 border-purple-600">
-                <td colSpan={2} className="px-2 py-1.5 text-right text-[10px] text-gray-900">Total:</td>
+                <td colSpan={2} className="px-2 py-1.5 text-right text-[10px] text-gray-400">Total:</td>
                 <td className="px-2 py-1.5 text-right text-green-400 font-bold">{totalValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                 <td></td>
               </tr>
@@ -382,7 +382,7 @@ export default function DespesasFixasPage() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 py-3 bg-gray-900 border-t border-gray-800">
           <Button size="sm" variant="outline" disabled={page === 1} onClick={() => setPage(p => p - 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Anterior</Button>
-          <span className="text-[10px] text-gray-900">Pág. {page} / {totalPages}</span>
+          <span className="text-[10px] text-gray-400">Pág. {page} / {totalPages}</span>
           <Button size="sm" variant="outline" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} className="h-6 px-2 text-[10px] bg-gray-800 border-gray-700 text-gray-300">Próxima</Button>
         </div>
       )}
@@ -393,12 +393,12 @@ export default function DespesasFixasPage() {
           <div className="bg-gray-900 border border-gray-700 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
               <h2 className="text-sm font-bold text-white">{modal.modo === "novo" ? "Nova Despesa Fixa" : "Editar Despesa Fixa"}</h2>
-              <button onClick={() => setModal(m => ({ ...m, open: false }))} className="text-gray-900 hover:text-white text-lg leading-none">×</button>
+              <button onClick={() => setModal(m => ({ ...m, open: false }))} className="text-gray-400 hover:text-white text-lg leading-none">×</button>
             </div>
             <div className="p-4 grid grid-cols-2 gap-3">
               <FormField label="Mês Ano" value={modal.dados.mesAno ?? ""} onChange={v => setField("mesAno", v)} placeholder="MM/AAAA" isMesAno />
               <div className="flex flex-col gap-0.5">
-                <label className="text-[10px] text-gray-900 font-medium">Tipo Pagto</label>
+                <label className="text-[10px] text-gray-400 font-medium">Tipo Pagto</label>
                 <select
                   value={modal.dados.tipoPagto ?? ""}
                   onChange={e => setField("tipoPagto", e.target.value)}
@@ -411,12 +411,12 @@ export default function DespesasFixasPage() {
               <FormField label="Cidade/UF" value={modal.dados.cidadeUF ?? ""} onChange={v => { setField("cidadeUF", v); if (v) setField("chaveResp", v); }} />
               <FormField label="Empresa" value={modal.dados.empresa ?? ""} onChange={v => setField("empresa", v)} />
               <div className="flex flex-col gap-0.5">
-                <label className="text-[10px] text-gray-900 font-medium">Cidade Resp.</label>
+                <label className="text-[10px] text-gray-400 font-medium">Cidade Resp.</label>
                 <CidadeRespSelect value={modal.dados.chaveResp ?? ""} onChange={v => { setField("chaveResp", v); if (v) setField("cidadeUF", v); }} />
               </div>
               <FormField label="Nome" value={modal.dados.nome ?? ""} onChange={v => setField("nome", v)} />
               <div className="col-span-1">
-                <label className="text-[10px] text-gray-900 font-medium">Banco</label>
+                <label className="text-[10px] text-gray-400 font-medium">Banco</label>
                 <BancoSelect
                   value={modal.dados.banco ?? ""}
                   onChange={v => setField("banco", v)}
@@ -432,7 +432,7 @@ export default function DespesasFixasPage() {
               <FormField label="Dt. Vencer" value={modal.dados.dataVencer ?? ""} onChange={v => setField("dataVencer", v)} placeholder="DD/MM/AAAA" />
               {modal.modo === "novo" && (
                 <div className="flex flex-col gap-0.5 col-span-2">
-                  <label className="text-[10px] text-gray-900 font-medium">Repetir por quantos meses?</label>
+                  <label className="text-[10px] text-gray-400 font-medium">Repetir por quantos meses?</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="number"
@@ -442,7 +442,7 @@ export default function DespesasFixasPage() {
                       onChange={e => setRepetirMeses(Math.max(1, Math.min(60, parseInt(e.target.value) || 1)))}
                       className="bg-gray-800 border border-gray-700 text-white text-xs rounded px-2 py-1 w-20 focus:outline-none focus:ring-1 focus:ring-purple-500"
                     />
-                    <span className="text-[10px] text-gray-900">
+                    <span className="text-[10px] text-gray-400">
                       {repetirMeses === 1 ? "Apenas este mês" : `Criará ${repetirMeses} registros (${modal.dados.mesAno || "MM/AAAA"} até ${(() => { if (!modal.dados.mesAno) return "?"; const [mm, aa] = modal.dados.mesAno.split("/"); let m = parseInt(mm)+repetirMeses-1; let a = parseInt(aa); while(m>12){m-=12;a++;} return `${String(m).padStart(2,"0")}/${a}`; })()})`}
                     </span>
                   </div>

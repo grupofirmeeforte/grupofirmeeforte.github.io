@@ -185,9 +185,9 @@ export default function RelatorioChaveJ() {
 
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={16} className="text-center py-12 text-gray-900">Carregando...</td></tr>
+              <tr><td colSpan={16} className="text-center py-12 text-gray-400">Carregando...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={16} className="text-center py-12 text-gray-900">Nenhum dado encontrado para {ano}.</td></tr>
+              <tr><td colSpan={16} className="text-center py-12 text-gray-400">Nenhum dado encontrado para {ano}.</td></tr>
             ) : (
               Object.entries(grupos).map(([chaveJ, tipoRows], gi) => {
                 const bgBase = gi % 2 === 0 ? "bg-white" : "bg-blue-50/30";
@@ -217,10 +217,10 @@ export default function RelatorioChaveJ() {
                       </td>
 
                       {/* Trimestre Valores */}
-                      <td className="px-2 py-1 border-r border-gray-100 text-right text-gray-900">{moeda(r.tri1v)}</td>
-                      <td className="px-2 py-1 border-r border-gray-100 text-right text-gray-900">{moeda(r.tri2v)}</td>
-                      <td className="px-2 py-1 border-r border-gray-100 text-right text-gray-900">{moeda(r.tri3v)}</td>
-                      <td className="px-2 py-1 border-r border-gray-200 text-right text-gray-900">{moeda(r.tri4v)}</td>
+                      <td className="px-2 py-1 border-r border-gray-100 text-right text-gray-700">{moeda(r.tri1v)}</td>
+                      <td className="px-2 py-1 border-r border-gray-100 text-right text-gray-700">{moeda(r.tri2v)}</td>
+                      <td className="px-2 py-1 border-r border-gray-100 text-right text-gray-700">{moeda(r.tri3v)}</td>
+                      <td className="px-2 py-1 border-r border-gray-200 text-right text-gray-700">{moeda(r.tri4v)}</td>
 
                       {/* Semestre Valores */}
                       <td className="px-2 py-1 border-r border-gray-100 text-right font-medium text-gray-800">{moeda(r.sem1v)}</td>
@@ -236,8 +236,8 @@ export default function RelatorioChaveJ() {
                       <td className="px-2 py-1 border-r border-gray-200 text-center text-gray-600">{qtdCell(r.tri4q)}</td>
 
                       {/* Semestre OP */}
-                      <td className="px-2 py-1 border-r border-gray-100 text-center font-medium text-gray-900">{qtdCell(r.sem1q)}</td>
-                      <td className="px-2 py-1 border-r border-gray-200 text-center font-medium text-gray-900">{qtdCell(r.sem2q)}</td>
+                      <td className="px-2 py-1 border-r border-gray-100 text-center font-medium text-gray-700">{qtdCell(r.sem1q)}</td>
+                      <td className="px-2 py-1 border-r border-gray-200 text-center font-medium text-gray-700">{qtdCell(r.sem2q)}</td>
 
                       {/* Ano OP */}
                       <td className="px-2 py-1 text-center font-bold text-blue-800">{qtdCell(r.anoq)}</td>

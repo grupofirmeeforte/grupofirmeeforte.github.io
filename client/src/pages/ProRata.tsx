@@ -302,7 +302,7 @@ export default function ProRataPage() {
   // ─── PAGINADOR ────────────────────────────────────────────────────────────
   const Paginador = () => (
     <div className="flex items-center justify-between py-2 px-1">
-      <span className="text-sm text-gray-900">{total} registro(s) — Página {page + 1} de {totalPages}</span>
+      <span className="text-sm text-gray-400">{total} registro(s) — Página {page + 1} de {totalPages}</span>
       <div className="flex gap-1">
         <Button size="sm" variant="outline" onClick={() => setPage(0)} disabled={page === 0}>«</Button>
         <Button size="sm" variant="outline" onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}>‹</Button>
@@ -320,7 +320,7 @@ export default function ProRataPage() {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto mb-3"></div>
-            <p className="text-gray-900">Verificando acesso...</p>
+            <p className="text-gray-400">Verificando acesso...</p>
           </div>
         </div>
       </div>
@@ -342,7 +342,7 @@ export default function ProRataPage() {
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               aba === 'operacoes'
                 ? 'border-indigo-600 text-indigo-700 bg-indigo-50'
-                : 'border-transparent text-gray-900 hover:text-gray-900 hover:border-gray-300'
+                : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
             }`}
           >
             <FileSpreadsheet className="w-4 h-4" />
@@ -358,7 +358,7 @@ export default function ProRataPage() {
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               aba === 'encerradas'
                 ? 'border-red-600 text-red-700 bg-red-50'
-                : 'border-transparent text-gray-900 hover:text-gray-900 hover:border-gray-300'
+                : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
             }`}
           >
             <TrendingDown className="w-4 h-4" />
@@ -380,7 +380,7 @@ export default function ProRataPage() {
             {/* Barra de ações */}
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-900" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                   className="pl-9"
                   placeholder="Buscar por Nº Operação, ChaveJ ou Empresa..."
@@ -399,7 +399,7 @@ export default function ProRataPage() {
             </div>
             {/* Filtro por empresa */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-900 font-medium">Empresa:</span>
+              <span className="text-sm text-gray-400 font-medium">Empresa:</span>
               {(['', 'FLEX', 'BMF'] as const).map(emp => (
                 <button
                   key={emp}
@@ -463,30 +463,30 @@ export default function ProRataPage() {
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
-                  <div className="text-center py-16 text-gray-900">Carregando...</div>
+                  <div className="text-center py-16 text-gray-400">Carregando...</div>
                 ) : (rows as any[]).length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 gap-3">
                     <FileSpreadsheet className="w-12 h-12 text-gray-300" />
-                    <p className="text-gray-900 font-medium">Nenhum registro encontrado</p>
-                    <p className="text-gray-900 text-sm">Importe um arquivo Excel (.xlsm / .xlsx) para começar.</p>
+                    <p className="text-gray-400 font-medium">Nenhum registro encontrado</p>
+                    <p className="text-gray-400 text-sm">Importe um arquivo Excel (.xlsm / .xlsx) para começar.</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-gray-800">
-                          <TableHead className="font-semibold text-gray-900">Agência BB</TableHead>
-                          <TableHead className="font-semibold text-gray-900">Nº Operação</TableHead>
-                          <TableHead className="font-semibold text-gray-900">ChaveJ</TableHead>
-                          <TableHead className="font-semibold text-gray-900">Empresa</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-right">Vr. Financiado</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-right">Comissão</TableHead>
-                          <TableHead className="font-semibold text-gray-900">Data Final</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-center">Parc. Pagas</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-center">Parc. Total</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-center bg-amber-50">Falta</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-right bg-green-50">VLR (A Receber)</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-center">Cod Est</TableHead>
+                          <TableHead className="font-semibold text-gray-200">Agência BB</TableHead>
+                          <TableHead className="font-semibold text-gray-200">Nº Operação</TableHead>
+                          <TableHead className="font-semibold text-gray-200">ChaveJ</TableHead>
+                          <TableHead className="font-semibold text-gray-200">Empresa</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-right">Vr. Financiado</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
+                          <TableHead className="font-semibold text-gray-200">Data Final</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-center">Parc. Pagas</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-center">Parc. Total</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-center bg-amber-50">Falta</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-right bg-green-50">VLR (A Receber)</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-center">Cod Est</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -494,24 +494,24 @@ export default function ProRataPage() {
                           const falta = row.qtdFaltaReceber ?? ((row.qtdParcelasTotal ?? 0) - (row.qtdParcelasPagas ?? 0));
                           return (
                             <TableRow key={row.id} className={rowIdx % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}>
-                              <TableCell className="text-gray-900 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
-                              <TableCell className="text-gray-900 font-mono text-sm font-medium">{row.nrOperacao}</TableCell>
+                              <TableCell className="text-gray-200 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
+                              <TableCell className="text-gray-200 font-mono text-sm font-medium">{row.nrOperacao}</TableCell>
                               <TableCell>
                                 <Badge variant="outline" className="text-xs font-mono">{row.chaveJ || '—'}</Badge>
                               </TableCell>
-                              <TableCell className="text-gray-900 text-sm">{row.empresa || '—'}</TableCell>
+                              <TableCell className="text-gray-200 text-sm">{row.empresa || '—'}</TableCell>
                               <TableCell className="text-right font-semibold text-blue-700">{fmt(row.valorFinanciado)}</TableCell>
-                              <TableCell className="text-right text-gray-900 text-sm">{fmt(row.comissao)}</TableCell>
-                              <TableCell className="text-gray-900 text-sm">{row.dataFinal || '—'}</TableCell>
-                              <TableCell className="text-center text-gray-900">{row.qtdParcelasPagas ?? '—'}</TableCell>
-                              <TableCell className="text-center text-gray-900">{row.qtdParcelasTotal ?? '—'}</TableCell>
+                              <TableCell className="text-right text-gray-200 text-sm">{fmt(row.comissao)}</TableCell>
+                              <TableCell className="text-gray-200 text-sm">{row.dataFinal || '—'}</TableCell>
+                              <TableCell className="text-center text-gray-200">{row.qtdParcelasPagas ?? '—'}</TableCell>
+                              <TableCell className="text-center text-gray-200">{row.qtdParcelasTotal ?? '—'}</TableCell>
                               <TableCell className="text-center bg-amber-50">
                                 <Badge className={`text-xs font-bold ${falta > 0 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-300'}`}>
                                   {falta}
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-right font-bold text-green-700 bg-green-50">{fmt(row.vlr)}</TableCell>
-                              <TableCell className="text-center text-gray-900 text-sm">{row.codEst || '—'}</TableCell>
+                              <TableCell className="text-center text-gray-400 text-sm">{row.codEst || '—'}</TableCell>
                             </TableRow>
                           );
                         })}
@@ -533,7 +533,7 @@ export default function ProRataPage() {
             {/* Seletor de importação */}
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative flex-1 min-w-[200px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-900" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                   className="pl-9"
                   placeholder="Buscar por Nº Operação, ChaveJ ou Empresa..."
@@ -542,7 +542,7 @@ export default function ProRataPage() {
                 />
               </div>
               <select
-                className="border rounded-md px-3 py-2 text-sm text-gray-900 bg-white"
+                className="border rounded-md px-3 py-2 text-sm text-gray-200 bg-white"
                 value={importacaoSelecionada ?? ''}
                 onChange={e => setImportacaoSelecionada(e.target.value || undefined)}
               >
@@ -602,7 +602,7 @@ export default function ProRataPage() {
               </Card>
               <Card className="border-gray-100 bg-gray-800">
                 <CardContent className="py-4">
-                  <p className="text-xs text-gray-900 font-medium uppercase tracking-wide">Total Financiado Encerrado</p>
+                  <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Total Financiado Encerrado</p>
                   <p className="text-xl font-bold text-gray-900">{fmt(encTotais?.totalFinanciado)}</p>
                 </CardContent>
               </Card>
@@ -618,49 +618,49 @@ export default function ProRataPage() {
               </CardHeader>
               <CardContent className="p-0">
                 {encLoading ? (
-                  <div className="text-center py-16 text-gray-900">Carregando...</div>
+                  <div className="text-center py-16 text-gray-400">Carregando...</div>
                 ) : (encerradasRows as any[]).length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-16 gap-3">
                     <CheckCircle2 className="w-12 h-12 text-green-300" />
-                    <p className="text-gray-900 font-medium">Nenhuma operação encerrada registrada</p>
-                    <p className="text-gray-900 text-sm">As operações encerradas aparecem aqui ao importar uma nova planilha no modo Subscrever.</p>
+                    <p className="text-gray-400 font-medium">Nenhuma operação encerrada registrada</p>
+                    <p className="text-gray-400 text-sm">As operações encerradas aparecem aqui ao importar uma nova planilha no modo Subscrever.</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-red-50">
-                          <TableHead className="font-semibold text-gray-900">Data Importação</TableHead>
-                          <TableHead className="font-semibold text-gray-900">Nº Operação</TableHead>
-                          <TableHead className="font-semibold text-gray-900">ChaveJ</TableHead>
-                          <TableHead className="font-semibold text-gray-900">Empresa</TableHead>
-                          <TableHead className="font-semibold text-gray-900">Agência BB</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-right">Vr. Financiado</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-right">Comissão</TableHead>
-                          <TableHead className="font-semibold text-gray-900">Data Final</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-center">Pagas</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-center">Total</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-right bg-red-50">VLR Perdido</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-center">Motivo</TableHead>
+                          <TableHead className="font-semibold text-gray-200">Data Importação</TableHead>
+                          <TableHead className="font-semibold text-gray-200">Nº Operação</TableHead>
+                          <TableHead className="font-semibold text-gray-200">ChaveJ</TableHead>
+                          <TableHead className="font-semibold text-gray-200">Empresa</TableHead>
+                          <TableHead className="font-semibold text-gray-200">Agência BB</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-right">Vr. Financiado</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
+                          <TableHead className="font-semibold text-gray-200">Data Final</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-center">Pagas</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-center">Total</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-right bg-red-50">VLR Perdido</TableHead>
+                          <TableHead className="font-semibold text-gray-200 text-center">Motivo</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {(encerradasRows as any[]).map((row: any) => (
                           <TableRow key={row.id} className="hover:bg-red-50/50">
-                            <TableCell className="text-gray-900 text-xs">
+                            <TableCell className="text-gray-400 text-xs">
                               {new Date(row.importacaoData).toLocaleString('pt-BR')}
                             </TableCell>
                             <TableCell className="font-mono text-sm font-medium text-white">{row.nrOperacao}</TableCell>
                             <TableCell>
                               <Badge variant="outline" className="text-xs font-mono">{row.chaveJ || '—'}</Badge>
                             </TableCell>
-                            <TableCell className="text-gray-900 text-sm">{row.empresa || '—'}</TableCell>
-                            <TableCell className="text-gray-900 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
+                            <TableCell className="text-gray-200 text-sm">{row.empresa || '—'}</TableCell>
+                            <TableCell className="text-gray-200 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
                             <TableCell className="text-right text-blue-700 font-semibold">{fmt(row.valorFinanciado)}</TableCell>
-                            <TableCell className="text-right text-gray-900 text-sm">{fmt(row.comissao)}</TableCell>
-                            <TableCell className="text-gray-900 text-sm">{row.dataFinal || '—'}</TableCell>
-                            <TableCell className="text-center text-gray-900">{row.qtdParcelasPagas ?? '—'}</TableCell>
-                            <TableCell className="text-center text-gray-900">{row.qtdParcelasTotal ?? '—'}</TableCell>
+                            <TableCell className="text-right text-gray-200 text-sm">{fmt(row.comissao)}</TableCell>
+                            <TableCell className="text-gray-200 text-sm">{row.dataFinal || '—'}</TableCell>
+                            <TableCell className="text-center text-gray-200">{row.qtdParcelasPagas ?? '—'}</TableCell>
+                            <TableCell className="text-center text-gray-200">{row.qtdParcelasTotal ?? '—'}</TableCell>
                             <TableCell className="text-right font-bold text-red-700 bg-red-50">{fmt(row.vlrPerdido)}</TableCell>
                             <TableCell className="text-center">
                               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -695,7 +695,7 @@ export default function ProRataPage() {
           <div className="space-y-4">
             {/* Modo de importação */}
             <div>
-              <p className="text-sm font-medium text-gray-900 mb-2">Modo de importação:</p>
+              <p className="text-sm font-medium text-gray-200 mb-2">Modo de importação:</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setImportMode('novo')}
@@ -729,8 +729,8 @@ export default function ProRataPage() {
 
             {/* Seleção de arquivo */}
             <div>
-              <p className="text-sm font-medium text-gray-900 mb-1">Arquivo Excel (.xlsm / .xlsx / .xls):</p>
-              <p className="text-xs text-gray-900 mb-2">
+              <p className="text-sm font-medium text-gray-200 mb-1">Arquivo Excel (.xlsm / .xlsx / .xls):</p>
+              <p className="text-xs text-gray-400 mb-2">
                 Colunas esperadas (linha 2 do arquivo): <strong>AGENCIA BB, NRO OPERACAO, CHAVEJ, VALORFINANCIADO, COMISSÃO, DATA FINAL, QTD PARCELAS PGS, QTD PARCELAS TOTAL, COD EST, Empresa</strong>
               </p>
               <input
