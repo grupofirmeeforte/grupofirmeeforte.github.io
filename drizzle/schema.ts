@@ -1674,3 +1674,31 @@ export const arquivoMorto = mysqlTable("arquivoMorto", {
 
 export type ArquivoMorto = typeof arquivoMorto.$inferSelect;
 export type InsertArquivoMorto = typeof arquivoMorto.$inferInsert;
+
+// ─── Reajustes de Comissão ────────────────────────────────────────────────────
+export const reajustes = mysqlTable("reajustes", {
+  id: int("id").autoincrement().primaryKey(),
+  mesRef: varchar("mesRef", { length: 10 }).notNull(),          // MM/AAAA do mês de referência
+  empresa: varchar("empresa", { length: 100 }),
+  chaveJ: varchar("chaveJ", { length: 50 }).notNull(),
+  nomeAgente: varchar("nomeAgente", { length: 255 }),
+  nrOperacao: varchar("nrOperacao", { length: 100 }),           // Número do contrato/operação
+  tipoProduto: varchar("tipoProduto", { length: 100 }),         // Consignado, Consórcio, etc.
+  convenio: varchar("convenio", { length: 150 }),
+  valorPagoAnterior: decimal("valorPagoAnterior", { precision: 15, scale: 2 }).default("0"),
+  novoValor: decimal("novoValor", { precision: 15, scale: 2 }).notNull(),
+  diferenca: decimal("diferenca", { precision: 15, scale: 2 }).notNull(),
+  status: varchar("status", { length: 30 }).default("pendente").notNull(), // pendente | enviado | cancelado
+  observacao: text("observacao"),
+  pagamentoId: int("pagamentoId"),                              // FK para pagamentos quando enviado
+  enviadoPor: varchar("enviadoPor", { length: 100 }),
+  dataEnvio: varchar("dataEnvio", { length: 10 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  mesRefIdx: index("idx_reajustes_mesRef").on(table.mesRef),
+  chaveJIdx: index("idx_reajustes_chaveJ").on(table.chaveJ),
+  statusIdx: index("idx_reajustes_status").on(table.status),
+}));
+export type Reajuste = typeof reajustes.$inferSelect;
+export type InsertReajuste = typeof reajustes.$inferInsert;

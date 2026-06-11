@@ -52,6 +52,7 @@ import NaoPerturbe from './pages/NaoPerturbe';
 import AgenciasBb from './pages/AgenciasBb';
 import PreviewEstacoes from './pages/PreviewEstacoes';
 import RetornoDocumentosPage from './pages/RetornoDocumentosPage';
+import ReajustePage from './pages/Reajuste';
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -142,6 +143,7 @@ function RouterWithInactivity() {
       <Route path={"/crm"} component={CRMPage} />
       <Route path={"/mailing-crm"} component={MailingCrmPage} />
       <Route path={"/contratos"} component={ContratosPage} />
+      <Route path={"/reajuste"} component={ReajustePage} />
       <Route path={"/nao-perturbe"} component={NaoPerturbe} />
       <Route path={"/agencias-bb"} component={AgenciasBb} />
       <Route path={"/preview-estacoes"} component={PreviewEstacoes} />
