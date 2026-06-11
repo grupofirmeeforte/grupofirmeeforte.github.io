@@ -317,7 +317,10 @@ function PerspectivadeGanho() {
   const nomeBuscaRef = useRef<HTMLInputElement>(null);
 
   // ChaveJ efetiva para a query (sem mes/ano — o backend calcula o período vigente automaticamente)
-  const chaveJEfetiva = isCeoOuAdmin && chaveJQuery ? chaveJQuery.toUpperCase().trim() : (chaveJReal || undefined);
+  // CEO/Admin: se digitou algo na busca, usa o que digitou; senão usa a própria chaveJ
+  const chaveJEfetiva = isCeoOuAdmin
+    ? (chaveJQuery ? chaveJQuery.toUpperCase().trim() : (chaveJReal || undefined))
+    : (chaveJReal || undefined);
 
   const utils = trpc.useUtils();
   const uploadLoteMutation = trpc.contratos.uploadLote.useMutation();
@@ -566,14 +569,14 @@ function PerspectivadeGanho() {
                   </TableRow>
                 ) : (
                   (rows as any[]).map((row: any, rowIdx: number) => (
-                    <TableRow key={row.id} className={rowIdx % 2 === 0 ? 'bg-white hover:bg-blue-900/30' : 'bg-blue-900/20/30 hover:bg-blue-100/40'}>
-                      <TableCell className="font-mono text-sm font-medium text-gray-900">{row.proposta || '—'}</TableCell>
-                      <TableCell className="text-xs text-gray-600 whitespace-nowrap">
+                    <TableRow key={row.id} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-blue-900'}>
+                      <TableCell className={`font-mono text-sm font-medium ${rowIdx % 2 === 0 ? 'text-gray-900' : 'text-white'}`}>{row.proposta || '—'}</TableCell>
+                      <TableCell className={`text-xs whitespace-nowrap ${rowIdx % 2 === 0 ? 'text-gray-600' : 'text-gray-200'}`}>
                         {row.solicitacao || '—'}
                       </TableCell>
                       <TableCell className="text-sm">
-                        <div className="font-medium text-gray-900">{row.nomeCliente || '—'}</div>
-                        {row.cpfCliente && <div className="text-xs text-gray-400 font-mono">{row.cpfCliente}</div>}
+                        <div className={`font-medium ${rowIdx % 2 === 0 ? 'text-gray-900' : 'text-white'}`}>{row.nomeCliente || '—'}</div>
+                        {row.cpfCliente && <div className={`text-xs font-mono ${rowIdx % 2 === 0 ? 'text-gray-400' : 'text-gray-300'}`}>{row.cpfCliente}</div>}
                       </TableCell>
                       <TableCell>
                         {/* Edição inline de situação */}
@@ -618,16 +621,16 @@ function PerspectivadeGanho() {
                           </button>
                         )}
                       </TableCell>
-                      <TableCell className="text-xs text-gray-300 max-w-[130px] truncate" title={row.produtoConsig ?? row.linha ?? ''}>
-                        <span className="text-blue-600 font-medium">{row.produtoConsig || row.linha || '—'}</span>
+                      <TableCell className="text-xs max-w-[130px] truncate" title={row.produtoConsig ?? row.linha ?? ''}>
+                        <span className={`font-medium ${rowIdx % 2 === 0 ? 'text-blue-600' : 'text-blue-300'}`}>{row.produtoConsig || row.linha || '—'}</span>
                       </TableCell>
-                      <TableCell className="text-right text-sm text-gray-700">
+                      <TableCell className={`text-right text-sm ${rowIdx % 2 === 0 ? 'text-gray-700' : 'text-gray-200'}`}>
                         {row.taxaJuros > 0 ? fmtPct(row.taxaJuros) : '—'}
                       </TableCell>
-                      <TableCell className="text-right text-sm text-gray-700">
+                      <TableCell className={`text-right text-sm ${rowIdx % 2 === 0 ? 'text-gray-700' : 'text-gray-200'}`}>
                         {row.prazoMeses > 0 ? `${row.prazoMeses}x` : (row.prazo || '—')}
                       </TableCell>
-                      <TableCell className="text-right font-semibold text-blue-700">
+                      <TableCell className={`text-right font-semibold ${rowIdx % 2 === 0 ? 'text-blue-700' : 'text-blue-300'}`}>
                         {row.valorSolicitado > 0 ? fmt(row.valorSolicitado) : '—'}
                       </TableCell>
                       <TableCell className="text-center">
@@ -668,9 +671,9 @@ function PerspectivadeGanho() {
                             className="text-xs text-left hover:opacity-80 transition-opacity"
                           >
                             {row.telefoneManuais ? (
-                              <span className="text-green-700 font-medium">{row.telefoneManuais.split(',')[0]}</span>
+                              <span className={`font-medium ${rowIdx % 2 === 0 ? 'text-green-700' : 'text-green-400'}`}>{row.telefoneManuais.split(',')[0]}</span>
                             ) : (
-                              <span className="text-gray-400 italic">+ telefone</span>
+                              <span className={`italic ${rowIdx % 2 === 0 ? 'text-gray-400' : 'text-gray-300'}`}>+ telefone</span>
                             )}
                           </button>
                         )}
