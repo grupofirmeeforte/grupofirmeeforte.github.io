@@ -188,7 +188,7 @@ function PermissoesEditor({
               onClick={() => toggleModulo(m.modulo)}
             >
               <div className="flex items-center gap-2">
-                {aberto ? <ChevronUp className="w-3 h-3 text-gray-400" /> : <ChevronDown className="w-3 h-3 text-gray-400" />}
+                {aberto ? <ChevronUp className="w-3 h-3 text-gray-700" /> : <ChevronDown className="w-3 h-3 text-gray-700" />}
                 <span className="text-sm font-medium text-gray-700">{m.label}</span>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded border font-medium ${nivelColor(nivelMod).bg} ${nivelColor(nivelMod).color}`}>
                   {nivelColor(nivelMod).label}
@@ -702,7 +702,7 @@ export default function AuditoriaPermissoes() {
                 {isLoading ? (
                   <TableRow><TableCell colSpan={4} className="text-center py-8">Carregando...</TableCell></TableRow>
                 ) : listaFiltrada.length === 0 ? (
-                  <TableRow><TableCell colSpan={4} className="text-center py-8 text-slate-400">Nenhum agente encontrado.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-8 text-slate-700">Nenhum agente encontrado.</TableCell></TableRow>
                 ) : listaFiltrada.map(a => (
                   <AgentePermissaoRow
                     key={a.id}
@@ -720,7 +720,7 @@ export default function AuditoriaPermissoes() {
               </TableBody>
             </Table>
           </div>
-          <p className="text-xs text-slate-400 p-3">{listaFiltrada.length} agente(s)</p>
+          <p className="text-xs text-slate-700 p-3">{listaFiltrada.length} agente(s)</p>
         </div>
       )}
     </div>

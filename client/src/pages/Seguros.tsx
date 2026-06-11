@@ -242,7 +242,7 @@ export default function Seguros() {
         {/* Filtros */}
         <div className="flex flex-wrap gap-3 mb-4 bg-gray-900 rounded-lg p-3 shadow-sm border">
           <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-            <Search className="w-4 h-4 text-gray-400" />
+            <Search className="w-4 h-4 text-gray-700" />
             <Input placeholder="Buscar contrato, agente, chave J..." value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} className="h-8" />
           </div>
           <Select value={empresa} onValueChange={v => { setEmpresa(v); setPage(0); }}>
@@ -274,9 +274,9 @@ export default function Seguros() {
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan={COLUNAS_SEGUROS.length + 1} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+                <tr><td colSpan={COLUNAS_SEGUROS.length + 1} className="text-center py-8 text-gray-700">Carregando...</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td colSpan={COLUNAS_SEGUROS.length + 1} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
+                <tr><td colSpan={COLUNAS_SEGUROS.length + 1} className="text-center py-8 text-gray-700">Nenhum registro encontrado</td></tr>
               ) : rows.map((row, i) => (
                 <tr key={row.id} className={i % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}>
                   {COLUNAS_SEGUROS.map(c => {

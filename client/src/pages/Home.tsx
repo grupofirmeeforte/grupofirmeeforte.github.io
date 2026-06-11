@@ -405,7 +405,7 @@ export default function Home() {
                           );
                         })
                       ) : (
-                        <span className="text-xs text-slate-400 italic">Em breve...</span>
+                        <span className="text-xs text-slate-700 italic">Em breve...</span>
                       )}
                     </div>
                   </div>
@@ -543,7 +543,7 @@ export default function Home() {
                   : grupoAtual.subModules.filter(m => !m.subKey || podeVer(grupoAtual.key, m.subKey)))
                 .filter(m => !m.ceoOnly || isCEO);
               if (subsVisiveis.length === 0) return (
-                <div className="text-center py-8 text-slate-400">
+                <div className="text-center py-8 text-slate-700">
                   <p className="text-lg font-medium">Em breve</p>
                   <p className="text-sm mt-1">Este módulo está em desenvolvimento.</p>
                 </div>

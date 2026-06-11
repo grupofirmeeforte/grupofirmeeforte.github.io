@@ -82,7 +82,7 @@ export default function MensagemSalmos() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-slate-400 text-xs mt-6">
+        <p className="text-center text-slate-700 text-xs mt-6">
           O salmo muda automaticamente a cada novo dia
         </p>
       </div>

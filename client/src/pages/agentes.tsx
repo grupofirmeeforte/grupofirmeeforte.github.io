@@ -132,7 +132,7 @@ export default function AgentesPage() {
           </Button>
         </div>
       } />
-      <div className="px-6 text-sm text-gray-400">
+      <div className="px-6 text-sm text-gray-700">
         {totalCount ? `Total: ${totalCount} agentes` : "Carregando..."}
       </div>
 
@@ -147,7 +147,7 @@ export default function AgentesPage() {
           </CardHeader>
           <CardContent>
             {!duplicatas ? (
-              <p className="text-sm text-gray-400">Carregando...</p>
+              <p className="text-sm text-gray-700">Carregando...</p>
             ) : duplicatas.length === 0 ? (
               <p className="text-sm text-green-700 font-medium">✅ Nenhum cadastro duplicado encontrado!</p>
             ) : (
@@ -169,7 +169,7 @@ export default function AgentesPage() {
                               <span>{ag.chaveJ}</span>
                               <span>{ag.numCadastro}</span>
                               <span className={ag.situacao?.startsWith('Ativo') ? 'text-green-700' : 'text-red-600'}>{ag.situacao}</span>
-                              <span className="text-gray-400">
+                              <span className="text-gray-700">
                                 {[ag.cargo, ag.area, ag.cidade, ag.email, ag.celular].filter(Boolean).length} campos preenchidos
                               </span>
                             </div>
@@ -206,7 +206,7 @@ export default function AgentesPage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-700" />
               <Input
                 placeholder="Buscar por nome..."
                 value={search}
@@ -347,15 +347,15 @@ export default function AgentesPage() {
                           <button
                             title="Copiar Chave J"
                             onClick={() => copyToClipboard(agente.chaveJ || '', `chave-${agente.id}`)}
-                            className="text-gray-400 hover:text-blue-600 transition-colors p-0.5 rounded"
+                            className="text-gray-700 hover:text-blue-600 transition-colors p-0.5 rounded"
                           >
                             {copiedId === `chave-${agente.id}` ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
                           </button>
-                          <span className="text-xs text-gray-400 font-mono ml-1">{'*'.repeat(6)}</span>
+                          <span className="text-xs text-gray-700 font-mono ml-1">{'*'.repeat(6)}</span>
                           <button
                             title="Copiar Senha"
                             onClick={() => copyToClipboard(agente.senha || '', `senha-${agente.id}`)}
-                            className="text-gray-400 hover:text-blue-600 transition-colors p-0.5 rounded"
+                            className="text-gray-700 hover:text-blue-600 transition-colors p-0.5 rounded"
                           >
                             {copiedId === `senha-${agente.id}` ? <Check className="w-3 h-3 text-green-500" /> : <Copy className="w-3 h-3" />}
                           </button>
@@ -411,18 +411,18 @@ export default function AgentesPage() {
                         </div>
                         {/* Linha 3: Nome + Data Nascimento */}
                         <div className="font-medium text-sm text-gray-900 leading-tight mt-0.5">
-                          {agente.nomeAgente}{agente.dataNascimento ? <span className="font-normal text-gray-400 text-xs ml-1">· {formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '')}</span> : ''}
+                          {agente.nomeAgente}{agente.dataNascimento ? <span className="font-normal text-gray-700 text-xs ml-1">· {formatDateString(typeof agente.dataNascimento === 'string' ? agente.dataNascimento : '')}</span> : ''}
                         </div>
                         {/* Linha 4: Empresa + Email + CEP */}
-                        <div className="text-xs text-gray-400 mt-0.5">{agente.empresa || '-'}{agente.email ? <span className="text-blue-500 ml-1">{agente.email}</span> : ''}{(agente as any).cep ? <span className="text-gray-400 ml-1">· CEP {(agente as any).cep}</span> : ''}</div>
+                        <div className="text-xs text-gray-700 mt-0.5">{agente.empresa || '-'}{agente.email ? <span className="text-blue-500 ml-1">{agente.email}</span> : ''}{(agente as any).cep ? <span className="text-gray-700 ml-1">· CEP {(agente as any).cep}</span> : ''}</div>
                         {/* Linha 5: Endereço + Cidade/UF */}
-                        <div className="text-xs text-gray-400">{(agente as any).endereco ? `${(agente as any).endereco}${(agente as any).numero ? `, ${(agente as any).numero}` : ''}${(agente as any).bairro ? ` - ${(agente as any).bairro}` : ''} · ` : ''}{agente.cidade ? `${agente.cidade}${agente.uf ? `/${agente.uf}` : ''}` : (agente.uf || '')}</div>
+                        <div className="text-xs text-gray-700">{(agente as any).endereco ? `${(agente as any).endereco}${(agente as any).numero ? `, ${(agente as any).numero}` : ''}${(agente as any).bairro ? ` - ${(agente as any).bairro}` : ''} · ` : ''}{agente.cidade ? `${agente.cidade}${agente.uf ? `/${agente.uf}` : ''}` : (agente.uf || '')}</div>
                       </TableCell>
                       {/* Função / Certificações unificadas */}
                       <TableCell className="min-w-[200px]">
                         {/* Admissão */}
                         {agente.dataAdmissao && (
-                          <div className="text-xs text-gray-400 mb-0.5">Adm: {formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '')}</div>
+                          <div className="text-xs text-gray-700 mb-0.5">Adm: {formatDateString(typeof agente.dataAdmissao === 'string' ? agente.dataAdmissao : '')}</div>
                         )}
                         {/* Cargo · Área · Vínculo */}
                         <div className="font-medium text-sm text-gray-900">
@@ -433,7 +433,7 @@ export default function AgentesPage() {
                           {(() => {
                             const key = agente.chaveJ?.trim().toUpperCase();
                             const c = key && statusCerts ? statusCerts[key]?.consig : undefined;
-                            if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-400">CONSIG: -</span>;
+                            if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-700">CONSIG: -</span>;
                             if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">CONSIG: {(c.dias ?? 0) === 0 ? 'Vencido' : `Venc. há ${Math.abs(c.dias ?? 0)}d`}</Badge>;
                             if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">CONSIG: {c.dias}d</Badge>;
                             return <Badge className="bg-green-100 text-green-800 border-0 text-xs">CONSIG: {c.dias}d</Badge>;
@@ -441,7 +441,7 @@ export default function AgentesPage() {
                           {(() => {
                             const key = agente.chaveJ?.trim().toUpperCase();
                             const c = key && statusCerts ? statusCerts[key]?.lgpd : undefined;
-                            if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-400">PLDFT: -</span>;
+                            if (!c || c.status === 'SEM_CERTIFICACAO') return <span className="text-xs text-slate-700">PLDFT: -</span>;
                             if (c.status === 'VENCIDO') return <Badge className="animate-pulse bg-red-600 text-white border-0 text-xs">PLDFT: {(c.dias ?? 0) === 0 ? 'Vencido' : `Venc. há ${Math.abs(c.dias ?? 0)}d`}</Badge>;
                             if (c.status === 'CRITICO') return <Badge className="animate-pulse bg-yellow-400 text-yellow-900 border-0 text-xs">PLDFT: {c.dias}d</Badge>;
                             return <Badge className="bg-green-100 text-green-800 border-0 text-xs">PLDFT: {c.dias}d</Badge>;
@@ -453,9 +453,9 @@ export default function AgentesPage() {
                       <TableCell className="min-w-[150px]">
                         {agente.cpfAgente
                           ? <div className="text-sm font-mono text-white">{agente.cpfAgente}</div>
-                          : <span className="text-xs text-slate-400">-</span>}
+                          : <span className="text-xs text-slate-700">-</span>}
                         {agente.celular && (
-                          <div className="text-xs text-gray-400 mt-0.5">{agente.celular}</div>
+                          <div className="text-xs text-gray-700 mt-0.5">{agente.celular}</div>
                         )}
                       </TableCell>
                       {/* Dados bancários compactos */}
@@ -464,7 +464,7 @@ export default function AgentesPage() {
                           <div className="font-medium text-sm text-gray-900">
                             {agente.banco}{agente.agencia ? ` · Ag ${agente.agencia}` : ''}{agente.conta ? ` · ${agente.tipo === 'Conta Poupança' ? 'Cp' : 'Cc'} ${agente.conta}` : ''}
                           </div>
-                        ) : <span className="text-xs text-slate-400">-</span>}
+                        ) : <span className="text-xs text-slate-700">-</span>}
                         {/* Favorecido */}
                         {((agente as any).favProprio || agente.favorecido) && (
                           <div className="text-[10px] text-slate-600 mt-0.5 flex items-center gap-1">

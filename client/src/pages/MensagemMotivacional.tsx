@@ -46,7 +46,7 @@ export default function MensagemMotivacional() {
             {isLoading ? (
               <div className="flex flex-col items-center gap-4 py-8">
                 <Zap className="w-16 h-16 text-amber-400 animate-pulse" />
-                <p className="text-slate-400">Carregando sua mensagem do dia...</p>
+                <p className="text-slate-700">Carregando sua mensagem do dia...</p>
               </div>
             ) : mensagem ? (
               <>
@@ -87,7 +87,7 @@ export default function MensagemMotivacional() {
             ) : (
               <div className="flex flex-col items-center gap-4 py-8">
                 <Zap className="w-16 h-16 text-amber-400/30" />
-                <p className="text-slate-400">Nenhuma mensagem disponível no momento.</p>
+                <p className="text-slate-700">Nenhuma mensagem disponível no momento.</p>
               </div>
             )}
           </CardContent>

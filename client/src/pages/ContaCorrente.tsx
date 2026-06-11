@@ -411,7 +411,7 @@ export default function ContaCorrente() {
       {/* Filtros */}
       <div className="bg-gray-900 border-b border-gray-700 px-4 py-2 flex items-center gap-3 flex-wrap">
         <div className="relative">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700" />
           <Input
             className="pl-8 h-8 w-48 text-sm"
             placeholder="Buscar ChaveJ, Agente..."
@@ -450,7 +450,7 @@ export default function ContaCorrente() {
       {/* Painel de Configuração de Comissão */}
       {showConfig && (
         <div className="w-72 min-w-[18rem] bg-white border-r shadow-sm flex-shrink-0 p-4 space-y-4">
-          <h3 className="text-sm font-bold text-gray-400">Configuração de Comissão</h3>
+          <h3 className="text-sm font-bold text-gray-700">Configuração de Comissão</h3>
 
           {/* Comissão Padrão */}
           <div className="border border-green-200 rounded-lg p-3 bg-green-50">
@@ -459,7 +459,7 @@ export default function ContaCorrente() {
               <div>
                 <label className="text-xs text-gray-300">Padrão (R$)</label>
                 <div className="flex items-center gap-1 mt-1">
-                  <span className="text-xs text-gray-400 font-medium">R$</span>
+                  <span className="text-xs text-gray-700 font-medium">R$</span>
                   <Input
                     className="h-7 text-sm w-full"
                     placeholder="0,00"
@@ -478,7 +478,7 @@ export default function ContaCorrente() {
               <div>
                 <label className="text-xs text-gray-300">Especial (R$)</label>
                 <div className="flex items-center gap-1 mt-1">
-                  <span className="text-xs text-gray-400 font-medium">R$</span>
+                  <span className="text-xs text-gray-700 font-medium">R$</span>
                   <Input
                     className="h-7 text-sm w-full"
                     placeholder="0,00"
@@ -495,7 +495,7 @@ export default function ContaCorrente() {
                   value={cfgAgentesEspeciais}
                   onChange={e => setCfgAgentesEspeciais(e.target.value)}
                 />
-                <p className="text-xs text-gray-400 mt-1">Digite um ChaveJ por linha para cálculo.</p>
+                <p className="text-xs text-gray-700 mt-1">Digite um ChaveJ por linha para cálculo.</p>
               </div>
             </div>
           </div>
@@ -518,9 +518,9 @@ export default function ContaCorrente() {
       {/* Tabela */}
       <div className="p-4 overflow-x-auto flex-1">
         {isLoading ? (
-          <div className="text-center py-12 text-gray-400">Carregando...</div>
+          <div className="text-center py-12 text-gray-700">Carregando...</div>
         ) : rows.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
+          <div className="text-center py-12 text-gray-700">
             <p className="text-lg font-medium">Nenhum registro encontrado</p>
             <p className="text-sm mt-1">Importe uma planilha Excel para começar</p>
           </div>
@@ -570,15 +570,15 @@ export default function ContaCorrente() {
                       <div className="flex items-center gap-1.5 mb-0.5">
                         <span className="font-mono text-[11px] text-blue-700 font-semibold">{r.chaveJ || "-"}</span>
                         <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{r.empresa || ""}</span>
-                        <span className="text-[9px] text-gray-400">{r.mesAno || ""}</span>
+                        <span className="text-[9px] text-gray-700">{r.mesAno || ""}</span>
                       </div>
                       <div className="text-[11px] text-white font-medium">{r.agente || "-"}</div>
-                      {r.supervisor && <div className="text-[10px] text-gray-400">Sup: {r.supervisor}</div>}
+                      {r.supervisor && <div className="text-[10px] text-gray-700">Sup: {r.supervisor}</div>}
                     </td>
                     {/* Coluna Conta */}
                     <td className="px-2 py-1.5">
-                      <div className="text-[11px] text-gray-400">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
-                      <div className="text-[10px] text-gray-400">
+                      <div className="text-[11px] text-gray-700">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
+                      <div className="text-[10px] text-gray-700">
                         {r.dataOperacao
                           ? (r.dataOperacao instanceof Date
                             ? r.dataOperacao.toLocaleDateString("pt-BR")
@@ -589,7 +589,7 @@ export default function ContaCorrente() {
                     {/* Coluna Valores */}
                     <td className="px-2 py-1.5 text-right whitespace-nowrap">
                       <div className="font-bold text-green-700 text-[12px]">{r.comissao ? fmtMoeda(r.comissao) : "-"}</div>
-                      <div className="text-[10px] text-gray-400">RBM: {fmtMoeda(r.rbm)}</div>
+                      <div className="text-[10px] text-gray-700">RBM: {fmtMoeda(r.rbm)}</div>
                     </td>
                     <td className="px-2 py-1.5 text-center" onClick={e => e.stopPropagation()}>
                       <div className="flex items-center justify-center gap-1">
@@ -619,7 +619,7 @@ export default function ContaCorrente() {
         {/* Paginação */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-700">
               Página {page + 1} de {totalPages} — {total.toLocaleString("pt-BR")} registros
             </span>
             <div className="flex gap-2">
@@ -648,14 +648,14 @@ export default function ContaCorrente() {
                 className={`p-3 rounded border-2 text-left transition ${importModo === "inserir" ? "border-blue-500 bg-blue-900/20" : "border-gray-700 hover:border-gray-300"}`}
               >
                 <div className="font-semibold text-sm">Apenas Inserir</div>
-                <div className="text-xs text-gray-400 mt-1">Adiciona somente registros novos.</div>
+                <div className="text-xs text-gray-700 mt-1">Adiciona somente registros novos.</div>
               </button>
               <button
                 onClick={() => setImportModo("subscrever")}
                 className={`p-3 rounded border-2 text-left transition ${importModo === "subscrever" ? "border-blue-500 bg-blue-900/20" : "border-gray-700 hover:border-gray-300"}`}
               >
                 <div className="font-semibold text-sm">Subscrever</div>
-                <div className="text-xs text-gray-400 mt-1">Adiciona todos os registros (pode duplicar).</div>
+                <div className="text-xs text-gray-700 mt-1">Adiciona todos os registros (pode duplicar).</div>
               </button>
             </div>
             <div>
@@ -668,7 +668,7 @@ export default function ContaCorrente() {
                 style={{ display: "block", width: "100%", padding: "10px", border: "2px dashed #d1d5db", borderRadius: 8, cursor: "pointer", fontSize: 13, background: "#f9fafb" }}
               />
               {importFileName && (
-                <p className="text-xs text-gray-400 mt-1">📄 {importFileName} — {importRows.length} registros lidos</p>
+                <p className="text-xs text-gray-700 mt-1">📄 {importFileName} — {importRows.length} registros lidos</p>
               )}
             </div>
             <div className="bg-blue-900/20 rounded-lg p-3 text-xs text-blue-700">
@@ -678,7 +678,7 @@ export default function ContaCorrente() {
             </div>
             {importing && (
               <div>
-                <div className="flex justify-between text-xs text-gray-400 mb-1">
+                <div className="flex justify-between text-xs text-gray-700 mb-1">
                   <span>Importando...</span><span>{importProgress}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">

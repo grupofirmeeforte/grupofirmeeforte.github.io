@@ -54,7 +54,7 @@ export default function PreviewEstacoes() {
         <h1 className="text-3xl font-black text-white mb-2">
           Preview — Animações das Estações
         </h1>
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-700 text-sm">
           Clique em cada estação para ver a animação completa (15 segundos)
         </p>
       </div>
@@ -82,7 +82,7 @@ export default function PreviewEstacoes() {
           >
             <div className="text-5xl mb-3">{e.emoji}</div>
             <div className="font-bold text-white text-lg mb-1">{e.label}</div>
-            <div className="text-xs text-gray-400 leading-relaxed">{e.desc}</div>
+            <div className="text-xs text-gray-700 leading-relaxed">{e.desc}</div>
             <div
               className="mt-3 text-xs font-semibold px-3 py-1 rounded-full inline-block"
               style={{ background: `${e.cor}22`, color: e.cor }}

@@ -437,7 +437,7 @@ export default function AgentesFormPage() {
                     <button
                       type="button"
                       onClick={() => setMostrarSenha(v => !v)}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-700 hover:text-gray-600"
                       tabIndex={-1}
                     >
                       {mostrarSenha ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -884,7 +884,7 @@ export default function AgentesFormPage() {
                     <SelectItem value="admin">Admin</SelectItem>
                   </SelectContent>
                 </Select>
-                <span className="text-xs text-slate-400">Usado como padrão quando não há permissão específica por sub-aba</span>
+                <span className="text-xs text-slate-700">Usado como padrão quando não há permissão específica por sub-aba</span>
               </div>
 
               {/* Permissões por módulo e sub-aba */}
@@ -909,7 +909,7 @@ export default function AgentesFormPage() {
                                 className={`px-3 py-1 rounded-full border text-xs font-medium transition-all ${
                                   nivel === n.value
                                     ? n.color + ' ring-2 ring-offset-1 ring-current'
-                                    : 'bg-white text-slate-400 border-slate-200 hover:border-slate-400'
+                                    : 'bg-white text-slate-700 border-slate-200 hover:border-slate-400'
                                 }`}
                               >
                                 {n.label}

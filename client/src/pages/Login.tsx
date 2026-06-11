@@ -344,7 +344,7 @@ export default function Login() {
                   )}
                 </div>
               ) : (
-                <p className="text-gray-400 text-sm mt-2">Aguarde um momento...</p>
+                <p className="text-gray-700 text-sm mt-2">Aguarde um momento...</p>
               )}
             </>
           ) : (
@@ -430,7 +430,7 @@ export default function Login() {
             <div className={`rounded-lg border p-4 ${mathError ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-medium text-gray-700">Verificação de Segurança</label>
-                <button type="button" onClick={renovarOperacao} className="text-gray-400 hover:text-gray-600 transition-colors" title="Nova operação">
+                <button type="button" onClick={renovarOperacao} className="text-gray-700 hover:text-gray-600 transition-colors" title="Nova operação">
                   <RefreshCw className="w-4 h-4" />
                 </button>
               </div>
@@ -483,7 +483,7 @@ export default function Login() {
           <p className="text-center text-xs text-gray-500 mt-6">
             Sistema seguro · Autenticação por ChaveJ · Acesso rápido disponível
           </p>
-          <p className="text-center text-xs text-gray-400 mt-2 border-t border-gray-100 pt-2">
+          <p className="text-center text-xs text-gray-700 mt-2 border-t border-gray-100 pt-2">
             🔒 Este sistema é licenciado para <span className="font-semibold text-gray-500">Grupo Firme &amp; Forte</span>
           </p>
         </div>

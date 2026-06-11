@@ -98,7 +98,7 @@ function AbaVersiculos() {
           </div>
         </CardContent>
       </Card>
-      <p className="text-center text-slate-400 text-xs mt-6">O versículo muda automaticamente a cada novo dia</p>
+      <p className="text-center text-slate-700 text-xs mt-6">O versículo muda automaticamente a cada novo dia</p>
     </div>
   );
 }
@@ -134,7 +134,7 @@ function AbaSalmos() {
           </div>
         </CardContent>
       </Card>
-      <p className="text-center text-slate-400 text-xs mt-6">O salmo muda automaticamente a cada novo dia</p>
+      <p className="text-center text-slate-700 text-xs mt-6">O salmo muda automaticamente a cada novo dia</p>
     </div>
   );
 }
@@ -155,7 +155,7 @@ function AbaMinutosSabedoria() {
           {isLoading ? (
             <div className="flex flex-col items-center gap-4 py-8">
               <Sparkles className="w-16 h-16 text-purple-200 animate-pulse" />
-              <p className="text-slate-400">Carregando reflexão...</p>
+              <p className="text-slate-700">Carregando reflexão...</p>
             </div>
           ) : pensamento ? (
             <>
@@ -167,7 +167,7 @@ function AbaMinutosSabedoria() {
               <div className="mb-6 flex justify-center">
                 <div className="w-16 h-1 rounded-full" style={{ background: 'linear-gradient(90deg, #c8960c, #6d28d9)' }} />
               </div>
-              <p className="text-xs text-slate-400 italic mb-2">C. Torres Pastorino — <em>Minutos de Sabedoria</em></p>
+              <p className="text-xs text-slate-700 italic mb-2">C. Torres Pastorino — <em>Minutos de Sabedoria</em></p>
               {total != null && total > 0 && <p className="text-xs text-slate-300 mt-1">{total} pensamento{total !== 1 ? 's' : ''} disponíve{total !== 1 ? 'is' : 'l'}</p>}
             </>
           ) : (
@@ -200,7 +200,7 @@ function AbaMotivacional() {
           {isLoading ? (
             <div className="flex flex-col items-center gap-4 py-8">
               <Zap className="w-16 h-16 text-amber-400 animate-pulse" />
-              <p className="text-slate-400">Carregando sua mensagem do dia...</p>
+              <p className="text-slate-700">Carregando sua mensagem do dia...</p>
             </div>
           ) : mensagem ? (
             <>
@@ -219,7 +219,7 @@ function AbaMotivacional() {
           ) : (
             <div className="flex flex-col items-center gap-4 py-8">
               <Zap className="w-16 h-16 text-amber-400/30" />
-              <p className="text-slate-400">Nenhuma mensagem disponível no momento.</p>
+              <p className="text-slate-700">Nenhuma mensagem disponível no momento.</p>
             </div>
           )}
         </CardContent>
@@ -447,7 +447,7 @@ function AbaOrixas() {
 
       {/* Seletor dos 10 Orixás */}
       <div className="bg-gray-900 rounded-2xl shadow-md p-4">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 text-center">Escolha seu Orixá</p>
+        <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3 text-center">Escolha seu Orixá</p>
         <div className="grid grid-cols-5 gap-2">
           {ORIXAS_10.map((o, idx) => (
             <button
@@ -569,7 +569,7 @@ function AbaHoroscopo() {
           )}
 
           {!signoSelecionado && !signoDoAgente && (
-            <div className="flex flex-col items-center gap-3 py-6 text-slate-400">
+            <div className="flex flex-col items-center gap-3 py-6 text-slate-700">
               <Star className="w-12 h-12 text-yellow-200" />
               <p className="text-sm">Clique em "Trocar signo" acima para ver o horóscopo de hoje</p>
             </div>
@@ -577,7 +577,7 @@ function AbaHoroscopo() {
           {signoSelecionado && isLoading && (
             <div className="flex flex-col items-center gap-4 py-8">
               <div className="animate-spin w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full" />
-              <p className="text-slate-400 text-sm">Buscando e traduzindo horóscopo...</p>
+              <p className="text-slate-700 text-sm">Buscando e traduzindo horóscopo...</p>
               <p className="text-slate-300 text-xs">Isso pode levar alguns segundos na primeira vez</p>
             </div>
           )}
@@ -590,7 +590,7 @@ function AbaHoroscopo() {
                 <span className="text-4xl">{SIGNO_EMOJIS[signoSelecionado]}</span>
                 <div>
                   <h2 className="text-2xl font-bold text-slate-800">{signoSelecionado}</h2>
-                  <p className="text-xs text-slate-400 capitalize">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  <p className="text-xs text-slate-700 capitalize">{new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 </div>
               </div>
               <div className="w-full h-0.5 rounded-full mb-5" style={{ background: 'linear-gradient(90deg, #1e3a5f, #c8960c)' }} />
@@ -633,7 +633,7 @@ export default function MensagemDoDiaHub() {
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   ativa
                     ? 'border-blue-600 text-blue-700 bg-blue-900/20'
-                    : 'border-transparent text-gray-400 hover:text-gray-400 hover:border-gray-300'
+                    : 'border-transparent text-gray-700 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />

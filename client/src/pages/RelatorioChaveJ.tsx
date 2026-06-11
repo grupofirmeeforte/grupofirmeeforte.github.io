@@ -185,9 +185,9 @@ export default function RelatorioChaveJ() {
 
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={16} className="text-center py-12 text-gray-400">Carregando...</td></tr>
+              <tr><td colSpan={16} className="text-center py-12 text-gray-700">Carregando...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={16} className="text-center py-12 text-gray-400">Nenhum dado encontrado para {ano}.</td></tr>
+              <tr><td colSpan={16} className="text-center py-12 text-gray-700">Nenhum dado encontrado para {ano}.</td></tr>
             ) : (
               Object.entries(grupos).map(([chaveJ, tipoRows], gi) => {
                 const bgBase = gi % 2 === 0 ? "bg-white" : "bg-blue-50/30";

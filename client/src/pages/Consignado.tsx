@@ -595,7 +595,7 @@ export default function Consignado() {
       {mostrarTotalizador && (
         <div className="px-6 py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b">
           <div className="mb-4">
-            <h2 className="text-sm font-semibold text-gray-400 mb-3">📊 Totalizador por Empresa e Mês/Ano</h2>
+            <h2 className="text-sm font-semibold text-gray-700 mb-3">📊 Totalizador por Empresa e Mês/Ano</h2>
             <div className="grid grid-cols-4 gap-3 items-end">
               <div>
                 <label className="text-xs font-medium text-gray-300 mb-1 block">Empresa</label>
@@ -651,7 +651,7 @@ export default function Consignado() {
               </div>
               <div className="bg-gray-900 rounded-lg p-3 shadow-sm">
                 <p className="text-xs text-gray-300 mb-1">Registros</p>
-                <p className="text-lg font-bold text-gray-400">{totalizador.registros}</p>
+                <p className="text-lg font-bold text-gray-700">{totalizador.registros}</p>
               </div>
             </div>
           )}
@@ -682,7 +682,7 @@ export default function Consignado() {
           </Select>
 
           <div className="relative flex-1 min-w-48">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700" />
             <Input
               placeholder="Buscar por agente, ChaveJ, convênio, nº operação..."
               value={filtroBusca}
@@ -710,7 +710,7 @@ export default function Consignado() {
             </Button>
           )}
 
-          <span className="text-sm text-gray-400 ml-auto">{registrosFiltrados.length} registro(s)</span>
+          <span className="text-sm text-gray-700 ml-auto">{registrosFiltrados.length} registro(s)</span>
         </div>
       </div>
 
@@ -727,7 +727,7 @@ export default function Consignado() {
       {/* Tabela */}
       <div className="px-6 py-4 overflow-x-auto">
         {isLoading ? (
-          <div className="text-center py-12 text-gray-400">Carregando...</div>
+          <div className="text-center py-12 text-gray-700">Carregando...</div>
         ) : (
           <table className="w-full text-xs border-collapse min-w-[600px]">
             <thead>
@@ -752,7 +752,7 @@ export default function Consignado() {
             <tbody>
               {registrosFiltrados.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="text-center py-10 text-gray-400">
+                  <td colSpan={6} className="text-center py-10 text-gray-700">
                     <p className="font-medium">Nenhum registro encontrado</p>
                     <p className="text-xs mt-1">Importe uma planilha ou cadastre manualmente</p>
                   </td>
@@ -782,24 +782,24 @@ export default function Consignado() {
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <span className="font-mono text-[11px] text-blue-700 font-semibold">{strVal(r.chaveJ)}</span>
                       <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{strVal(r.empresa)}</span>
-                      <span className="text-[9px] text-gray-400">{mesNumParaStr(r.mes)}</span>
+                      <span className="text-[9px] text-gray-700">{mesNumParaStr(r.mes)}</span>
                     </div>
                     <div className="text-[11px] text-white font-medium whitespace-nowrap">{strVal(r.nomeAgente)}</div>
                     {(r as any).favorecido && (
                       <div className="text-[10px] text-blue-600 font-medium leading-tight">Fav: {(r as any).favorecido}</div>
                     )}
-                    {r.supervisor && <div className="text-[10px] text-gray-400">Sup: {r.supervisor}</div>}
+                    {r.supervisor && <div className="text-[10px] text-gray-700">Sup: {r.supervisor}</div>}
                   </td>
                   {/* Coluna Operação + Produto */}
                   <td className="px-2 py-1.5 border-b border-gray-100">
-                    <div className="text-[11px] text-gray-400 font-medium">{strVal(r.convenio)}</div>
-                    <div className={`font-mono text-[10px] ${r.isDuplicate ? 'text-red-700 font-bold' : 'text-gray-400'}`}>
+                    <div className="text-[11px] text-gray-700 font-medium">{strVal(r.convenio)}</div>
+                    <div className={`font-mono text-[10px] ${r.isDuplicate ? 'text-red-700 font-bold' : 'text-gray-700'}`}>
                       {strVal(r.nrOperacao)}{r.isDuplicate && <span className="ml-1">⚠️</span>}
                     </div>
-                    {r.dtContratacao && <div className="text-[10px] text-gray-400">{strVal(r.dtContratacao)}</div>}
+                    {r.dtContratacao && <div className="text-[10px] text-gray-700">{strVal(r.dtContratacao)}</div>}
                     <div className="text-[10px] text-gray-300 font-medium mt-0.5">{strVal(r.produto)}</div>
-                    {r.descricaoProduto && <div className="text-[10px] text-gray-400 max-w-[150px] truncate" title={r.descricaoProduto}>{r.descricaoProduto}</div>}
-                    <div className="text-[10px] text-gray-400">
+                    {r.descricaoProduto && <div className="text-[10px] text-gray-700 max-w-[150px] truncate" title={r.descricaoProduto}>{r.descricaoProduto}</div>}
+                    <div className="text-[10px] text-gray-700">
                       {r.juros ? `Juros: ${pctJuros(r.juros)}` : ''}{r.prefixoBB ? ` · BB: ${r.prefixoBB}` : ''}
                     </div>
                     {r.restricaoSRCC && <div className="text-[10px] text-orange-600">SRCC: {r.restricaoSRCC}</div>}
@@ -807,9 +807,9 @@ export default function Consignado() {
                   {/* Coluna Valores */}
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
                     <div className="font-bold text-blue-800 text-[12px]">{moeda(r.valorLiquido)}</div>
-                    <div className="text-[10px] text-gray-400">Bruto: {moeda(r.valorBruto)}</div>
-                    <div className="text-[10px] text-gray-400">RBM: {moeda(r.rbm)}</div>
-                    {r.parcela != null && <div className="text-[10px] text-gray-400">Parc: {r.parcela}</div>}
+                    <div className="text-[10px] text-gray-700">Bruto: {moeda(r.valorBruto)}</div>
+                    <div className="text-[10px] text-gray-700">RBM: {moeda(r.rbm)}</div>
+                    {r.parcela != null && <div className="text-[10px] text-gray-700">Parc: {r.parcela}</div>}
                   </td>
                   {/* Coluna Comissão */}
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
@@ -834,7 +834,7 @@ export default function Consignado() {
                       return null;
                     })()}
                     {r.tabela && r.tabela !== 'NULL' && r.tabela !== '0' && (
-                      <div className="text-[10px] text-gray-400">{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
+                      <div className="text-[10px] text-gray-700">{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
                     )}
                   </td>
                   <td className="px-2 py-1.5 border-b border-gray-100">

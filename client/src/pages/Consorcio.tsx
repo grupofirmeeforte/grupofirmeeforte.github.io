@@ -366,7 +366,7 @@ export default function Consorcio() {
       {/* Filtros */}
       <div className="bg-gray-900 border-b border-gray-700 px-4 py-2 flex flex-wrap gap-2">
         <div className="relative">
-          <Search className="absolute left-2 top-2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-2 top-2 w-4 h-4 text-gray-700" />
           <Input
             className="pl-8 h-9 w-52 text-sm"
             placeholder="Proposta / ChaveJ / Agente"
@@ -435,9 +435,9 @@ export default function Consorcio() {
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={6} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+              <tr><td colSpan={6} className="text-center py-8 text-gray-700">Carregando...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={6} className="text-center py-8 text-gray-400">Nenhum registro encontrado</td></tr>
+              <tr><td colSpan={6} className="text-center py-8 text-gray-700">Nenhum registro encontrado</td></tr>
             ) : rows.map((row, i) => (
               <tr key={row.id} className={`${i % 2 === 0 ? "bg-white" : "bg-gray-800"} ${selectedIds.has(row.id) ? "ring-1 ring-inset ring-blue-400" : ""}`}>
                 <td className="px-2 py-1.5 border-r border-gray-700 text-center">
@@ -453,14 +453,14 @@ export default function Consorcio() {
                   <div className="flex items-center gap-1.5 mb-0.5">
                     <span className="font-mono text-[11px] text-blue-700 font-semibold">{row.chaveJ ?? "-"}</span>
                     <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{row.empresa ?? ""}</span>
-                    <span className="text-[9px] text-gray-400">{row.mesAno ?? ""}</span>
+                    <span className="text-[9px] text-gray-700">{row.mesAno ?? ""}</span>
                   </div>
                   <div className="text-[11px] text-white font-medium whitespace-nowrap">{row.nomeAgente ?? "-"}</div>
                 </td>
                 {/* Coluna Operação */}
                 <td className="px-2 py-1.5 border-r border-gray-700">
-                  <div className="font-mono text-[11px] text-gray-400 font-medium">{row.proposta ?? "-"}</div>
-                  <div className="text-[10px] text-gray-400 whitespace-nowrap">{row.data ?? ""}</div>
+                  <div className="font-mono text-[11px] text-gray-700 font-medium">{row.proposta ?? "-"}</div>
+                  <div className="text-[10px] text-gray-700 whitespace-nowrap">{row.data ?? ""}</div>
                   {row.segmento && (
                     <span className={`text-[9px] px-1 py-0.5 rounded font-medium ${row.segmento === "IMOVEL" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>
                       {row.segmento}
@@ -470,15 +470,15 @@ export default function Consorcio() {
                 {/* Coluna Valores */}
                 <td className="px-2 py-1.5 border-r border-gray-700 text-right whitespace-nowrap">
                   <div className="font-bold text-blue-800 text-[12px]">{fmtMoeda(row.valorBem)}</div>
-                  <div className="text-[10px] text-gray-400">RBM: {fmtMoeda(row.rbm)}</div>
-                  {row.parcLiberada && <div className="text-[10px] text-gray-400">Parc: {row.parcLiberada}</div>}
+                  <div className="text-[10px] text-gray-700">RBM: {fmtMoeda(row.rbm)}</div>
+                  {row.parcLiberada && <div className="text-[10px] text-gray-700">Parc: {row.parcLiberada}</div>}
                 </td>
                 {/* Coluna Comissão */}
                 <td className="px-2 py-1.5 border-r border-gray-700 text-right whitespace-nowrap">
                   {parseFloat(row.comissao ?? '0') > 0 ? (
                     <>
                       <div className="font-bold text-green-700 text-[12px]">{fmtMoeda(row.comissao)}</div>
-                      <div className="text-[10px] text-gray-400">{fmtPct(row.pctComissao2)}</div>
+                      <div className="text-[10px] text-gray-700">{fmtPct(row.pctComissao2)}</div>
                     </>
                   ) : (
                     <span className="text-[11px] text-gray-300">-</span>
@@ -511,7 +511,7 @@ export default function Consorcio() {
       {/* Paginação */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-4 py-3 bg-white border-t text-sm">
-          <span className="text-gray-400">
+          <span className="text-gray-700">
             Página {page + 1} de {totalPages} — {total.toLocaleString("pt-BR")} registros
           </span>
           <div className="flex gap-2">
@@ -539,14 +539,14 @@ export default function Consorcio() {
                 className={`p-3 rounded border-2 text-left transition ${importModo === "inserir" ? "border-blue-500 bg-blue-900/20" : "border-gray-700 hover:border-gray-300"}`}
               >
                 <div className="font-semibold text-sm">Apenas Inserir</div>
-                <div className="text-xs text-gray-400 mt-1">Adiciona somente registros novos. Ignora propostas já existentes.</div>
+                <div className="text-xs text-gray-700 mt-1">Adiciona somente registros novos. Ignora propostas já existentes.</div>
               </button>
               <button
                 onClick={() => setImportModo("subscrever")}
                 className={`p-3 rounded border-2 text-left transition ${importModo === "subscrever" ? "border-blue-500 bg-blue-900/20" : "border-gray-700 hover:border-gray-300"}`}
               >
                 <div className="font-semibold text-sm">Subscrever</div>
-                <div className="text-xs text-gray-400 mt-1">Adiciona novos e atualiza os existentes pelo número da proposta.</div>
+                <div className="text-xs text-gray-700 mt-1">Adiciona novos e atualiza os existentes pelo número da proposta.</div>
               </button>
             </div>
 
@@ -559,13 +559,13 @@ export default function Consorcio() {
                 style={{ display: "block", width: "100%", padding: "10px", border: "2px dashed #d1d5db", borderRadius: 8, cursor: "pointer", fontSize: 13, background: "#f9fafb" }}
               />
               {importFileName && (
-                <p className="text-xs text-gray-400 mt-1">📄 {importFileName} — {importRows.length} registros lidos</p>
+                <p className="text-xs text-gray-700 mt-1">📄 {importFileName} — {importRows.length} registros lidos</p>
               )}
             </div>
 
             {importing && (
               <div>
-                <div className="flex justify-between text-xs text-gray-400 mb-1">
+                <div className="flex justify-between text-xs text-gray-700 mb-1">
                   <span>Importando...</span><span>{importProgress}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
@@ -674,7 +674,7 @@ export default function Consorcio() {
                   <Label className="text-xs text-gray-300">% Demais</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,65" value={cfgPadraoDemais1} onChange={e => setCfgPadraoDemais1(e.target.value)} />
-                    <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
+                    <span className="absolute right-2 top-2 text-xs text-gray-700">%</span>
                   </div>
                 </div>
                 {/* Parc. Demais De */}
@@ -698,7 +698,7 @@ export default function Consorcio() {
                   <Label className="text-xs text-gray-300">% Imóvel</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,20" value={cfgPadraoDemais2} onChange={e => setCfgPadraoDemais2(e.target.value)} />
-                    <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
+                    <span className="absolute right-2 top-2 text-xs text-gray-700">%</span>
                   </div>
                 </div>
                 {/* Parc. Imóvel De */}
@@ -729,7 +729,7 @@ export default function Consorcio() {
                   <Label className="text-xs text-gray-300">% Demais</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 1,00" value={cfgEspecialDemais1} onChange={e => setCfgEspecialDemais1(e.target.value)} />
-                    <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
+                    <span className="absolute right-2 top-2 text-xs text-gray-700">%</span>
                   </div>
                 </div>
                 {/* Parc. Demais De */}
@@ -753,7 +753,7 @@ export default function Consorcio() {
                   <Label className="text-xs text-gray-300">% Imóvel</Label>
                   <div className="relative">
                     <Input className="pr-6 h-9 text-sm" placeholder="ex: 0,75" value={cfgEspecialDemais2} onChange={e => setCfgEspecialDemais2(e.target.value)} />
-                    <span className="absolute right-2 top-2 text-xs text-gray-400">%</span>
+                    <span className="absolute right-2 top-2 text-xs text-gray-700">%</span>
                   </div>
                 </div>
                 {/* Parc. Imóvel De */}
@@ -782,7 +782,7 @@ export default function Consorcio() {
                   value={cfgAgentesEspeciais}
                   onChange={e => setCfgAgentesEspeciais(e.target.value)}
                 />
-                <p className="text-xs text-gray-400 mt-1">Digite um ChaveJ por linha. Esses agentes usarão as taxas especiais no cálculo.</p>
+                <p className="text-xs text-gray-700 mt-1">Digite um ChaveJ por linha. Esses agentes usarão as taxas especiais no cálculo.</p>
               </div>
             </div>
           </div>
