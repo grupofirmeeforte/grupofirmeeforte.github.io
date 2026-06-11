@@ -682,12 +682,12 @@ export default function Consignado() {
           </Select>
 
           <div className="relative flex-1 min-w-48">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               placeholder="Buscar por agente, ChaveJ, convênio, nº operação..."
               value={filtroBusca}
               onChange={e => setFiltroBusca(e.target.value)}
-              className="pl-9"
+              className="pl-9 text-white placeholder:text-gray-400 bg-gray-800 border-gray-600"
             />
           </div>
 
