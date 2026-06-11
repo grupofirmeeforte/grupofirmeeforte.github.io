@@ -581,7 +581,7 @@ export default function PagamentosPage() {
                     {row.mesAno && <span className="text-[9px] text-gray-400">{row.mesAno}</span>}
                   </div>
                   {(row as any).nomeAgente && <div className="text-[11px] text-white font-medium truncate max-w-[220px]" title={(row as any).nomeAgente}>{(row as any).nomeAgente}</div>}
-                  {(row as any).favorecidoAgente && <div className="text-[10px] text-green-400 font-medium truncate max-w-[200px]">Fav: {(row as any).favorecidoAgente}</div>}
+                  {(row as any).favorecidoAgente && <div className="text-[11px] text-green-400 font-medium truncate max-w-[220px]" title={(row as any).favorecidoAgente}>{(row as any).favorecidoAgente}</div>}
                   {!(row as any).nomeAgente && <div className="text-[11px] text-white font-medium truncate max-w-[200px]" title={row.nomeFavorecido ?? ""}>{row.nomeFavorecido || "-"}</div>}
                   <div className="text-[10px] text-gray-400">{row.empresa || ""}{row.cidadeUF ? ` · ${row.cidadeUF}` : ""}</div>
                 </td>
