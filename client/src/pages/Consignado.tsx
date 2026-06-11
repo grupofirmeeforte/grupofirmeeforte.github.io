@@ -763,12 +763,12 @@ export default function Consignado() {
                   key={r.id}
                   className={
                     idx % 2 === 0
-                      ? 'bg-white hover:bg-blue-900/30 transition-colors'
-                      : 'bg-blue-900/20/40 hover:bg-blue-100/60 transition-colors'
+                      ? 'bg-white hover:bg-blue-900 transition-colors'
+                      : 'bg-blue-900/20/40 hover:bg-blue-900 transition-colors'
                   }
                 >
                   {modoSelecao && (
-                    <td className="px-2 py-1.5 border-b border-gray-100 text-center">
+                    <td className={`px-2 py-1.5 border-b border-gray-100 text-center group-hover:text-white`}>
                       <input
                         type="checkbox"
                         checked={selecionados.has(r.id)}
@@ -778,63 +778,63 @@ export default function Consignado() {
                     </td>
                   )}
                   {/* Coluna Agente */}
-                  <td className="px-2 py-1.5 border-b border-gray-100">
+                  <td className={`px-2 py-1.5 border-b border-gray-100 group`}>
                     <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="font-mono text-[11px] text-blue-700 font-semibold">{strVal(r.chaveJ)}</span>
-                      <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{strVal(r.empresa)}</span>
-                      <span className="text-[9px] text-gray-600">{mesNumParaStr(r.mes)}</span>
+                      <span className={`font-mono text-[11px] ${idx % 2 === 0 ? 'text-blue-700 group-hover:text-white' : 'text-blue-300 group-hover:text-white'} font-semibold`}>{strVal(r.chaveJ)}</span>
+                      <span className={`text-[9px] px-1 py-0.5 rounded ${idx % 2 === 0 ? 'bg-blue-100 text-blue-700 group-hover:bg-blue-300 group-hover:text-white' : 'bg-blue-300 text-white group-hover:bg-blue-200'}`}>{strVal(r.empresa)}</span>
+                      <span className={`text-[9px] ${idx % 2 === 0 ? 'text-gray-600 group-hover:text-white' : 'text-gray-300 group-hover:text-white'}`}>{mesNumParaStr(r.mes)}</span>
                     </div>
                     <div className={`text-[11px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-white'} font-medium whitespace-nowrap`}>{strVal(r.nomeAgente)}</div>
                     {(r as any).favorecido && (
-                      <div className={`text-[10px] ${idx % 2 === 0 ? 'text-blue-900' : 'text-blue-300'} font-medium leading-tight`}>Fav: {(r as any).favorecido}</div>
+                      <div className={`text-[10px] ${idx % 2 === 0 ? 'text-blue-900 group-hover:text-white' : 'text-blue-300 group-hover:text-white'} font-medium leading-tight`}>Fav: {(r as any).favorecido}</div>
                     )}
-                    {r.supervisor && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>Sup: {r.supervisor}</div>}
+                    {r.supervisor && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900 group-hover:text-white' : 'text-gray-300 group-hover:text-white'}`}>Sup: {r.supervisor}</div>}
                   </td>
                   {/* Coluna Operação + Produto */}
-                  <td className="px-2 py-1.5 border-b border-gray-100">
-                    <div className={`text-[11px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-200'} font-medium`}>{strVal(r.convenio)}</div>
-                    <div className={`font-mono text-[10px] ${r.isDuplicate ? 'text-red-700 font-bold' : 'text-gray-600'}`}>
+                  <td className="px-2 py-1.5 border-b border-gray-100 group">
+                    <div className={`text-[11px] ${idx % 2 === 0 ? 'text-gray-900 group-hover:text-white' : 'text-gray-200 group-hover:text-white'} font-medium`}>{strVal(r.convenio)}</div>
+                    <div className={`font-mono text-[10px] ${r.isDuplicate ? 'text-red-700 font-bold group-hover:text-red-200' : `${idx % 2 === 0 ? 'text-gray-600 group-hover:text-white' : 'text-gray-300 group-hover:text-white'}`}`}>
                       {strVal(r.nrOperacao)}{r.isDuplicate && <span className="ml-1">⚠️</span>}
                     </div>
-                    {r.dtContratacao && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>{strVal(r.dtContratacao)}</div>}
-                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-200'} font-medium mt-0.5`}>{strVal(r.produto)}</div>
-                    {r.descricaoProduto && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'} max-w-[150px] truncate`} title={r.descricaoProduto}>{r.descricaoProduto}</div>}
-                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>
+                    {r.dtContratacao && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900 group-hover:text-white' : 'text-gray-300 group-hover:text-white'}`}>{strVal(r.dtContratacao)}</div>}
+                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900 group-hover:text-white' : 'text-gray-200 group-hover:text-white'} font-medium mt-0.5`}>{strVal(r.produto)}</div>
+                    {r.descricaoProduto && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900 group-hover:text-white' : 'text-gray-300 group-hover:text-white'} max-w-[150px] truncate`} title={r.descricaoProduto}>{r.descricaoProduto}</div>}
+                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900 group-hover:text-white' : 'text-gray-300 group-hover:text-white'}`}>
                       {r.juros ? `Juros: ${pctJuros(r.juros)}` : ''}{r.prefixoBB ? ` · BB: ${r.prefixoBB}` : ''}
                     </div>
-                    {r.restricaoSRCC && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-orange-900' : 'text-orange-300'}`}>SRCC: {r.restricaoSRCC}</div>}
+                    {r.restricaoSRCC && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-orange-900 group-hover:text-orange-200' : 'text-orange-300 group-hover:text-orange-100'}`}>SRCC: {r.restricaoSRCC}</div>}
                   </td>
                   {/* Coluna Valores */}
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
-                    <div className="font-bold text-blue-800 text-[12px]">{moeda(r.valorLiquido)}</div>
-                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>Bruto: {moeda(r.valorBruto)}</div>
-                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>RBM: {moeda(r.rbm)}</div>
-                    {r.parcela != null && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>Parc: {r.parcela}</div>}
+                  <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap group">
+                    <div className={`font-bold text-[12px] ${idx % 2 === 0 ? 'text-blue-800 group-hover:text-blue-200' : 'text-blue-300 group-hover:text-blue-100'}`}>{moeda(r.valorLiquido)}</div>
+                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900 group-hover:text-white' : 'text-gray-300 group-hover:text-white'}`}>Bruto: {moeda(r.valorBruto)}</div>
+                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900 group-hover:text-white' : 'text-gray-300 group-hover:text-white'}`}>RBM: {moeda(r.rbm)}</div>
+                    {r.parcela != null && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900 group-hover:text-white' : 'text-gray-300 group-hover:text-white'}`}>Parc: {r.parcela}</div>}
                   </td>
                   {/* Coluna Comissão */}
-                  <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
+                  <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap group">
                     {/* % do RBM usado pela comissão - acima do valor */}
                     {(() => {
                       const com = parseFloat(String(r.totalComissao || '0').replace(',', '.'));
                       const rbmVal = parseFloat(String(r.rbm || '0').replace(',', '.'));
                       if (com > 0 && rbmVal > 0) {
                         const pctRbm = (com / rbmVal) * 100;
-                        return <div className="text-[10px] font-semibold text-orange-600">{pctRbm.toFixed(1)}% do RBM</div>;
+                        return <div className={`text-[10px] font-semibold ${idx % 2 === 0 ? 'text-orange-600 group-hover:text-orange-200' : 'text-orange-400 group-hover:text-orange-100'}`}>{pctRbm.toFixed(1)}% do RBM</div>;
                       }
                       return null;
                     })()}
-                    <div className="font-bold text-green-700 text-[12px]">{moeda(r.totalComissao)}</div>
+                    <div className={`font-bold text-[12px] ${idx % 2 === 0 ? 'text-green-700 group-hover:text-green-200' : 'text-green-400 group-hover:text-green-100'}`}>{moeda(r.totalComissao)}</div>
                     {/* % da tabela de comissão (percPago salvo no banco) */}
                     {(() => {
                       const pp = parseFloat(String(r.percPago || '0').replace(',', '.'));
                       if (pp > 0) {
                         const pct = pp >= 1 ? pp : pp * 100;
-                        return <div className="text-[10px] font-semibold text-blue-600">{pct.toFixed(2)}% tabela</div>;
+                        return <div className={`text-[10px] font-semibold ${idx % 2 === 0 ? 'text-blue-600 group-hover:text-blue-200' : 'text-blue-400 group-hover:text-blue-100'}`}>{pct.toFixed(2)}% tabela</div>;
                       }
                       return null;
                     })()}
                     {r.tabela && r.tabela !== 'NULL' && r.tabela !== '0' && (
-                      <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
+                      <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900 group-hover:text-white' : 'text-gray-300 group-hover:text-white'}`}>{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
                     )}
                   </td>
                   <td className="px-2 py-1.5 border-b border-gray-100">
