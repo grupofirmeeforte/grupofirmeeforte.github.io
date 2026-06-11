@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, Send, Trash2, X, RefreshCw, Search } from "lucide-react";
+import { ArrowLeft, Plus, Send, Trash2, X, RefreshCw, Search, Pencil, TrendingUp, TrendingDown } from "lucide-react";
 import { useLocation } from "wouter";
 
 function getMesAtual(): string {
@@ -54,6 +54,9 @@ export default function ReajustePage() {
   const [selecionadosAuto, setSelecionadosAuto] = useState<string[]>([]); // chaveJ|empresa
   const [mesEnvioAuto, setMesEnvioAuto] = useState(getMesAtual());
   const [showEnviarAutoDialog, setShowEnviarAutoDialog] = useState(false);
+  // Edição de linha na aba automática
+  const [editandoKey, setEditandoKey] = useState<string | null>(null);
+  const [editNovoValor, setEditNovoValor] = useState("");
 
   const { data: diferencas = [], isLoading: loadingAuto, refetch: refetchAuto } = trpc.reajustes.buscarDiferencas.useQuery(
     { mesRef: filtroMesAuto, empresa: filtroEmpresaAuto || undefined },
@@ -143,6 +146,23 @@ export default function ReajustePage() {
       .reduce((acc, d) => acc + d.diferenca, 0);
   }, [diferencas, selecionadosAuto]);
 
+  const totalPositivo = useMemo(() => diferencas.filter(d => d.diferenca > 0).reduce((a, d) => a + d.diferenca, 0), [diferencas]);
+  const totalNegativo = useMemo(() => diferencas.filter(d => d.diferenca < 0).reduce((a, d) => a + d.diferenca, 0), [diferencas]);
+  const qtdPositivo = useMemo(() => diferencas.filter(d => d.diferenca > 0).length, [diferencas]);
+  const qtdNegativo = useMemo(() => diferencas.filter(d => d.diferenca < 0).length, [diferencas]);
+
+  // Estado local das diferenças para permitir edição
+  const [diferencasEditadas, setDiferencasEditadas] = useState<Record<string, number>>({});
+
+  const getDiferenca = (d: typeof diferencas[0]) => {
+    const key = `${d.chaveJ}|${d.empresa ?? ''}`;
+    return diferencasEditadas[key] !== undefined ? diferencasEditadas[key] : d.diferenca;
+  };
+  const getNovoValor = (d: typeof diferencas[0]) => {
+    const key = `${d.chaveJ}|${d.empresa ?? ''}`;
+    return diferencasEditadas[key] !== undefined ? d.valorPago + diferencasEditadas[key] : d.novoValor;
+  };
+
   const pendentes = reajustes.filter((r) => r.status === "pendente");
 
   function toggleSelecionado(id: number) {
@@ -193,9 +213,23 @@ export default function ReajustePage() {
         chaveJ: d.chaveJ,
         nomeAgente: d.nomeAgente ?? undefined,
         valorPagoAnterior: d.valorPago,
-        novoValor: d.novoValor,
+        novoValor: getNovoValor(d),
       }));
     criarEmLoteMutation.mutate({ itens, mesAno: mesEnvioAuto });
+  }
+
+  function handleSalvarEdicao(key: string, d: typeof diferencas[0]) {
+    const novoV = parseFloat(editNovoValor.replace(',', '.'));
+    if (!isNaN(novoV)) {
+      const novaDif = parseFloat((novoV - d.valorPago).toFixed(2));
+      setDiferencasEditadas(prev => ({ ...prev, [key]: novaDif }));
+    }
+    setEditandoKey(null);
+  }
+
+  function handleRemoverLinha(key: string) {
+    setDiferencasEditadas(prev => ({ ...prev, [key]: 0 }));
+    setSelecionadosAuto(prev => prev.filter(k => k !== key));
   }
 
   const statusColor: Record<string, string> = {
@@ -276,6 +310,28 @@ export default function ReajustePage() {
             )}
           </div>
 
+          {/* Cards de totais */}
+          {buscarAtivado && diferencas.length > 0 && (
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3 flex items-center gap-3">
+                <TrendingUp className="w-8 h-8 text-green-400 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-400">A Pagar (Positivo)</p>
+                  <p className="text-lg font-bold text-green-300">{fmt(totalPositivo)}</p>
+                  <p className="text-xs text-gray-500">{qtdPositivo} agente(s)</p>
+                </div>
+              </div>
+              <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 flex items-center gap-3">
+                <TrendingDown className="w-8 h-8 text-red-400 flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-400">A Descontar (Negativo)</p>
+                  <p className="text-lg font-bold text-red-300">{fmt(totalNegativo)}</p>
+                  <p className="text-xs text-gray-500">{qtdNegativo} agente(s)</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Tabela diferenças */}
           <div className="overflow-x-auto rounded-lg border border-gray-700">
             <table className="w-full text-xs">
@@ -296,19 +352,21 @@ export default function ReajustePage() {
                   <th className="p-2 text-right text-gray-400">Valor Pago</th>
                   <th className="p-2 text-right text-gray-400">Novo Valor (Cálculo)</th>
                   <th className="p-2 text-right text-yellow-400">Diferença</th>
+                  <th className="p-2 text-center text-gray-400">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {loadingAuto ? (
-                  <tr><td colSpan={7} className="text-center p-8 text-gray-400">Buscando diferenças...</td></tr>
+                  <tr><td colSpan={8} className="text-center p-8 text-gray-400">Buscando diferenças...</td></tr>
                 ) : !buscarAtivado ? (
-                  <tr><td colSpan={7} className="text-center p-8 text-gray-500">Selecione o mês e clique em "Buscar Diferenças"</td></tr>
+                  <tr><td colSpan={8} className="text-center p-8 text-gray-500">Selecione o mês e clique em "Buscar Diferenças"</td></tr>
                 ) : diferencas.length === 0 ? (
-                  <tr><td colSpan={7} className="text-center p-8 text-green-400">✓ Nenhuma diferença encontrada — todos os valores estão corretos!</td></tr>
+                  <tr><td colSpan={8} className="text-center p-8 text-green-400">✓ Nenhuma diferença encontrada — todos os valores estão corretos!</td></tr>
                 ) : (
-                  diferencas.map((d, i) => {
+                  diferencas.filter(d => getDiferenca(d) !== 0).map((d, i) => {
                     const key = `${d.chaveJ}|${d.empresa ?? ''}`;
-                    const isPositivo = d.diferenca > 0;
+                    const isPositivo = getDiferenca(d) > 0;
+                    const isEditando = editandoKey === key;
                     return (
                       <tr key={key} className={`border-b border-gray-800 hover:bg-[#1a2235]/50 ${i % 2 === 0 ? "bg-[#0d1526]" : "bg-[#0a0f1e]"}`}>
                         <td className="p-2">
@@ -327,9 +385,40 @@ export default function ReajustePage() {
                         </td>
                         <td className="p-2 text-gray-300">{d.empresa || "-"}</td>
                         <td className="p-2 text-right text-gray-400">{fmt(d.valorPago)}</td>
-                        <td className="p-2 text-right text-green-300">{fmt(d.novoValor)}</td>
-                        <td className={`p-2 text-right font-bold ${d.diferenca > 0 ? "text-yellow-300" : "text-red-400"}`}>
-                          {d.diferenca > 0 ? "+" : ""}{fmt(d.diferenca)}
+                        <td className="p-2 text-right">
+                          {isEditando ? (
+                            <div className="flex items-center gap-1 justify-end">
+                              <Input
+                                autoFocus
+                                value={editNovoValor}
+                                onChange={(e) => setEditNovoValor(e.target.value)}
+                                onKeyDown={(e) => { if (e.key === 'Enter') handleSalvarEdicao(key, d); if (e.key === 'Escape') setEditandoKey(null); }}
+                                className="bg-[#0a0f1e] border-yellow-500 text-white text-xs w-24 h-6 text-right"
+                              />
+                              <button onClick={() => handleSalvarEdicao(key, d)} className="text-green-400 hover:text-green-300"><span className="text-xs">OK</span></button>
+                            </div>
+                          ) : (
+                            <span className="text-green-300">{fmt(getNovoValor(d))}</span>
+                          )}
+                        </td>
+                        <td className={`p-2 text-right font-bold ${getDiferenca(d) > 0 ? "text-yellow-300" : "text-red-400"}`}>
+                          {getDiferenca(d) > 0 ? "+" : ""}{fmt(getDiferenca(d))}
+                        </td>
+                        <td className="p-2 text-center">
+                          <div className="flex gap-1 justify-center">
+                            <button
+                              onClick={() => { setEditandoKey(key); setEditNovoValor(String(getNovoValor(d).toFixed(2)).replace('.', ',')); }}
+                              className="text-blue-400 hover:text-blue-300 p-1" title="Editar valor"
+                            >
+                              <Pencil className="w-3 h-3" />
+                            </button>
+                            <button
+                              onClick={() => handleRemoverLinha(key)}
+                              className="text-red-400 hover:text-red-300 p-1" title="Remover da lista"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
