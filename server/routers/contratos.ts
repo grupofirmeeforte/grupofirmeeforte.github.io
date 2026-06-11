@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router, adminProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { contratos, crm } from "../../drizzle/schema";
-import { eq, desc, like, and, sql } from "drizzle-orm";
+import { eq, desc, like, and, sql, or } from "drizzle-orm";
 import { storagePut } from "../storage";
 import { PDFParse } from 'pdf-parse';
 
@@ -399,7 +399,10 @@ export const contratosRouter = router({
           and(
             input.chaveJ ? eq(contratos.chaveJOperador, input.chaveJ) : undefined,
             input.nomeCliente ? like(contratos.nomeCliente, `%${input.nomeCliente}%`) : undefined,
-            input.numeroProposta ? like(contratos.numeroProposta, `%${input.numeroProposta}%`) : undefined,
+            input.numeroProposta ? or(
+              like(contratos.numeroProposta, `%${input.numeroProposta}%`),
+              like(contratos.chaveJOperador, `%${input.numeroProposta}%`)
+            ) : undefined,
             input.nomeOperador ? like(contratos.nomeOperador, `%${input.nomeOperador}%`) : undefined,
             input.empresa ? like(contratos.empresa, `%${input.empresa}%`) : undefined,
             input.linhaCredito ? like(contratos.linhaCredito, `%${input.linhaCredito}%`) : undefined,
