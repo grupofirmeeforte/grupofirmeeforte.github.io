@@ -323,7 +323,7 @@
 - [ ] Atualizar tela Cálculo para exibir os dados importados
 
 ## UI LEGIBILITY FIXES (PAGE-BY-PAGE)
-- [x] Agentes - Fix CPF/Celular visibility on light backgrounds (text-gray-400→700, text-slate-400→700)
+- [x] Agentes - COMPLETO: Todas as cores corrigidas (CPF/Celular/Banco/PIX text-gray-900/700, Badges bg-*-600 text-white)
 - [ ] Pending: Await user screenshots for remaining pages
 
 ## FASE 25: REESCRITA DA PÁGINA CÁLCULO (DADOS REAIS)- [x] Criar router calculosRouter em server/routers/calculos.ts com listar/mesesDisponiveis/empresasDisponiveis/criar/editar/deletar
