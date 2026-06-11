@@ -570,15 +570,15 @@ export default function ContaCorrente() {
                       <div className="flex items-center gap-1.5 mb-0.5">
                         <span className="font-mono text-[11px] text-blue-700 font-semibold">{r.chaveJ || "-"}</span>
                         <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{r.empresa || ""}</span>
-                        <span className="text-[9px] text-gray-400">{r.mesAno || ""}</span>
+                        <span className="text-[9px] text-gray-700">{r.mesAno || ""}</span>
                       </div>
                       <div className="text-[11px] text-white font-medium">{r.agente || "-"}</div>
-                      {r.supervisor && <div className="text-[10px] text-gray-400">Sup: {r.supervisor}</div>}
+                      {r.supervisor && <div className="text-[10px] text-gray-700">Sup: {r.supervisor}</div>}
                     </td>
                     {/* Coluna Conta */}
                     <td className="px-2 py-1.5">
-                      <div className="text-[11px] text-gray-200">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
-                      <div className="text-[10px] text-gray-400">
+                      <div className="text-[11px] text-gray-900">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
+                      <div className="text-[10px] text-gray-700">
                         {r.dataOperacao
                           ? (r.dataOperacao instanceof Date
                             ? r.dataOperacao.toLocaleDateString("pt-BR")
@@ -588,8 +588,8 @@ export default function ContaCorrente() {
                     </td>
                     {/* Coluna Valores */}
                     <td className="px-2 py-1.5 text-right whitespace-nowrap">
-                      <div className="font-bold text-green-700 text-[12px]">{r.comissao ? fmtMoeda(r.comissao) : "-"}</div>
-                      <div className="text-[10px] text-gray-400">RBM: {fmtMoeda(r.rbm)}</div>
+                      <div className="font-bold text-green-900 text-[12px]">{r.comissao ? fmtMoeda(r.comissao) : "-"}</div>
+                      <div className="text-[10px] text-gray-700">RBM: {fmtMoeda(r.rbm)}</div>
                     </td>
                     <td className="px-2 py-1.5 text-center" onClick={e => e.stopPropagation()}>
                       <div className="flex items-center justify-center gap-1">
