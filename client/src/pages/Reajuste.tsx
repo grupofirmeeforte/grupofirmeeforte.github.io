@@ -346,12 +346,8 @@ export default function ReajustePage() {
                       />
                     )}
                   </th>
-                  <th className="p-2 text-left text-gray-400">Mês Ref</th>
-                  <th className="p-2 text-left text-gray-400">ChaveJ / Agente</th>
-                  <th className="p-2 text-left text-gray-400">Empresa</th>
-                  <th className="p-2 text-right text-gray-400">Valor Pago</th>
-                  <th className="p-2 text-right text-gray-400">Novo Valor (Cálculo)</th>
-                  <th className="p-2 text-right text-yellow-400">Diferença</th>
+                  <th className="p-2 text-left text-gray-400">Agente / Empresa</th>
+                  <th className="p-2 text-right text-gray-400">Pago / Novo / Dif.</th>
                   <th className="p-2 text-center text-gray-400">Ações</th>
                 </tr>
               </thead>
@@ -378,31 +374,36 @@ export default function ReajustePage() {
                             />
                           )}
                         </td>
-                        <td className="p-2 text-blue-300">{d.mesRef}</td>
                         <td className="p-2">
-                          <div className="text-yellow-300 font-mono">{d.chaveJ}</div>
-                          <div className="text-gray-400 text-[10px]">{d.nomeAgente}</div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-yellow-300 font-mono text-[10px]">{d.chaveJ}</span>
+                            <span className="text-blue-300 text-[10px]">·{d.mesRef}</span>
+                          </div>
+                          <div className="text-gray-300 text-[10px]">{d.nomeAgente}</div>
+                          <div className="text-gray-500 text-[10px]">{d.empresa || "-"}</div>
                         </td>
-                        <td className="p-2 text-gray-300">{d.empresa || "-"}</td>
-                        <td className="p-2 text-right text-gray-400">{fmt(d.valorPago)}</td>
                         <td className="p-2 text-right">
-                          {isEditando ? (
-                            <div className="flex items-center gap-1 justify-end">
-                              <Input
-                                autoFocus
-                                value={editNovoValor}
-                                onChange={(e) => setEditNovoValor(e.target.value)}
-                                onKeyDown={(e) => { if (e.key === 'Enter') handleSalvarEdicao(key, d); if (e.key === 'Escape') setEditandoKey(null); }}
-                                className="bg-[#0a0f1e] border-yellow-500 text-white text-xs w-24 h-6 text-right"
-                              />
-                              <button onClick={() => handleSalvarEdicao(key, d)} className="text-green-400 hover:text-green-300"><span className="text-xs">OK</span></button>
-                            </div>
-                          ) : (
-                            <span className="text-green-300">{fmt(getNovoValor(d))}</span>
-                          )}
-                        </td>
-                        <td className={`p-2 text-right font-bold ${getDiferenca(d) > 0 ? "text-yellow-300" : "text-red-400"}`}>
-                          {getDiferenca(d) > 0 ? "+" : ""}{fmt(getDiferenca(d))}
+                          <div className="text-gray-400 text-[10px]">Pago: {fmt(d.valorPago)}</div>
+                          <div className="text-[10px]">
+                            Novo:&nbsp;
+                            {isEditando ? (
+                              <span className="inline-flex items-center gap-1">
+                                <Input
+                                  autoFocus
+                                  value={editNovoValor}
+                                  onChange={(e) => setEditNovoValor(e.target.value)}
+                                  onKeyDown={(e) => { if (e.key === 'Enter') handleSalvarEdicao(key, d); if (e.key === 'Escape') setEditandoKey(null); }}
+                                  className="bg-[#0a0f1e] border-yellow-500 text-white text-xs w-20 h-5 text-right"
+                                />
+                                <button onClick={() => handleSalvarEdicao(key, d)} className="text-green-400 text-[10px]">OK</button>
+                              </span>
+                            ) : (
+                              <span className="text-green-300">{fmt(getNovoValor(d))}</span>
+                            )}
+                          </div>
+                          <div className={`font-bold text-xs ${getDiferenca(d) > 0 ? "text-yellow-300" : "text-red-400"}`}>
+                            Dif: {getDiferenca(d) > 0 ? "+" : ""}{fmt(getDiferenca(d))}
+                          </div>
                         </td>
                         <td className="p-2 text-center">
                           <div className="flex gap-1 justify-center">
