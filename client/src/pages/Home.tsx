@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles, FolderOpen, Star, Package, Shirt, Zap, LayoutDashboard, Shield, DatabaseBackup, MessageSquare, PhoneOff } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles, FolderOpen, Star, Package, Shirt, Zap, LayoutDashboard, Shield, DatabaseBackup, MessageSquare, PhoneOff, RefreshCw } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -189,6 +189,7 @@ export default function Home() {
         { title: 'Pagamentos', description: 'Lançamento e controle de pagamentos', icon: DollarSign, color: 'bg-green-600', path: '/pagamentos', subKey: 'pagamentos' },
         { title: 'Contas das Lojas', description: 'Comprovantes e controle de pagamento de contas por loja', icon: FileText, color: 'bg-teal-600', path: '/contas-lojas', subKey: 'contas-lojas' },
         { title: 'Extratos Bancários', description: 'Lançamentos e movimentações das contas bancárias', icon: Landmark, color: 'bg-cyan-700', path: '/extratos-bancarios', subKey: 'extratos-bancarios', ceoOnly: true },
+        { title: 'Reajuste', description: 'Reajuste de comissões pagas com diferença', icon: RefreshCw, color: 'bg-orange-600', path: '/reajuste', subKey: 'reajuste' },
       ],
     },
 
