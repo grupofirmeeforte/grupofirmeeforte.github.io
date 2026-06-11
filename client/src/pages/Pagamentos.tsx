@@ -583,7 +583,7 @@ export default function PagamentosPage() {
                   {/* Agente + Favorecido */}
                   <div>
                     {(row as any).nomeAgente && (
-                      <div className="text-[11px] text-white font-medium truncate max-w-[220px] mb-1" title={(row as any).nomeAgente}>{(row as any).nomeAgente}</div>
+                      <div className={`text-[11px] ${i % 2 === 0 ? 'text-gray-900' : 'text-white'} font-medium truncate max-w-[220px] mb-1`} title={(row as any).nomeAgente}>{(row as any).nomeAgente}</div>
                     )}
                     {(row as any).favorecidoAgente && (
                       <div className="text-[14px] font-semibold px-2 py-1 rounded bg-green-900/60 text-green-300 border border-green-700 break-words" title={(row as any).favorecidoAgente}>{(row as any).favorecidoAgente}</div>
