@@ -784,32 +784,32 @@ export default function Consignado() {
                       <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{strVal(r.empresa)}</span>
                       <span className="text-[9px] text-gray-600">{mesNumParaStr(r.mes)}</span>
                     </div>
-                    <div className="text-[11px] text-white font-medium whitespace-nowrap">{strVal(r.nomeAgente)}</div>
+                    <div className={`text-[11px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-white'} font-medium whitespace-nowrap`}>{strVal(r.nomeAgente)}</div>
                     {(r as any).favorecido && (
-                      <div className="text-[10px] text-blue-600 font-medium leading-tight">Fav: {(r as any).favorecido}</div>
+                      <div className={`text-[10px] ${idx % 2 === 0 ? 'text-blue-900' : 'text-blue-300'} font-medium leading-tight`}>Fav: {(r as any).favorecido}</div>
                     )}
-                    {r.supervisor && <div className="text-[10px] text-gray-600">Sup: {r.supervisor}</div>}
+                    {r.supervisor && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>Sup: {r.supervisor}</div>}
                   </td>
                   {/* Coluna Operação + Produto */}
                   <td className="px-2 py-1.5 border-b border-gray-100">
-                    <div className="text-[11px] text-gray-800 font-medium">{strVal(r.convenio)}</div>
+                    <div className={`text-[11px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-200'} font-medium`}>{strVal(r.convenio)}</div>
                     <div className={`font-mono text-[10px] ${r.isDuplicate ? 'text-red-700 font-bold' : 'text-gray-600'}`}>
                       {strVal(r.nrOperacao)}{r.isDuplicate && <span className="ml-1">⚠️</span>}
                     </div>
-                    {r.dtContratacao && <div className="text-[10px] text-gray-600">{strVal(r.dtContratacao)}</div>}
-                    <div className="text-[10px] text-gray-700 font-medium mt-0.5">{strVal(r.produto)}</div>
-                    {r.descricaoProduto && <div className="text-[10px] text-gray-600 max-w-[150px] truncate" title={r.descricaoProduto}>{r.descricaoProduto}</div>}
-                    <div className="text-[10px] text-gray-600">
+                    {r.dtContratacao && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>{strVal(r.dtContratacao)}</div>}
+                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-200'} font-medium mt-0.5`}>{strVal(r.produto)}</div>
+                    {r.descricaoProduto && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'} max-w-[150px] truncate`} title={r.descricaoProduto}>{r.descricaoProduto}</div>}
+                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>
                       {r.juros ? `Juros: ${pctJuros(r.juros)}` : ''}{r.prefixoBB ? ` · BB: ${r.prefixoBB}` : ''}
                     </div>
-                    {r.restricaoSRCC && <div className="text-[10px] text-orange-600">SRCC: {r.restricaoSRCC}</div>}
+                    {r.restricaoSRCC && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-orange-900' : 'text-orange-300'}`}>SRCC: {r.restricaoSRCC}</div>}
                   </td>
                   {/* Coluna Valores */}
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
                     <div className="font-bold text-blue-800 text-[12px]">{moeda(r.valorLiquido)}</div>
-                    <div className="text-[10px] text-gray-600">Bruto: {moeda(r.valorBruto)}</div>
-                    <div className="text-[10px] text-gray-600">RBM: {moeda(r.rbm)}</div>
-                    {r.parcela != null && <div className="text-[10px] text-gray-600">Parc: {r.parcela}</div>}
+                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>Bruto: {moeda(r.valorBruto)}</div>
+                    <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>RBM: {moeda(r.rbm)}</div>
+                    {r.parcela != null && <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>Parc: {r.parcela}</div>}
                   </td>
                   {/* Coluna Comissão */}
                   <td className="px-2 py-1.5 border-b border-gray-100 text-right whitespace-nowrap">
@@ -834,7 +834,7 @@ export default function Consignado() {
                       return null;
                     })()}
                     {r.tabela && r.tabela !== 'NULL' && r.tabela !== '0' && (
-                      <div className="text-[10px] text-gray-600">{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
+                      <div className={`text-[10px] ${idx % 2 === 0 ? 'text-gray-900' : 'text-gray-300'}`}>{r.tabela.replace(/^Ativo(\d+)$/, 'Ativo $1').replace(/^Tabela(\d+)$/, 'Tabela $1')}</div>
                     )}
                   </td>
                   <td className="px-2 py-1.5 border-b border-gray-100">
