@@ -580,17 +580,18 @@ export default function PagamentosPage() {
                     {row.tipoPagto && <span className="text-[9px] px-1 py-0.5 rounded bg-gray-700 text-gray-300">{row.tipoPagto}</span>}
                     {row.mesAno && <span className="text-[9px] text-gray-400">{row.mesAno}</span>}
                   </div>
-                  {/* Agente = responsável */}
-                  {(row as any).nomeAgente && (
-                    <div className="text-[11px] text-white font-medium truncate max-w-[220px]" title={(row as any).nomeAgente}>{(row as any).nomeAgente}</div>
-                  )}
-                  {/* Favorecido = sempre respeitar o lançado, independente do tipo de pagamento */}
-                  {(row as any).favorecidoAgente && (
-                    <div className="text-[14px] font-semibold px-2 py-1 rounded bg-green-900/60 text-green-300 border border-green-700 break-words" title={(row as any).favorecidoAgente}>{(row as any).favorecidoAgente}</div>
-                  )}
-                  {!(row as any).favorecidoAgente && (
-                    <div className="text-[11px] text-white font-medium truncate max-w-[200px]" title={row.nomeFavorecido ?? ""}>{row.nomeFavorecido || "-"}</div>
-                  )}
+                  {/* Agente + Favorecido */}
+                  <div>
+                    {(row as any).nomeAgente && (
+                      <div className="text-[11px] text-white font-medium truncate max-w-[220px] mb-1" title={(row as any).nomeAgente}>{(row as any).nomeAgente}</div>
+                    )}
+                    {(row as any).favorecidoAgente && (
+                      <div className="text-[14px] font-semibold px-2 py-1 rounded bg-green-900/60 text-green-300 border border-green-700 break-words" title={(row as any).favorecidoAgente}>{(row as any).favorecidoAgente}</div>
+                    )}
+                    {!(row as any).favorecidoAgente && row.nomeFavorecido && (
+                      <div className="text-[11px] text-white font-medium truncate max-w-[200px]" title={row.nomeFavorecido}>{row.nomeFavorecido}</div>
+                    )}
+                  </div>
                   <div className="text-[10px] text-gray-400">{row.empresa || ""}{row.cidadeUF ? ` · ${row.cidadeUF}` : ""}</div>
                 </td>
                 {/* Coluna Dados Bancários */}
