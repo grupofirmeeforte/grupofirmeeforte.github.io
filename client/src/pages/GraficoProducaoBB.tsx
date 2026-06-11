@@ -50,7 +50,7 @@ function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-gray-700 rounded-lg shadow-lg p-3 text-xs max-w-[220px]">
-      <p className="font-bold text-gray-200 mb-2">{label}</p>
+      <p className="font-bold text-gray-400 mb-2">{label}</p>
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center justify-between gap-3 mb-1">
           <span className="flex items-center gap-1">

@@ -273,7 +273,7 @@ export default function Ourocap() {
                   </td>
                   {/* Coluna Produto / Cliente */}
                   <td className="px-3 py-1.5">
-                    <div className="text-[11px] text-gray-200 font-medium">{(row as any).codProduto ?? "-"}</div>
+                    <div className="text-[11px] text-gray-400 font-medium">{(row as any).codProduto ?? "-"}</div>
                     <div className="text-[10px] text-gray-400 font-mono">{(row as any).proposta ?? ""}</div>
                     {(row as any).cpfCliente && <div className="text-[10px] text-gray-400">CPF: {(row as any).cpfCliente}</div>}
                     <div className="text-[10px] text-gray-400">

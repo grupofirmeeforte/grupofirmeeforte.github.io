@@ -845,7 +845,7 @@ export default function CRMPage() {
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 abaAtiva === key
                   ? "border-sky-600 text-sky-600"
-                  : "border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300"
+                  : "border-transparent text-gray-400 hover:text-gray-400 hover:border-gray-300"
               }`}
             >
               <Icon className="w-4 h-4" />

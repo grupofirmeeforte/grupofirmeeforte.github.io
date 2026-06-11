@@ -59,7 +59,7 @@ export default function AgenciasBb() {
               {busca && (
                 <button
                   onClick={limpar}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-400"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -118,7 +118,7 @@ export default function AgenciasBb() {
                   <span className="font-mono text-yellow-400 font-semibold">
                     {String(ag.prefixo).padStart(4, "0")}
                   </span>
-                  <span className="text-gray-200">{ag.nome}</span>
+                  <span className="text-gray-400">{ag.nome}</span>
                 </div>
               ))}
             </div>

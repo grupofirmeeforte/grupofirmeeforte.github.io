@@ -43,7 +43,7 @@ function BuscaAgentesSugestoes({ termo, onSelect }: {
           onMouseDown={e => { e.preventDefault(); onSelect(ag.chaveJ ?? '', ag.nomeAgente ?? ''); }}
         >
           <span className="font-medium text-blue-700 shrink-0">{ag.chaveJ}</span>
-          <span className="text-gray-200 truncate">{ag.nomeAgente}</span>
+          <span className="text-gray-400 truncate">{ag.nomeAgente}</span>
           {ag.empresa && <span className="text-xs text-gray-400 ml-auto shrink-0">{ag.empresa}</span>}
         </button>
       ))}
@@ -249,14 +249,14 @@ function ExtratoConsignado() {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-800">
-                    <TableHead className="font-semibold text-gray-200">Nome</TableHead>
-                    <TableHead className="font-semibold text-gray-200">Nº Operação</TableHead>
-                    <TableHead className="font-semibold text-gray-200 text-center">Parcelas</TableHead>
-                    <TableHead className="font-semibold text-gray-200">Convênio</TableHead>
-                    <TableHead className="font-semibold text-gray-200 text-right">Juros</TableHead>
-                    <TableHead className="font-semibold text-gray-200 text-right">Valor Líquido</TableHead>
-                    <TableHead className="font-semibold text-gray-200 text-right">Percentual</TableHead>
-                    <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
+                    <TableHead className="font-semibold text-gray-400">Nome</TableHead>
+                    <TableHead className="font-semibold text-gray-400">Nº Operação</TableHead>
+                    <TableHead className="font-semibold text-gray-400 text-center">Parcelas</TableHead>
+                    <TableHead className="font-semibold text-gray-400">Convênio</TableHead>
+                    <TableHead className="font-semibold text-gray-400 text-right">Juros</TableHead>
+                    <TableHead className="font-semibold text-gray-400 text-right">Valor Líquido</TableHead>
+                    <TableHead className="font-semibold text-gray-400 text-right">Percentual</TableHead>
+                    <TableHead className="font-semibold text-gray-400 text-right">Comissão</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -538,16 +538,16 @@ function PerspectivadeGanho() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Proposta</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Data</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Cliente / CPF</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Situação</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Produto</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Taxa</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Prazo</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Valor</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-center">Fontes</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Telefone</TableHead>
+                  <TableHead className="font-semibold text-gray-400 uppercase text-xs tracking-wide">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-400 uppercase text-xs tracking-wide">Data</TableHead>
+                  <TableHead className="font-semibold text-gray-400 uppercase text-xs tracking-wide">Cliente / CPF</TableHead>
+                  <TableHead className="font-semibold text-gray-400 uppercase text-xs tracking-wide">Situação</TableHead>
+                  <TableHead className="font-semibold text-gray-400 uppercase text-xs tracking-wide">Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-400 uppercase text-xs tracking-wide text-right">Taxa</TableHead>
+                  <TableHead className="font-semibold text-gray-400 uppercase text-xs tracking-wide text-right">Prazo</TableHead>
+                  <TableHead className="font-semibold text-gray-400 uppercase text-xs tracking-wide text-right">Valor</TableHead>
+                  <TableHead className="font-semibold text-gray-400 uppercase text-xs tracking-wide text-center">Fontes</TableHead>
+                  <TableHead className="font-semibold text-gray-400 uppercase text-xs tracking-wide">Telefone</TableHead>
                   <TableHead className="font-semibold text-amber-600 uppercase text-xs tracking-wide text-right bg-amber-50">% / Comissão</TableHead>
                 </TableRow>
               </TableHeader>
@@ -760,10 +760,10 @@ function ExtratoCC() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  <TableHead className="font-semibold text-gray-200">Agência</TableHead>
-                  <TableHead className="font-semibold text-gray-200">Chave J</TableHead>
-                  <TableHead className="font-semibold text-gray-200">Nome</TableHead>
-                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Agência</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Chave J</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-400 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -831,13 +831,13 @@ function ExtratoConsorcio() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  {isAdminOuSuporte && <TableHead className="font-semibold text-gray-200">Agente</TableHead>}
-                  <TableHead className="font-semibold text-gray-200">Proposta</TableHead>
-                  <TableHead className="font-semibold text-gray-200">Empresa</TableHead>
-                  <TableHead className="font-semibold text-gray-200 text-center">Parc. Liberada</TableHead>
-                  <TableHead className="font-semibold text-gray-200">Segmento</TableHead>
-                  <TableHead className="font-semibold text-gray-200 text-right">Valor Bem</TableHead>
-                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
+                  {isAdminOuSuporte && <TableHead className="font-semibold text-gray-400">Agente</TableHead>}
+                  <TableHead className="font-semibold text-gray-400">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Empresa</TableHead>
+                  <TableHead className="font-semibold text-gray-400 text-center">Parc. Liberada</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Segmento</TableHead>
+                  <TableHead className="font-semibold text-gray-400 text-right">Valor Bem</TableHead>
+                  <TableHead className="font-semibold text-gray-400 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -910,9 +910,9 @@ function ExtratoOurocap() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  <TableHead className="font-semibold text-gray-200">Nº Operação</TableHead>
-                  <TableHead className="font-semibold text-gray-200 text-right">Valor Líquido</TableHead>
-                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Nº Operação</TableHead>
+                  <TableHead className="font-semibold text-gray-400 text-right">Valor Líquido</TableHead>
+                  <TableHead className="font-semibold text-gray-400 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -984,19 +984,19 @@ function ExtratoSeguros() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  <TableHead className="font-semibold text-gray-200">Nome</TableHead>
-                  <TableHead className="font-semibold text-gray-200">Contrato</TableHead>
-                  <TableHead className="font-semibold text-gray-200">Banco</TableHead>
-                  <TableHead className="font-semibold text-gray-200 text-right">Valor Empréstimo</TableHead>
-                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Contrato</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Banco</TableHead>
+                  <TableHead className="font-semibold text-gray-400 text-right">Valor Empréstimo</TableHead>
+                  <TableHead className="font-semibold text-gray-400 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
                   <TableRow key={row.id} className="hover:bg-gray-800">
                     <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
-                    <TableCell className="font-mono text-sm text-gray-200">{row.nrContrato || '—'}</TableCell>
-                    <TableCell className="text-gray-200 text-sm">{row.banco || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-400">{row.nrContrato || '—'}</TableCell>
+                    <TableCell className="text-gray-400 text-sm">{row.banco || '—'}</TableCell>
                     <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.vrEmprestimo ?? 0)))}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissaoAgente ?? 0)))}</TableCell>
                   </TableRow>
@@ -1056,19 +1056,19 @@ function ExtratoBBDental() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-800">
-                  <TableHead className="font-semibold text-gray-200">Nome</TableHead>
-                  <TableHead className="font-semibold text-gray-200">Proposta</TableHead>
-                  <TableHead className="font-semibold text-gray-200">Produto</TableHead>
-                  <TableHead className="font-semibold text-gray-200 text-right">Valor Produto</TableHead>
-                  <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Nome</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Proposta</TableHead>
+                  <TableHead className="font-semibold text-gray-400">Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-400 text-right">Valor Produto</TableHead>
+                  <TableHead className="font-semibold text-gray-400 text-right">Comissão</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {(rows as any[]).map((row: any) => (
                   <TableRow key={row.id} className="hover:bg-gray-800">
                     <TableCell className="font-medium text-gray-900">{row.nomeAgente || '—'}</TableCell>
-                    <TableCell className="font-mono text-sm text-gray-200">{row.proposta || '—'}</TableCell>
-                    <TableCell className="text-gray-200 text-sm">{row.produto || '—'}</TableCell>
+                    <TableCell className="font-mono text-sm text-gray-400">{row.proposta || '—'}</TableCell>
+                    <TableCell className="text-gray-400 text-sm">{row.produto || '—'}</TableCell>
                     <TableCell className="text-right font-semibold text-blue-700">{fmt(parseFloat(String(row.vrProduto ?? 0)))}</TableCell>
                     <TableCell className="text-right font-semibold text-green-700">{fmt(parseFloat(String(row.comissao ?? 0)))}</TableCell>
                   </TableRow>
@@ -1112,7 +1112,7 @@ function ConteudoAbaPlaceholder({ aba }: { aba: Aba }) {
           <div className={`w-16 h-16 rounded-2xl ${info.cor} flex items-center justify-center`}>
             <Icon className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-200">{info.label}</h2>
+          <h2 className="text-xl font-semibold text-gray-400">{info.label}</h2>
           <p className="text-gray-400 text-sm">Módulo em desenvolvimento. Em breve disponível.</p>
         </CardContent>
       </Card>
@@ -1314,7 +1314,7 @@ function MinhaTabela() {
                         <TableCell key={k} className={`font-bold text-xs py-1 px-3 text-center whitespace-nowrap ${
                           k === colunaAnterior ? 'text-amber-700 bg-amber-50' :
                           k === colunaVigente  ? 'text-green-700 bg-green-50' :
-                          'text-gray-200'
+                          'text-gray-400'
                         }`}>
                           {fmtPct(row[k])}
                         </TableCell>
@@ -1364,7 +1364,7 @@ export default function ExtratosPage() {
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   ativa
                     ? 'border-blue-600 text-blue-700 bg-blue-900/20'
-                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
+                    : 'border-transparent text-gray-400 hover:text-gray-400 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />

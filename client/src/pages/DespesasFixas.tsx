@@ -252,7 +252,7 @@ export default function DespesasFixasPage() {
   const totalValor = rows.reduce((acc, r) => acc + (r.valor ? parseFloat(r.valor) : 0), 0);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100">
+    <div className="min-h-screen bg-gray-950 text-gray-400">
       <PageHeader title="Despesas Fixas" actions={
         <div className="flex gap-1.5 items-center">
           <Button onClick={abrirNovo} size="sm" className="bg-purple-700 hover:bg-purple-600 text-white text-[10px] h-6 px-2">+ Novo</Button>

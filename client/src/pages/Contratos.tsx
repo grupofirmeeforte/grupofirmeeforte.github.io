@@ -773,19 +773,19 @@ export default function ContratosPage() {
                         <div className="mt-3 pt-3 border-t border-slate-700 flex flex-wrap gap-3 items-center">
                           <div>
                             <p className="text-slate-400 text-xs">Convênio</p>
-                            <p className="text-slate-200 text-sm">{r.nomeConvenio ?? '—'}</p>
+                            <p className="text-slate-400 text-sm">{r.nomeConvenio ?? '—'}</p>
                           </div>
                           <div>
                             <p className="text-slate-400 text-xs">Operador</p>
-                            <p className="text-slate-200 text-sm">{r.nomeOperador ?? r.chaveJOperador ?? '—'}</p>
+                            <p className="text-slate-400 text-sm">{r.nomeOperador ?? r.chaveJOperador ?? '—'}</p>
                           </div>
                           <div>
                             <p className="text-slate-400 text-xs">1ª Parcela</p>
-                            <p className="text-slate-200 text-sm">{r.dataPrimeiraParcela ?? '—'}</p>
+                            <p className="text-slate-400 text-sm">{r.dataPrimeiraParcela ?? '—'}</p>
                           </div>
                           <div>
                             <p className="text-slate-400 text-xs">Últ. Parcela</p>
-                            <p className="text-slate-200 text-sm">{r.dataUltimaParcela ?? '—'}</p>
+                            <p className="text-slate-400 text-sm">{r.dataUltimaParcela ?? '—'}</p>
                             <p className="text-amber-400 text-xs font-semibold mt-0.5">
                               {(() => {
                                 if (!r.dataUltimaParcela) return '';

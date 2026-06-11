@@ -459,7 +459,7 @@ export default function Consorcio() {
                 </td>
                 {/* Coluna Operação */}
                 <td className="px-2 py-1.5 border-r border-gray-700">
-                  <div className="font-mono text-[11px] text-gray-200 font-medium">{row.proposta ?? "-"}</div>
+                  <div className="font-mono text-[11px] text-gray-400 font-medium">{row.proposta ?? "-"}</div>
                   <div className="text-[10px] text-gray-400 whitespace-nowrap">{row.data ?? ""}</div>
                   {row.segmento && (
                     <span className={`text-[9px] px-1 py-0.5 rounded font-medium ${row.segmento === "IMOVEL" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"}`}>

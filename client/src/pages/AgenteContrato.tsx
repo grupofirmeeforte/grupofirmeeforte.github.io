@@ -530,7 +530,7 @@ export default function AgenteContrato() {
       <div className="max-w-4xl mx-auto bg-gray-900 border border-gray-700-lg print:shadow-none my-6 print:my-0 p-10 print:p-8">
         {!tipoContrato ? (
           <div className="text-center py-16">
-            <p className="text-lg font-semibold text-gray-200 mb-2">Empresa não identificada para geração de contrato</p>
+            <p className="text-lg font-semibold text-gray-400 mb-2">Empresa não identificada para geração de contrato</p>
             <p className="text-sm text-gray-400">
               A empresa cadastrada é: <strong>{ag.empresa || "não informada"}</strong>
             </p>

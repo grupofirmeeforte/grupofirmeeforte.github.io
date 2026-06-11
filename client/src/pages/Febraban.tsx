@@ -68,7 +68,7 @@ function situacaoBadge(s: string | null | undefined) {
     "Cancelada": "bg-red-100 text-red-800",
     "Pendente": "bg-yellow-100 text-yellow-800",
   };
-  const cls = colors[s] || "bg-gray-100 text-gray-200";
+  const cls = colors[s] || "bg-gray-100 text-gray-400";
   return <span className={`px-2 py-0.5 rounded text-xs font-medium ${cls}`}>{s}</span>;
 }
 
@@ -102,7 +102,7 @@ function GrafTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-gray-700 rounded-lg shadow-lg p-3 text-xs max-w-[220px]">
-      <p className="font-bold text-gray-200 mb-2">{label}</p>
+      <p className="font-bold text-gray-400 mb-2">{label}</p>
       {payload.map((p: any, i: number) => (
         <div key={i} className="flex items-center justify-between gap-3 mb-1">
           <span className="flex items-center gap-1">
@@ -228,7 +228,7 @@ function GraficosProducaoInline({ empresa, filtros }: { empresa: string; filtros
                         s.data[li] > 0 ? (
                           <div key={label} className="flex justify-between items-center gap-1">
                             <span className="text-[9px] text-gray-400 whitespace-nowrap">{label}</span>
-                            <span className="text-[9px] font-semibold text-gray-200 whitespace-nowrap">{fmtFull(s.data[li])}</span>
+                            <span className="text-[9px] font-semibold text-gray-400 whitespace-nowrap">{fmtFull(s.data[li])}</span>
                           </div>
                         ) : null
                       ))}
@@ -1019,19 +1019,19 @@ export default function FebrabanPage() {
             <table className="w-full text-sm">
               <thead className="bg-gray-800 border-b">
                 <tr>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">EMPRESA</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">MÊS/ANO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">PROPOSTA</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">LINHA</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">SITUAÇÃO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">OPERADOR</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">SOLICITAÇÃO</th>
-                  <th className="px-3 py-2 text-left font-semibold text-gray-200">PRAZO</th>
-                  <th className="px-3 py-2 text-right font-semibold text-gray-200">TROCO</th>
-                  <th className="px-3 py-2 text-right font-semibold text-gray-200">FINANCIADO</th>
-                  <th className="px-3 py-2 text-center font-semibold text-gray-200">TIPO</th>
-                  <th className="px-3 py-2 text-center font-semibold text-gray-200">PAGO</th>
-                  <th className="px-3 py-2 text-center font-semibold text-gray-200">AÇÕES</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-400">EMPRESA</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-400">MÊS/ANO</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-400">PROPOSTA</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-400">LINHA</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-400">SITUAÇÃO</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-400">OPERADOR</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-400">SOLICITAÇÃO</th>
+                  <th className="px-3 py-2 text-left font-semibold text-gray-400">PRAZO</th>
+                  <th className="px-3 py-2 text-right font-semibold text-gray-400">TROCO</th>
+                  <th className="px-3 py-2 text-right font-semibold text-gray-400">FINANCIADO</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-400">TIPO</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-400">PAGO</th>
+                  <th className="px-3 py-2 text-center font-semibold text-gray-400">AÇÕES</th>
                 </tr>
               </thead>
               <tbody>

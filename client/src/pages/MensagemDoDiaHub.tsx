@@ -633,7 +633,7 @@ export default function MensagemDoDiaHub() {
                 className={`flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
                   ativa
                     ? 'border-blue-600 text-blue-700 bg-blue-900/20'
-                    : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
+                    : 'border-transparent text-gray-400 hover:text-gray-400 hover:border-gray-300'
                 }`}
               >
                 <Icon className="w-4 h-4" />

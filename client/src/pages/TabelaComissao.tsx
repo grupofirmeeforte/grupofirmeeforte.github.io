@@ -405,7 +405,7 @@ export default function TabelaComissao() {
   };
 
   function getConvenioColor(convenio: string | null) {
-    if (!convenio) return { row: 'bg-white hover:bg-gray-800', badge: 'bg-gray-100 text-gray-200 border border-gray-300' };
+    if (!convenio) return { row: 'bg-white hover:bg-gray-800', badge: 'bg-gray-100 text-gray-400 border border-gray-300' };
     const upper = convenio.toUpperCase();
     for (const [key, val] of Object.entries(CONVENIO_COLORS)) {
       if (upper.includes(key)) return val;
@@ -742,7 +742,7 @@ export default function TabelaComissao() {
                           onChange={() => toggleCol(col)}
                           className="accent-blue-600"
                         />
-                        <span className="text-sm text-gray-200">Ativo {String(i + 1).padStart(2, '0')}</span>
+                        <span className="text-sm text-gray-400">Ativo {String(i + 1).padStart(2, '0')}</span>
                       </label>
                     ))}
                   </div>
@@ -1033,44 +1033,44 @@ export default function TabelaComissao() {
 
           <div className="grid grid-cols-2 gap-4 py-2">
              <div>
-              <label className="text-sm font-medium text-gray-200 mb-1 block">Empresa</label>
+              <label className="text-sm font-medium text-gray-400 mb-1 block">Empresa</label>
               <Input value={form.empresa || ''} onChange={e => setField('empresa', e.target.value)} placeholder="BMF, FLEX..." />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-200 mb-1 block">Código <span className="text-gray-400 text-xs">(até 5 códigos separados por /)</span></label>
+              <label className="text-sm font-medium text-gray-400 mb-1 block">Código <span className="text-gray-400 text-xs">(até 5 códigos separados por /)</span></label>
               <Input value={form.codigo || ''} onChange={e => setField('codigo', e.target.value.slice(0,24))} placeholder="2880/2881/2882" maxLength={24} />
             </div>
             <div className="col-span-2">
-              <label className="text-sm font-medium text-gray-200 mb-1 block">Convênio</label>
+              <label className="text-sm font-medium text-gray-400 mb-1 block">Convênio</label>
               <Input value={form.convenio || ''} onChange={e => setField('convenio', e.target.value)} placeholder="CONSIGNADO INSS, FEDERAL..." />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-200 mb-1 block">Tx Juros De</label>
+              <label className="text-sm font-medium text-gray-400 mb-1 block">Tx Juros De</label>
               <Input value={form.txJurosDe || ''} onChange={e => setField('txJurosDe', e.target.value)} placeholder="0.0185" />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-200 mb-1 block">Tx Juros Até</label>
+              <label className="text-sm font-medium text-gray-400 mb-1 block">Tx Juros Até</label>
               <Input value={form.txJurosAte || ''} onChange={e => setField('txJurosAte', e.target.value)} placeholder="acima ou 0.0199" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-200 mb-1 block">Valor Mínimo</label>
+              <label className="text-sm font-medium text-gray-400 mb-1 block">Valor Mínimo</label>
               <Input value={form.valorMinimo || ''} onChange={e => setField('valorMinimo', e.target.value)} placeholder=">=$1.000,00" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-200 mb-1 block">Meses De</label>
+              <label className="text-sm font-medium text-gray-400 mb-1 block">Meses De</label>
               <Input value={form.mesesDe || ''} onChange={e => setField('mesesDe', e.target.value)} placeholder="48" />
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-200 mb-1 block">Meses Até</label>
+              <label className="text-sm font-medium text-gray-400 mb-1 block">Meses Até</label>
               <Input value={form.mesesAte || ''} onChange={e => setField('mesesAte', e.target.value)} placeholder="60" />
             </div>
 
             <div className="col-span-2">
-              <label className="text-sm font-medium text-gray-200 mb-2 block">Valores dos Ativos</label>
+              <label className="text-sm font-medium text-gray-400 mb-2 block">Valores dos Ativos</label>
               <div className="grid grid-cols-5 gap-2">
                 {['ativo01', 'ativo02', 'ativo03', 'ativo04', 'ativo05', 'ativo06', 'ativo07', 'ativo08', 'ativo09', 'ativo10', 'ativo11', 'ativo12', 'ativo13', 'ativo14', 'ativo15', 'ativo16', 'ativo17', 'ativo18', 'ativo19', 'ativo20'].map((key) => (
                   <div key={key}>

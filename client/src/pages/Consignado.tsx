@@ -595,7 +595,7 @@ export default function Consignado() {
       {mostrarTotalizador && (
         <div className="px-6 py-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b">
           <div className="mb-4">
-            <h2 className="text-sm font-semibold text-gray-200 mb-3">📊 Totalizador por Empresa e Mês/Ano</h2>
+            <h2 className="text-sm font-semibold text-gray-400 mb-3">📊 Totalizador por Empresa e Mês/Ano</h2>
             <div className="grid grid-cols-4 gap-3 items-end">
               <div>
                 <label className="text-xs font-medium text-gray-300 mb-1 block">Empresa</label>
@@ -651,7 +651,7 @@ export default function Consignado() {
               </div>
               <div className="bg-gray-900 rounded-lg p-3 shadow-sm">
                 <p className="text-xs text-gray-300 mb-1">Registros</p>
-                <p className="text-lg font-bold text-gray-200">{totalizador.registros}</p>
+                <p className="text-lg font-bold text-gray-400">{totalizador.registros}</p>
               </div>
             </div>
           )}
@@ -792,7 +792,7 @@ export default function Consignado() {
                   </td>
                   {/* Coluna Operação + Produto */}
                   <td className="px-2 py-1.5 border-b border-gray-100">
-                    <div className="text-[11px] text-gray-200 font-medium">{strVal(r.convenio)}</div>
+                    <div className="text-[11px] text-gray-400 font-medium">{strVal(r.convenio)}</div>
                     <div className={`font-mono text-[10px] ${r.isDuplicate ? 'text-red-700 font-bold' : 'text-gray-400'}`}>
                       {strVal(r.nrOperacao)}{r.isDuplicate && <span className="ml-1">⚠️</span>}
                     </div>

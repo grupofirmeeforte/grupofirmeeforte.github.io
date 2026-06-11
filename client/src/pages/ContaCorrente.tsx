@@ -450,7 +450,7 @@ export default function ContaCorrente() {
       {/* Painel de Configuração de Comissão */}
       {showConfig && (
         <div className="w-72 min-w-[18rem] bg-white border-r shadow-sm flex-shrink-0 p-4 space-y-4">
-          <h3 className="text-sm font-bold text-gray-200">Configuração de Comissão</h3>
+          <h3 className="text-sm font-bold text-gray-400">Configuração de Comissão</h3>
 
           {/* Comissão Padrão */}
           <div className="border border-green-200 rounded-lg p-3 bg-green-50">
@@ -577,7 +577,7 @@ export default function ContaCorrente() {
                     </td>
                     {/* Coluna Conta */}
                     <td className="px-2 py-1.5">
-                      <div className="text-[11px] text-gray-200">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
+                      <div className="text-[11px] text-gray-400">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
                       <div className="text-[10px] text-gray-400">
                         {r.dataOperacao
                           ? (r.dataOperacao instanceof Date

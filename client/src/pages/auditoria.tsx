@@ -288,25 +288,25 @@ export default function AuditoriaPage() {
       <div className="flex gap-1 border-b border-gray-700">
         <button
           onClick={() => setAba('logs')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'logs' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'logs' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-400'}`}
         >
           <ClipboardList className="w-4 h-4" /> Logs de Acesso
         </button>
         <button
           onClick={() => setAba('feriados')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'feriados' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'feriados' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-400'}`}
         >
           <CalendarDays className="w-4 h-4" /> Feriados
         </button>
         <button
           onClick={() => setAba('credito-despesas')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'credito-despesas' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'credito-despesas' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-400'}`}
         >
           <BarChart2 className="w-4 h-4" /> Crédito x Despesas
         </button>
         <button
           onClick={() => setAba('permissoes')}
-          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'permissoes' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-200'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${aba === 'permissoes' ? 'bg-white border border-b-white border-gray-700 text-blue-700' : 'text-gray-400 hover:text-gray-400'}`}
         >
           <Shield className="w-4 h-4" /> Permissões
         </button>
@@ -372,7 +372,7 @@ export default function AuditoriaPage() {
                 {sessoesAtivas.map((s: any) => (
                   <div key={s.id} className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
                     <span className="font-mono text-[11px] text-blue-700 font-semibold">{s.chaveJ}</span>
-                    <span className="text-[11px] text-gray-200">{s.nomeAgente}</span>
+                    <span className="text-[11px] text-gray-400">{s.nomeAgente}</span>
                     {s.modulo && <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">{s.modulo}</span>}
                     <span className="text-[10px] text-gray-400">{tempoOnline(s.ultimoAcesso)}</span>
                     {isCeo && (
@@ -395,7 +395,7 @@ export default function AuditoriaPage() {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Filter className="w-4 h-4 text-gray-400" />
-                <span className="text-sm font-medium text-gray-200">Filtros</span>
+                <span className="text-sm font-medium text-gray-400">Filtros</span>
                 {temFiltroAtivo && <span className="text-[10px] px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full">ativos</span>}
               </div>
               {temFiltroAtivo && (
@@ -488,7 +488,7 @@ export default function AuditoriaPage() {
                       {/* Coluna Agente */}
                       <td className="px-2 py-1">
                         <div className="font-mono text-[10px] text-blue-700 font-semibold leading-tight">{log.chaveJ}</div>
-                        <div className="text-[10px] text-gray-200 leading-tight truncate max-w-[170px]" title={log.nomeAgente}>{log.nomeAgente}</div>
+                        <div className="text-[10px] text-gray-400 leading-tight truncate max-w-[170px]" title={log.nomeAgente}>{log.nomeAgente}</div>
                         {log.ipAddress && <div className="text-[9px] text-gray-400 leading-tight">{log.ipAddress}</div>}
                       </td>
                       {/* Coluna Módulo/Ação */}
@@ -873,7 +873,7 @@ function DespesasInternasAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any)
     <button
       onClick={() => setAba('despesas-internas')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'despesas-internas' ? 'bg-white border border-b-white border-gray-700 text-red-700' : 'text-gray-400 hover:text-gray-200'
+        aba === 'despesas-internas' ? 'bg-white border border-b-white border-gray-700 text-red-700' : 'text-gray-400 hover:text-gray-400'
       }`}
     >
       <Wallet className="w-4 h-4" /> Despesas Internas
@@ -1085,7 +1085,7 @@ function DespesasInternasAba() {
                         <TableCell>
                           <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800">{d.categoria}</span>
                         </TableCell>
-                        <TableCell className="text-sm text-gray-200 max-w-[180px] truncate">{d.descricao ?? '—'}</TableCell>
+                        <TableCell className="text-sm text-gray-400 max-w-[180px] truncate">{d.descricao ?? '—'}</TableCell>
                         <TableCell className="text-sm text-gray-300">{d.dataLancamento ?? '—'}</TableCell>
                         <TableCell className="text-sm text-gray-300">{d.lancadoPor ?? '—'}</TableCell>
                         <TableCell className="text-right font-bold text-red-700">{fmt(d.valor)}</TableCell>
@@ -1190,7 +1190,7 @@ function BloqueiosAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => voi
     <button
       onClick={() => setAba('bloqueios')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'bloqueios' ? 'bg-white border border-b-white border-gray-700 text-red-700' : 'text-gray-400 hover:text-gray-200'
+        aba === 'bloqueios' ? 'bg-white border border-b-white border-gray-700 text-red-700' : 'text-gray-400 hover:text-gray-400'
       }`}
     >
       <Lock className="w-4 h-4" /> Bloqueios
@@ -1298,7 +1298,7 @@ function BackupAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => void }
     <button
       onClick={() => setAba('backup')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'backup' ? 'bg-white border border-b-white border-gray-700 text-emerald-700' : 'text-gray-400 hover:text-gray-200'
+        aba === 'backup' ? 'bg-white border border-b-white border-gray-700 text-emerald-700' : 'text-gray-400 hover:text-gray-400'
       }`}
     >
       <DatabaseBackup className="w-4 h-4" /> Backup
@@ -1424,7 +1424,7 @@ function BackupAba() {
           <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-green-600 shrink-0" />
             <div className="text-sm">
-              <span className="font-semibold text-gray-200">Último backup gerado:</span>{' '}
+              <span className="font-semibold text-gray-400">Último backup gerado:</span>{' '}
               <span className="text-gray-300">{ultimoBackup.dataHora}</span>
               <span className="text-gray-400 ml-2">• {ultimoBackup.tabelas} tabelas • {ultimoBackup.tamanhoKB} KB</span>
             </div>
@@ -1455,7 +1455,7 @@ function ArquivoMortoAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => 
     <button
       onClick={() => setAba('arquivo-morto')}
       className={`flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-t-lg transition-colors ${
-        aba === 'arquivo-morto' ? 'bg-white border border-b-white border-gray-700 text-amber-700' : 'text-gray-400 hover:text-gray-200'
+        aba === 'arquivo-morto' ? 'bg-white border border-b-white border-gray-700 text-amber-700' : 'text-gray-400 hover:text-gray-400'
       }`}
     >
       <FolderArchive className="w-4 h-4" /> Arquivo Morto
@@ -1764,7 +1764,7 @@ function ArquivoMortoAba() {
                 }}
               >
                 {uploadFile ? (
-                  <div className="flex items-center justify-center gap-2 text-sm text-gray-200">
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
                     {getFileIcon(uploadFile.name.split(".").pop())}
                     <span className="font-medium">{uploadFile.name}</span>
                     <span className="text-gray-400">({fmtTamanho(uploadFile.size)})</span>

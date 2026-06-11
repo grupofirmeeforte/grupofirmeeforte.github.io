@@ -342,7 +342,7 @@ export default function ProRataPage() {
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               aba === 'operacoes'
                 ? 'border-indigo-600 text-indigo-700 bg-indigo-50'
-                : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
+                : 'border-transparent text-gray-400 hover:text-gray-400 hover:border-gray-300'
             }`}
           >
             <FileSpreadsheet className="w-4 h-4" />
@@ -358,7 +358,7 @@ export default function ProRataPage() {
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               aba === 'encerradas'
                 ? 'border-red-600 text-red-700 bg-red-50'
-                : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300'
+                : 'border-transparent text-gray-400 hover:text-gray-400 hover:border-gray-300'
             }`}
           >
             <TrendingDown className="w-4 h-4" />
@@ -475,18 +475,18 @@ export default function ProRataPage() {
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-gray-800">
-                          <TableHead className="font-semibold text-gray-200">Agência BB</TableHead>
-                          <TableHead className="font-semibold text-gray-200">Nº Operação</TableHead>
-                          <TableHead className="font-semibold text-gray-200">ChaveJ</TableHead>
-                          <TableHead className="font-semibold text-gray-200">Empresa</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-right">Vr. Financiado</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
-                          <TableHead className="font-semibold text-gray-200">Data Final</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-center">Parc. Pagas</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-center">Parc. Total</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-center bg-amber-50">Falta</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-right bg-green-50">VLR (A Receber)</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-center">Cod Est</TableHead>
+                          <TableHead className="font-semibold text-gray-400">Agência BB</TableHead>
+                          <TableHead className="font-semibold text-gray-400">Nº Operação</TableHead>
+                          <TableHead className="font-semibold text-gray-400">ChaveJ</TableHead>
+                          <TableHead className="font-semibold text-gray-400">Empresa</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-right">Vr. Financiado</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-right">Comissão</TableHead>
+                          <TableHead className="font-semibold text-gray-400">Data Final</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-center">Parc. Pagas</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-center">Parc. Total</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-center bg-amber-50">Falta</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-right bg-green-50">VLR (A Receber)</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-center">Cod Est</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -494,17 +494,17 @@ export default function ProRataPage() {
                           const falta = row.qtdFaltaReceber ?? ((row.qtdParcelasTotal ?? 0) - (row.qtdParcelasPagas ?? 0));
                           return (
                             <TableRow key={row.id} className={rowIdx % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}>
-                              <TableCell className="text-gray-200 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
-                              <TableCell className="text-gray-200 font-mono text-sm font-medium">{row.nrOperacao}</TableCell>
+                              <TableCell className="text-gray-400 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
+                              <TableCell className="text-gray-400 font-mono text-sm font-medium">{row.nrOperacao}</TableCell>
                               <TableCell>
                                 <Badge variant="outline" className="text-xs font-mono">{row.chaveJ || '—'}</Badge>
                               </TableCell>
-                              <TableCell className="text-gray-200 text-sm">{row.empresa || '—'}</TableCell>
+                              <TableCell className="text-gray-400 text-sm">{row.empresa || '—'}</TableCell>
                               <TableCell className="text-right font-semibold text-blue-700">{fmt(row.valorFinanciado)}</TableCell>
-                              <TableCell className="text-right text-gray-200 text-sm">{fmt(row.comissao)}</TableCell>
-                              <TableCell className="text-gray-200 text-sm">{row.dataFinal || '—'}</TableCell>
-                              <TableCell className="text-center text-gray-200">{row.qtdParcelasPagas ?? '—'}</TableCell>
-                              <TableCell className="text-center text-gray-200">{row.qtdParcelasTotal ?? '—'}</TableCell>
+                              <TableCell className="text-right text-gray-400 text-sm">{fmt(row.comissao)}</TableCell>
+                              <TableCell className="text-gray-400 text-sm">{row.dataFinal || '—'}</TableCell>
+                              <TableCell className="text-center text-gray-400">{row.qtdParcelasPagas ?? '—'}</TableCell>
+                              <TableCell className="text-center text-gray-400">{row.qtdParcelasTotal ?? '—'}</TableCell>
                               <TableCell className="text-center bg-amber-50">
                                 <Badge className={`text-xs font-bold ${falta > 0 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-300'}`}>
                                   {falta}
@@ -542,7 +542,7 @@ export default function ProRataPage() {
                 />
               </div>
               <select
-                className="border rounded-md px-3 py-2 text-sm text-gray-200 bg-white"
+                className="border rounded-md px-3 py-2 text-sm text-gray-400 bg-white"
                 value={importacaoSelecionada ?? ''}
                 onChange={e => setImportacaoSelecionada(e.target.value || undefined)}
               >
@@ -630,18 +630,18 @@ export default function ProRataPage() {
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-red-50">
-                          <TableHead className="font-semibold text-gray-200">Data Importação</TableHead>
-                          <TableHead className="font-semibold text-gray-200">Nº Operação</TableHead>
-                          <TableHead className="font-semibold text-gray-200">ChaveJ</TableHead>
-                          <TableHead className="font-semibold text-gray-200">Empresa</TableHead>
-                          <TableHead className="font-semibold text-gray-200">Agência BB</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-right">Vr. Financiado</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-right">Comissão</TableHead>
-                          <TableHead className="font-semibold text-gray-200">Data Final</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-center">Pagas</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-center">Total</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-right bg-red-50">VLR Perdido</TableHead>
-                          <TableHead className="font-semibold text-gray-200 text-center">Motivo</TableHead>
+                          <TableHead className="font-semibold text-gray-400">Data Importação</TableHead>
+                          <TableHead className="font-semibold text-gray-400">Nº Operação</TableHead>
+                          <TableHead className="font-semibold text-gray-400">ChaveJ</TableHead>
+                          <TableHead className="font-semibold text-gray-400">Empresa</TableHead>
+                          <TableHead className="font-semibold text-gray-400">Agência BB</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-right">Vr. Financiado</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-right">Comissão</TableHead>
+                          <TableHead className="font-semibold text-gray-400">Data Final</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-center">Pagas</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-center">Total</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-right bg-red-50">VLR Perdido</TableHead>
+                          <TableHead className="font-semibold text-gray-400 text-center">Motivo</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -654,13 +654,13 @@ export default function ProRataPage() {
                             <TableCell>
                               <Badge variant="outline" className="text-xs font-mono">{row.chaveJ || '—'}</Badge>
                             </TableCell>
-                            <TableCell className="text-gray-200 text-sm">{row.empresa || '—'}</TableCell>
-                            <TableCell className="text-gray-200 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
+                            <TableCell className="text-gray-400 text-sm">{row.empresa || '—'}</TableCell>
+                            <TableCell className="text-gray-400 font-mono text-sm">{row.agenciaBB || '—'}</TableCell>
                             <TableCell className="text-right text-blue-700 font-semibold">{fmt(row.valorFinanciado)}</TableCell>
-                            <TableCell className="text-right text-gray-200 text-sm">{fmt(row.comissao)}</TableCell>
-                            <TableCell className="text-gray-200 text-sm">{row.dataFinal || '—'}</TableCell>
-                            <TableCell className="text-center text-gray-200">{row.qtdParcelasPagas ?? '—'}</TableCell>
-                            <TableCell className="text-center text-gray-200">{row.qtdParcelasTotal ?? '—'}</TableCell>
+                            <TableCell className="text-right text-gray-400 text-sm">{fmt(row.comissao)}</TableCell>
+                            <TableCell className="text-gray-400 text-sm">{row.dataFinal || '—'}</TableCell>
+                            <TableCell className="text-center text-gray-400">{row.qtdParcelasPagas ?? '—'}</TableCell>
+                            <TableCell className="text-center text-gray-400">{row.qtdParcelasTotal ?? '—'}</TableCell>
                             <TableCell className="text-right font-bold text-red-700 bg-red-50">{fmt(row.vlrPerdido)}</TableCell>
                             <TableCell className="text-center">
                               <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -695,7 +695,7 @@ export default function ProRataPage() {
           <div className="space-y-4">
             {/* Modo de importação */}
             <div>
-              <p className="text-sm font-medium text-gray-200 mb-2">Modo de importação:</p>
+              <p className="text-sm font-medium text-gray-400 mb-2">Modo de importação:</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setImportMode('novo')}
@@ -729,7 +729,7 @@ export default function ProRataPage() {
 
             {/* Seleção de arquivo */}
             <div>
-              <p className="text-sm font-medium text-gray-200 mb-1">Arquivo Excel (.xlsm / .xlsx / .xls):</p>
+              <p className="text-sm font-medium text-gray-400 mb-1">Arquivo Excel (.xlsm / .xlsx / .xls):</p>
               <p className="text-xs text-gray-400 mb-2">
                 Colunas esperadas (linha 2 do arquivo): <strong>AGENCIA BB, NRO OPERACAO, CHAVEJ, VALORFINANCIADO, COMISSÃO, DATA FINAL, QTD PARCELAS PGS, QTD PARCELAS TOTAL, COD EST, Empresa</strong>
               </p>

@@ -596,7 +596,7 @@ export default function MailingCrm() {
                   {/* Coluna 3: Localização */}
                   <td className="px-3 py-2.5 min-w-[130px]">
                     <div className="flex items-center gap-1">
-                      {r.cidade && <span className="text-[12px] text-gray-200 font-medium">{r.cidade}</span>}
+                      {r.cidade && <span className="text-[12px] text-gray-400 font-medium">{r.cidade}</span>}
                       {r.sgUf && <span className="text-[10px] px-1 py-0.5 rounded bg-gray-100 text-gray-300 font-bold">{r.sgUf}</span>}
                     </div>
                     {r.dtInclusao && <div className="text-[10px] text-gray-400">Incl: {r.dtInclusao}</div>}
@@ -606,7 +606,7 @@ export default function MailingCrm() {
 
                   {/* Coluna 4: Contato / Datas */}
                   <td className="px-3 py-2.5 min-w-[140px]">
-                    {r.dataContato && <div className="text-[11px] text-gray-200">Contato: {r.dataContato}</div>}
+                    {r.dataContato && <div className="text-[11px] text-gray-400">Contato: {r.dataContato}</div>}
                     {r.dataInserido && <div className="text-[10px] text-gray-400">Inserido: {r.dataInserido}</div>}
                   </td>
 

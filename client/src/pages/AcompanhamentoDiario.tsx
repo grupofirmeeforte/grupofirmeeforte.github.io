@@ -330,7 +330,7 @@ export default function AcompanhamentoDiario() {
                         const label = isSab ? "Sábado" : isDom ? "Domingo" : null;
                         const zebraUtil = !isWkd ? (colIdx % 2 === 0 ? "bg-blue-950/20" : "") : "";
                         return (
-                          <td key={d} className={`px-1 py-2 text-center ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-white" : !isWkd ? "text-gray-200" : ""}`}>
+                          <td key={d} className={`px-1 py-2 text-center ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-white" : !isWkd ? "text-gray-400" : ""}`}>
                             {val > 0 ? (
                               <span className={isWkd ? "text-red-300" : "text-white"}>{fmt(val)}</span>
                             ) : label ? (
@@ -356,7 +356,7 @@ export default function AcompanhamentoDiario() {
                       const label = isSab ? "Sábado" : isDom ? "Domingo" : null;
                       const zebraUtil = !isWkd ? (colIdx % 2 === 0 ? "bg-blue-950/30" : "") : "";
                       return (
-                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-green-300" : !isWkd ? "text-gray-200" : ""}`}>
+                        <td key={d} className={`px-1 py-2 text-center text-[10px] ${isWkd ? "bg-red-950/20" : zebraUtil} ${!isWkd && val > 0 ? "text-green-300" : !isWkd ? "text-gray-400" : ""}`}>
                           {val > 0 ? (
                             <span className={isWkd ? "text-red-300" : "text-green-300"}>{fmt(val)}</span>
                           ) : label ? (
@@ -377,7 +377,7 @@ export default function AcompanhamentoDiario() {
             <span><span className="text-green-400 font-bold">Verde</span> = aproveitamento ≥ 50%</span>
             <span><span className="text-red-400 font-bold">Vermelho</span> = aproveitamento &lt; 50%</span>
             <span><span className="text-gray-300">—</span> = fim de semana</span>
-            <span><span className="text-gray-200">·</span> = sem produção</span>
+            <span><span className="text-gray-400">·</span> = sem produção</span>
             <span>Dias C/ = dias úteis com produção | Dias S/ = dias úteis sem produção</span>
           </div>
         </div>

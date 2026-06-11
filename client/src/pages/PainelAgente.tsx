@@ -206,7 +206,7 @@ export default function PainelAgente() {
             {/* Produção */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-slate-400">
                   <TrendingUp className="w-5 h-5 text-green-400" />
                   Produção — {painel?.mesAtual}
                 </CardTitle>
@@ -244,7 +244,7 @@ export default function PainelAgente() {
             {/* Meta */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center justify-between text-slate-200">
+                <CardTitle className="text-base flex items-center justify-between text-slate-400">
                   <span className="flex items-center gap-2"><Target className="w-5 h-5 text-amber-400" /> Meta do Mês</span>
                   <Button
                     size="sm"
@@ -316,7 +316,7 @@ export default function PainelAgente() {
           {/* Ranking + Posição */}
           <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center justify-between text-slate-200">
+              <CardTitle className="text-base flex items-center justify-between text-slate-400">
                 <span className="flex items-center gap-2"><Trophy className="w-5 h-5 text-yellow-400" /> 🏆 Top 10 do Mês</span>
                 <div className="flex items-center gap-2">
                   {painel?.ranking?.posicao && painel.ranking.posicao > 0 && (
@@ -383,7 +383,7 @@ export default function PainelAgente() {
             {/* Conquistas */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-slate-400">
                   <Medal className="w-5 h-5 text-purple-400" /> Conquistas
                 </CardTitle>
               </CardHeader>
@@ -412,7 +412,7 @@ export default function PainelAgente() {
             {/* Documentos vencendo */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-slate-400">
                   <AlertTriangle className="w-5 h-5 text-red-400" /> Documentos Vencendo
                 </CardTitle>
               </CardHeader>
@@ -468,7 +468,7 @@ export default function PainelAgente() {
           {painel?.historico && painel.historico.length > 0 && (
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-slate-400">
                   <Calendar className="w-5 h-5 text-blue-400" /> Histórico de Produção
                 </CardTitle>
               </CardHeader>
