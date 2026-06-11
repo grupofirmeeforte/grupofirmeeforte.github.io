@@ -451,37 +451,37 @@ export default function Consorcio() {
                 {/* Coluna Agente */}
                 <td className="px-2 py-1.5 border-r border-gray-700">
                   <div className="flex items-center gap-1.5 mb-0.5">
-                    <span className="font-mono text-[11px] text-blue-700 font-semibold">{row.chaveJ ?? "-"}</span>
-                    <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{row.empresa ?? ""}</span>
-                    <span className="text-[9px] text-gray-700">{row.mesAno ?? ""}</span>
+                    <span className={`font-mono text-[11px] font-semibold ${i % 2 === 0 ? "text-blue-700" : "text-blue-300"}`}>{row.chaveJ ?? "-"}</span>
+                    <span className={`text-[9px] px-1 py-0.5 rounded ${i % 2 === 0 ? "bg-blue-100 text-blue-700" : "bg-blue-900 text-blue-300"}`}>{row.empresa ?? ""}</span>
+                    <span className={`text-[9px] ${i % 2 === 0 ? "text-gray-700" : "text-gray-400"}`}>{row.mesAno ?? ""}</span>
                   </div>
-                  <div className="text-[11px] text-white font-medium whitespace-nowrap">{row.nomeAgente ?? "-"}</div>
+                  <div className={`text-[11px] font-medium whitespace-nowrap ${i % 2 === 0 ? "text-gray-900" : "text-white"}`}>{row.nomeAgente ?? "-"}</div>
                 </td>
                 {/* Coluna Operação */}
                 <td className="px-2 py-1.5 border-r border-gray-700">
-                  <div className="font-mono text-[11px] text-gray-900 font-medium">{row.proposta ?? "-"}</div>
-                  <div className="text-[10px] text-gray-900 whitespace-nowrap">{row.data ?? ""}</div>
+                  <div className={`font-mono text-[11px] font-medium ${i % 2 === 0 ? "text-gray-900" : "text-gray-300"}`}>{row.proposta ?? "-"}</div>
+                  <div className={`text-[10px] whitespace-nowrap ${i % 2 === 0 ? "text-gray-900" : "text-gray-300"}`}>{row.data ?? ""}</div>
                   {row.segmento && (
-                    <span className={`text-[9px] px-1 py-0.5 rounded font-medium ${row.segmento === "IMOVEL" ? "bg-blue-600 text-white" : "bg-green-600 text-white"}`}>
+                    <span className={`text-[9px] px-1 py-0.5 rounded font-medium ${row.segmento === "IMOVEL" ? (i % 2 === 0 ? "bg-blue-100 text-blue-700" : "bg-blue-600 text-white") : (i % 2 === 0 ? "bg-green-100 text-green-700" : "bg-green-600 text-white")}`}>
                       {row.segmento}
                     </span>
                   )}
                 </td>
                 {/* Coluna Valores */}
                 <td className="px-2 py-1.5 border-r border-gray-700 text-right whitespace-nowrap">
-                  <div className="font-bold text-blue-800 text-[12px]">{fmtMoeda(row.valorBem)}</div>
-                  <div className="text-[10px] text-gray-900">RBM: {fmtMoeda(row.rbm)}</div>
-                  {row.parcLiberada && <div className="text-[10px] text-gray-900">Parc: {row.parcLiberada}</div>}
+                  <div className={`font-bold text-[12px] ${i % 2 === 0 ? "text-blue-800" : "text-blue-300"}`}>{fmtMoeda(row.valorBem)}</div>
+                  <div className={`text-[10px] ${i % 2 === 0 ? "text-gray-900" : "text-gray-300"}`}>RBM: {fmtMoeda(row.rbm)}</div>
+                  {row.parcLiberada && <div className={`text-[10px] ${i % 2 === 0 ? "text-gray-900" : "text-gray-300"}`}>Parc: {row.parcLiberada}</div>}
                 </td>
                 {/* Coluna Comissão */}
                 <td className="px-2 py-1.5 border-r border-gray-700 text-right whitespace-nowrap">
                   {parseFloat(row.comissao ?? '0') > 0 ? (
                     <>
-                      <div className="font-bold text-green-700 text-[12px]">{fmtMoeda(row.comissao)}</div>
-                      <div className="text-[10px] text-gray-900">{fmtPct(row.pctComissao2)}</div>
+                      <div className={`font-bold text-[12px] ${i % 2 === 0 ? "text-green-700" : "text-green-300"}`}>{fmtMoeda(row.comissao)}</div>
+                      <div className={`text-[10px] ${i % 2 === 0 ? "text-gray-900" : "text-gray-300"}`}>{fmtPct(row.pctComissao2)}</div>
                     </>
                   ) : (
-                    <span className="text-[11px] text-gray-900">-</span>
+                    <span className={`text-[11px] ${i % 2 === 0 ? "text-gray-900" : "text-gray-300"}`}>-</span>
                   )}
                 </td>
                 <td className="px-2 py-1.5 whitespace-nowrap">
