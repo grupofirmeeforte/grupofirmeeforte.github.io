@@ -86,7 +86,7 @@ function FotoTooltip({ fotoUrl, fotoKey }: { fotoUrl: string; fotoKey?: string |
                 className="w-64 h-64 object-contain"
               />
             ) : (
-              <div className="w-64 h-64 flex items-center justify-center text-slate-700 text-sm">Carregando...</div>
+              <div className="w-64 h-64 flex items-center justify-center text-slate-900 text-sm">Carregando...</div>
             )}
           </div>
           <button
@@ -253,9 +253,9 @@ export default function AtivoImobilizado() {
         {/* Tabela */}
         <div className="bg-gray-900 rounded-lg border border-gray-700 overflow-x-auto">
           {isLoading ? (
-            <div className="p-8 text-center text-slate-700">Carregando...</div>
+            <div className="p-8 text-center text-slate-900">Carregando...</div>
           ) : ativos.length === 0 ? (
-            <div className="p-8 text-center text-slate-700">Nenhum ativo cadastrado</div>
+            <div className="p-8 text-center text-slate-900">Nenhum ativo cadastrado</div>
           ) : (
             <table className="w-full border-collapse">
               <thead>
@@ -278,7 +278,7 @@ export default function AtivoImobilizado() {
                             {uploadingId === a.id ? (
                               <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
                             ) : (
-                              <Camera className="w-4 h-4 text-slate-700" />
+                              <Camera className="w-4 h-4 text-slate-900" />
                             )}
                           </div>
                         </label>
@@ -344,7 +344,7 @@ export default function AtivoImobilizado() {
                   <span className="text-xs text-amber-600 font-medium">Adicionar foto</span>
                 </label>
               )}
-              <p className="text-xs text-slate-700">Foto do bem (máx. 5MB)</p>
+              <p className="text-xs text-slate-900">Foto do bem (máx. 5MB)</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

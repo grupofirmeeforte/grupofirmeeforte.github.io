@@ -162,7 +162,7 @@ export default function NaoPerturbe() {
               <PhoneOff className="w-8 h-8 text-red-500" />
               <div>
                 <p className="text-2xl font-bold text-white">{contagem?.total ?? 0}</p>
-                <p className="text-xs text-gray-700">Registros na lista</p>
+                <p className="text-xs text-gray-900">Registros na lista</p>
               </div>
             </CardContent>
           </Card>
@@ -170,7 +170,7 @@ export default function NaoPerturbe() {
 
         {/* Busca */}
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-900" />
           <Input
             placeholder="Buscar por nome, CPF, município..."
             value={busca}
@@ -203,9 +203,9 @@ export default function NaoPerturbe() {
                 </thead>
                 <tbody>
                   {isLoading ? (
-                    <tr><td colSpan={8} className="text-center p-8 text-gray-700">Carregando...</td></tr>
+                    <tr><td colSpan={8} className="text-center p-8 text-gray-900">Carregando...</td></tr>
                   ) : rows.length === 0 ? (
-                    <tr><td colSpan={8} className="text-center p-8 text-gray-700">
+                    <tr><td colSpan={8} className="text-center p-8 text-gray-900">
                       {busca ? "Nenhum resultado encontrado" : "Lista vazia — importe a planilha BB ou adicione manualmente"}
                     </td></tr>
                   ) : rows.map(row => (
@@ -216,7 +216,7 @@ export default function NaoPerturbe() {
                           <span className="font-medium text-white text-xs">{row.nome || "—"}</span>
                         </div>
                         {row.telefoneFormatado && row.telefoneFormatado !== '' && (
-                          <div className="text-xs text-gray-700 ml-5">{row.telefoneFormatado}</div>
+                          <div className="text-xs text-gray-900 ml-5">{row.telefoneFormatado}</div>
                         )}
                       </td>
                       <td className="px-3 py-2 text-xs text-gray-300 font-mono">{row.cpf || "—"}</td>
@@ -224,8 +224,8 @@ export default function NaoPerturbe() {
                         {row.municipio ? `${row.municipio}${row.uf ? `/${row.uf}` : ""}` : "—"}
                       </td>
                       <td className="px-3 py-2 text-xs text-gray-300 max-w-[150px] truncate" title={row.ocupacao ?? ""}>{row.ocupacao || "—"}</td>
-                      <td className="px-3 py-2 text-xs text-gray-700">{row.dataInclusao || new Date(row.createdAt).toLocaleDateString("pt-BR")}</td>
-                      <td className="px-3 py-2 text-xs text-gray-700 max-w-[120px] truncate" title={row.reclamacao ?? ""}>{row.reclamacao || row.motivo || "—"}</td>
+                      <td className="px-3 py-2 text-xs text-gray-900">{row.dataInclusao || new Date(row.createdAt).toLocaleDateString("pt-BR")}</td>
+                      <td className="px-3 py-2 text-xs text-gray-900 max-w-[120px] truncate" title={row.reclamacao ?? ""}>{row.reclamacao || row.motivo || "—"}</td>
                       <td className="px-3 py-2">
                         <Badge
                           variant={row.origem === "manual" ? "outline" : "secondary"}
@@ -257,7 +257,7 @@ export default function NaoPerturbe() {
             {totalPaginas > 1 && (
               <div className="flex justify-center gap-2 p-4">
                 <Button variant="outline" size="sm" disabled={pagina === 1} onClick={() => setPagina(p => p - 1)}>Anterior</Button>
-                <span className="text-gray-700 text-sm flex items-center px-2">{pagina} / {totalPaginas}</span>
+                <span className="text-gray-900 text-sm flex items-center px-2">{pagina} / {totalPaginas}</span>
                 <Button variant="outline" size="sm" disabled={pagina === totalPaginas} onClick={() => setPagina(p => p + 1)}>Próxima</Button>
               </div>
             )}
@@ -327,7 +327,7 @@ export default function NaoPerturbe() {
               <input ref={xlsxRef} type="file" accept=".xlsx,.xls" className="hidden" onChange={handleXlsxUpload} />
             </div>
             {importarPlanilhaBB.isPending && (
-              <p className="text-sm text-center text-gray-700">Processando registros, aguarde...</p>
+              <p className="text-sm text-center text-gray-900">Processando registros, aguarde...</p>
             )}
           </div>
           <DialogFooter>

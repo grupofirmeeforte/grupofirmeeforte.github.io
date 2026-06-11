@@ -64,7 +64,7 @@ function fmtDate(val: string | null | undefined) {
 }
 
 function situacaoColor(s: string | null | undefined) {
-  if (!s || s === '-') return 'text-slate-700';
+  if (!s || s === '-') return 'text-slate-900';
   if (s === 'A VENCER') return 'text-green-700 font-semibold';
   if (s === 'VENCIDO') return 'text-red-600 font-semibold';
   return '';
@@ -278,7 +278,7 @@ export default function Certificacoes() {
                 </TableRow>
               ) : registros.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={16} className="text-center py-8 text-slate-700">
+                  <TableCell colSpan={16} className="text-center py-8 text-slate-900">
                     Nenhum registro encontrado. Importe um arquivo ou cadastre manualmente.
                   </TableCell>
                 </TableRow>
@@ -295,7 +295,7 @@ export default function Certificacoes() {
                       )}
                     </div>
                     <div className="text-sm text-white mt-0.5">{c.nomeAgente || '-'}</div>
-                    <div className="text-[11px] text-gray-700 mt-0.5">
+                    <div className="text-[11px] text-gray-900 mt-0.5">
                       {(c as any).empresa && <span>{(c as any).empresa}</span>}
                       {c.cpf && <span className="ml-1 font-mono">· {c.cpf}</span>}
                     </div>
@@ -310,13 +310,13 @@ export default function Certificacoes() {
                           {c.ventoCertif && <span className="ml-1">· Venc: {fmtDate(c.ventoCertif)}</span>}
                         </div>
                         {c.diasFaltando != null && (
-                          <div className="text-[11px] text-gray-700">{c.diasFaltando}d restantes</div>
+                          <div className="text-[11px] text-gray-900">{c.diasFaltando}d restantes</div>
                         )}
                         {c.nrCertificadoConsig && (
-                          <div className="text-[10px] font-mono text-gray-700">Nr: {c.nrCertificadoConsig}</div>
+                          <div className="text-[10px] font-mono text-gray-900">Nr: {c.nrCertificadoConsig}</div>
                         )}
                       </div>
-                    ) : <span className="text-xs text-slate-700">-</span>}
+                    ) : <span className="text-xs text-slate-900">-</span>}
                   </TableCell>
                   {/* Coluna PLDFT compacta */}
                   <TableCell className="min-w-[160px]">
@@ -328,13 +328,13 @@ export default function Certificacoes() {
                           {c.ventoCertif3 && <span className="ml-1">· Venc: {fmtDate(c.ventoCertif3)}</span>}
                         </div>
                         {c.diasFaltando2 != null && (
-                          <div className="text-[11px] text-gray-700">{c.diasFaltando2}d restantes</div>
+                          <div className="text-[11px] text-gray-900">{c.diasFaltando2}d restantes</div>
                         )}
                         {c.nrCertificadoPldft && (
-                          <div className="text-[10px] font-mono text-gray-700">Nr: {c.nrCertificadoPldft}</div>
+                          <div className="text-[10px] font-mono text-gray-900">Nr: {c.nrCertificadoPldft}</div>
                         )}
                       </div>
-                    ) : <span className="text-xs text-slate-700">-</span>}
+                    ) : <span className="text-xs text-slate-900">-</span>}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
@@ -381,7 +381,7 @@ export default function Certificacoes() {
             </TableBody>
           </Table>
         </div>
-        <p className="text-xs text-slate-700 mt-2">{registros.length} registro(s)</p>
+        <p className="text-xs text-slate-900 mt-2">{registros.length} registro(s)</p>
       </div>
 
       {/* Modal Criar/Editar */}

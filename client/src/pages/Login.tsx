@@ -320,7 +320,7 @@ export default function Login() {
               {showCloseBtn && (
                 <button
                   onClick={() => setLocation('/')}
-                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors text-lg font-bold"
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-900 transition-colors text-lg font-bold"
                   title="Entrar no sistema"
                 >
                   ×
@@ -344,7 +344,7 @@ export default function Login() {
                   )}
                 </div>
               ) : (
-                <p className="text-gray-700 text-sm mt-2">Aguarde um momento...</p>
+                <p className="text-gray-900 text-sm mt-2">Aguarde um momento...</p>
               )}
             </>
           ) : (
@@ -392,7 +392,7 @@ export default function Login() {
           {/* ── FORMULÁRIO SENHA ─────────────────────────────────────────── */}
           <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">ChaveJ</label>
+              <label className="block text-sm font-medium text-gray-900 mb-2">ChaveJ</label>
               <Input
                 type="text"
                 placeholder="Digite sua ChaveJ"
@@ -410,7 +410,7 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Senha</label>
+              <label className="block text-sm font-medium text-gray-900 mb-2">Senha</label>
               <Input
                 type="password"
                 placeholder="Digite sua senha"
@@ -429,8 +429,8 @@ export default function Login() {
             {/* CAPTCHA matemático */}
             <div className={`rounded-lg border p-4 ${mathError ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50'}`}>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-700">Verificação de Segurança</label>
-                <button type="button" onClick={renovarOperacao} className="text-gray-700 hover:text-gray-600 transition-colors" title="Nova operação">
+                <label className="block text-sm font-medium text-gray-900">Verificação de Segurança</label>
+                <button type="button" onClick={renovarOperacao} className="text-gray-900 hover:text-gray-600 transition-colors" title="Nova operação">
                   <RefreshCw className="w-4 h-4" />
                 </button>
               </div>
@@ -483,7 +483,7 @@ export default function Login() {
           <p className="text-center text-xs text-gray-500 mt-6">
             Sistema seguro · Autenticação por ChaveJ · Acesso rápido disponível
           </p>
-          <p className="text-center text-xs text-gray-700 mt-2 border-t border-gray-100 pt-2">
+          <p className="text-center text-xs text-gray-900 mt-2 border-t border-gray-100 pt-2">
             🔒 Este sistema é licenciado para <span className="font-semibold text-gray-500">Grupo Firme &amp; Forte</span>
           </p>
         </div>

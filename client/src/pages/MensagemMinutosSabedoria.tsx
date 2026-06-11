@@ -45,7 +45,7 @@ export default function MensagemMinutosSabedoria() {
             {isLoading ? (
               <div className="flex flex-col items-center gap-4 py-8">
                 <BookOpen className="w-16 h-16 text-purple-200 animate-pulse" />
-                <p className="text-slate-700">Carregando reflexão...</p>
+                <p className="text-slate-900">Carregando reflexão...</p>
               </div>
             ) : pensamento ? (
               <>
@@ -57,7 +57,7 @@ export default function MensagemMinutosSabedoria() {
                   <h2 className="text-xl font-bold text-purple-800 mb-6">{pensamento.titulo}</h2>
                 )}
 
-                <div className="text-slate-700 text-base leading-relaxed text-left whitespace-pre-line mb-8 px-2">
+                <div className="text-slate-900 text-base leading-relaxed text-left whitespace-pre-line mb-8 px-2">
                   {pensamento.conteudo}
                 </div>
 
@@ -65,7 +65,7 @@ export default function MensagemMinutosSabedoria() {
                   <div className="w-16 h-1 rounded-full" style={{ background: 'linear-gradient(90deg, #c8960c, #6d28d9)' }} />
                 </div>
 
-                <p className="text-xs text-slate-700 italic mb-2">
+                <p className="text-xs text-slate-900 italic mb-2">
                   C. Torres Pastorino — <em>Minutos de Sabedoria</em>
                 </p>
                 {total != null && total > 0 && (

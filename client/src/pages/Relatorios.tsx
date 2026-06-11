@@ -138,7 +138,7 @@ export default function Relatorios() {
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Filtros</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Mês/Ano</label>
+              <label className="block text-sm font-medium text-slate-900 mb-1">Mês/Ano</label>
               <Input
                 type="text"
                 placeholder={filtros.mesAno}
@@ -149,7 +149,7 @@ export default function Relatorios() {
               <p className="text-xs text-slate-500 mt-1">Mês anterior: {getMesAnterior()}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Chave J</label>
+              <label className="block text-sm font-medium text-slate-900 mb-1">Chave J</label>
               <Input
                 type="text"
                 placeholder="Ex: J9660864"
@@ -159,7 +159,7 @@ export default function Relatorios() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Nome Agente</label>
+              <label className="block text-sm font-medium text-slate-900 mb-1">Nome Agente</label>
               <Input
                 type="text"
                 placeholder="Ex: João Silva"

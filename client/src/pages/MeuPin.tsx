@@ -119,9 +119,9 @@ export default function MeuPin() {
                 </>
               ) : (
                 <>
-                  <AlertCircle className="w-5 h-5 text-gray-700 shrink-0" />
+                  <AlertCircle className="w-5 h-5 text-gray-900 shrink-0" />
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Nenhum PIN cadastrado</p>
+                    <p className="text-sm font-medium text-gray-900">Nenhum PIN cadastrado</p>
                     <p className="text-xs text-gray-500">Cadastre um PIN para agilizar seu acesso.</p>
                   </div>
                 </>
@@ -142,7 +142,7 @@ export default function MeuPin() {
             {/* Formulário de cadastro */}
             <form onSubmit={handleSalvar} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-gray-900 mb-1.5">
                   {temPin ? 'Novo PIN' : 'PIN'} (4 a 6 dígitos)
                 </label>
                 <Input
@@ -158,7 +158,7 @@ export default function MeuPin() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Confirmar PIN</label>
+                <label className="block text-sm font-medium text-gray-900 mb-1.5">Confirmar PIN</label>
                 <Input
                   type="password"
                   inputMode="numeric"
@@ -172,7 +172,7 @@ export default function MeuPin() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label className="block text-sm font-medium text-gray-900 mb-1.5">
                   Confirme sua senha atual
                 </label>
                 <Input
@@ -182,7 +182,7 @@ export default function MeuPin() {
                   onChange={(e) => setSenhaConfirmacao(e.target.value)}
                   autoComplete="off"
                 />
-                <p className="text-xs text-gray-700 mt-1">Por segurança, confirme sua senha para salvar o PIN.</p>
+                <p className="text-xs text-gray-900 mt-1">Por segurança, confirme sua senha para salvar o PIN.</p>
               </div>
 
               {error && (

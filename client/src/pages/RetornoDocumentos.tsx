@@ -157,7 +157,7 @@ export default function RetornoDocumentos() {
       {/* Filtros */}
       <div className="flex flex-wrap gap-2 items-center">
         <div className="relative">
-          <Search className="absolute left-2 top-2 w-3.5 h-3.5 text-gray-700" />
+          <Search className="absolute left-2 top-2 w-3.5 h-3.5 text-gray-900" />
           <Input placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-7 h-8 text-xs w-48" />
         </div>
         <Select value={empresa} onValueChange={setEmpresa}>
@@ -227,7 +227,7 @@ export default function RetornoDocumentos() {
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={13} className="text-center py-4 text-gray-700">Nenhum documento encontrado</td></tr>
+              <tr><td colSpan={13} className="text-center py-4 text-gray-900">Nenhum documento encontrado</td></tr>
             )}
           </tbody>
         </table>

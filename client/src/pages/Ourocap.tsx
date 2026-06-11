@@ -224,7 +224,7 @@ export default function Ourocap() {
         {/* Filtros */}
         <div className="flex flex-wrap gap-3 mb-4 bg-gray-900 rounded-lg p-3 shadow-sm border">
           <div className="flex items-center gap-2 flex-1 min-w-[200px]">
-            <Search className="w-4 h-4 text-gray-700" />
+            <Search className="w-4 h-4 text-gray-900" />
             <Input placeholder="Buscar proposta, agente, CPF..." value={search} onChange={e => { setSearch(e.target.value); setPage(0); }} className="h-8" />
           </div>
           <Select value={empresa} onValueChange={v => { setEmpresa(v); setPage(0); }}>
@@ -256,9 +256,9 @@ export default function Ourocap() {
             </thead>
             <tbody>
               {isLoading ? (
-                <tr><td colSpan={4} className="text-center py-8 text-gray-700">Carregando...</td></tr>
+                <tr><td colSpan={4} className="text-center py-8 text-gray-900">Carregando...</td></tr>
               ) : rows.length === 0 ? (
-                <tr><td colSpan={4} className="text-center py-8 text-gray-700">Nenhum registro encontrado</td></tr>
+                <tr><td colSpan={4} className="text-center py-8 text-gray-900">Nenhum registro encontrado</td></tr>
               ) : rows.map((row, i) => (
                 <tr key={row.id} className={i % 2 === 0 ? "bg-white hover:bg-blue-900/30" : "bg-blue-900/20/30 hover:bg-blue-100/40"}>
                   {/* Coluna Agente */}
@@ -266,17 +266,17 @@ export default function Ourocap() {
                     <div className="flex items-center gap-1.5 mb-0.5">
                       <span className="font-mono text-[11px] text-blue-700 font-semibold">{(row as any).chaveJ ?? "-"}</span>
                       <span className="text-[9px] px-1 py-0.5 rounded bg-blue-100 text-blue-700">{(row as any).empresa ?? ""}</span>
-                      <span className="text-[9px] text-gray-700">{(row as any).mesAno ?? ""}</span>
+                      <span className="text-[9px] text-gray-900">{(row as any).mesAno ?? ""}</span>
                     </div>
                     <div className="text-[11px] text-white font-medium">{(row as any).nomeAgente ?? "-"}</div>
-                    {(row as any).supervisor && <div className="text-[10px] text-gray-700">Sup: {(row as any).supervisor}</div>}
+                    {(row as any).supervisor && <div className="text-[10px] text-gray-900">Sup: {(row as any).supervisor}</div>}
                   </td>
                   {/* Coluna Produto / Cliente */}
                   <td className="px-3 py-1.5">
-                    <div className="text-[11px] text-gray-700 font-medium">{(row as any).codProduto ?? "-"}</div>
-                    <div className="text-[10px] text-gray-700 font-mono">{(row as any).proposta ?? ""}</div>
-                    {(row as any).cpfCliente && <div className="text-[10px] text-gray-700">CPF: {(row as any).cpfCliente}</div>}
-                    <div className="text-[10px] text-gray-700">
+                    <div className="text-[11px] text-gray-900 font-medium">{(row as any).codProduto ?? "-"}</div>
+                    <div className="text-[10px] text-gray-900 font-mono">{(row as any).proposta ?? ""}</div>
+                    {(row as any).cpfCliente && <div className="text-[10px] text-gray-900">CPF: {(row as any).cpfCliente}</div>}
+                    <div className="text-[10px] text-gray-900">
                       {(row as any).dtVenda ? `Venda: ${toDate((row as any).dtVenda)}` : ""}
                       {(row as any).dtDebito ? ` · Déb: ${toDate((row as any).dtDebito)}` : ""}
                     </div>
@@ -284,8 +284,8 @@ export default function Ourocap() {
                   {/* Coluna Valores */}
                   <td className="px-3 py-1.5 text-right whitespace-nowrap">
                     <div className="font-bold text-green-700 text-[12px]">{fmtMoeda((row as any).comissao)}</div>
-                    <div className="text-[10px] text-gray-700">Prod: {fmtMoeda((row as any).vrProduto)}</div>
-                    <div className="text-[10px] text-gray-700">RBM: {fmtMoeda((row as any).rbm)}</div>
+                    <div className="text-[10px] text-gray-900">Prod: {fmtMoeda((row as any).vrProduto)}</div>
+                    <div className="text-[10px] text-gray-900">RBM: {fmtMoeda((row as any).rbm)}</div>
                   </td>
                   <td className="px-3 py-1.5 text-center">
                     <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 h-6 w-6 p-0" onClick={() => setDeleteId(row.id)}>
