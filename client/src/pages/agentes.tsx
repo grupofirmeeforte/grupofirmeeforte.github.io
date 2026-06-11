@@ -452,8 +452,8 @@ export default function AgentesPage() {
                       <TableCell>{agente.supervisor}</TableCell>
                       <TableCell className="min-w-[150px]">
                         {agente.cpfAgente
-                          ? <div className="text-sm font-mono text-white">{agente.cpfAgente}</div>
-                          : <span className="text-xs text-slate-400">-</span>}
+                          ? <div className="text-sm font-mono text-gray-900">{agente.cpfAgente}</div>
+                          : <span className="text-xs text-slate-700">-</span>}
                         {agente.celular && (
                           <div className="text-xs text-gray-700 mt-0.5">{agente.celular}</div>
                         )}
@@ -464,19 +464,19 @@ export default function AgentesPage() {
                           <div className="font-medium text-sm text-gray-900">
                             {agente.banco}{agente.agencia ? ` · Ag ${agente.agencia}` : ''}{agente.conta ? ` · ${agente.tipo === 'Conta Poupança' ? 'Cp' : 'Cc'} ${agente.conta}` : ''}
                           </div>
-                        ) : <span className="text-xs text-slate-400">-</span>}
+                        ) : <span className="text-xs text-slate-700">-</span>}
                         {/* Favorecido */}
                         {((agente as any).favProprio || agente.favorecido) && (
                           <div className="text-[10px] text-slate-800 mt-0.5 flex items-center gap-1">
                             <span className="font-medium">Fav:</span>
                             {(agente as any).favProprio
-                              ? <span className="text-emerald-700 font-medium">{agente.nomeAgente} <span className="text-[9px] bg-emerald-100 text-emerald-700 rounded px-1 font-semibold">próprio</span></span>
-                              : <span className="text-orange-600 font-semibold">{agente.favorecido} <span className="text-[9px] bg-orange-100 text-orange-700 rounded px-1">favorecido</span></span>
+                              ? <span className="text-emerald-900 font-medium">{agente.nomeAgente} <span className="text-[9px] bg-emerald-100 text-emerald-900 rounded px-1 font-semibold">próprio</span></span>
+                              : <span className="text-orange-900 font-semibold">{agente.favorecido} <span className="text-[9px] bg-orange-100 text-orange-900 rounded px-1">favorecido</span></span>
                             }
                           </div>
                         )}
                         {agente.pix && (
-                          <div className="text-xs text-blue-700 mt-0.5">PIX: {agente.pix}</div>
+                          <div className="text-xs text-blue-900 mt-0.5">PIX: {agente.pix}</div>
                         )}
                       </TableCell>
                       <TableCell className="text-right space-x-1">
