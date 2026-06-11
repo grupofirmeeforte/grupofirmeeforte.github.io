@@ -812,9 +812,9 @@ export default function Calculo() {
                       <span className="font-bold text-purple-700 text-xs">{r.chaveJ || '-'}</span>
                       {r.situacao && (
                         <span className={`text-[9px] font-semibold px-1 py-0.5 rounded-full border ${
-                          r.situacao === 'Ativo' ? 'bg-green-100 text-green-800 border-green-300'
-                          : r.situacao === 'Inativo' ? 'bg-red-100 text-red-700 border-red-300'
-                          : 'bg-gray-100 text-gray-300 border-gray-300'
+                          r.situacao === 'Ativo' ? 'bg-green-600 text-white border-green-700'
+                          : r.situacao === 'Inativo' ? 'bg-red-600 text-white border-red-700'
+                          : 'bg-gray-600 text-white border-gray-700'
                         }`}>{r.situacao}</span>
                       )}
                       {r.mesRef && <span className="text-[9px] text-purple-500 font-mono">{fmtMesRef(r.mesRef)}</span>}
@@ -824,10 +824,10 @@ export default function Calculo() {
                       <div className="text-[10px] text-blue-600 font-medium leading-tight">Fav: {(r as any).favorecido}</div>
                     )}
                     {(r as any).nivelAgente && (
-                      <div className="text-[10px] text-orange-600 font-semibold leading-tight">{(r as any).nivelAgente}</div>
+                      <div className="text-[10px] text-orange-900 font-semibold leading-tight">{(r as any).nivelAgente}</div>
                     )}
-                    <div className="text-[10px] text-slate-500">{r.empresa || ''}{r.cidade ? ` · ${r.cidade}` : ''}</div>
-                    {r.tipoPagamento && <div className="text-[9px] text-slate-400 mt-0.5">{r.tipoPagamento}</div>}
+                    <div className="text-[10px] text-slate-700">{r.empresa || ''}{r.cidade ? ` · ${r.cidade}` : ''}</div>
+                    {r.tipoPagamento && <div className="text-[9px] text-slate-700 mt-0.5">{r.tipoPagamento}</div>}
                   </td>
                   {/* Célula compacta RBM */}
                   <td className="px-2 py-1 border-b border-slate-200 align-top text-right">
@@ -842,7 +842,7 @@ export default function Calculo() {
                       const perc = percSalvo !== 0 ? percSalvo : percCalc;
                       if (perc === 0) return null;
                       return (
-                        <div className="text-[10px] font-semibold text-amber-600">
+                        <div className="text-[10px] font-semibold text-amber-900">
                           {(perc * 100).toFixed(2).replace('.', ',')}% s/ RBM
                         </div>
                       );
@@ -855,25 +855,25 @@ export default function Calculo() {
                   {/* Célula compacta Comissões */}
                   <td className="px-2 py-1 border-b border-slate-200 align-top text-right">
                     {/* Comissão Total em destaque */}
-                    <div className="font-bold text-pink-700 text-xs">{r.comissaoTotal ? fmtMoeda(r.comissaoTotal) : '-'}</div>
-                    {r.percentual && parseFloat(String(r.percentual)) !== 0 && <div className="text-[10px] text-slate-400">{fmtPerc(r.percentual)}</div>}
-                    {r.comissaoConsig && parseFloat(String(r.comissaoConsig)) !== 0 && <div className="text-[10px] text-slate-500">Consig: {fmtMoeda(r.comissaoConsig)}</div>}
-                    {r.comissaoConsorcio && parseFloat(String(r.comissaoConsorcio)) !== 0 && <div className="text-[10px] text-slate-500">Consórc: {fmtMoeda(r.comissaoConsorcio)}</div>}
-                    {r.comissaoOurocap && parseFloat(String(r.comissaoOurocap)) !== 0 && <div className="text-[10px] text-slate-500">Ouro: {fmtMoeda(r.comissaoOurocap)}</div>}
-                    {r.comissaoCc && parseFloat(String(r.comissaoCc)) !== 0 && <div className="text-[10px] text-slate-500">C/C: {fmtMoeda(r.comissaoCc)}</div>}
-                    {r.comissaoSeguros && parseFloat(String(r.comissaoSeguros)) !== 0 && <div className="text-[10px] text-slate-500">Seg: {fmtMoeda(r.comissaoSeguros)}</div>}
+                    <div className="font-bold text-pink-900 text-xs">{r.comissaoTotal ? fmtMoeda(r.comissaoTotal) : '-'}</div>
+                    {r.percentual && parseFloat(String(r.percentual)) !== 0 && <div className="text-[10px] text-slate-700">{fmtPerc(r.percentual)}</div>}
+                    {r.comissaoConsig && parseFloat(String(r.comissaoConsig)) !== 0 && <div className="text-[10px] text-slate-700">Consig: {fmtMoeda(r.comissaoConsig)}</div>}
+                    {r.comissaoConsorcio && parseFloat(String(r.comissaoConsorcio)) !== 0 && <div className="text-[10px] text-slate-700">Consórc: {fmtMoeda(r.comissaoConsorcio)}</div>}
+                    {r.comissaoOurocap && parseFloat(String(r.comissaoOurocap)) !== 0 && <div className="text-[10px] text-slate-700">Ouro: {fmtMoeda(r.comissaoOurocap)}</div>}
+                    {r.comissaoCc && parseFloat(String(r.comissaoCc)) !== 0 && <div className="text-[10px] text-slate-700">C/C: {fmtMoeda(r.comissaoCc)}</div>}
+                    {r.comissaoSeguros && parseFloat(String(r.comissaoSeguros)) !== 0 && <div className="text-[10px] text-slate-700">Seg: {fmtMoeda(r.comissaoSeguros)}</div>}
                   </td>
                   {/* Célula compacta Pagamento */}
                   <td className="px-2 py-1 border-b border-slate-200 align-top text-right">
                     {/* Vr. Líquido em destaque */}
-                    <div className="font-bold text-emerald-700 text-xs">{r.vrLiquidoC2 ? fmtMoeda(r.vrLiquidoC2) : '-'}</div>
+                    <div className="font-bold text-emerald-900 text-xs">{r.vrLiquidoC2 ? fmtMoeda(r.vrLiquidoC2) : '-'}</div>
                     {r.srccC2 && parseFloat(String(r.srccC2)) !== 0 && (
                       <>
-                        <div className="text-[10px] text-red-500">-SRCC: {fmtMoeda(r.srccC2)}</div>
-                        {r.vrLiquidoSrcc && <div className="text-[10px] text-emerald-600 font-semibold">= {fmtMoeda(r.vrLiquidoSrcc)}</div>}
+                        <div className="text-[10px] text-red-900">-SRCC: {fmtMoeda(r.srccC2)}</div>
+                        {r.vrLiquidoSrcc && <div className="text-[10px] text-emerald-900 font-semibold">= {fmtMoeda(r.vrLiquidoSrcc)}</div>}
                       </>
                     )}
-                    {r.qtdeContas && String(r.qtdeContas) !== '0' && <div className="text-[10px] text-slate-400">Contas: {r.qtdeContas}</div>}
+                    {r.qtdeContas && String(r.qtdeContas) !== '0' && <div className="text-[10px] text-slate-700">Contas: {r.qtdeContas}</div>}
                     {/* Dt Pagto editável */}
                     <div className="mt-0.5">
                       {editandoDtPagto === r.id ? (

@@ -325,6 +325,7 @@
 ## UI LEGIBILITY FIXES (PAGE-BY-PAGE)
 - [x] Agentes - COMPLETO: Todas as cores corrigidas (CPF/Celular/Banco/PIX text-gray-900/700, Badges bg-*-600 text-white)
 - [x] Certificacoes - COMPLETO: Linhas pares (branco) com texto preto, linhas ímpares (azul escuro) com texto branco. Situacao: green-900/red-900
+- [x] Calculo - COMPLETO: Badges bg-*-600 text-white, Textos cinza text-slate-700, Cores escuras (orange-900, pink-900, emerald-900, red-900, amber-900)
 - [ ] Pending: Await user screenshots for remaining pages
 
 ## FASE 25: REESCRITA DA PÁGINA CÁLCULO (DADOS REAIS)- [x] Criar router calculosRouter em server/routers/calculos.ts com listar/mesesDisponiveis/empresasDisponiveis/criar/editar/deletar
