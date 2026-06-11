@@ -54,6 +54,7 @@ export default function ReajustePage() {
   const [selecionadosAuto, setSelecionadosAuto] = useState<string[]>([]); // chaveJ|empresa
   const [mesEnvioAuto, setMesEnvioAuto] = useState(getMesAtual());
   const [showEnviarAutoDialog, setShowEnviarAutoDialog] = useState(false);
+  const [filtroTextoAuto, setFiltroTextoAuto] = useState("");
   // Edição de linha na aba automática
   const [editandoKey, setEditandoKey] = useState<string | null>(null);
   const [editNovoValor, setEditNovoValor] = useState("");
@@ -146,10 +147,20 @@ export default function ReajustePage() {
       .reduce((acc, d) => acc + d.diferenca, 0);
   }, [diferencas, selecionadosAuto]);
 
-  const totalPositivo = useMemo(() => diferencas.filter(d => d.diferenca > 0).reduce((a, d) => a + d.diferenca, 0), [diferencas]);
-  const totalNegativo = useMemo(() => diferencas.filter(d => d.diferenca < 0).reduce((a, d) => a + d.diferenca, 0), [diferencas]);
-  const qtdPositivo = useMemo(() => diferencas.filter(d => d.diferenca > 0).length, [diferencas]);
-  const qtdNegativo = useMemo(() => diferencas.filter(d => d.diferenca < 0).length, [diferencas]);
+  const diferencasFiltradas = useMemo(() => {
+    if (!filtroTextoAuto.trim()) return diferencas;
+    const t = filtroTextoAuto.toLowerCase();
+    return diferencas.filter(d =>
+      (d.chaveJ ?? '').toLowerCase().includes(t) ||
+      (d.nomeAgente ?? '').toLowerCase().includes(t) ||
+      (d.favorecido ?? '').toLowerCase().includes(t)
+    );
+  }, [diferencas, filtroTextoAuto]);
+
+  const totalPositivo = useMemo(() => diferencasFiltradas.filter(d => d.diferenca > 0).reduce((a, d) => a + d.diferenca, 0), [diferencasFiltradas]);
+  const totalNegativo = useMemo(() => diferencasFiltradas.filter(d => d.diferenca < 0).reduce((a, d) => a + d.diferenca, 0), [diferencasFiltradas]);
+  const qtdPositivo = useMemo(() => diferencasFiltradas.filter(d => d.diferenca > 0).length, [diferencasFiltradas]);
+  const qtdNegativo = useMemo(() => diferencasFiltradas.filter(d => d.diferenca < 0).length, [diferencasFiltradas]);
 
   // Estado local das diferenças para permitir edição
   const [diferencasEditadas, setDiferencasEditadas] = useState<Record<string, number>>({});
@@ -359,7 +370,7 @@ export default function ReajustePage() {
                 ) : diferencas.length === 0 ? (
                   <tr><td colSpan={8} className="text-center p-8 text-green-400">✓ Nenhuma diferença encontrada — todos os valores estão corretos!</td></tr>
                 ) : (
-                  diferencas.filter(d => getDiferenca(d) !== 0).map((d, i) => {
+                  diferencasFiltradas.filter(d => getDiferenca(d) !== 0).map((d, i) => {
                     const key = `${d.chaveJ}|${d.empresa ?? ''}`;
                     const isPositivo = getDiferenca(d) > 0;
                     const isEditando = editandoKey === key;
@@ -375,11 +386,15 @@ export default function ReajustePage() {
                           )}
                         </td>
                         <td className="p-2">
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 flex-wrap">
                             <span className="text-yellow-300 font-mono text-[10px]">{d.chaveJ}</span>
+                            {d.nivel && <span className="bg-blue-600/30 text-blue-300 text-[9px] px-1 rounded">{d.nivel}</span>}
                             <span className="text-blue-300 text-[10px]">·{d.mesRef}</span>
                           </div>
                           <div className="text-gray-300 text-[10px]">{d.nomeAgente}</div>
+                          {d.favorecido && d.favorecido !== d.nomeAgente && (
+                            <div className="text-cyan-400 text-[9px]">Fav: {d.favorecido}</div>
+                          )}
                           <div className="text-gray-500 text-[10px]">{d.empresa || "-"}</div>
                         </td>
                         <td className="p-2 text-right">

@@ -61,6 +61,15 @@ export const reajustesRouter = {
         pagMap.set(key, (pagMap.get(key) ?? 0) + val);
       }
 
+      // Buscar dados dos agentes (nivel e favorecido)
+      const chaveJs = [...new Set(calcs.map(c => c.chaveJ).filter(Boolean))] as string[];
+      const agentesData = chaveJs.length > 0
+        ? await db.select({ chaveJ: agentes.chaveJ, nivel: agentes.nivel, favorecido: agentes.favorecido })
+            .from(agentes)
+            .where(inArray(agentes.chaveJ, chaveJs))
+        : [];
+      const agenteMap = new Map(agentesData.map(a => [a.chaveJ, a]));
+
       // Calcular diferenças
       const diferencas: Array<{
         chaveJ: string;
@@ -70,6 +79,8 @@ export const reajustesRouter = {
         novoValor: number;
         valorPago: number;
         diferenca: number;
+        nivel: string | null;
+        favorecido: string | null;
       }> = [];
 
       for (const c of calcs) {
@@ -77,6 +88,7 @@ export const reajustesRouter = {
         const key = `${c.chaveJ}|${c.empresa ?? ''}`;
         const valorPago = pagMap.get(key) ?? 0;
         const diferenca = parseFloat((novoValor - valorPago).toFixed(2));
+        const ag = agenteMap.get(c.chaveJ ?? '');
         if (Math.abs(diferenca) >= 0.01) {
           diferencas.push({
             chaveJ: c.chaveJ ?? '',
@@ -86,6 +98,8 @@ export const reajustesRouter = {
             novoValor,
             valorPago,
             diferenca,
+            nivel: ag?.nivel ?? null,
+            favorecido: ag?.favorecido ?? null,
           });
         }
       }
