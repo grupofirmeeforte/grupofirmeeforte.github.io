@@ -686,3 +686,4 @@ export const contratosRouter = router({
       return { ok: true, telefones: telsAtuais };
     }),
 });
+// ChaveJ fix: Thu Jun 11 17:33:57 UTC 2026
