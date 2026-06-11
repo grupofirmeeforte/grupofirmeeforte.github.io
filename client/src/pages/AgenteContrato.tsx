@@ -251,7 +251,7 @@ function ContratoBMF({ ag }: { ag: any }) {
         <p className="mb-6">Por estar ciente assino e concordo com esse adendo.</p>
 
         {/* Assinatura do adendo */}
-        <div className="text-right text-xs text-gray-300 mb-6">
+        <div className="text-right text-xs text-gray-100 mb-6">
           Barreiras (BA) {new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
         </div>
         <div className="flex justify-center">
@@ -277,8 +277,8 @@ function ContratoFLEX({ ag }: { ag: any }) {
       {/* Cabeçalho */}
       <div className="text-center mb-8">
         <h1 className="text-base font-bold uppercase tracking-wide">CONTRATO DE PRESTAÇÃO DE SERVIÇOS</h1>
-        <p className="text-xs mt-2 text-gray-300">Firme &amp; Forte Ltda — CNPJ: 32.828.962/0001-20</p>
-        <p className="text-xs text-gray-300">Rua 24 de Outubro nº 283, Centro, Barreiras-BA — CEP: 47800-041</p>
+        <p className="text-xs mt-2 text-gray-100">Firme &amp; Forte Ltda — CNPJ: 32.828.962/0001-20</p>
+        <p className="text-xs text-gray-100">Rua 24 de Outubro nº 283, Centro, Barreiras-BA — CEP: 47800-041</p>
       </div>
 
       <p className="mb-4 text-justify">Pelo presente instrumento particular e na melhor forma de direito, de um lado,</p>
@@ -530,7 +530,7 @@ export default function AgenteContrato() {
       <div className="max-w-4xl mx-auto bg-gray-900 border border-gray-700-lg print:shadow-none my-6 print:my-0 p-10 print:p-8">
         {!tipoContrato ? (
           <div className="text-center py-16">
-            <p className="text-lg font-semibold text-gray-200 mb-2">Empresa não identificada para geração de contrato</p>
+            <p className="text-lg font-semibold text-white mb-2">Empresa não identificada para geração de contrato</p>
             <p className="text-sm text-gray-400">
               A empresa cadastrada é: <strong>{ag.empresa || "não informada"}</strong>
             </p>

@@ -450,14 +450,14 @@ export default function ContaCorrente() {
       {/* Painel de Configuração de Comissão */}
       {showConfig && (
         <div className="w-72 min-w-[18rem] bg-white border-r shadow-sm flex-shrink-0 p-4 space-y-4">
-          <h3 className="text-sm font-bold text-gray-200">Configuração de Comissão</h3>
+          <h3 className="text-sm font-bold text-white">Configuração de Comissão</h3>
 
           {/* Comissão Padrão */}
           <div className="border border-green-200 rounded-lg p-3 bg-green-50">
             <h4 className="text-xs font-semibold text-green-800 mb-2">Comissão Padrão</h4>
             <div className="space-y-2">
               <div>
-                <label className="text-xs text-gray-300">Padrão (R$)</label>
+                <label className="text-xs text-gray-100">Padrão (R$)</label>
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs text-gray-400 font-medium">R$</span>
                   <Input
@@ -476,7 +476,7 @@ export default function ContaCorrente() {
             <h4 className="text-xs font-semibold text-blue-800 mb-2">Comissão Especial</h4>
             <div className="space-y-2">
               <div>
-                <label className="text-xs text-gray-300">Especial (R$)</label>
+                <label className="text-xs text-gray-100">Especial (R$)</label>
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs text-gray-400 font-medium">R$</span>
                   <Input
@@ -488,7 +488,7 @@ export default function ContaCorrente() {
                 </div>
               </div>
               <div>
-                <label className="text-xs text-gray-300">Agentes com comissão especial</label>
+                <label className="text-xs text-gray-100">Agentes com comissão especial</label>
                 <textarea
                   className="mt-1 w-full border rounded p-1.5 text-xs font-mono resize-none h-24 focus:outline-none focus:ring-1 focus:ring-blue-400"
                   placeholder="Um ChaveJ por linha\nEx: J12345\nJ67890"
@@ -577,7 +577,7 @@ export default function ContaCorrente() {
                     </td>
                     {/* Coluna Conta */}
                     <td className="px-2 py-1.5">
-                      <div className="text-[11px] text-gray-200">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
+                      <div className="text-[11px] text-white">Ag: {r.agencia || "-"} · Cc: {r.contaCorrente || "-"}</div>
                       <div className="text-[10px] text-gray-400">
                         {r.dataOperacao
                           ? (r.dataOperacao instanceof Date
@@ -781,7 +781,7 @@ export default function ContaCorrente() {
           <DialogHeader>
             <DialogTitle>Confirmar Exclusão</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-300">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-100">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
             <Button

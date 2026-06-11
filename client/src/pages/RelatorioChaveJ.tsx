@@ -9,11 +9,11 @@ import { usePermissao } from "@/hooks/usePermissao";
 import { useRegistrarModulo } from '@/hooks/useRegistrarModulo';
 
 const moeda = (v: number) =>
-  v === 0 ? <span className="text-gray-300">R$ -</span> :
+  v === 0 ? <span className="text-gray-100">R$ -</span> :
   <span>R$ {v.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>;
 
 const qtdCell = (v: number) =>
-  v === 0 ? <span className="text-gray-300">-</span> : <span>{v}</span>;
+  v === 0 ? <span className="text-gray-100">-</span> : <span>{v}</span>;
 
 type TipoOP = "NOVO" | "REFIN" | "CANC";
 

@@ -273,7 +273,7 @@ export default function Ourocap() {
                   </td>
                   {/* Coluna Produto / Cliente */}
                   <td className="px-3 py-1.5">
-                    <div className="text-[11px] text-gray-200 font-medium">{(row as any).codProduto ?? "-"}</div>
+                    <div className="text-[11px] text-white font-medium">{(row as any).codProduto ?? "-"}</div>
                     <div className="text-[10px] text-gray-400 font-mono">{(row as any).proposta ?? ""}</div>
                     {(row as any).cpfCliente && <div className="text-[10px] text-gray-400">CPF: {(row as any).cpfCliente}</div>}
                     <div className="text-[10px] text-gray-400">
@@ -300,7 +300,7 @@ export default function Ourocap() {
 
         {/* Paginação */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between mt-3 text-sm text-gray-300">
+          <div className="flex items-center justify-between mt-3 text-sm text-gray-100">
             <span>{total} registros no total</span>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" disabled={page === 0} onClick={() => setPage(p => p - 1)}>Anterior</Button>
@@ -318,8 +318,8 @@ export default function Ourocap() {
             <DialogTitle>Importar OuroCap</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
-            <p className="text-sm text-gray-300">Arquivo: <strong>{importFileName}</strong></p>
-            <p className="text-sm text-gray-300">{importRows.length} registros encontrados</p>
+            <p className="text-sm text-gray-100">Arquivo: <strong>{importFileName}</strong></p>
+            <p className="text-sm text-gray-100">{importRows.length} registros encontrados</p>
             <div>
               <label className="text-sm font-medium">Modo de importação:</label>
               <Select value={importModo} onValueChange={v => setImportModo(v as any)}>
@@ -349,7 +349,7 @@ export default function Ourocap() {
       <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Confirmar exclusão</DialogTitle></DialogHeader>
-          <p className="text-sm text-gray-300">Deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-100">Deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
             <Button variant="destructive" onClick={() => deleteId && excluirMut.mutate({ id: deleteId })}>Excluir</Button>

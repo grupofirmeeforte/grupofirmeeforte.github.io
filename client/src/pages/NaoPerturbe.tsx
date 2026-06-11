@@ -191,14 +191,14 @@ export default function NaoPerturbe() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-700 bg-gray-800">
-                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Nome</th>
-                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">CPF</th>
-                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Município/UF</th>
-                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Ocupação</th>
-                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Inclusão</th>
-                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Reclamação</th>
-                    <th className="text-left px-3 py-2 text-gray-300 font-semibold">Origem</th>
-                    <th className="text-center px-3 py-2 text-gray-300 font-semibold">Ação</th>
+                    <th className="text-left px-3 py-2 text-gray-100 font-semibold">Nome</th>
+                    <th className="text-left px-3 py-2 text-gray-100 font-semibold">CPF</th>
+                    <th className="text-left px-3 py-2 text-gray-100 font-semibold">Município/UF</th>
+                    <th className="text-left px-3 py-2 text-gray-100 font-semibold">Ocupação</th>
+                    <th className="text-left px-3 py-2 text-gray-100 font-semibold">Inclusão</th>
+                    <th className="text-left px-3 py-2 text-gray-100 font-semibold">Reclamação</th>
+                    <th className="text-left px-3 py-2 text-gray-100 font-semibold">Origem</th>
+                    <th className="text-center px-3 py-2 text-gray-100 font-semibold">Ação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -219,11 +219,11 @@ export default function NaoPerturbe() {
                           <div className="text-xs text-gray-400 ml-5">{row.telefoneFormatado}</div>
                         )}
                       </td>
-                      <td className="px-3 py-2 text-xs text-gray-300 font-mono">{row.cpf || "—"}</td>
-                      <td className="px-3 py-2 text-xs text-gray-300">
+                      <td className="px-3 py-2 text-xs text-gray-100 font-mono">{row.cpf || "—"}</td>
+                      <td className="px-3 py-2 text-xs text-gray-100">
                         {row.municipio ? `${row.municipio}${row.uf ? `/${row.uf}` : ""}` : "—"}
                       </td>
-                      <td className="px-3 py-2 text-xs text-gray-300 max-w-[150px] truncate" title={row.ocupacao ?? ""}>{row.ocupacao || "—"}</td>
+                      <td className="px-3 py-2 text-xs text-gray-100 max-w-[150px] truncate" title={row.ocupacao ?? ""}>{row.ocupacao || "—"}</td>
                       <td className="px-3 py-2 text-xs text-gray-400">{row.dataInclusao || new Date(row.createdAt).toLocaleDateString("pt-BR")}</td>
                       <td className="px-3 py-2 text-xs text-gray-400 max-w-[120px] truncate" title={row.reclamacao ?? ""}>{row.reclamacao || row.motivo || "—"}</td>
                       <td className="px-3 py-2">
@@ -273,7 +273,7 @@ export default function NaoPerturbe() {
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="text-sm text-gray-300 mb-1 block">Telefone (opcional)</label>
+              <label className="text-sm text-gray-100 mb-1 block">Telefone (opcional)</label>
               <Input
                 placeholder="(77) 99999-0000"
                 value={novoTel}
@@ -281,7 +281,7 @@ export default function NaoPerturbe() {
               />
             </div>
             <div>
-              <label className="text-sm text-gray-300 mb-1 block">Motivo (opcional)</label>
+              <label className="text-sm text-gray-100 mb-1 block">Motivo (opcional)</label>
               <Input
                 placeholder="Ex: Solicitou não ser contatado"
                 value={novoMotivo}

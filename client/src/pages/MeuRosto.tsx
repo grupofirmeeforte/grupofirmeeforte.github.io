@@ -168,7 +168,7 @@ export default function MeuRosto() {
               {!cameraAtiva && estado !== "processando" && estado !== "sucesso" && estado !== "erro" && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-gray-800 to-gray-900">
                   <Camera className="w-16 h-16 text-gray-400" />
-                  <p className="text-gray-300 text-sm text-center px-4">
+                  <p className="text-gray-100 text-sm text-center px-4">
                     Clique em "Abrir Câmera" para começar
                   </p>
                 </div>

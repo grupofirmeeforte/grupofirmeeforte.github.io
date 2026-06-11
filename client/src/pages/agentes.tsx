@@ -163,7 +163,7 @@ export default function AgentesPage() {
                         <p className="font-semibold text-sm">{grupo[0]?.nomeAgente} &mdash; CPF: {grupo[0]?.cpfAgente}</p>
                         <div className="mt-2 space-y-1">
                           {grupo.map((ag) => (
-                            <div key={ag.id} className="text-xs text-gray-300 flex gap-4">
+                            <div key={ag.id} className="text-xs text-gray-100 flex gap-4">
                               <span className="font-mono">#{ag.id}</span>
                               <span>{ag.empresa}</span>
                               <span>{ag.chaveJ}</span>
@@ -406,7 +406,7 @@ export default function AgentesPage() {
                               ? 'bg-red-100 text-red-700 border-red-300'
                               : agente.situacao === 'Afastado'
                               ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
-                              : 'bg-gray-100 text-gray-300 border-gray-300'
+                              : 'bg-gray-100 text-gray-100 border-gray-300'
                           }`}>{agente.situacao || '-'}</span>
                         </div>
                         {/* Linha 3: Nome + Data Nascimento */}
@@ -534,7 +534,7 @@ export default function AgentesPage() {
 
       {totalPages > 1 && (
         <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-300">
+          <div className="text-sm text-gray-100">
             Página {page + 1} de {totalPages}
           </div>
           <div className="space-x-2">

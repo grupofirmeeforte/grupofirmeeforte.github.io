@@ -93,7 +93,7 @@ export default function PreviewEstacoes() {
         ))}
       </div>
 
-      <p className="mt-8 text-gray-300 text-xs text-center">
+      <p className="mt-8 text-gray-100 text-xs text-center">
         No sistema real, aparece automaticamente nos primeiros 3 dias de cada estação,<br />
         uma vez por dia — e se repete a cada novo ano.
       </p>

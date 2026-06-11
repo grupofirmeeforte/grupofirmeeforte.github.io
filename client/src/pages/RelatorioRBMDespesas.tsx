@@ -77,7 +77,7 @@ export default function RelatorioRBMDespesas() {
                     {/* Cabeçalho do card */}
                     <div className="flex items-start justify-between px-3 py-2 border-b border-gray-100">
                       <div className="flex items-center gap-2 min-w-0">
-                        <span className={`shrink-0 px-2 py-0.5 rounded text-xs font-bold ${r.empresa==='BMF'?'bg-green-100 text-green-800':r.empresa==='FLEX'?'bg-blue-100 text-blue-800':'bg-gray-100 text-gray-200'}`}>
+                        <span className={`shrink-0 px-2 py-0.5 rounded text-xs font-bold ${r.empresa==='BMF'?'bg-green-100 text-green-800':r.empresa==='FLEX'?'bg-blue-100 text-blue-800':'bg-gray-100 text-white'}`}>
                           {r.empresa}
                         </span>
                         <div className="min-w-0">
@@ -129,7 +129,7 @@ export default function RelatorioRBMDespesas() {
 
             {/* Totalizador */}
             <div className="mt-4 bg-gray-800 text-white rounded-lg p-3">
-              <div className="text-xs font-bold mb-2 uppercase tracking-wide text-gray-300">Totais Gerais — {data.length} agentes</div>
+              <div className="text-xs font-bold mb-2 uppercase tracking-wide text-gray-100">Totais Gerais — {data.length} agentes</div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                 <div>
                   <div className="text-[10px] text-gray-400 uppercase">RBM Total</div>

@@ -449,7 +449,7 @@ export default function PagamentosPage() {
                     ? v === "sim" ? "bg-green-700 border-green-500 text-white"
                       : v === "nao" ? "bg-red-700 border-red-500 text-white"
                       : "bg-blue-700 border-blue-500 text-white"
-                    : "bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700"
+                    : "bg-gray-800 border-gray-600 text-gray-100 hover:bg-gray-700"
                 }`}>
                 {v === "todos" ? "Todos" : v === "sim" ? "Pago" : "Não Pago"}
               </button>
@@ -551,7 +551,7 @@ export default function PagamentosPage() {
       <div className="overflow-x-auto">
         <table className="w-full text-xs border-collapse">
           <thead>
-            <tr className="bg-gray-800 text-gray-300 uppercase text-xs">
+            <tr className="bg-gray-800 text-gray-100 uppercase text-xs">
               <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Beneficiário</th>
               <th className="px-2 py-2 text-left border-b border-gray-700 whitespace-nowrap">Dados Bancários</th>
               <th className="px-2 py-2 text-right border-b border-gray-700 whitespace-nowrap">Valor</th>
@@ -577,7 +577,7 @@ export default function PagamentosPage() {
                       : <span className="text-[9px] px-1 py-0.5 rounded bg-blue-900/60 text-blue-300 border border-blue-700">Pagamento</span>
                     }
                     {row.chaveJ && <span className="font-mono text-[10px] text-purple-300 font-semibold">{row.chaveJ}</span>}
-                    {row.tipoPagto && <span className="text-[9px] px-1 py-0.5 rounded bg-gray-700 text-gray-300">{row.tipoPagto}</span>}
+                    {row.tipoPagto && <span className="text-[9px] px-1 py-0.5 rounded bg-gray-700 text-gray-100">{row.tipoPagto}</span>}
                     {row.mesAno && <span className="text-[9px] text-gray-400">{row.mesAno}</span>}
                   </div>
                   {(row as any).nomeAgente && <div className="text-[11px] text-white font-medium truncate max-w-[220px]" title={(row as any).nomeAgente}>{(row as any).nomeAgente}</div>}
@@ -587,7 +587,7 @@ export default function PagamentosPage() {
                 </td>
                 {/* Coluna Dados Bancários */}
                 <td className="px-2 py-1.5 whitespace-nowrap text-[10px]">
-                  <div className="text-gray-300">
+                  <div className="text-gray-100">
                     {row.banco || "-"}{row.agencia ? ` · Ag ${row.agencia}` : ""}{row.conta ? ` · ${row.tipoConta === 'Conta Poupança' ? 'Cp' : 'Cc'} ${row.conta}` : ""}
                     {row.tipoConta && <span className="ml-1 text-gray-400">({row.tipoConta})</span>}
                   </div>
@@ -841,7 +841,7 @@ export default function PagamentosPage() {
             <div className="flex items-center gap-3 pt-4">
               <input type="checkbox" id="pago-check" checked={form.pago}
                 onChange={e => setForm(f => ({ ...f, pago: e.target.checked }))} className="w-4 h-4 accent-green-500" />
-              <Label htmlFor="pago-check" className="text-sm text-gray-300 cursor-pointer">Pago</Label>
+              <Label htmlFor="pago-check" className="text-sm text-gray-100 cursor-pointer">Pago</Label>
             </div>
             {form.pago && (
               <div>
@@ -880,7 +880,7 @@ export default function PagamentosPage() {
           <DialogHeader>
             <DialogTitle className="text-red-400">Confirmar exclusão</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-300">Tem certeza que deseja excluir este pagamento? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-100">Tem certeza que deseja excluir este pagamento? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeletandoId(null)}
               className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">Cancelar</Button>
@@ -979,7 +979,7 @@ export default function PagamentosPage() {
             <div className="flex items-center gap-3 pt-4">
               <input type="checkbox" id="desp-pago-check" checked={formDesp.pago}
                 onChange={e => setFormDesp(f => ({ ...f, pago: e.target.checked }))} className="w-4 h-4 accent-green-500" />
-              <Label htmlFor="desp-pago-check" className="text-sm text-gray-300 cursor-pointer">Pago</Label>
+              <Label htmlFor="desp-pago-check" className="text-sm text-gray-100 cursor-pointer">Pago</Label>
             </div>
             {formDesp.pago && (
               <div>
@@ -1013,7 +1013,7 @@ export default function PagamentosPage() {
           <DialogHeader>
             <DialogTitle className="text-red-400">Confirmar exclusão</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-300">Tem certeza que deseja excluir esta despesa fixa? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-100">Tem certeza que deseja excluir esta despesa fixa? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeletandoDespId(null)}
               className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700">Cancelar</Button>

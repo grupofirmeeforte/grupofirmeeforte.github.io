@@ -120,9 +120,9 @@ export default function PainelAgente() {
               <Target className="w-5 h-5" /> Defina sua meta para {painel?.mesAtual}!
             </DialogTitle>
           </DialogHeader>
-          <p className="text-slate-300 text-sm">Você ainda não definiu sua meta para este mês. Que tal definir agora e se desafiar a conquistá-la?</p>
+          <p className="text-slate-100 text-sm">Você ainda não definiu sua meta para este mês. Que tal definir agora e se desafiar a conquistá-la?</p>
           <div className="space-y-2">
-            <Label className="text-slate-300">Valor da meta (R$)</Label>
+            <Label className="text-slate-100">Valor da meta (R$)</Label>
             <Input
               value={metaInput}
               onChange={e => setMetaInput(e.target.value)}
@@ -132,7 +132,7 @@ export default function PainelAgente() {
             />
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setModalMetaInicial(false)} className="border-slate-600 text-slate-300 bg-transparent hover:bg-slate-700">
+            <Button variant="outline" onClick={() => setModalMetaInicial(false)} className="border-slate-600 text-slate-100 bg-transparent hover:bg-slate-700">
               Agora não
             </Button>
             <Button
@@ -206,7 +206,7 @@ export default function PainelAgente() {
             {/* Produção */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-white">
                   <TrendingUp className="w-5 h-5 text-green-400" />
                   Produção — {painel?.mesAtual}
                 </CardTitle>
@@ -244,13 +244,13 @@ export default function PainelAgente() {
             {/* Meta */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center justify-between text-slate-200">
+                <CardTitle className="text-base flex items-center justify-between text-white">
                   <span className="flex items-center gap-2"><Target className="w-5 h-5 text-amber-400" /> Meta do Mês</span>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => { setMetaInput(metaTotal > 0 ? String(metaTotal) : ''); setModalMeta(true); }}
-                    className="h-7 text-xs bg-transparent border-slate-600 text-slate-300 hover:bg-slate-700"
+                    className="h-7 text-xs bg-transparent border-slate-600 text-slate-100 hover:bg-slate-700"
                   >
                     <Edit2 className="w-3 h-3 mr-1" /> Definir
                   </Button>
@@ -265,7 +265,7 @@ export default function PainelAgente() {
                         <div className="text-5xl mb-2">🏆</div>
                         <div className="text-2xl font-black text-yellow-400 mb-1">PARABÉNS!</div>
                         <div className="text-green-400 font-bold text-lg mb-1">Você bateu sua meta!</div>
-                        <div className="text-slate-300 text-sm mb-3">{fmt(comissaoAtual)} de {fmt(metaTotal)}</div>
+                        <div className="text-slate-100 text-sm mb-3">{fmt(comissaoAtual)} de {fmt(metaTotal)}</div>
                         <div className="flex justify-center gap-2">
                           <Badge className="bg-yellow-500 text-black font-bold text-sm px-3 py-1">🥇 Meta Conquistada!</Badge>
                         </div>
@@ -281,7 +281,7 @@ export default function PainelAgente() {
                             <div className="text-slate-400 text-xs">de {fmt(metaTotal)}</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-slate-300 text-sm font-semibold">Falta</div>
+                            <div className="text-slate-100 text-sm font-semibold">Falta</div>
                             <div className="text-red-400 font-black text-xl">{fmt(Math.max(0, metaTotal - comissaoAtual))}</div>
                           </div>
                         </div>
@@ -316,7 +316,7 @@ export default function PainelAgente() {
           {/* Ranking + Posição */}
           <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center justify-between text-slate-200">
+              <CardTitle className="text-base flex items-center justify-between text-white">
                 <span className="flex items-center gap-2"><Trophy className="w-5 h-5 text-yellow-400" /> 🏆 Top 10 do Mês</span>
                 <div className="flex items-center gap-2">
                   {painel?.ranking?.posicao && painel.ranking.posicao > 0 && (
@@ -383,7 +383,7 @@ export default function PainelAgente() {
             {/* Conquistas */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-white">
                   <Medal className="w-5 h-5 text-purple-400" /> Conquistas
                 </CardTitle>
               </CardHeader>
@@ -412,7 +412,7 @@ export default function PainelAgente() {
             {/* Documentos vencendo */}
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-white">
                   <AlertTriangle className="w-5 h-5 text-red-400" /> Documentos Vencendo
                 </CardTitle>
               </CardHeader>
@@ -468,7 +468,7 @@ export default function PainelAgente() {
           {painel?.historico && painel.historico.length > 0 && (
             <Card className="border-0 bg-slate-800/80 text-white shadow-xl">
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2 text-slate-200">
+                <CardTitle className="text-base flex items-center gap-2 text-white">
                   <Calendar className="w-5 h-5 text-blue-400" /> Histórico de Produção
                 </CardTitle>
               </CardHeader>
@@ -508,7 +508,7 @@ export default function PainelAgente() {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div>
-              <Label className="text-slate-300">Meta Total (R$)</Label>
+              <Label className="text-slate-100">Meta Total (R$)</Label>
               <Input
                 value={metaInput}
                 onChange={e => setMetaInput(e.target.value)}
@@ -518,7 +518,7 @@ export default function PainelAgente() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setModalMeta(false)} className="border-slate-600 text-slate-300 bg-transparent">
+            <Button variant="outline" onClick={() => setModalMeta(false)} className="border-slate-600 text-slate-100 bg-transparent">
               Cancelar
             </Button>
             <Button onClick={handleSalvarMeta} className="bg-amber-600 hover:bg-amber-700 text-white" disabled={salvarMeta.isPending}>

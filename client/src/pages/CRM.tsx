@@ -115,7 +115,7 @@ function AbaRelatorios() {
                 const pct = totalFunil > 0 ? Math.round((total / totalFunil) * 100) : 0;
                 return (
                   <div key={key} className="flex items-center gap-3">
-                    <span className="w-32 text-xs text-gray-300 text-right">{label}</span>
+                    <span className="w-32 text-xs text-gray-100 text-right">{label}</span>
                     <div className="flex-1 bg-gray-100 rounded-full h-5 relative">
                       <div className={`h-5 rounded-full ${color.replace("text-", "bg-").replace("-800", "-400").replace("-100", "-400")}`} style={{ width: `${pct}%`, minWidth: total > 0 ? "2rem" : 0 }} />
                     </div>
@@ -208,7 +208,7 @@ function AbaClientes() {
           <thead className="bg-gray-800 border-b">
             <tr>
               {["Nome", "CPF", "Telefone", "Convênio", "Margem", "Agente", "Ações"].map(h => (
-                <th key={h} className="text-left py-2 px-3 font-medium text-gray-300">{h}</th>
+                <th key={h} className="text-left py-2 px-3 font-medium text-gray-100">{h}</th>
               ))}
             </tr>
           </thead>
@@ -220,7 +220,7 @@ function AbaClientes() {
             ) : data.clientes.map(c => (
               <tr key={c.id} className="border-b hover:bg-gray-800">
                 <td className="py-2 px-3 font-medium">{c.nome}</td>
-                <td className="py-2 px-3 text-gray-300">{c.cpf ?? "—"}</td>
+                <td className="py-2 px-3 text-gray-100">{c.cpf ?? "—"}</td>
                 <td className="py-2 px-3">{c.telefone ?? "—"}</td>
                 <td className="py-2 px-3">{c.convenio ?? "—"}</td>
                 <td className="py-2 px-3">{fmtMoeda(c.margemDisponivel)}</td>
@@ -238,7 +238,7 @@ function AbaClientes() {
       </div>
 
       {totalPaginas > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-300">
+        <div className="flex items-center justify-between text-sm text-gray-100">
           <span>{data?.total} clientes</span>
           <div className="flex gap-2 items-center">
             <Button size="sm" variant="outline" disabled={pagina === 1} onClick={() => setPagina(p => p - 1)}><ChevronLeft className="w-4 h-4" /></Button>
@@ -354,7 +354,7 @@ function AbaOportunidades() {
           <thead className="bg-gray-800 border-b">
             <tr>
               {["Cliente", "Produto", "Valor Est.", "Status", "Previsão", "Agente", "Ações"].map(h => (
-                <th key={h} className="text-left py-2 px-3 font-medium text-gray-300">{h}</th>
+                <th key={h} className="text-left py-2 px-3 font-medium text-gray-100">{h}</th>
               ))}
             </tr>
           </thead>
@@ -368,7 +368,7 @@ function AbaOportunidades() {
               return (
                 <tr key={o.id} className="border-b hover:bg-gray-800">
                   <td className="py-2 px-3 font-medium">{o.clienteNome}</td>
-                  <td className="py-2 px-3 text-gray-300">{o.produto ?? "—"}</td>
+                  <td className="py-2 px-3 text-gray-100">{o.produto ?? "—"}</td>
                   <td className="py-2 px-3">{fmtMoeda(o.valorEstimado)}</td>
                   <td className="py-2 px-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${st.color}`}>{st.label}</span></td>
                   <td className="py-2 px-3 text-gray-400">{o.previsaoFechamento ? fmtData(o.previsaoFechamento) : "—"}</td>
@@ -475,7 +475,7 @@ function AbaAtendimentos() {
                           {RESULTADO_LABELS[a.resultado] ?? a.resultado}
                         </Badge>
                       </div>
-                      {a.assunto && <p className="text-sm text-gray-300 mt-1">{a.assunto}</p>}
+                      {a.assunto && <p className="text-sm text-gray-100 mt-1">{a.assunto}</p>}
                       {a.descricao && <p className="text-xs text-gray-400 mt-1">{a.descricao}</p>}
                       {a.proximoPasso && <p className="text-xs text-blue-600 mt-1">Próximo passo: {a.proximoPasso}</p>}
                       <p className="text-xs text-gray-400 mt-1">{fmtData(a.dataAtendimento)} · {a.chaveJAgente ?? "—"}</p>
@@ -551,7 +551,7 @@ function AbaTarefas() {
   };
   const concluir = (id: number) => atualizar.mutate({ id, status: "concluida", dataConclusao: new Date().toISOString() });
 
-  const PRIORIDADE_COLORS: Record<string, string> = { baixa: "bg-gray-100 text-gray-300", media: "bg-yellow-100 text-yellow-700", alta: "bg-red-100 text-red-700" };
+  const PRIORIDADE_COLORS: Record<string, string> = { baixa: "bg-gray-100 text-gray-100", media: "bg-yellow-100 text-yellow-700", alta: "bg-red-100 text-red-700" };
   const TIPO_ICONS: Record<string, any> = { ligar: PhoneCall, whatsapp: MessageCircle, email: Mail, visita: MapPin, enviar_proposta: Send, outro: CheckSquare };
 
   return (
@@ -559,7 +559,7 @@ function AbaTarefas() {
       <div className="flex gap-2 flex-wrap items-center">
         <div className="flex gap-1">
           {["todos", "pendente", "em_andamento", "concluida", "cancelada"].map(s => (
-            <button key={s} onClick={() => setFiltroStatus(s)} className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${filtroStatus === s ? "bg-sky-600 text-white" : "bg-gray-100 text-gray-300 hover:bg-gray-200"}`}>
+            <button key={s} onClick={() => setFiltroStatus(s)} className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${filtroStatus === s ? "bg-sky-600 text-white" : "bg-gray-100 text-gray-100 hover:bg-gray-200"}`}>
               {s === "todos" ? "Todas" : STATUS_TAREFA[s]?.label ?? s}
             </button>
           ))}
@@ -712,7 +712,7 @@ function AbaMailing() {
         <div className="overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-gray-800 border-b">
-              <tr>{["Nome", "CPF", "Telefone", "Convênio", "Margem", "Status", "Ação"].map(h => <th key={h} className="text-left py-2 px-3 font-medium text-gray-300">{h}</th>)}</tr>
+              <tr>{["Nome", "CPF", "Telefone", "Convênio", "Margem", "Status", "Ação"].map(h => <th key={h} className="text-left py-2 px-3 font-medium text-gray-100">{h}</th>)}</tr>
             </thead>
             <tbody>
               {loadingContatos ? (
@@ -742,7 +742,7 @@ function AbaMailing() {
           </table>
         </div>
         {totalPaginas > 1 && (
-          <div className="flex items-center justify-between text-sm text-gray-300">
+          <div className="flex items-center justify-between text-sm text-gray-100">
             <span>{contatos?.total} contatos</span>
             <div className="flex gap-2 items-center">
               <Button size="sm" variant="outline" disabled={pagina === 1} onClick={() => setPagina(p => p - 1)}><ChevronLeft className="w-4 h-4" /></Button>
@@ -765,7 +765,7 @@ function AbaMailing() {
         <p className="text-center text-gray-400 py-8">Carregando...</p>
       ) : !listas?.length ? (
         <div className="text-center py-12">
-          <Mail className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <Mail className="w-12 h-12 text-gray-100 mx-auto mb-3" />
           <p className="text-gray-400">Nenhuma lista de mailing</p>
           <p className="text-sm text-gray-400">Importe uma lista CSV para começar</p>
         </div>
@@ -845,7 +845,7 @@ export default function CRMPage() {
               className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                 abaAtiva === key
                   ? "border-sky-600 text-sky-600"
-                  : "border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-300"
+                  : "border-transparent text-gray-400 hover:text-white hover:border-gray-300"
               }`}
             >
               <Icon className="w-4 h-4" />

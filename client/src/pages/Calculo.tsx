@@ -814,7 +814,7 @@ export default function Calculo() {
                         <span className={`text-[9px] font-semibold px-1 py-0.5 rounded-full border ${
                           r.situacao === 'Ativo' ? 'bg-green-100 text-green-800 border-green-300'
                           : r.situacao === 'Inativo' ? 'bg-red-100 text-red-700 border-red-300'
-                          : 'bg-gray-100 text-gray-300 border-gray-300'
+                          : 'bg-gray-100 text-gray-100 border-gray-300'
                         }`}>{r.situacao}</span>
                       )}
                       {r.mesRef && <span className="text-[9px] text-purple-500 font-mono">{fmtMesRef(r.mesRef)}</span>}
@@ -904,7 +904,7 @@ export default function Calculo() {
                           className="cursor-pointer hover:bg-purple-100 rounded px-1 py-0.5 min-w-[6rem] inline-block text-blue-600 font-medium border border-transparent hover:border-purple-300 text-[10px]"
                           title={selecionados.size > 1 && selecionados.has(r.id) ? `Clique para editar e aplicar em ${selecionados.size} linhas selecionadas` : "Clique para editar"}
                         >
-                          {r.dtPagto || <span className="text-slate-300 italic">DD/MM/AAAA</span>}
+                          {r.dtPagto || <span className="text-slate-100 italic">DD/MM/AAAA</span>}
                         </span>
                       )}
                     </div>
@@ -936,7 +936,7 @@ export default function Calculo() {
                       >
                         {r.creditosDebitos && parseFloat(String(r.creditosDebitos)) !== 0
                           ? fmtMoeda(r.creditosDebitos)
-                          : <span className="text-slate-300 italic text-[10px]">0,00</span>}
+                          : <span className="text-slate-100 italic text-[10px]">0,00</span>}
                       </span>
                     )}
                     {r.ajudaCusto && parseFloat(String(r.ajudaCusto)) !== 0 && <div className="text-[10px] text-slate-500">Aj.Custo: {fmtMoeda(r.ajudaCusto)}</div>}

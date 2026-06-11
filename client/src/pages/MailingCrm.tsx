@@ -127,7 +127,7 @@ function resultadoBadge(resultado?: string | null) {
     return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 text-red-600 font-medium">{resultado}</span>;
   if (r.includes("retornar") || r.includes("aguardando") || r.includes("pendente"))
     return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-yellow-100 text-yellow-700 font-medium">{resultado}</span>;
-  return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-300 font-medium">{resultado}</span>;
+  return <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-100 font-medium">{resultado}</span>;
 }
 
 export default function MailingCrm() {
@@ -588,7 +588,7 @@ export default function MailingCrm() {
                           )}
                         </div>
                       ) : (
-                        <span className="text-[11px] text-gray-300">—</span>
+                        <span className="text-[11px] text-gray-100">—</span>
                       );
                     })()}
                   </td>
@@ -596,8 +596,8 @@ export default function MailingCrm() {
                   {/* Coluna 3: Localização */}
                   <td className="px-3 py-2.5 min-w-[130px]">
                     <div className="flex items-center gap-1">
-                      {r.cidade && <span className="text-[12px] text-gray-200 font-medium">{r.cidade}</span>}
-                      {r.sgUf && <span className="text-[10px] px-1 py-0.5 rounded bg-gray-100 text-gray-300 font-bold">{r.sgUf}</span>}
+                      {r.cidade && <span className="text-[12px] text-white font-medium">{r.cidade}</span>}
+                      {r.sgUf && <span className="text-[10px] px-1 py-0.5 rounded bg-gray-100 text-gray-100 font-bold">{r.sgUf}</span>}
                     </div>
                     {r.dtInclusao && <div className="text-[10px] text-gray-400">Incl: {r.dtInclusao}</div>}
                     {r.prfDepe && <div className="text-[10px] text-gray-400">Prf: {r.prfDepe}</div>}
@@ -606,7 +606,7 @@ export default function MailingCrm() {
 
                   {/* Coluna 4: Contato / Datas */}
                   <td className="px-3 py-2.5 min-w-[140px]">
-                    {r.dataContato && <div className="text-[11px] text-gray-200">Contato: {r.dataContato}</div>}
+                    {r.dataContato && <div className="text-[11px] text-white">Contato: {r.dataContato}</div>}
                     {r.dataInserido && <div className="text-[10px] text-gray-400">Inserido: {r.dataInserido}</div>}
                   </td>
 
@@ -663,7 +663,7 @@ export default function MailingCrm() {
       <Dialog open={confirmDedup} onOpenChange={o => !o && setConfirmDedup(false)}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>🔄 Deduplicar CPFs</DialogTitle></DialogHeader>
-          <p className="text-sm text-gray-300">
+          <p className="text-sm text-gray-100">
             Foram encontrados <strong>{contagemDup?.duplicados ?? 0} CPF(s)</strong> com registros duplicados
             ({contagemDup?.registrosAfetados ?? 0} registro(s) serão removidos).
             <br /><br />
@@ -691,7 +691,7 @@ export default function MailingCrm() {
               {confirmLimpeza === 'falecidos' ? '🪦 Remover Falecidos' : '👴 Remover maiores de 78 anos'}
             </DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-gray-300">
+          <p className="text-sm text-gray-100">
             {confirmLimpeza === 'falecidos'
               ? `Isso irá excluir permanentemente ${contagem?.falecidos ?? 0} registro(s) identificados como falecidos (campo NÃO PERTUBE contém indicação de óbito). Esta ação não pode ser desfeita.`
               : `Isso irá excluir permanentemente ${contagem?.acima78 ?? 0} registro(s) com mais de 78 anos calculados pela data de nascimento. Esta ação não pode ser desfeita.`
@@ -717,7 +717,7 @@ export default function MailingCrm() {
       <Dialog open={confirmDel !== null} onOpenChange={o => !o && setConfirmDel(null)}>
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Confirmar exclusão</DialogTitle></DialogHeader>
-          <p className="text-sm text-gray-300">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
+          <p className="text-sm text-gray-100">Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDel(null)}>Cancelar</Button>
             <Button variant="destructive" onClick={() => confirmDel && deletar.mutate({ id: confirmDel })} disabled={deletar.isPending}>

@@ -164,7 +164,7 @@ export default function CaixaRecados() {
                 {/* Seletor de tipo de destinatário — apenas para gestão */}
                 {euSouGestao && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-200 mb-1.5">Tipo de Destinatário</label>
+                    <label className="block text-sm font-medium text-white mb-1.5">Tipo de Destinatário</label>
                     <div className="flex gap-2">
                       <button
                         type="button"
@@ -196,7 +196,7 @@ export default function CaixaRecados() {
 
                 {/* Seletor de destinatário — botões visuais (sem z-index issues) */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Destinatário *</label>
+                  <label className="block text-sm font-medium text-white mb-1.5">Destinatário *</label>
                   {tipoDestinatario === "cargo" || isPromotor ? (
                     <div className="grid grid-cols-2 gap-2">
                       {DESTINATARIOS_CARGO.map(d => {
@@ -237,7 +237,7 @@ export default function CaixaRecados() {
                               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all text-left ${
                                 sel
                                   ? "bg-orange-50 border-orange-400 text-orange-700 shadow-sm"
-                                  : "bg-white border-gray-700 text-gray-300 hover:border-gray-300"
+                                  : "bg-white border-gray-700 text-gray-100 hover:border-gray-300"
                               }`}
                             >
                               <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center shrink-0 text-sm font-bold text-orange-600">
@@ -257,7 +257,7 @@ export default function CaixaRecados() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Assunto (opcional)</label>
+                  <label className="block text-sm font-medium text-white mb-1.5">Assunto (opcional)</label>
                   <Input
                     value={assunto}
                     onChange={(e) => setAssunto(e.target.value)}
@@ -267,7 +267,7 @@ export default function CaixaRecados() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Mensagem *</label>
+                  <label className="block text-sm font-medium text-white mb-1.5">Mensagem *</label>
                   <Textarea
                     value={mensagem}
                     onChange={(e) => setMensagem(e.target.value)}
@@ -394,9 +394,9 @@ export default function CaixaRecados() {
                                   )}
                                 </div>
                                 {recado.assunto && (
-                                  <p className="text-sm font-medium text-gray-200 mt-0.5">{recado.assunto}</p>
+                                  <p className="text-sm font-medium text-white mt-0.5">{recado.assunto}</p>
                                 )}
-                                <p className="text-sm text-gray-300 mt-1 whitespace-pre-wrap break-words">{recado.mensagem}</p>
+                                <p className="text-sm text-gray-100 mt-1 whitespace-pre-wrap break-words">{recado.mensagem}</p>
                                 <div className="flex items-center gap-3 mt-2 flex-wrap">
                                   <span className="flex items-center gap-1 text-xs text-gray-400">
                                     <Clock className="w-3 h-3" />

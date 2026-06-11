@@ -69,7 +69,7 @@ export default function MensagemMinutosSabedoria() {
                   C. Torres Pastorino — <em>Minutos de Sabedoria</em>
                 </p>
                 {total != null && total > 0 && (
-                  <p className="text-xs text-slate-300 mt-1">
+                  <p className="text-xs text-slate-100 mt-1">
                     {total} pensamento{total !== 1 ? 's' : ''} disponíve{total !== 1 ? 'is' : 'l'}
                   </p>
                 )}
