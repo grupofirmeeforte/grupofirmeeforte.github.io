@@ -117,7 +117,26 @@ function extrairDadosContrato(texto: string) {
 
   // Operador
   const nomeOperador = campo(/\bOperador\b\s*\n([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÀÈÌÒÙÄËÏÖÜ][^\n]+)/i);
-  const chaveJOperador = campo(/\bChave\b\s*\n([A-Z]{1,2}\d+)/i);
+  // ChaveJ: estrutura real do PDF é "Chave" -> "CPF Operador" -> "Nome Operador" -> "JH016470"
+  // Procura pela linha "Chave" e pega o primeiro valor que parece uma ChaveJ (letras + dígitos)
+  let chaveJOperador: string | null = null;
+  {
+    const linhas = texto.split('\n');
+    const idxChave = linhas.findIndex(l => l.trim() === 'Chave');
+    if (idxChave >= 0) {
+      for (let j = idxChave + 1; j < Math.min(idxChave + 6, linhas.length); j++) {
+        const val = linhas[j].trim();
+        if (/^[A-Z]{1,3}\d{4,}/i.test(val)) {
+          chaveJOperador = val.toUpperCase();
+          break;
+        }
+      }
+    }
+    // Fallback: regex simples
+    if (!chaveJOperador) {
+      chaveJOperador = campo(/\bChave\b[^\n]*\n[^\n]*\n([A-Z]{1,3}\d{4,})/i);
+    }
+  }
 
   // Agência e Conta do cliente (seção 2 - Dados do Cliente)
   // Aceita variações de codificação do acento: Agência, Agencia, Agência
