@@ -2,8 +2,8 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
-import { reajustes, pagamentos, agentes } from "../../drizzle/schema";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { reajustes, pagamentos, agentes, calculos } from "../../drizzle/schema";
+import { eq, and, desc, inArray, sql, ne } from "drizzle-orm";
 
 export const reajustesRouter = {
   // Listar reajustes com filtros
@@ -27,6 +27,70 @@ export const reajustesRouter = {
         .from(reajustes)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
         .orderBy(desc(reajustes.createdAt));
+    }),
+
+  // Buscar diferenças automaticamente entre calculos e pagamentos
+  buscarDiferencas: protectedProcedure
+    .input(z.object({
+      mesRef: z.string(), // MM/AAAA
+      empresa: z.string().optional(),
+    }))
+    .query(async ({ input }) => {
+      const db = await getDb();
+      if (!db) return [];
+
+      // Buscar todos os cálculos do mês
+      const condCalc: any[] = [eq(calculos.mesRef, input.mesRef)];
+      if (input.empresa) condCalc.push(eq(calculos.empresa, input.empresa));
+      const calcs = await db.select().from(calculos).where(and(...condCalc));
+
+      // Buscar pagamentos tipo Comissão do mesmo mês
+      const condPag: any[] = [
+        eq(pagamentos.mesAno, input.mesRef),
+        ne(pagamentos.tipoPagto, 'Reajuste'),
+        ne(pagamentos.tipoPagto, 'Cancelado'),
+      ];
+      if (input.empresa) condPag.push(eq(pagamentos.empresa, input.empresa));
+      const pags = await db.select().from(pagamentos).where(and(...condPag));
+
+      // Agrupar pagamentos por chaveJ + empresa
+      const pagMap = new Map<string, number>();
+      for (const p of pags) {
+        const key = `${p.chaveJ}|${p.empresa ?? ''}`;
+        const val = parseFloat(String(p.valor ?? 0));
+        pagMap.set(key, (pagMap.get(key) ?? 0) + val);
+      }
+
+      // Calcular diferenças
+      const diferencas: Array<{
+        chaveJ: string;
+        nomeAgente: string | null;
+        empresa: string | null;
+        mesRef: string | null;
+        novoValor: number;
+        valorPago: number;
+        diferenca: number;
+      }> = [];
+
+      for (const c of calcs) {
+        const novoValor = parseFloat(String(c.comissaoTotal ?? 0));
+        const key = `${c.chaveJ}|${c.empresa ?? ''}`;
+        const valorPago = pagMap.get(key) ?? 0;
+        const diferenca = parseFloat((novoValor - valorPago).toFixed(2));
+        if (Math.abs(diferenca) >= 0.01) {
+          diferencas.push({
+            chaveJ: c.chaveJ ?? '',
+            nomeAgente: c.nomeAgente ?? null,
+            empresa: c.empresa ?? null,
+            mesRef: c.mesRef ?? null,
+            novoValor,
+            valorPago,
+            diferenca,
+          });
+        }
+      }
+
+      return diferencas.sort((a, b) => Math.abs(b.diferenca) - Math.abs(a.diferenca));
     }),
 
   // Criar reajuste manualmente
@@ -131,6 +195,86 @@ export const reajustesRouter = {
       }
 
       return { ok: true, enviados: itens.length };
+    }),
+
+  // Criar reajustes em lote (a partir das diferenças automáticas) e enviar para pagamento
+  criarEmLote: protectedProcedure
+    .input(z.object({
+      itens: z.array(z.object({
+        mesRef: z.string(),
+        empresa: z.string().optional(),
+        chaveJ: z.string(),
+        nomeAgente: z.string().optional(),
+        valorPagoAnterior: z.number(),
+        novoValor: z.number(),
+      })),
+      mesAno: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+
+      const hoje = new Date();
+      const dataHoje = `${String(hoje.getDate()).padStart(2, '0')}/${String(hoje.getMonth() + 1).padStart(2, '0')}/${hoje.getFullYear()}`;
+      const nomeEnviador = (ctx.user as any)?.name ?? "Sistema";
+      let criados = 0;
+
+      for (const item of input.itens) {
+        const diferenca = parseFloat((item.novoValor - item.valorPagoAnterior).toFixed(2));
+        if (Math.abs(diferenca) < 0.01) continue;
+
+        // Buscar nome do agente se não fornecido
+        let nomeAgente = item.nomeAgente;
+        if (!nomeAgente) {
+          const ag = await db.select({ nomeAgente: agentes.nomeAgente }).from(agentes).where(eq(agentes.chaveJ, item.chaveJ)).limit(1);
+          nomeAgente = ag[0]?.nomeAgente ?? undefined;
+        }
+
+        // Inserir reajuste
+        const [inserted] = await db.insert(reajustes).values({
+          mesRef: item.mesRef,
+          empresa: item.empresa ?? null,
+          chaveJ: item.chaveJ,
+          nomeAgente: nomeAgente ?? null,
+          valorPagoAnterior: String(item.valorPagoAnterior),
+          novoValor: String(item.novoValor),
+          diferenca: String(diferenca),
+          tipoProduto: "Comissão",
+          status: "enviado",
+          enviadoPor: nomeEnviador,
+          dataEnvio: dataHoje,
+          observacao: "Reajuste automático por diferença de cálculo",
+        });
+
+        // Buscar dados bancários do agente
+        const ag = await db.select().from(agentes).where(eq(agentes.chaveJ, item.chaveJ)).limit(1);
+        const agente = ag[0];
+
+        // Criar pagamento
+        await db.insert(pagamentos).values({
+          mesAno: input.mesAno,
+          tipoPagto: "Reajuste",
+          empresa: item.empresa ?? null,
+          chaveJ: item.chaveJ,
+          nomeFavorecido: nomeAgente ?? agente?.nomeAgente ?? null,
+          banco: agente?.banco ?? null,
+          agencia: agente?.agencia ?? null,
+          conta: agente?.conta ?? null,
+          cpfCnpj: agente?.cpfAgente ?? null,
+          tipoConta: agente?.tipo ?? null,
+          pix: agente?.pix ?? null,
+          valor: String(diferenca),
+          pago: false,
+          dataVencer: dataHoje,
+          origem: "sistema",
+          observacao: `Reajuste automático - Mês ref: ${item.mesRef} - Pago: R$ ${item.valorPagoAnterior.toFixed(2)} / Correto: R$ ${item.novoValor.toFixed(2)}`,
+          chaveJResp: (ctx.user as any)?.chaveJ ?? null,
+        } as any);
+
+        criados++;
+      }
+
+      return { ok: true, criados };
     }),
 
   // Cancelar reajuste
