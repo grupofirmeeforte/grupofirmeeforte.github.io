@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,9 @@ export default function ReajustePage() {
   const [mesEnvioAuto, setMesEnvioAuto] = useState(getMesAtual());
   const [showEnviarAutoDialog, setShowEnviarAutoDialog] = useState(false);
   const [filtroTextoAuto, setFiltroTextoAuto] = useState("");
+  const [filtroTipoAuto, setFiltroTipoAuto] = useState<"todos" | "positivo" | "negativo">("todos");
+  // Manter resultados na tela sem precisar buscar de novo
+  const [diferencasCached, setDiferencasCached] = useState<typeof diferencas>([]);
   // Edição de linha na aba automática
   const [editandoKey, setEditandoKey] = useState<string | null>(null);
   const [editNovoValor, setEditNovoValor] = useState("");
@@ -147,15 +150,26 @@ export default function ReajustePage() {
       .reduce((acc, d) => acc + d.diferenca, 0);
   }, [diferencas, selecionadosAuto]);
 
+  // Quando busca retorna, salvar em cache para persistir na tela
+  useEffect(() => {
+    if (diferencas.length > 0) setDiferencasCached(diferencas);
+  }, [diferencas]);
+  const diferencasBase = diferencas.length > 0 ? diferencas : diferencasCached;
+  
   const diferencasFiltradas = useMemo(() => {
-    if (!filtroTextoAuto.trim()) return diferencas;
-    const t = filtroTextoAuto.toLowerCase();
-    return diferencas.filter(d =>
-      (d.chaveJ ?? '').toLowerCase().includes(t) ||
-      (d.nomeAgente ?? '').toLowerCase().includes(t) ||
-      (d.favorecido ?? '').toLowerCase().includes(t)
-    );
-  }, [diferencas, filtroTextoAuto]);
+    let lista = diferencasBase;
+    if (filtroTextoAuto.trim()) {
+      const t = filtroTextoAuto.toLowerCase();
+      lista = lista.filter(d =>
+        (d.chaveJ ?? '').toLowerCase().includes(t) ||
+        (d.nomeAgente ?? '').toLowerCase().includes(t) ||
+        (d.favorecido ?? '').toLowerCase().includes(t)
+      );
+    }
+    if (filtroTipoAuto === "positivo") lista = lista.filter(d => d.diferenca > 0);
+    if (filtroTipoAuto === "negativo") lista = lista.filter(d => d.diferenca < 0);
+    return lista;
+  }, [diferencasBase, filtroTextoAuto, filtroTipoAuto]);
 
   const totalPositivo = useMemo(() => diferencasFiltradas.filter(d => d.diferenca > 0).reduce((a, d) => a + d.diferenca, 0), [diferencasFiltradas]);
   const totalNegativo = useMemo(() => diferencasFiltradas.filter(d => d.diferenca < 0).reduce((a, d) => a + d.diferenca, 0), [diferencasFiltradas]);
@@ -285,63 +299,104 @@ export default function ReajustePage() {
       {/* ── ABA AUTOMÁTICO ── */}
       {aba === "automatico" && (
         <div>
-          {/* Filtros */}
-          <div className="flex flex-wrap gap-3 mb-4 bg-[#111827] p-3 rounded-lg border border-gray-700 items-end">
+          {/* Linha 1: Filtros de busca */}
+          <div className="flex flex-wrap gap-2 mb-2 bg-[#111827] p-3 rounded-t-lg border border-b-0 border-gray-700 items-end">
             <div>
-              <Label className="text-xs text-gray-400 mb-1 block">Mês Ref (MM/AAAA)</Label>
+              <Label className="text-xs text-gray-400 mb-1 block">Mês Ref</Label>
               <Input
                 value={filtroMesAuto}
-                onChange={(e) => { setFiltroMesAuto(e.target.value); setBuscarAtivado(false); }}
+                onChange={(e) => { setFiltroMesAuto(e.target.value); }}
                 placeholder="MM/AAAA"
-                className="bg-[#1a2235] border-gray-600 text-white text-xs w-32 h-8"
+                className="bg-[#1a2235] border-gray-600 text-white text-xs w-28 h-8"
               />
             </div>
             <div>
               <Label className="text-xs text-gray-400 mb-1 block">Empresa</Label>
               <Input
                 value={filtroEmpresaAuto}
-                onChange={(e) => { setFiltroEmpresaAuto(e.target.value); setBuscarAtivado(false); }}
+                onChange={(e) => { setFiltroEmpresaAuto(e.target.value); }}
                 placeholder="BMF, FLEX..."
-                className="bg-[#1a2235] border-gray-600 text-white text-xs w-28 h-8"
+                className="bg-[#1a2235] border-gray-600 text-white text-xs w-24 h-8"
               />
             </div>
             <Button
               onClick={() => { setBuscarAtivado(true); refetchAuto(); }}
-              className="bg-yellow-600 hover:bg-yellow-500 text-white text-xs h-8 px-4"
+              disabled={loadingAuto}
+              className="bg-yellow-600 hover:bg-yellow-500 text-white text-xs h-8 px-4 mt-5"
             >
-              <Search className="w-3 h-3 mr-1" /> Buscar Diferenças
+              <Search className="w-3 h-3 mr-1" /> {loadingAuto ? "Buscando..." : "Buscar"}
             </Button>
             {selecionadosAuto.length > 0 && (
               <Button
                 onClick={() => setShowEnviarAutoDialog(true)}
-                className="bg-green-600 hover:bg-green-700 text-white text-xs h-8 px-4"
+                className="bg-green-600 hover:bg-green-700 text-white text-xs h-8 px-4 mt-5"
               >
-                <Send className="w-3 h-3 mr-1" /> Enviar Selecionados ({selecionadosAuto.length}) — {fmt(totalAutoSelecionado)}
+                <Send className="w-3 h-3 mr-1" /> Enviar ({selecionadosAuto.length}) — {fmt(totalAutoSelecionado)}
               </Button>
             )}
           </div>
-
-          {/* Cards de totais */}
-          {buscarAtivado && diferencas.length > 0 && (
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3 flex items-center gap-3">
-                <TrendingUp className="w-8 h-8 text-green-400 flex-shrink-0" />
-                <div>
-                  <p className="text-xs text-gray-400">A Pagar (Positivo)</p>
-                  <p className="text-lg font-bold text-green-300">{fmt(totalPositivo)}</p>
-                  <p className="text-xs text-gray-500">{qtdPositivo} agente(s)</p>
-                </div>
-              </div>
-              <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 flex items-center gap-3">
-                <TrendingDown className="w-8 h-8 text-red-400 flex-shrink-0" />
-                <div>
-                  <p className="text-xs text-gray-400">A Descontar (Negativo)</p>
-                  <p className="text-lg font-bold text-red-300">{fmt(totalNegativo)}</p>
-                  <p className="text-xs text-gray-500">{qtdNegativo} agente(s)</p>
-                </div>
+          {/* Linha 2: Filtros de exibição + Cards de totais */}
+          <div className="flex flex-wrap gap-2 mb-3 bg-[#0d1526] p-3 rounded-b-lg border border-gray-700 items-center">
+            <div>
+              <Label className="text-xs text-gray-400 mb-1 block">Buscar por nome</Label>
+              <Input
+                value={filtroTextoAuto}
+                onChange={(e) => setFiltroTextoAuto(e.target.value)}
+                placeholder="ChaveJ ou nome..."
+                className="bg-[#1a2235] border-gray-600 text-white text-xs w-40 h-8"
+              />
+            </div>
+            <div>
+              <Label className="text-xs text-gray-400 mb-1 block">Mostrar</Label>
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setFiltroTipoAuto("todos")}
+                  className={`px-2 py-1 text-[10px] rounded border transition-colors ${
+                    filtroTipoAuto === "todos"
+                      ? "bg-gray-600 border-gray-400 text-white"
+                      : "bg-transparent border-gray-600 text-gray-400 hover:text-white"
+                  }`}
+                >Todos</button>
+                <button
+                  onClick={() => setFiltroTipoAuto("positivo")}
+                  className={`px-2 py-1 text-[10px] rounded border transition-colors ${
+                    filtroTipoAuto === "positivo"
+                      ? "bg-green-700 border-green-500 text-white"
+                      : "bg-transparent border-gray-600 text-gray-400 hover:text-green-300"
+                  }`}
+                >A Receber</button>
+                <button
+                  onClick={() => setFiltroTipoAuto("negativo")}
+                  className={`px-2 py-1 text-[10px] rounded border transition-colors ${
+                    filtroTipoAuto === "negativo"
+                      ? "bg-red-700 border-red-500 text-white"
+                      : "bg-transparent border-gray-600 text-gray-400 hover:text-red-300"
+                  }`}
+                >Devendo</button>
               </div>
             </div>
-          )}
+            {/* Cards de totais inline */}
+            {diferencasBase.length > 0 && (
+              <>
+                <div className="bg-green-900/20 border border-green-500/30 rounded-lg px-3 py-2 flex items-center gap-2 ml-auto">
+                  <TrendingUp className="w-5 h-5 text-green-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-[10px] text-gray-400">A Receber</p>
+                    <p className="text-sm font-bold text-green-300">{fmt(totalPositivo)}</p>
+                    <p className="text-[10px] text-gray-500">{qtdPositivo} ag.</p>
+                  </div>
+                </div>
+                <div className="bg-red-900/20 border border-red-500/30 rounded-lg px-3 py-2 flex items-center gap-2">
+                  <TrendingDown className="w-5 h-5 text-red-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-[10px] text-gray-400">Devendo</p>
+                    <p className="text-sm font-bold text-red-300">{fmt(totalNegativo)}</p>
+                    <p className="text-[10px] text-gray-500">{qtdNegativo} ag.</p>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Tabela diferenças */}
           <div className="overflow-x-auto rounded-lg border border-gray-700">
