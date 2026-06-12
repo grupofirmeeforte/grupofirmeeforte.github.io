@@ -542,6 +542,7 @@ function PerspectivadeGanho() {
               <TableHeader>
                 <TableRow className="bg-gray-800">
                   <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Proposta</TableHead>
+                  <TableHead className="font-semibold text-indigo-300 uppercase text-xs tracking-wide">ChaveJ</TableHead>
                   <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Data</TableHead>
                   <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Cliente / CPF</TableHead>
                   <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Situação</TableHead>
@@ -557,11 +558,11 @@ function PerspectivadeGanho() {
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center py-10 text-gray-400">Carregando...</TableCell>
+                    <TableCell colSpan={12} className="text-center py-10 text-gray-400">Carregando...</TableCell>
                   </TableRow>
                 ) : rows.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center py-10 text-gray-400">
+                    <TableCell colSpan={12} className="text-center py-10 text-gray-400">
                       {periodoInicio && periodoFim
                         ? `Nenhum contrato PDF no período vigente (${periodoInicio} a ${periodoFim})`
                         : 'Nenhum contrato PDF encontrado'}
@@ -571,6 +572,7 @@ function PerspectivadeGanho() {
                   (rows as any[]).map((row: any, rowIdx: number) => (
                     <TableRow key={row.id} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-blue-900'}>
                       <TableCell className={`font-mono text-sm font-medium ${rowIdx % 2 === 0 ? 'text-gray-900' : 'text-white'}`}>{row.proposta || '—'}</TableCell>
+                      <TableCell className="font-mono text-xs font-bold text-indigo-600 whitespace-nowrap">{row.chaveJOperador || '—'}</TableCell>
                       <TableCell className={`text-xs whitespace-nowrap ${rowIdx % 2 === 0 ? 'text-gray-600' : 'text-gray-200'}`}>
                         {row.solicitacao || '—'}
                       </TableCell>
