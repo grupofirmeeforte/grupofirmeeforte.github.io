@@ -1465,7 +1465,7 @@ function ArquivoMortoAbaBtn({ aba, setAba }: { aba: string; setAba: (v: any) => 
 
 // ─── ABA ARQUIVO MORTO ────────────────────────────────────────────────────────
 const MODULOS_ARQUIVO = [
-  "Consignado", "Consórcio", "Conta Corrente", "Ourocap",
+  "Consignado", "Contratos", "Consórcio", "Conta Corrente", "Ourocap",
   "Seguros", "BB Dental", "Febraban", "Cálculo", "Pagamentos", "Outros",
 ];
 
