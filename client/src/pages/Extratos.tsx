@@ -61,7 +61,7 @@ const ABAS: { id: Aba; label: string; icon: React.ElementType; cor: string }[] =
   { id: 'ourocap',      label: 'Extrato Ourocap',         icon: Star,        cor: 'bg-yellow-600'  },
   { id: 'seguros',      label: 'Extrato Seguros',         icon: Shield,      cor: 'bg-red-600'     },
   { id: 'bbdental',     label: 'Extrato BB Dental',       icon: Smile,       cor: 'bg-teal-600'    },
-  { id: 'perspectiva',  label: 'Produção do Mês',         icon: TrendingUp,  cor: 'bg-indigo-600'  },
+  { id: 'perspectiva',  label: 'Pré-Extrato',             icon: TrendingUp,  cor: 'bg-indigo-600'  },
   { id: 'minha-tabela', label: 'Minha Tabela',            icon: FileText,    cor: 'bg-orange-600'  },
 ];
 

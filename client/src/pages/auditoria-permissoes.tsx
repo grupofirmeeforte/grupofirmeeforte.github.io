@@ -49,7 +49,7 @@ const MODULOS_PERMISSOES = [
     { key: 'ourocap', label: 'Extrato Ourocap' },
     { key: 'seguros', label: 'Extrato Seguros' },
     { key: 'bbdental', label: 'Extrato BB Dental' },
-    { key: 'perspectiva', label: 'Perspectiva de Ganho' },
+    { key: 'perspectiva', label: 'Pré-Extrato' },
     { key: 'minha-tabela', label: 'Minha Tabela' },
   ]},
   { modulo: 'crm', label: 'CRM', subabas: [
