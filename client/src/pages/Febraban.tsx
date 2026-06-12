@@ -934,8 +934,8 @@ export default function FebrabanPage() {
           <CardTitle className="text-base">Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-            <div className="relative col-span-2 md:col-span-1">
+          <div className="flex flex-wrap gap-3">
+            <div className="relative">
               <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
               <Input
                 placeholder="Proposta ou Operador..."
@@ -969,36 +969,36 @@ export default function FebrabanPage() {
                   value={mesano ? String(mesano) : "__all__"}
                   onValueChange={(v) => { setMesano(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
                 >
-                  <SelectTrigger className="min-w-[130px]"><SelectValue placeholder="Mês/Ano" /></SelectTrigger>
+                  <SelectTrigger className="w-[130px]"><SelectValue placeholder="Mês/Ano" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="__all__">Todos meses</SelectItem>
                     {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               ) : (
-                <div className="flex items-center gap-1">
+                <>
                   <Select
                     value={mesanoInicio ? String(mesanoInicio) : "__all__"}
                     onValueChange={(v) => { setMesanoInicio(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
                   >
-                    <SelectTrigger className="min-w-[120px]"><SelectValue placeholder="De" /></SelectTrigger>
+                    <SelectTrigger className="w-[110px]"><SelectValue placeholder="De" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="__all__">De (início)</SelectItem>
+                      <SelectItem value="__all__">De</SelectItem>
                       {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  <span className="text-gray-400 text-xs">até</span>
+                  <span className="text-gray-400 text-xs px-1">até</span>
                   <Select
                     value={mesanoFim ? String(mesanoFim) : "__all__"}
                     onValueChange={(v) => { setMesanoFim(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
                   >
-                    <SelectTrigger className="min-w-[120px]"><SelectValue placeholder="Até" /></SelectTrigger>
+                    <SelectTrigger className="w-[110px]"><SelectValue placeholder="Até" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="__all__">Até (fim)</SelectItem>
+                      <SelectItem value="__all__">Até</SelectItem>
                       {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                </div>
+                </>
               )}
             </div>
 
