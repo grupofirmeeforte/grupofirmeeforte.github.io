@@ -44,11 +44,10 @@ export const reajustesRouter = {
       if (input.empresa) condCalc.push(eq(calculos.empresa, input.empresa));
       const calcs = await db.select().from(calculos).where(and(...condCalc));
 
-      // Buscar pagamentos tipo Comissão do mesmo mês
+      // Buscar pagamentos tipo Comissão do mesmo mês (somente Comissão, não outros lançamentos)
       const condPag: any[] = [
         eq(pagamentos.mesAno, input.mesRef),
-        ne(pagamentos.tipoPagto, 'Reajuste'),
-        ne(pagamentos.tipoPagto, 'Cancelado'),
+        eq(pagamentos.tipoPagto, 'Comissão'),
       ];
       if (input.empresa) condPag.push(eq(pagamentos.empresa, input.empresa));
       const pags = await db.select().from(pagamentos).where(and(...condPag));
