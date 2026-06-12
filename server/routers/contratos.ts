@@ -117,36 +117,44 @@ function extrairDadosContrato(texto: string) {
 
   // Operador
   const nomeOperador = campo(/\bOperador\b\s*\n([A-ZÁÉÍÓÚÂÊÎÔÛÃÕÇÀÈÌÒÙÄËÏÖÜ][^\n]+)/i);
-  // ChaveJ: PDF tem linhas vazias entre cada campo
-  // Estrutura: "Chave" -> "" -> "CPF Operador" -> "" -> "NOME OPERADOR" -> "" -> "JH016470"
-  // Ignora linhas vazias e palavras-chave, pega o primeiro valor que parece ChaveJ
+  // ChaveJ: formato real do PDF - tudo na mesma linha com espaços
+  // Linha de cabeçalho: "Operador   Chave   CPF Operador"
+  // Linha de dados:    " KELLY JOSAINA...   JJ204048   307.004.368.20"
+  // Estratégia: achar a linha que contém "Operador" e "Chave" juntos,
+  // depois pegar a linha seguinte e extrair o token que parece ChaveJ
   let chaveJOperador: string | null = null;
   {
     const linhas = texto.split('\n');
-    const idxChave = linhas.findIndex(l => l.trim() === 'Chave');
-    console.log('[DEBUG ChaveJ] idxChave:', idxChave, '| total linhas:', linhas.length);
-    if (idxChave >= 0) {
-      // Busca nas próximas 15 linhas (por causa das linhas vazias)
-      for (let j = idxChave + 1; j < Math.min(idxChave + 15, linhas.length); j++) {
-        const val = linhas[j].trim();
-        console.log(`[DEBUG ChaveJ] linha ${j}: "${val}" | regex ChaveJ:`, /^[A-Z]{1,3}\d{4,}$/i.test(val));
-        // Ignora linhas vazias e palavras-chave do PDF
-        if (!val || /^(CPF|Operador|Chave|Correspondente|Loja|Nome|Dados)/i.test(val)) continue;
-        // Verifica se parece uma ChaveJ: 1-3 letras seguidas de 4+ dígitos
-        if (/^[A-Z]{1,3}\d{4,}$/i.test(val)) {
-          chaveJOperador = val.toUpperCase();
-          console.log('[DEBUG ChaveJ] ENCONTRADA:', chaveJOperador);
-          break;
+    // 1ª tentativa: linha de cabeçalho com "Operador" e "Chave" na mesma linha
+    const idxHeader = linhas.findIndex(l => /\bOperador\b/.test(l) && /\bChave\b/.test(l));
+    if (idxHeader >= 0) {
+      // A linha seguinte tem os dados: " NOME_OPERADOR   CHAVEJ   CPF"
+      const dataLine = linhas[idxHeader + 1] ?? '';
+      // Extrair todos os tokens que parecem ChaveJ (1-3 letras + 4-9 dígitos)
+      const tokens = dataLine.match(/\b([A-Z]{1,3}\d{4,9})\b/gi);
+      if (tokens && tokens.length > 0) {
+        chaveJOperador = tokens[0].toUpperCase();
+      }
+    }
+    // 2ª tentativa: linha isolada com apenas "Chave" (formato antigo)
+    if (!chaveJOperador) {
+      const idxChave = linhas.findIndex(l => l.trim() === 'Chave');
+      if (idxChave >= 0) {
+        for (let j = idxChave + 1; j < Math.min(idxChave + 15, linhas.length); j++) {
+          const val = linhas[j].trim();
+          if (!val || /^(CPF|Operador|Chave|Correspondente|Loja|Nome|Dados)/i.test(val)) continue;
+          if (/^[A-Z]{1,3}\d{4,}$/i.test(val)) {
+            chaveJOperador = val.toUpperCase();
+            break;
+          }
         }
       }
     }
-    // Fallback: busca qualquer padrão ChaveJ no texto todo
+    // 3ª tentativa: fallback geral — busca padrão ChaveJ no texto todo
     if (!chaveJOperador) {
       const m = texto.match(/\b([A-Z]{1,3}\d{6,9})\b/);
       if (m) chaveJOperador = m[1].toUpperCase();
-      console.log('[DEBUG ChaveJ] Fallback resultado:', chaveJOperador);
     }
-    console.log('[DEBUG ChaveJ] RESULTADO FINAL:', chaveJOperador);
   }
 
   // Agência e Conta do cliente (seção 2 - Dados do Cliente)

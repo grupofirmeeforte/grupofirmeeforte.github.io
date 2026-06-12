@@ -1023,6 +1023,7 @@ export const febrabanRouter = {
           proposta: r.numeroProposta ?? '',
           linha: febData?.linha ?? r.linhaCredito ?? '',
           situacao,
+          chaveJOperador: r.chaveJOperador ?? '',
           operador: r.chaveJOperador ?? '',
           nomeOperador: r.nomeOperador ?? '',
           nomeCliente: r.nomeCliente ?? '',

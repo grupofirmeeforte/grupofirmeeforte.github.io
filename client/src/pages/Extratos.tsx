@@ -317,9 +317,9 @@ function PerspectivadeGanho() {
   const nomeBuscaRef = useRef<HTMLInputElement>(null);
 
   // ChaveJ efetiva para a query (sem mes/ano — o backend calcula o período vigente automaticamente)
-  // CEO/Admin: se digitou algo na busca, usa o que digitou; senão usa a própria chaveJ
+  // CEO/Admin: só busca se selecionou um agente; agente normal usa a própria ChaveJ
   const chaveJEfetiva = isCeoOuAdmin
-    ? (chaveJQuery ? chaveJQuery.toUpperCase().trim() : (chaveJReal || undefined))
+    ? (chaveJQuery ? chaveJQuery.toUpperCase().trim() : undefined)
     : (chaveJReal || undefined);
 
   const utils = trpc.useUtils();
@@ -353,9 +353,11 @@ function PerspectivadeGanho() {
     }
   };
 
+  // CEO/Admin só executa a query quando selecionou um agente; agente normal executa sempre
+  const queryEnabled = isCeoOuAdmin ? !!chaveJQuery : !!chaveJReal;
   const { data, isLoading } = trpc.febraban.perspectiva.useQuery(
     { chaveJ: chaveJEfetiva },
-    { enabled: isCeoOuAdmin ? true : !!chaveJReal }
+    { enabled: queryEnabled }
   );
 
   // Mutation para salvar situação manual no contrato
@@ -425,6 +427,14 @@ function PerspectivadeGanho() {
             Período vigente: <strong>{periodoInicio}</strong> a <strong>{periodoFim}</strong>
           </span>
           <span className="text-xs text-indigo-400 ml-1">(do último dia útil do mês anterior ao penúltimo dia útil do mês atual)</span>
+        </div>
+      )}
+
+      {/* Mensagem para CEO selecionar agente */}
+      {isCeoOuAdmin && !chaveJQuery && (
+        <div className="mb-4 p-4 bg-amber-50 border border-amber-300 rounded-lg flex items-center gap-3">
+          <Search className="w-5 h-5 text-amber-600 shrink-0" />
+          <p className="text-sm text-amber-800 font-medium">Selecione um agente abaixo para visualizar a Perspectiva de Ganho dele.</p>
         </div>
       )}
 
