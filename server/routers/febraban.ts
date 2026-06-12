@@ -741,7 +741,14 @@ export const febrabanRouter = {
 
       // ChaveJ do usuário logado
       let chaveJLogado: string | null = null;
-      if (ctx.user?.email && ctx.user.email.includes('@')) {
+      // Agente logado via ChaveJ: openId = 'agente_123'
+      if (ctx.user?.openId?.startsWith('agente_')) {
+        const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+        const [ag] = await db.select({ chaveJ: agentes.chaveJ })
+          .from(agentes).where(eq(agentes.id, agenteId)).limit(1);
+        if (ag?.chaveJ) chaveJLogado = ag.chaveJ.toUpperCase().trim();
+      } else if (ctx.user?.email && ctx.user.email.includes('@')) {
+        // Fallback para login OAuth com email
         chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
       }
       const chaveJ = input.chaveJ ?? chaveJLogado;
