@@ -1483,9 +1483,12 @@ function ArquivoMortoAba() {
   const [uploadMesAno, setUploadMesAno] = useState("");
   const [uploadDescricao, setUploadDescricao] = useState("");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<{current: number; total: number; nome: string} | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const folderRef = useRef<HTMLInputElement>(null);
 
   const { data: filtros } = trpc.arquivoMorto.filtros.useQuery();
   const { data, isLoading } = trpc.arquivoMorto.list.useQuery({
@@ -1532,40 +1535,76 @@ function ArquivoMortoAba() {
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0];
-    if (f) setUploadFile(f);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    if (files.length === 1) {
+      setUploadFile(files[0]);
+      setUploadFiles([]);
+    } else {
+      setUploadFiles(Array.from(files));
+      setUploadFile(null);
+    }
+  };
+  const handleFolderSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setUploadFiles(Array.from(files));
+    setUploadFile(null);
   };
 
   const handleUpload = async () => {
-    if (!uploadFile) return toast.error("Selecione um arquivo");
     if (!uploadModulo) return toast.error("Selecione o módulo");
+    const filesToUpload = uploadFiles.length > 0 ? uploadFiles : uploadFile ? [uploadFile] : [];
+    if (filesToUpload.length === 0) return toast.error("Selecione um arquivo ou pasta");
     setUploading(true);
+    let sucesso = 0;
+    let erro = 0;
     try {
-      const base64: string = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          const result = ev.target?.result as string;
-          resolve(result.split(",")[1]);
-        };
-        reader.onerror = () => reject(new Error("Falha ao ler o arquivo"));
-        reader.readAsDataURL(uploadFile);
-      });
-      const ext = uploadFile.name.split(".").pop() ?? "bin";
-      const mimeType = uploadFile.type || "application/octet-stream";
-      await uploadMutation.mutateAsync({
-        modulo: uploadModulo,
-        mesAno: uploadMesAno || undefined,
-        nomeArquivo: uploadFile.name,
-        tipoArquivo: ext,
-        tamanho: uploadFile.size,
-        descricao: uploadDescricao || undefined,
-        fileBase64: base64,
-        mimeType,
-      });
+      for (let i = 0; i < filesToUpload.length; i++) {
+        const f = filesToUpload[i];
+        setUploadProgress({ current: i + 1, total: filesToUpload.length, nome: f.name });
+        try {
+          const base64: string = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+              const result = ev.target?.result as string;
+              resolve(result.split(",")[1]);
+            };
+            reader.onerror = () => reject(new Error("Falha ao ler o arquivo"));
+            reader.readAsDataURL(f);
+          });
+          const ext = f.name.split(".").pop() ?? "bin";
+          const mimeType = f.type || "application/octet-stream";
+          await uploadMutation.mutateAsync({
+            modulo: uploadModulo,
+            mesAno: uploadMesAno || undefined,
+            nomeArquivo: f.name,
+            tipoArquivo: ext,
+            tamanho: f.size,
+            descricao: uploadDescricao || undefined,
+            fileBase64: base64,
+            mimeType,
+          });
+          sucesso++;
+        } catch {
+          erro++;
+        }
+      }
+      if (filesToUpload.length > 1) {
+        if (erro === 0) toast.success(`${sucesso} arquivo(s) enviado(s) com sucesso!`);
+        else toast.warning(`${sucesso} enviado(s), ${erro} com erro`);
+        setUploadModal(false);
+        setUploadFile(null);
+        setUploadFiles([]);
+        setUploadDescricao("");
+        utils.arquivoMorto.list.invalidate();
+        utils.arquivoMorto.filtros.invalidate();
+      }
     } catch (err: any) {
       toast.error("Erro ao enviar: " + (err?.message || "Tente novamente"));
     } finally {
       setUploading(false);
+      setUploadProgress(null);
     }
   };
 
@@ -1746,10 +1785,27 @@ function ArquivoMortoAba() {
               />
             </div>
             <div>
-              <Label>Arquivo *</Label>
+              <Label>Arquivos / Pasta *</Label>
+              {/* Botões de seleção */}
+              <div className="mt-1 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="flex-1 flex items-center justify-center gap-2 border border-amber-400 text-amber-400 rounded-lg py-2 text-sm hover:bg-amber-400 hover:text-white transition-colors"
+                >
+                  <Upload className="w-4 h-4" /> Selecionar Arquivo(s)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => folderRef.current?.click()}
+                  className="flex-1 flex items-center justify-center gap-2 border border-blue-400 text-blue-400 rounded-lg py-2 text-sm hover:bg-blue-400 hover:text-white transition-colors"
+                >
+                  <FolderArchive className="w-4 h-4" /> Selecionar Pasta
+                </button>
+              </div>
+              {/* Área de drag & drop */}
               <div
-                className={`mt-1 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${dragOver ? 'border-amber-500 bg-amber-100' : 'border-amber-300 hover:bg-amber-50'}`}
-                onClick={() => fileRef.current?.click()}
+                className={`mt-2 border-2 border-dashed rounded-lg p-3 text-center transition-colors ${dragOver ? 'border-amber-500 bg-amber-50' : 'border-gray-600'}`}
                 onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); }}
                 onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); }}
                 onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(false); }}
@@ -1758,32 +1814,57 @@ function ArquivoMortoAba() {
                   e.stopPropagation();
                   setDragOver(false);
                   const files = e.dataTransfer.files;
-                  if (files && files.length > 0) {
-                    setUploadFile(files[0]);
-                  }
+                  if (!files || files.length === 0) return;
+                  if (files.length === 1) { setUploadFile(files[0]); setUploadFiles([]); }
+                  else { setUploadFiles(Array.from(files)); setUploadFile(null); }
                 }}
               >
-                {uploadFile ? (
+                {uploadFiles.length > 0 ? (
+                  <div className="text-left max-h-32 overflow-y-auto space-y-1">
+                    <p className="text-xs text-amber-400 font-medium mb-1">{uploadFiles.length} arquivo(s) selecionado(s):</p>
+                    {uploadFiles.slice(0, 5).map((f, i) => (
+                      <div key={i} className="flex items-center gap-2 text-xs text-gray-300">
+                        {getFileIcon(f.name.split('.').pop())}
+                        <span className="truncate flex-1">{f.name}</span>
+                        <span className="text-gray-500 shrink-0">{fmtTamanho(f.size)}</span>
+                      </div>
+                    ))}
+                    {uploadFiles.length > 5 && <p className="text-xs text-gray-500">...e mais {uploadFiles.length - 5} arquivo(s)</p>}
+                  </div>
+                ) : uploadFile ? (
                   <div className="flex items-center justify-center gap-2 text-sm text-gray-200">
-                    {getFileIcon(uploadFile.name.split(".").pop())}
+                    {getFileIcon(uploadFile.name.split('.').pop())}
                     <span className="font-medium">{uploadFile.name}</span>
                     <span className="text-gray-400">({fmtTamanho(uploadFile.size)})</span>
                   </div>
                 ) : (
-                  <div className="text-gray-400 text-sm">
-                    <Upload className="w-6 h-6 mx-auto mb-1 text-amber-400" />
-                    {dragOver ? 'Solte o arquivo aqui!' : 'Arraste o arquivo aqui ou clique para selecionar (Excel, PDF, CSV...)'}
-                  </div>
+                  <p className="text-gray-500 text-xs">{dragOver ? 'Solte aqui!' : 'Ou arraste arquivos aqui'}</p>
                 )}
               </div>
-              <input ref={fileRef} type="file" className="hidden" onChange={handleFileSelect} accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.txt" />
+              {/* Barra de progresso */}
+              {uploadProgress && (
+                <div className="mt-2">
+                  <div className="flex justify-between text-xs text-gray-400 mb-1">
+                    <span className="truncate">{uploadProgress.nome}</span>
+                    <span>{uploadProgress.current}/{uploadProgress.total}</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div
+                      className="bg-amber-500 h-2 rounded-full transition-all"
+                      style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              <input ref={fileRef} type="file" className="hidden" multiple onChange={handleFileSelect} accept=".xlsx,.xls,.csv,.pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" />
+              <input ref={folderRef} type="file" className="hidden" onChange={handleFolderSelect} {...{ webkitdirectory: '', directory: '' } as any} multiple />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setUploadModal(false); setUploadFile(null); }}>Cancelar</Button>
+            <Button variant="outline" onClick={() => { setUploadModal(false); setUploadFile(null); setUploadFiles([]); }}>Cancelar</Button>
             <Button
               onClick={handleUpload}
-              disabled={!uploadFile || uploading || uploadMutation.isPending}
+              disabled={(uploadFiles.length === 0 && !uploadFile) || uploading || uploadMutation.isPending}
               className="bg-amber-600 hover:bg-amber-700 text-white"
             >
               {uploading || uploadMutation.isPending ? (
