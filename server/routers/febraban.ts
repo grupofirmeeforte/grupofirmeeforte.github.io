@@ -20,6 +20,8 @@ export const febrabanRouter = {
       search: z.string().optional(),
       empresa: z.string().optional(),
       mesano: z.number().optional(),
+      mesanoInicio: z.number().optional(),
+      mesanoFim: z.number().optional(),
       situacao: z.string().optional(),
       operador: z.string().optional(),
       pago: z.enum(["todos", "sim", "nao", "srcc"]).default("todos"),
@@ -46,7 +48,13 @@ export const febrabanRouter = {
       if (input.empresa && input.empresa !== "__all__") {
         conditions.push(eq(febraban.empresa, input.empresa));
       }
-      if (input.mesano) {
+      if (input.mesanoInicio && input.mesanoFim) {
+        conditions.push(sql`${febraban.mesano} >= ${input.mesanoInicio} AND ${febraban.mesano} <= ${input.mesanoFim}`);
+      } else if (input.mesanoInicio) {
+        conditions.push(sql`${febraban.mesano} >= ${input.mesanoInicio}`);
+      } else if (input.mesanoFim) {
+        conditions.push(sql`${febraban.mesano} <= ${input.mesanoFim}`);
+      } else if (input.mesano) {
         conditions.push(eq(febraban.mesano, input.mesano));
       }
       if (input.situacao && input.situacao !== "__all__") {
@@ -155,6 +163,8 @@ export const febrabanRouter = {
       search: z.string().optional(),
       empresa: z.string().optional(),
       mesano: z.number().optional(),
+      mesanoInicio: z.number().optional(),
+      mesanoFim: z.number().optional(),
       situacao: z.string().optional(),
       operador: z.string().optional(),
       pago: z.enum(["todos", "sim", "nao", "srcc"]).default("todos"),
@@ -179,7 +189,13 @@ export const febrabanRouter = {
       if (input.empresa && input.empresa !== "__all__") {
         conditions.push(eq(febraban.empresa, input.empresa));
       }
-      if (input.mesano) {
+      if (input.mesanoInicio && input.mesanoFim) {
+        conditions.push(sql`${febraban.mesano} >= ${input.mesanoInicio} AND ${febraban.mesano} <= ${input.mesanoFim}`);
+      } else if (input.mesanoInicio) {
+        conditions.push(sql`${febraban.mesano} >= ${input.mesanoInicio}`);
+      } else if (input.mesanoFim) {
+        conditions.push(sql`${febraban.mesano} <= ${input.mesanoFim}`);
+      } else if (input.mesano) {
         conditions.push(eq(febraban.mesano, input.mesano));
       }
       if (input.situacao && input.situacao !== "__all__") {

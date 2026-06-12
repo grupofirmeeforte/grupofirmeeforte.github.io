@@ -372,6 +372,9 @@ export default function FebrabanPage() {
   const [search, setSearch] = useState("");
   const [empresa, setEmpresa] = useState("__all__");
   const [mesano, setMesano] = useState<number | undefined>();
+  const [mesanoInicio, setMesanoInicio] = useState<number | undefined>();
+  const [mesanoFim, setMesanoFim] = useState<number | undefined>();
+  const [usarPeriodo, setUsarPeriodo] = useState(false);
   const [situacao, setSituacao] = useState("__all__");
   const [operador, setOperador] = useState("__all__");
   const [filtroPago, setFiltroPago] = useState<"todos" | "sim" | "nao" | "srcc">("todos");
@@ -399,21 +402,27 @@ export default function FebrabanPage() {
     limit: LIMIT,
     search: search || undefined,
     empresa: empresa !== "__all__" ? empresa : undefined,
-    mesano: mesano,
+    mesano: usarPeriodo ? undefined : mesano,
+    mesanoInicio: usarPeriodo ? mesanoInicio : undefined,
+    mesanoFim: usarPeriodo ? mesanoFim : undefined,
+    situacao: situacao !== "__all__" ? situacao : undefined,
+    operador: operador !== "__all__" ? operador : undefined,
+    pago: filtroPago,
+  };
+
+  const countParams = {
+    search: search || undefined,
+    empresa: empresa !== "__all__" ? empresa : undefined,
+    mesano: usarPeriodo ? undefined : mesano,
+    mesanoInicio: usarPeriodo ? mesanoInicio : undefined,
+    mesanoFim: usarPeriodo ? mesanoFim : undefined,
     situacao: situacao !== "__all__" ? situacao : undefined,
     operador: operador !== "__all__" ? operador : undefined,
     pago: filtroPago,
   };
 
   const { data: rows, refetch } = trpc.febraban.list.useQuery(queryParams);
-  const { data: total } = trpc.febraban.count.useQuery({
-    search: search || undefined,
-    empresa: empresa !== "__all__" ? empresa : undefined,
-    mesano: mesano,
-    situacao: situacao !== "__all__" ? situacao : undefined,
-    operador: operador !== "__all__" ? operador : undefined,
-    pago: filtroPago,
-  });
+  const { data: total } = trpc.febraban.count.useQuery(countParams);
   const { data: filtros } = trpc.febraban.filtros.useQuery();
   const { data: resumo } = trpc.febraban.resumo.useQuery({ mesano: mesano });
   const utils = trpc.useUtils();
@@ -944,16 +953,54 @@ export default function FebrabanPage() {
               </SelectContent>
             </Select>
 
-            <Select
-              value={mesano ? String(mesano) : "__all__"}
-              onValueChange={(v) => { setMesano(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
-            >
-              <SelectTrigger><SelectValue placeholder="Mês/Ano" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="__all__">Todos meses</SelectItem>
-                {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            {/* Filtro de período */}
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => { setUsarPeriodo(!usarPeriodo); setMesano(undefined); setMesanoInicio(undefined); setMesanoFim(undefined); setPage(0); }}
+                className={`text-xs px-2 py-1 rounded border h-10 whitespace-nowrap transition-colors ${
+                  usarPeriodo ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {usarPeriodo ? 'Período ✓' : 'Período'}
+              </button>
+              {!usarPeriodo ? (
+                <Select
+                  value={mesano ? String(mesano) : "__all__"}
+                  onValueChange={(v) => { setMesano(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
+                >
+                  <SelectTrigger className="min-w-[130px]"><SelectValue placeholder="Mês/Ano" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__all__">Todos meses</SelectItem>
+                    {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="flex items-center gap-1">
+                  <Select
+                    value={mesanoInicio ? String(mesanoInicio) : "__all__"}
+                    onValueChange={(v) => { setMesanoInicio(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
+                  >
+                    <SelectTrigger className="min-w-[120px]"><SelectValue placeholder="De" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">De (início)</SelectItem>
+                      {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <span className="text-gray-400 text-xs">até</span>
+                  <Select
+                    value={mesanoFim ? String(mesanoFim) : "__all__"}
+                    onValueChange={(v) => { setMesanoFim(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
+                  >
+                    <SelectTrigger className="min-w-[120px]"><SelectValue placeholder="Até" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__all__">Até (fim)</SelectItem>
+                      {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
 
             <Select value={situacao} onValueChange={(v) => { setSituacao(v); setPage(0); }}>
               <SelectTrigger><SelectValue placeholder="Situação" /></SelectTrigger>
