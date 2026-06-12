@@ -1482,6 +1482,7 @@ function ArquivoMortoAba() {
   const [uploadModulo, setUploadModulo] = useState(MODULOS_ARQUIVO[0]);
   const [uploadMesAno, setUploadMesAno] = useState("");
   const [uploadDescricao, setUploadDescricao] = useState("");
+  const [uploadNumeroDoc, setUploadNumeroDoc] = useState("");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<{current: number; total: number; nome: string} | null>(null);
@@ -1504,9 +1505,10 @@ function ArquivoMortoAba() {
       utils.arquivoMorto.list.invalidate();
       utils.arquivoMorto.filtros.invalidate();
       setUploadModal(false);
-      setUploadFile(null);
-      setUploadDescricao("");
-      toast.success("Arquivo enviado com sucesso!");
+        setUploadFile(null);
+        setUploadDescricao("");
+        setUploadNumeroDoc("");
+        toast.success("Arquivo enviado com sucesso!");
     },
     onError: (e) => toast.error("Erro ao enviar: " + e.message),
   });
@@ -1534,15 +1536,24 @@ function ArquivoMortoAba() {
     }
   };
 
+  // Extrai número do nome do arquivo: "Proposta-208870431.pdf" → "208870431"
+  function extrairNumeroDoc(nome: string): string {
+    const semExt = nome.replace(/\.[^.]+$/, "");
+    const match = semExt.match(/(\d{5,})/);
+    return match ? match[1] : "";
+  }
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     if (files.length === 1) {
       setUploadFile(files[0]);
       setUploadFiles([]);
+      setUploadNumeroDoc(extrairNumeroDoc(files[0].name));
     } else {
       setUploadFiles(Array.from(files));
       setUploadFile(null);
+      setUploadNumeroDoc("");
     }
   };
   const handleFolderSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1550,6 +1561,7 @@ function ArquivoMortoAba() {
     if (!files || files.length === 0) return;
     setUploadFiles(Array.from(files));
     setUploadFile(null);
+    setUploadNumeroDoc("");
   };
 
   const handleUpload = async () => {
@@ -1582,6 +1594,7 @@ function ArquivoMortoAba() {
             tipoArquivo: ext,
             tamanho: f.size,
             descricao: uploadDescricao || undefined,
+            numeroDoc: uploadNumeroDoc || extrairNumeroDoc(f.name) || undefined,
             fileBase64: base64,
             mimeType,
           });
@@ -1597,6 +1610,7 @@ function ArquivoMortoAba() {
         setUploadFile(null);
         setUploadFiles([]);
         setUploadDescricao("");
+        setUploadNumeroDoc("");
         utils.arquivoMorto.list.invalidate();
         utils.arquivoMorto.filtros.invalidate();
       }
@@ -1651,7 +1665,7 @@ function ArquivoMortoAba() {
           <Search className="absolute left-2 top-2.5 w-4 h-4 text-gray-400" />
           <input
             className="pl-8 h-9 w-52 text-sm border border-gray-700 rounded-md px-3 focus:outline-none focus:ring-1 focus:ring-amber-400"
-            placeholder="Nome do arquivo..."
+            placeholder="Nome ou Nº documento..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0); }}
           />
@@ -1682,16 +1696,16 @@ function ArquivoMortoAba() {
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="bg-amber-700 text-white">
-              {["Arquivo", "Módulo", "Mês/Ano", "Tamanho", "Enviado por", "Data", "Ações"].map(h => (
+              {["Arquivo", "Nº Doc", "Módulo", "Mês/Ano", "Tamanho", "Enviado por", "Data", "Ações"].map(h => (
                 <th key={h} className="px-3 py-2 text-left font-semibold whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan={7} className="text-center py-8 text-gray-400">Carregando...</td></tr>
+              <tr><td colSpan={8} className="text-center py-8 text-gray-400">Carregando...</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={7} className="text-center py-10 text-gray-400">
+              <tr><td colSpan={8} className="text-center py-10 text-gray-400">
                 <FolderArchive className="w-10 h-10 mx-auto mb-2 text-gray-300" />
                 Nenhum arquivo encontrado. Clique em "Enviar Arquivo" para adicionar.
               </td></tr>
@@ -1704,6 +1718,7 @@ function ArquivoMortoAba() {
                   </div>
                   {row.descricao && <div className="text-[10px] text-gray-400 mt-0.5">{row.descricao}</div>}
                 </td>
+                <td className="px-3 py-2 text-xs font-mono text-yellow-300">{row.numeroDoc ?? "-"}</td>
                 <td className="px-3 py-2">
                   <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-medium">{row.modulo}</span>
                 </td>
@@ -1774,6 +1789,16 @@ function ArquivoMortoAba() {
                 value={uploadMesAno}
                 onChange={e => setUploadMesAno(e.target.value)}
               />
+            </div>
+            <div>
+              <Label>Nº Documento / Proposta</Label>
+              <input
+                className="mt-1 w-full h-9 border border-gray-700 rounded-md px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-400"
+                placeholder="ex: 208870431"
+                value={uploadNumeroDoc}
+                onChange={e => setUploadNumeroDoc(e.target.value)}
+              />
+              <p className="text-[10px] text-gray-400 mt-0.5">Preenchido automaticamente do nome do arquivo. Pode editar.</p>
             </div>
             <div>
               <Label>Descrição (opcional)</Label>
@@ -1861,7 +1886,7 @@ function ArquivoMortoAba() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setUploadModal(false); setUploadFile(null); setUploadFiles([]); }}>Cancelar</Button>
+            <Button variant="outline" onClick={() => { setUploadModal(false); setUploadFile(null); setUploadFiles([]); setUploadNumeroDoc(""); }}>Cancelar</Button>
             <Button
               onClick={handleUpload}
               disabled={(uploadFiles.length === 0 && !uploadFile) || uploading || uploadMutation.isPending}

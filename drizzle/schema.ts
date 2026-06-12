@@ -1664,6 +1664,7 @@ export const arquivoMorto = mysqlTable("arquivoMorto", {
   arquivoKey: varchar("arquivoKey", { length: 500 }).notNull(),
   arquivoUrl: varchar("arquivoUrl", { length: 500 }).notNull(),
   descricao: text("descricao"),
+  numeroDoc: varchar("numeroDoc", { length: 100 }),         // número de proposta/documento
   uploadadoPor: varchar("uploadadoPor", { length: 255 }), // nome do CEO
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

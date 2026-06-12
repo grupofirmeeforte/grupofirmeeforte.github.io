@@ -63,7 +63,9 @@ export const arquivoMortoRouter = router({
       if (input.mesAno && input.mesAno !== "__all__") conditions.push(eq(arquivoMorto.mesAno, input.mesAno));
       if (input.search) {
         const s = `%${input.search}%`;
-        conditions.push(like(arquivoMorto.nomeArquivo, s));
+        conditions.push(
+          sql`(${arquivoMorto.nomeArquivo} LIKE ${s} OR ${arquivoMorto.numeroDoc} LIKE ${s})`
+        );
       }
       const where = conditions.length > 0 ? and(...conditions) : undefined;
 
@@ -108,6 +110,7 @@ export const arquivoMortoRouter = router({
       tipoArquivo: z.string().optional(),
       tamanho: z.number().optional(),
       descricao: z.string().optional(),
+      numeroDoc: z.string().optional(),
       // Arquivo em base64
       fileBase64: z.string(),
       mimeType: z.string().optional(),
@@ -134,6 +137,7 @@ export const arquivoMortoRouter = router({
         arquivoKey: savedKey,
         arquivoUrl: url,
         descricao: input.descricao ?? null,
+        numeroDoc: input.numeroDoc ?? null,
         uploadadoPor: (ctx.user as any).nomeAgente ?? (ctx.user as any).name ?? "CEO",
       });
 
