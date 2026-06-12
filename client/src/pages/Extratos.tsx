@@ -43,7 +43,7 @@ function BuscaAgentesSugestoes({ termo, onSelect }: {
           onMouseDown={e => { e.preventDefault(); onSelect(ag.chaveJ ?? '', ag.nomeAgente ?? ''); }}
         >
           <span className="font-medium text-blue-700 shrink-0">{ag.chaveJ}</span>
-          <span className="text-gray-200 truncate">{ag.nomeAgente}</span>
+          <span className="text-gray-900 truncate">{ag.nomeAgente}</span>
           {ag.empresa && <span className="text-xs text-gray-400 ml-auto shrink-0">{ag.empresa}</span>}
         </button>
       ))}
