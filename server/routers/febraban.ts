@@ -1060,6 +1060,142 @@ export const febrabanRouter = {
       };
     }),
 
+  // Produção do Mês: busca direto do Febraban por ChaveJ e período vigente
+  producaoMes: protectedProcedure
+    .input(z.object({
+      chaveJ: z.string().optional(),
+      mes: z.number().optional(),
+      ano: z.number().optional(),
+    }))
+    .query(async ({ input, ctx }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
+      // ChaveJ do usuário logado
+      let chaveJLogado: string | null = null;
+      if (ctx.user?.openId?.startsWith('agente_')) {
+        const agenteId = parseInt(ctx.user.openId.replace('agente_', ''), 10);
+        const [ag] = await db.select({ chaveJ: agentes.chaveJ })
+          .from(agentes).where(eq(agentes.id, agenteId)).limit(1);
+        if (ag?.chaveJ) chaveJLogado = ag.chaveJ.toUpperCase().trim();
+      } else if (ctx.user?.email && ctx.user.email.includes('@')) {
+        chaveJLogado = ctx.user.email.split('@')[0].toUpperCase();
+      }
+      const chaveJ = input.chaveJ ?? chaveJLogado;
+
+      // Período vigente: último dia útil do mês anterior → penúltimo dia útil do mês atual
+      const agora = new Date();
+      const mesRef = input.mes ?? (agora.getMonth() + 1);
+      const anoRef = input.ano ?? agora.getFullYear();
+      const mesAnteriorRef = mesRef === 1 ? 12 : mesRef - 1;
+      const anoAnteriorRef = mesRef === 1 ? anoRef - 1 : anoRef;
+
+      const feriadosRows = await db
+        .select({ data: feriados.data })
+        .from(feriados)
+        .where(sql`ano IN (${anoAnteriorRef}, ${anoRef}) AND tipo = 'nacional'`);
+      const feriadosSet = new Set(feriadosRows.map(f => f.data));
+
+      const isUtilDate = (d: Date): boolean => {
+        const dow = d.getDay();
+        if (dow === 0 || dow === 6) return false;
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return !feriadosSet.has(`${dd}/${mm}/${yyyy}`);
+      };
+
+      // Último dia útil do mês anterior
+      let cursor = new Date(anoAnteriorRef, mesAnteriorRef, 0);
+      while (!isUtilDate(cursor)) { cursor.setDate(cursor.getDate() - 1); }
+      const dataInicio = new Date(cursor);
+      dataInicio.setHours(0, 0, 0, 0);
+
+      // Penúltimo dia útil do mês atual
+      cursor = new Date(anoRef, mesRef, 0);
+      while (!isUtilDate(cursor)) { cursor.setDate(cursor.getDate() - 1); }
+      cursor.setDate(cursor.getDate() - 1);
+      while (!isUtilDate(cursor)) { cursor.setDate(cursor.getDate() - 1); }
+      const dataFim = new Date(cursor);
+      dataFim.setHours(23, 59, 59, 999);
+
+      const fmtData = (d: Date) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+
+      // Parsear data no formato DD/MM/YYYY
+      const parseDateBR2 = (s: string): Date | null => {
+        if (!s) return null;
+        const m = s.match(/(\d{2})[\/\.](\d{2})[\/\.](\d{4})/);
+        if (!m) return null;
+        const d = new Date(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1]));
+        return isNaN(d.getTime()) ? null : d;
+      };
+
+      // Buscar registros do Febraban no período vigente
+      const conditions: any[] = [];
+      if (chaveJ) conditions.push(sql`UPPER(TRIM(${febraban.operador})) = ${chaveJ.toUpperCase().trim()}`);
+
+      const febRows = await db
+        .select({
+          id: febraban.id,
+          proposta: febraban.proposta,
+          linha: febraban.linha,
+          situacao: febraban.situacao,
+          operador: febraban.operador,
+          solicitacao: febraban.solicitacao,
+          prazo: febraban.prazo,
+          troco: febraban.troco,
+          financiado: febraban.financiado,
+          empresa: febraban.empresa,
+        })
+        .from(febraban)
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .orderBy(desc(febraban.solicitacao));
+
+      // Filtrar pelo período vigente usando a data de solicitação
+      const rowsFiltrados = febRows.filter(r => {
+        const dataRef = parseDateBR2(r.solicitacao ?? '');
+        if (!dataRef) return false;
+        dataRef.setHours(12, 0, 0, 0);
+        return dataRef >= dataInicio && dataRef <= dataFim;
+      });
+
+      // Buscar nome do agente
+      let nomeAgente = '';
+      if (chaveJ) {
+        const [ag] = await db.select({ nomeAgente: agentes.nomeAgente })
+          .from(agentes)
+          .where(sql`UPPER(TRIM(${agentes.chaveJ})) = ${chaveJ.toUpperCase().trim()}`)
+          .limit(1);
+        if (ag?.nomeAgente) nomeAgente = ag.nomeAgente;
+      }
+
+      const rows = rowsFiltrados.map(r => ({
+        id: r.id,
+        proposta: r.proposta ?? '',
+        convenio: String(r.linha ?? ''),
+        linha: String(r.linha ?? ''),
+        situacao: r.situacao ?? 'Pendente',
+        operador: r.operador ?? '',
+        solicitacao: r.solicitacao ?? '',
+        prazo: r.prazo ?? '',
+        troco: String(r.troco ?? '0'),
+        financiado: String(r.financiado ?? '0'),
+        empresa: r.empresa ?? '',
+      }));
+
+      return {
+        rows,
+        chaveJ: chaveJ ?? '',
+        nomeAgente,
+        periodoInicio: fmtData(dataInicio),
+        periodoFim: fmtData(dataFim),
+        mesRef,
+        anoRef,
+        total: rows.length,
+        totalFinanciado: rows.reduce((acc, r) => acc + parseFloat(r.financiado || '0'), 0),
+      };
+    }),
+
     // Acompanhamento Diário: produção por agente por dia no mês selecionado
   acompanhamentoDiario: protectedProcedure
     .input(z.object({

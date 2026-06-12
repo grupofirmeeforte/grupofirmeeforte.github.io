@@ -61,7 +61,7 @@ const ABAS: { id: Aba; label: string; icon: React.ElementType; cor: string }[] =
   { id: 'ourocap',      label: 'Extrato Ourocap',         icon: Star,        cor: 'bg-yellow-600'  },
   { id: 'seguros',      label: 'Extrato Seguros',         icon: Shield,      cor: 'bg-red-600'     },
   { id: 'bbdental',     label: 'Extrato BB Dental',       icon: Smile,       cor: 'bg-teal-600'    },
-  { id: 'perspectiva',  label: 'Perspectiva de Ganho',   icon: TrendingUp,  cor: 'bg-indigo-600'  },
+  { id: 'perspectiva',  label: 'Produção do Mês',         icon: TrendingUp,  cor: 'bg-indigo-600'  },
   { id: 'minha-tabela', label: 'Minha Tabela',            icon: FileText,    cor: 'bg-orange-600'  },
 ];
 
@@ -300,7 +300,7 @@ function ExtratoConsignado() {
   );
 }
 
-// ─── PERSPECTIVA DE GANHO ────────────────────────────────────────────────────
+// ─── PRODUÇÃO DO MÊS (pré-extrato Febraban) ────────────────────────────────
 function PerspectivadeGanho() {
   const { data: meData } = trpc.auth.me.useQuery();
   const chaveJReal = (meData as any)?.chaveJ ?? '';
@@ -310,101 +310,36 @@ function PerspectivadeGanho() {
   const isCeoOuAdmin = cargo === 'CEO' || permissoes === 'admin';
 
   // Campo de busca por nome ou ChaveJ para CEO/Admin
-  const [chaveJBusca, setChaveJBusca] = useState('');
   const [chaveJQuery, setChaveJQuery] = useState('');
   const [nomeBusca, setNomeBusca] = useState('');
   const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
   const nomeBuscaRef = useRef<HTMLInputElement>(null);
 
-  // ChaveJ efetiva para a query (sem mes/ano — o backend calcula o período vigente automaticamente)
-  // CEO/Admin: só busca se selecionou um agente; agente normal usa a própria ChaveJ
   const chaveJEfetiva = isCeoOuAdmin
     ? (chaveJQuery ? chaveJQuery.toUpperCase().trim() : undefined)
     : (chaveJReal || undefined);
 
-  const utils = trpc.useUtils();
-  const uploadLoteMutation = trpc.contratos.uploadLote.useMutation();
-  const [uploadingPdf, setUploadingPdf] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const fileParaBase64 = async (file: File): Promise<string> => {
-    const buffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(buffer);
-    let bin = '';
-    for (let j = 0; j < bytes.byteLength; j++) bin += String.fromCharCode(bytes[j]);
-    return btoa(bin);
-  };
-
-  const handleUploadPdf = async (files: FileList) => {
-    const pdfs = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.pdf'));
-    if (pdfs.length === 0) { toast.error('Nenhum PDF selecionado'); return; }
-    setUploadingPdf(true);
-    try {
-      const arquivos = await Promise.all(pdfs.map(async (f) => ({ fileBase64: await fileParaBase64(f), nomeArquivo: f.name })));
-      const res = await uploadLoteMutation.mutateAsync({ arquivos, substituirDuplicatas: true });
-      if (res.erros > 0) toast.error(`Upload: ${res.ok} OK, ${res.erros} com erro`);
-      else toast.success(`${res.ok} contrato(s) importado(s) com sucesso!`);
-      utils.febraban.perspectiva.invalidate();
-    } catch (e: any) {
-      toast.error('Erro ao importar PDF: ' + (e?.message ?? 'desconhecido'));
-    } finally {
-      setUploadingPdf(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
-  // CEO/Admin só executa a query quando selecionou um agente; agente normal executa sempre
   const queryEnabled = isCeoOuAdmin ? !!chaveJQuery : !!chaveJReal;
-  const { data, isLoading } = trpc.febraban.perspectiva.useQuery(
+  const { data, isLoading } = trpc.febraban.producaoMes.useQuery(
     { chaveJ: chaveJEfetiva },
     { enabled: queryEnabled }
   );
 
-  // Mutation para salvar situação manual no contrato
-  const atualizarMutation = trpc.contratos.atualizar.useMutation({
-    onSuccess: () => utils.febraban.perspectiva.invalidate(),
-  });
-
-  // Mutation para salvar telefone
-  const salvarTelefoneMutation = trpc.contratos.salvarTelefone.useMutation({
-    onSuccess: () => { setEditandoTelefoneId(null); utils.febraban.perspectiva.invalidate(); },
-    onError: (err) => alert(err.message),
-  });
-
-  // Estado de edição inline de situação
-  const [editandoSituacaoId, setEditandoSituacaoId] = useState<number | null>(null);
-  const [situacaoEditando, setSituacaoEditando] = useState('');
-
-  // Estado de edição inline de telefone
-  const [editandoTelefoneId, setEditandoTelefoneId] = useState<number | null>(null);
-  const [telefoneEditando, setTelefoneEditando] = useState('');
-
-  const salvarSituacao = async (id: number) => {
-    await atualizarMutation.mutateAsync({ id, situacao: situacaoEditando });
-    setEditandoSituacaoId(null);
-  };
-
-  const salvarTelefone = async (id: number) => {
-    if (!telefoneEditando.trim()) return;
-    await salvarTelefoneMutation.mutateAsync({ contratoId: id, telefone: telefoneEditando.trim() });
-  };
-
   const rows = data?.rows ?? [];
-  const ativoCol = data?.ativoCol ?? null;
-  const periodoInicio = (data as any)?.periodoInicio ?? '';
-  const periodoFim = (data as any)?.periodoFim ?? '';
+  const periodoInicio = data?.periodoInicio ?? '';
+  const periodoFim = data?.periodoFim ?? '';
   const chaveJExibida = isCeoOuAdmin && chaveJQuery ? chaveJQuery.toUpperCase().trim() : chaveJReal;
-  const mesRef = (data as any)?.mesRef;
-  const anoRef = (data as any)?.anoRef;
+  const nomeAgenteExibido = data?.nomeAgente || nomeAgente;
+  const mesRef = data?.mesRef;
+  const anoRef = data?.anoRef;
   const mesAtualStr = mesRef && anoRef ? `${String(mesRef).padStart(2,'0')}/${anoRef}` : '';
 
-  // Totais
-  const totalValorSolicitado = useMemo(
-    () => (rows as any[]).reduce((acc, r: any) => acc + (r.valorSolicitado ?? 0), 0),
+  const totalFinanciado = useMemo(
+    () => (rows as any[]).reduce((acc, r: any) => acc + parseFloat(r.financiado || '0'), 0),
     [rows]
   );
-  const totalPerspectiva = useMemo(
-    () => (rows as any[]).reduce((acc, r: any) => acc + (r.perspectivaComissao ?? 0), 0),
+  const totalTroco = useMemo(
+    () => (rows as any[]).reduce((acc, r: any) => acc + parseFloat(r.troco || '0'), 0),
     [rows]
   );
   const totalContratadas = useMemo(
@@ -413,11 +348,10 @@ function PerspectivadeGanho() {
   );
 
   const fmt = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const fmtPct = (v: number) => `${parseFloat(v.toFixed(2)).toString().replace('.', ',')}%`;
 
   return (
     <div>
-      <PainelIdentificacao chaveJ={chaveJExibida} nomeAgente={nomeAgente} mesRef={mesAtualStr} />
+      <PainelIdentificacao chaveJ={chaveJExibida} nomeAgente={nomeAgenteExibido} mesRef={mesAtualStr} />
 
       {/* Período vigente */}
       {periodoInicio && periodoFim && (
@@ -434,7 +368,7 @@ function PerspectivadeGanho() {
       {isCeoOuAdmin && !chaveJQuery && (
         <div className="mb-4 p-4 bg-amber-50 border border-amber-300 rounded-lg flex items-center gap-3">
           <Search className="w-5 h-5 text-amber-600 shrink-0" />
-          <p className="text-sm text-amber-800 font-medium">Selecione um agente abaixo para visualizar a Perspectiva de Ganho dele.</p>
+          <p className="text-sm text-amber-800 font-medium">Selecione um agente para visualizar a Produção do Mês.</p>
         </div>
       )}
 
@@ -451,10 +385,8 @@ function PerspectivadeGanho() {
                 onChange={e => { setNomeBusca(e.target.value); setMostrarSugestoes(true); }}
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
-                    // Se parecer ChaveJ (começa com J), buscar direto
                     if (/^J\d/i.test(nomeBusca.trim())) {
                       setChaveJQuery(nomeBusca.trim().toUpperCase());
-                      setChaveJBusca(nomeBusca.trim().toUpperCase());
                     }
                     setMostrarSugestoes(false);
                   }
@@ -464,13 +396,11 @@ function PerspectivadeGanho() {
                 onBlur={() => setTimeout(() => setMostrarSugestoes(false), 200)}
                 className="h-8 text-sm bg-white text-gray-900 placeholder:text-gray-500"
               />
-              {/* Sugestões de autocomplete */}
               {mostrarSugestoes && nomeBusca.length >= 2 && (
                 <BuscaAgentesSugestoes
                   termo={nomeBusca}
                   onSelect={(chaveJ, nome) => {
                     setChaveJQuery(chaveJ);
-                    setChaveJBusca(chaveJ);
                     setNomeBusca(`${nome} (${chaveJ})`);
                     setMostrarSugestoes(false);
                   }}
@@ -478,7 +408,7 @@ function PerspectivadeGanho() {
               )}
             </div>
             {chaveJQuery && (
-              <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => { setNomeBusca(''); setChaveJBusca(''); setChaveJQuery(''); }}>Limpar</Button>
+              <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => { setNomeBusca(''); setChaveJQuery(''); }}>Limpar</Button>
             )}
             <span className="text-xs text-blue-500">CEO/Admin: consulte qualquer agente</span>
           </div>
@@ -488,63 +418,7 @@ function PerspectivadeGanho() {
         </div>
       )}
 
-      {/* Área drag & drop de upload de PDF */}
-      <div
-        className={`mb-3 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
-          uploadingPdf ? 'border-emerald-300 bg-emerald-50' : 'border-emerald-400 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-500'
-        }`}
-        onClick={() => !uploadingPdf && fileInputRef.current?.click()}
-        onDragOver={e => { e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = 'copy'; }}
-        onDragEnter={e => { e.preventDefault(); e.stopPropagation(); }}
-        onDrop={e => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (uploadingPdf) return;
-          const files = e.dataTransfer.files;
-          if (files && files.length > 0) {
-            handleUploadPdf(files);
-          } else {
-            const items = e.dataTransfer.items;
-            if (items && items.length > 0) {
-              const dt = new DataTransfer();
-              for (let i = 0; i < items.length; i++) {
-                const file = items[i].getAsFile();
-                if (file) dt.items.add(file);
-              }
-              if (dt.files.length > 0) handleUploadPdf(dt.files);
-            }
-          }
-        }}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf"
-          multiple
-          className="hidden"
-          onChange={e => e.target.files && handleUploadPdf(e.target.files)}
-        />
-        {uploadingPdf ? (
-          <div className="flex items-center justify-center gap-2 text-emerald-600">
-            <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm font-medium">Importando contratos...</span>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-1">
-            <Upload className="w-7 h-7 text-emerald-500 mb-1" />
-            <span className="text-sm font-semibold text-emerald-700">Arraste os PDFs aqui ou clique para selecionar</span>
-            <span className="text-xs text-emerald-500">Suporta múltiplos arquivos — substitui automaticamente duplicatas</span>
-          </div>
-        )}
-      </div>
-
-      {/* Nota de edição */}
-      <div className="mb-3 text-xs text-gray-400 flex items-center gap-1">
-        <AlertTriangle className="w-3.5 h-3.5 text-yellow-500" />
-        Clique no badge de situação de qualquer contrato para alterar manualmente.
-      </div>
-
-      {/* ─── TABELA DETALHADA ──────────────────────────────────────────────────────── */}
+      {/* ─── TABELA PRODUÇÃO DO MÊS (dados do Febraban) ─────────────────────────── */}
       <Card>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -552,160 +426,56 @@ function PerspectivadeGanho() {
               <TableHeader>
                 <TableRow className="bg-gray-800">
                   <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Proposta</TableHead>
-                  <TableHead className="font-semibold text-indigo-300 uppercase text-xs tracking-wide">ChaveJ</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Data</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Cliente / CPF</TableHead>
+                  <TableHead className="font-semibold text-indigo-300 uppercase text-xs tracking-wide">Operador</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Solicitado em</TableHead>
                   <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Situação</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Produto</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Taxa</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Convênio / Linha</TableHead>
                   <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Prazo</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Valor</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-center">Fontes</TableHead>
-                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Telefone</TableHead>
-                  <TableHead className="font-semibold text-amber-600 uppercase text-xs tracking-wide text-right bg-amber-50">% / Comissão</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Troco</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide text-right">Financiado</TableHead>
+                  <TableHead className="font-semibold text-gray-200 uppercase text-xs tracking-wide">Empresa</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   <TableRow>
-                    <TableCell colSpan={12} className="text-center py-10 text-gray-400">Carregando...</TableCell>
+                    <TableCell colSpan={9} className="text-center py-10 text-gray-400">Carregando...</TableCell>
                   </TableRow>
                 ) : rows.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={12} className="text-center py-10 text-gray-400">
-                      {periodoInicio && periodoFim
-                        ? `Nenhum contrato PDF no período vigente (${periodoInicio} a ${periodoFim})`
-                        : 'Nenhum contrato PDF encontrado'}
+                    <TableCell colSpan={9} className="text-center py-10 text-gray-400">
+                      {queryEnabled
+                        ? `Nenhuma operação no período vigente${periodoInicio ? ` (${periodoInicio} a ${periodoFim})` : ''}`
+                        : 'Selecione um agente para ver a produção'}
                     </TableCell>
                   </TableRow>
                 ) : (
                   (rows as any[]).map((row: any, rowIdx: number) => (
-                    <TableRow key={row.id} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-blue-900'}>
+                    <TableRow key={row.id ?? rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-blue-900'}>
                       <TableCell className={`font-mono text-sm font-medium ${rowIdx % 2 === 0 ? 'text-gray-900' : 'text-white'}`}>{row.proposta || '—'}</TableCell>
-                      <TableCell className="font-mono text-xs font-bold text-indigo-600 whitespace-nowrap">{row.chaveJOperador || '—'}</TableCell>
-                      <TableCell className={`text-xs whitespace-nowrap ${rowIdx % 2 === 0 ? 'text-gray-600' : 'text-gray-200'}`}>
-                        {row.solicitacao || '—'}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        <div className={`font-medium ${rowIdx % 2 === 0 ? 'text-gray-900' : 'text-white'}`}>{row.nomeCliente || '—'}</div>
-                        {row.cpfCliente && <div className={`text-xs font-mono ${rowIdx % 2 === 0 ? 'text-gray-400' : 'text-gray-300'}`}>{row.cpfCliente}</div>}
-                      </TableCell>
+                      <TableCell className="font-mono text-xs font-bold text-indigo-600 whitespace-nowrap">{row.operador || '—'}</TableCell>
+                      <TableCell className={`text-xs whitespace-nowrap ${rowIdx % 2 === 0 ? 'text-gray-600' : 'text-gray-200'}`}>{row.solicitacao || '—'}</TableCell>
                       <TableCell>
-                        {/* Edição inline de situação */}
-                        {editandoSituacaoId === row.id ? (
-                          <div className="flex items-center gap-1">
-                            <select
-                              autoFocus
-                              value={situacaoEditando}
-                              onChange={e => setSituacaoEditando(e.target.value)}
-                              className="text-xs border border-blue-400 rounded px-1.5 py-0.5 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            >
-                              <option value="">-- Selecione --</option>
-                              <option value="Contratada">Contratada</option>
-                              <option value="Cancelada">Cancelada</option>
-                              <option value="Pendente">Pendente</option>
-                            </select>
-                            <button
-                              onClick={() => salvarSituacao(row.id)}
-                              disabled={atualizarMutation.isPending}
-                              className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded hover:bg-green-700 disabled:opacity-50"
-                            >OK</button>
-                            <button
-                              onClick={() => setEditandoSituacaoId(null)}
-                              className="text-xs bg-gray-400 text-white px-1.5 py-0.5 rounded hover:bg-gray-8000"
-                            >X</button>
-                          </div>
-                        ) : (
-                          <button
-                            title="Clique para editar a situação"
-                            onClick={() => {
-                              setEditandoSituacaoId(row.id);
-                              setSituacaoEditando(row.situacao || '');
-                            }}
-                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer hover:opacity-80 transition-opacity border border-transparent hover:border-current ${
-                              (row.situacao ?? '').toLowerCase() === 'contratada' ? 'bg-green-100 text-green-700' :
-                              (row.situacao ?? '').toLowerCase() === 'cancelada'  ? 'bg-red-100 text-red-700' :
-                              'bg-yellow-100 text-yellow-700'
-                            }`}
-                          >
-                            {row.situacao || 'Pendente'}
-                            <span className="ml-1 text-[9px] opacity-60">✎</span>
-                          </button>
-                        )}
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                          (row.situacao ?? '').toLowerCase().includes('contrat') ? 'bg-green-100 text-green-700' :
+                          (row.situacao ?? '').toLowerCase().includes('cancel') ? 'bg-red-100 text-red-700' :
+                          'bg-yellow-100 text-yellow-700'
+                        }`}>{row.situacao || '—'}</span>
                       </TableCell>
-                      <TableCell className="text-xs max-w-[130px] truncate" title={row.produtoConsig ?? row.linha ?? ''}>
-                        <span className={`font-medium ${rowIdx % 2 === 0 ? 'text-blue-600' : 'text-blue-300'}`}>{row.produtoConsig || row.linha || '—'}</span>
+                      <TableCell className="text-xs max-w-[160px] truncate" title={row.convenio ?? row.linha ?? ''}>
+                        <div className={`font-medium ${rowIdx % 2 === 0 ? 'text-blue-600' : 'text-blue-300'}`}>{row.convenio || '—'}</div>
+                        {row.linha && <div className={`text-xs ${rowIdx % 2 === 0 ? 'text-gray-400' : 'text-gray-300'}`}>{row.linha}</div>}
                       </TableCell>
                       <TableCell className={`text-right text-sm ${rowIdx % 2 === 0 ? 'text-gray-700' : 'text-gray-200'}`}>
-                        {row.taxaJuros > 0 ? fmtPct(row.taxaJuros) : '—'}
+                        {row.prazo ? `${row.prazo}x` : '—'}
                       </TableCell>
-                      <TableCell className={`text-right text-sm ${rowIdx % 2 === 0 ? 'text-gray-700' : 'text-gray-200'}`}>
-                        {row.prazoMeses > 0 ? `${row.prazoMeses}x` : (row.prazo || '—')}
+                      <TableCell className={`text-right font-semibold ${rowIdx % 2 === 0 ? 'text-green-700' : 'text-green-400'}`}>
+                        {row.troco ? fmt(parseFloat(row.troco)) : '—'}
                       </TableCell>
                       <TableCell className={`text-right font-semibold ${rowIdx % 2 === 0 ? 'text-blue-700' : 'text-blue-300'}`}>
-                        {row.valorSolicitado > 0 ? fmt(row.valorSolicitado) : '—'}
+                        {row.financiado ? fmt(parseFloat(row.financiado)) : '—'}
                       </TableCell>
-                      <TableCell className="text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700" title="Contrato PDF enviado">PDF</span>
-                          {row.temFebraban && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700" title="Encontrado na Febraban">FEB</span>
-                          )}
-                        </div>
-                      </TableCell>
-                      {/* Célula de Telefone editável inline */}
-                      <TableCell>
-                        {editandoTelefoneId === row.id ? (
-                          <div className="flex items-center gap-1">
-                            <input
-                              autoFocus
-                              type="tel"
-                              value={telefoneEditando}
-                              onChange={e => setTelefoneEditando(e.target.value)}
-                              onKeyDown={e => { if (e.key === 'Enter') salvarTelefone(row.id); if (e.key === 'Escape') setEditandoTelefoneId(null); }}
-                              placeholder="(99) 99999-9999"
-                              className="text-xs border border-blue-400 rounded px-1.5 py-0.5 w-32 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            />
-                            <button
-                              onClick={() => salvarTelefone(row.id)}
-                              disabled={salvarTelefoneMutation.isPending}
-                              className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded hover:bg-green-700 disabled:opacity-50"
-                            >OK</button>
-                            <button
-                              onClick={() => setEditandoTelefoneId(null)}
-                              className="text-xs bg-gray-400 text-white px-1.5 py-0.5 rounded hover:bg-gray-8000"
-                            >X</button>
-                          </div>
-                        ) : (
-                          <button
-                            title="Clique para adicionar telefone"
-                            onClick={() => { setEditandoTelefoneId(row.id); setTelefoneEditando(''); }}
-                            className="text-xs text-left hover:opacity-80 transition-opacity"
-                          >
-                            {row.telefoneManuais ? (
-                              <span className={`font-medium ${rowIdx % 2 === 0 ? 'text-green-700' : 'text-green-400'}`}>{row.telefoneManuais.split(',')[0]}</span>
-                            ) : (
-                              <span className={`italic ${rowIdx % 2 === 0 ? 'text-gray-400' : 'text-gray-300'}`}>+ telefone</span>
-                            )}
-                          </button>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right font-bold text-amber-700 bg-amber-50">
-                        {row.perspectivaComissao != null ? (
-                          <div>
-                            <div>{fmt(row.perspectivaComissao)}</div>
-                            {row.percentualUsado != null && (
-                              <div className="text-xs text-gray-400 font-normal">{fmtPct(row.percentualUsado)}</div>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 text-xs">
-                            {(row.situacao ?? '').toLowerCase() === 'contratada'
-                              ? (row.telefoneManuais ? 'sem tabela' : 'aguard. telefone')
-                              : '—'}
-                          </span>
-                        )}
-                      </TableCell>
+                      <TableCell className={`text-xs ${rowIdx % 2 === 0 ? 'text-gray-600' : 'text-gray-300'}`}>{row.empresa || '—'}</TableCell>
                     </TableRow>
                   ))
                 )}
@@ -715,19 +485,18 @@ function PerspectivadeGanho() {
           {/* Rodapé com totais */}
           <div className="border-t bg-gray-800 px-4 py-3 flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-400">{rows.length} contrato(s)</span>
-              {periodoInicio && <span className="text-xs text-indigo-600">{periodoInicio} → {periodoFim}</span>}
-              <span className="text-xs text-green-600 font-medium">{totalContratadas} contratada(s)</span>
-              {ativoCol && <span className="text-xs text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded font-medium">{ativoCol.replace('ativo', 'Ativo ')}</span>}
+              <span className="text-sm text-gray-400">{rows.length} operação(s)</span>
+              {periodoInicio && <span className="text-xs text-indigo-400">{periodoInicio} → {periodoFim}</span>}
+              <span className="text-xs text-green-400 font-medium">{totalContratadas} contratada(s)</span>
             </div>
             <div className="flex gap-6">
               <div className="text-right">
-                <p className="text-xs text-gray-400">Total Valor Solicitado</p>
-                <p className="font-bold text-blue-700">{fmt(totalValorSolicitado)}</p>
+                <p className="text-xs text-gray-400">Total Troco</p>
+                <p className="font-bold text-green-400">{fmt(totalTroco)}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-gray-400">Total Comissão Perspectiva</p>
-                <p className="font-bold text-amber-700">{fmt(totalPerspectiva)}</p>
+                <p className="text-xs text-gray-400">Total Financiado</p>
+                <p className="font-bold text-blue-400">{fmt(totalFinanciado)}</p>
               </div>
             </div>
           </div>
