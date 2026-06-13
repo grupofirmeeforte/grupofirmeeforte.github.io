@@ -372,9 +372,6 @@ export default function FebrabanPage() {
   const [search, setSearch] = useState("");
   const [empresa, setEmpresa] = useState("__all__");
   const [mesano, setMesano] = useState<number | undefined>();
-  const [mesanoInicio, setMesanoInicio] = useState<number | undefined>();
-  const [mesanoFim, setMesanoFim] = useState<number | undefined>();
-  const [usarPeriodo, setUsarPeriodo] = useState(false);
   const [situacao, setSituacao] = useState("__all__");
   const [operador, setOperador] = useState("__all__");
   const [filtroPago, setFiltroPago] = useState<"todos" | "sim" | "nao" | "srcc">("todos");
@@ -402,27 +399,21 @@ export default function FebrabanPage() {
     limit: LIMIT,
     search: search || undefined,
     empresa: empresa !== "__all__" ? empresa : undefined,
-    mesano: usarPeriodo ? undefined : mesano,
-    mesanoInicio: usarPeriodo ? mesanoInicio : undefined,
-    mesanoFim: usarPeriodo ? mesanoFim : undefined,
-    situacao: situacao !== "__all__" ? situacao : undefined,
-    operador: operador !== "__all__" ? operador : undefined,
-    pago: filtroPago,
-  };
-
-  const countParams = {
-    search: search || undefined,
-    empresa: empresa !== "__all__" ? empresa : undefined,
-    mesano: usarPeriodo ? undefined : mesano,
-    mesanoInicio: usarPeriodo ? mesanoInicio : undefined,
-    mesanoFim: usarPeriodo ? mesanoFim : undefined,
+    mesano: mesano,
     situacao: situacao !== "__all__" ? situacao : undefined,
     operador: operador !== "__all__" ? operador : undefined,
     pago: filtroPago,
   };
 
   const { data: rows, refetch } = trpc.febraban.list.useQuery(queryParams);
-  const { data: total } = trpc.febraban.count.useQuery(countParams);
+  const { data: total } = trpc.febraban.count.useQuery({
+    search: search || undefined,
+    empresa: empresa !== "__all__" ? empresa : undefined,
+    mesano: mesano,
+    situacao: situacao !== "__all__" ? situacao : undefined,
+    operador: operador !== "__all__" ? operador : undefined,
+    pago: filtroPago,
+  });
   const { data: filtros } = trpc.febraban.filtros.useQuery();
   const { data: resumo } = trpc.febraban.resumo.useQuery({ mesano: mesano });
   const utils = trpc.useUtils();
@@ -662,34 +653,25 @@ export default function FebrabanPage() {
             // Detectar formato: novo (Operação/Produto/ChaveJ/Data/Liquido/Bruto) ou antigo (PROPOSTA/LINHA/OPERADOR/SOLICITACAO/TROCO/FINANCIADO)
         const isNovoFormato = colMap[norm("OPERACAO")] !== undefined || colMap[norm("OPERAÇÃO")] !== undefined;
 
-        // Converte Mês/Ano (Date ou número) para MESANO numérico no formato AAAAMM (ex: 04/2026 → 202604)
+        // Converte Mês/Ano (Date ou número) para MESANO numérico (ex: 04/2026 → 426)
         const toMesano = (v: any): number | undefined => {
           if (!v) return undefined;
           if (v instanceof Date && !isNaN(v.getTime())) {
             const mes = v.getMonth() + 1;
-            const ano = v.getFullYear(); // ano completo
-            return ano * 100 + mes; // ex: 2026*100+4 = 202604
+            const ano = v.getFullYear() % 100; // últimos 2 dígitos
+            return mes * 100 + ano; // ex: 4*100+26 = 426
           }
-          // string MM/AAAA ou MM/AA
+          // string MM/AAAA
           const s = String(v).trim();
           const m = s.match(/^(\d{1,2})[/\-](\d{2,4})$/);
           if (m) {
             const mes = parseInt(m[1]);
-            const anoRaw = parseInt(m[2]);
-            const ano = anoRaw < 100 ? 2000 + anoRaw : anoRaw; // converte AA para AAAA
-            return ano * 100 + mes; // ex: 2026*100+4 = 202604
+            const ano = parseInt(m[2]) % 100;
+            return mes * 100 + ano;
           }
-          // número direto — se for formato antigo (ex: 426), converter para AAAAMM
+          // número direto (ex: 426)
           const n = parseInt(s);
-          if (isNaN(n)) return undefined;
-          // Se o número tem 3-4 dígitos (formato antigo MMA ou MMAA), converter
-          if (n >= 100 && n <= 9999) {
-            const mes = Math.floor(n / 100);
-            const anoSuffix = n % 100;
-            const ano = 2000 + anoSuffix;
-            return ano * 100 + mes;
-          }
-          return n; // já está no formato AAAAMM
+          return isNaN(n) ? undefined : n;
         };
 
         const registros: any[] = [];
@@ -943,8 +925,8 @@ export default function FebrabanPage() {
           <CardTitle className="text-base">Filtros</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <div className="relative">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+            <div className="relative col-span-2 md:col-span-1">
               <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
               <Input
                 placeholder="Proposta ou Operador..."
@@ -962,54 +944,16 @@ export default function FebrabanPage() {
               </SelectContent>
             </Select>
 
-            {/* Filtro de período */}
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => { setUsarPeriodo(!usarPeriodo); setMesano(undefined); setMesanoInicio(undefined); setMesanoFim(undefined); setPage(0); }}
-                className={`text-xs px-2 py-1 rounded border h-10 whitespace-nowrap transition-colors ${
-                  usarPeriodo ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                {usarPeriodo ? 'Período ✓' : 'Período'}
-              </button>
-              {!usarPeriodo ? (
-                <Select
-                  value={mesano ? String(mesano) : "__all__"}
-                  onValueChange={(v) => { setMesano(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
-                >
-                  <SelectTrigger className="w-[130px]"><SelectValue placeholder="Mês/Ano" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__all__">Todos meses</SelectItem>
-                    {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <>
-                  <Select
-                    value={mesanoInicio ? String(mesanoInicio) : "__all__"}
-                    onValueChange={(v) => { setMesanoInicio(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
-                  >
-                    <SelectTrigger className="w-[110px]"><SelectValue placeholder="De" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__all__">De</SelectItem>
-                      {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                  <span className="text-gray-400 text-xs px-1">até</span>
-                  <Select
-                    value={mesanoFim ? String(mesanoFim) : "__all__"}
-                    onValueChange={(v) => { setMesanoFim(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
-                  >
-                    <SelectTrigger className="w-[110px]"><SelectValue placeholder="Até" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__all__">Até</SelectItem>
-                      {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </>
-              )}
-            </div>
+            <Select
+              value={mesano ? String(mesano) : "__all__"}
+              onValueChange={(v) => { setMesano(v === "__all__" ? undefined : parseInt(v)); setPage(0); }}
+            >
+              <SelectTrigger><SelectValue placeholder="Mês/Ano" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">Todos meses</SelectItem>
+                {filtros?.mesanos.map(m => <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
 
             <Select value={situacao} onValueChange={(v) => { setSituacao(v); setPage(0); }}>
               <SelectTrigger><SelectValue placeholder="Situação" /></SelectTrigger>

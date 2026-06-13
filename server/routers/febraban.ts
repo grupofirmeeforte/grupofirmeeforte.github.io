@@ -4,11 +4,11 @@ import { getDb } from "../db";
 import { febraban, consignados, feriados, tabelasComissao, agentes, contratos } from "../../drizzle/schema";
 import { eq, and, like, or, desc, asc, sql, isNotNull, isNull, ne } from "drizzle-orm";
 
-// Converte número MESANO (ex: 202601) para string legível (ex: "01/2026")
+// Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
 export function mesanoToStr(mesano: number): string {
-  const s = String(mesano).padStart(6, "0");
-  const ano = s.slice(0, 4);
-  const mes = s.slice(4, 6);
+  const s = String(mesano);
+  const mes = s.slice(0, s.length - 2).padStart(2, "0");
+  const ano = "20" + s.slice(-2);
   return `${mes}/${ano}`;
 }
 
@@ -20,8 +20,6 @@ export const febrabanRouter = {
       search: z.string().optional(),
       empresa: z.string().optional(),
       mesano: z.number().optional(),
-      mesanoInicio: z.number().optional(),
-      mesanoFim: z.number().optional(),
       situacao: z.string().optional(),
       operador: z.string().optional(),
       pago: z.enum(["todos", "sim", "nao", "srcc"]).default("todos"),
@@ -48,13 +46,7 @@ export const febrabanRouter = {
       if (input.empresa && input.empresa !== "__all__") {
         conditions.push(eq(febraban.empresa, input.empresa));
       }
-      if (input.mesanoInicio && input.mesanoFim) {
-        conditions.push(sql`${febraban.mesano} >= ${input.mesanoInicio} AND ${febraban.mesano} <= ${input.mesanoFim}`);
-      } else if (input.mesanoInicio) {
-        conditions.push(sql`${febraban.mesano} >= ${input.mesanoInicio}`);
-      } else if (input.mesanoFim) {
-        conditions.push(sql`${febraban.mesano} <= ${input.mesanoFim}`);
-      } else if (input.mesano) {
+      if (input.mesano) {
         conditions.push(eq(febraban.mesano, input.mesano));
       }
       if (input.situacao && input.situacao !== "__all__") {
@@ -163,8 +155,6 @@ export const febrabanRouter = {
       search: z.string().optional(),
       empresa: z.string().optional(),
       mesano: z.number().optional(),
-      mesanoInicio: z.number().optional(),
-      mesanoFim: z.number().optional(),
       situacao: z.string().optional(),
       operador: z.string().optional(),
       pago: z.enum(["todos", "sim", "nao", "srcc"]).default("todos"),
@@ -189,13 +179,7 @@ export const febrabanRouter = {
       if (input.empresa && input.empresa !== "__all__") {
         conditions.push(eq(febraban.empresa, input.empresa));
       }
-      if (input.mesanoInicio && input.mesanoFim) {
-        conditions.push(sql`${febraban.mesano} >= ${input.mesanoInicio} AND ${febraban.mesano} <= ${input.mesanoFim}`);
-      } else if (input.mesanoInicio) {
-        conditions.push(sql`${febraban.mesano} >= ${input.mesanoInicio}`);
-      } else if (input.mesanoFim) {
-        conditions.push(sql`${febraban.mesano} <= ${input.mesanoFim}`);
-      } else if (input.mesano) {
+      if (input.mesano) {
         conditions.push(eq(febraban.mesano, input.mesano));
       }
       if (input.situacao && input.situacao !== "__all__") {
@@ -442,7 +426,8 @@ export const febrabanRouter = {
           const fim = new Date(cursor); fim.setHours(23, 59, 59, 999);
 
           if (dataSolic >= inicio && dataSolic <= fim) {
-            return parseInt(`${anoRef}${String(mesRef).padStart(2, '0')}`);
+            const anoSuffix = String(anoRef).slice(-2);
+            return parseInt(`${mesRef}${anoSuffix}`);
           }
         }
         return undefined;
@@ -634,24 +619,28 @@ export const febrabanRouter = {
       for (const emp of empresas) {
         // Determinar o mesano mais recente desta empresa
         // MESANO formato MMAA (ex: 626=jun/2026, 1225=dez/2025)
-        // mesano agora usa formato AAAAMM (ex: 202606)
+        // Para ordenar corretamente, converter para AAAAMM: ano=20+AA, mes=MM
+        // RIGHT(LPAD(mesano,6,'0'),2) = AA, LEFT(LPAD(mesano,6,'0'),4) = MMXX
+        // Ordem real: CONCAT('20',RIGHT(LPAD(mesano,6,'0'),2), LPAD(LEFT(LPAD(mesano,6,'0'),LENGTH(mesano)-2),2,'0'))
         let mesano: number | undefined = inputMesano;
         if (!mesano) {
           const latest = await db
             .select({ v: febraban.mesano })
             .from(febraban)
             .where(sql`empresa = ${emp} AND mesano IS NOT NULL`)
-            .orderBy(sql`mesano DESC`)
+            .orderBy(sql`CONCAT('20', RIGHT(LPAD(CAST(mesano AS CHAR),6,'0'),2), LPAD(FLOOR(mesano / 100),2,'0')) DESC`)
             .limit(1);
           mesano = latest[0]?.v ?? undefined;
         }
         if (!mesano) continue;
 
-        const anoFull = String(Math.floor(mesano / 100)); // ex: '2026'
+        const mesanoStr = String(mesano);
+        const anoSuffix = mesanoStr.slice(-2);
+        const anoFull = "20" + anoSuffix;
 
         const baseWhere = sql`empresa = ${emp} AND mesano = ${mesano}`;
         // ANO: soma todos os meses do mesmo ano do mesano mais recente desta empresa
-        const anoWhere = sql`empresa = ${emp} AND FLOOR(mesano / 100) = ${Math.floor(mesano / 100)}`;
+        const anoWhere = sql`empresa = ${emp} AND RIGHT(LPAD(CAST(mesano AS CHAR), 6, '0'), 2) = ${anoSuffix}`;
 
         const [contratado, pendente, diaAtual, diaAnterior, ano,
                qtdContratado, qtdPendente, qtdDiaAtual, qtdDiaAnterior, qtdAno,
@@ -1221,7 +1210,8 @@ export const febrabanRouter = {
       const { agentes: agentesTable } = await import('../../drizzle/schema');
 
       // Calcular mesano no formato usado na Febraban (ex: 526 para maio/2026)
-      const mesano = input.ano * 100 + input.mes; // formato AAAAMM ex: 202606
+      const anoSuffix = String(input.ano).slice(-2);
+      const mesano = Number(`${input.mes}${anoSuffix}`);
       const isTodas = input.empresa === 'TODAS';
 
       // Buscar operadores únicos da Febraban para este mesano e empresa
@@ -1369,19 +1359,20 @@ export const febrabanRouter = {
           eq(febraban.situacao, 'Contratada'),
           input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`
         ));
-      const parseMesano = (m: number) => { const s = String(m).padStart(6, '0'); return { mes: parseInt(s.slice(4, 6)), ano: parseInt(s.slice(0, 4)) }; };
+      const parseMesano = (m: number) => { const s = String(m); return { mes: parseInt(s.slice(0, s.length - 2)), ano: parseInt('20' + s.slice(-2)) }; };
       const anosSet = new Set<number>();
       for (const r of anosRows) { if (r.mesano) { const { ano } = parseMesano(r.mesano); anosSet.add(ano); } }
       const anos = Array.from(anosSet).sort((a, b) => b - a);
       // Determinar ano efetivo: usa o fornecido ou o mais recente
       const anoEfetivo = input.ano ?? (anos[0] ?? new Date().getFullYear());
+      const anoSuffix = String(anoEfetivo).slice(-2);
       const rows = await db
         .select({ mesano: febraban.mesano, operador: febraban.operador, troco: febraban.troco })
         .from(febraban)
         .where(and(
           eq(febraban.situacao, 'Contratada'),
           input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`,
-          sql`FLOOR(${febraban.mesano} / 100) = ${anoEfetivo}`
+          sql`RIGHT(LPAD(CAST(${febraban.mesano} AS CHAR), 6, '0'), 2) = ${anoSuffix}`
         ));
       const getLabel = (m: number) => { const { mes } = parseMesano(m); if (input.periodo === 'bimestre') return `${Math.ceil(mes / 2)}º Bim`; if (input.periodo === 'trimestre') return `${Math.ceil(mes / 3)}º Tri`; if (input.periodo === 'semestre') return `${mes <= 6 ? 1 : 2}º Sem`; return String(anoEfetivo); };
       const getOrder = (m: number) => { const { mes } = parseMesano(m); if (input.periodo === 'bimestre') return Math.ceil(mes / 2); if (input.periodo === 'trimestre') return Math.ceil(mes / 3); if (input.periodo === 'semestre') return mes <= 6 ? 1 : 2; return 1; };
@@ -1412,18 +1403,19 @@ export const febrabanRouter = {
     .query(async ({ input }) => {
       const db = await getDb();
       if (!db) return { data: [], labels: [] };
-      const parseMesano = (m: number) => { const s = String(m).padStart(6, '0'); return { mes: parseInt(s.slice(4, 6)), ano: parseInt(s.slice(0, 4)) }; };
+      const parseMesano = (m: number) => { const s = String(m); return { mes: parseInt(s.slice(0, s.length - 2)), ano: parseInt('20' + s.slice(-2)) }; };
       // Determinar ano efetivo
       const anosRows = await db.selectDistinct({ mesano: febraban.mesano }).from(febraban).where(input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`);
       const anosSet = new Set<number>(); for (const r of anosRows) { if (r.mesano) { const { ano } = parseMesano(r.mesano); anosSet.add(ano); } }
       const anos = Array.from(anosSet).sort((a, b) => b - a);
       const anoEfetivo = input.ano ?? (anos[0] ?? new Date().getFullYear());
+      const anoSuffix = String(anoEfetivo).slice(-2);
       const rows = await db
         .select({ mesano: febraban.mesano, situacao: febraban.situacao, troco: febraban.troco, financiado: febraban.financiado })
         .from(febraban)
         .where(and(
           input.empresa ? eq(febraban.empresa, input.empresa) : sql`1=1`,
-          sql`FLOOR(${febraban.mesano} / 100) = ${anoEfetivo}`
+          sql`RIGHT(LPAD(CAST(${febraban.mesano} AS CHAR), 6, '0'), 2) = ${anoSuffix}`
         ));
       const getLabel = (m: number) => { const { mes } = parseMesano(m); if (input.periodo === 'bimestre') return `${Math.ceil(mes / 2)}º Bim`; if (input.periodo === 'trimestre') return `${Math.ceil(mes / 3)}º Tri`; if (input.periodo === 'semestre') return `${mes <= 6 ? 1 : 2}º Sem`; return String(anoEfetivo); };
       const getOrder = (m: number) => { const { mes } = parseMesano(m); if (input.periodo === 'bimestre') return Math.ceil(mes / 2); if (input.periodo === 'trimestre') return Math.ceil(mes / 3); if (input.periodo === 'semestre') return mes <= 6 ? 1 : 2; return 1; };
@@ -1464,15 +1456,18 @@ export const febrabanRouter = {
           .select({ v: febraban.mesano })
           .from(febraban)
           .where(sql`mesano IS NOT NULL${input.empresa ? sql` AND empresa = ${input.empresa}` : sql``}`)
-          .orderBy(sql`mesano DESC`)
+          .orderBy(sql`CONCAT('20', RIGHT(LPAD(CAST(mesano AS CHAR),6,'0'),2), LPAD(FLOOR(mesano / 100),2,'0')) DESC`)
           .limit(1);
         if (latest[0]?.v) {
-          anoRef = Math.floor(latest[0].v / 100);
+          const s = String(latest[0].v);
+          anoRef = parseInt('20' + s.slice(-2));
         }
       }
       if (!anoRef) return { rows: [], ano: null };
 
-      // Buscar todos os registros do ano de referência (formato AAAAMM: FLOOR(mesano/100) = ano)
+      const anoSuffix = String(anoRef).slice(-2); // '26' para 2026
+
+      // Buscar todos os registros do ano de referência
       const allRows = await db
         .select({
           mesano: febraban.mesano,
@@ -1483,7 +1478,7 @@ export const febrabanRouter = {
           empresa: febraban.empresa,
         })
         .from(febraban)
-        .where(sql`FLOOR(mesano / 100) = ${anoRef}${input.empresa ? sql` AND empresa = ${input.empresa}` : sql``}`);
+        .where(sql`RIGHT(LPAD(CAST(mesano AS CHAR), 6, '0'), 2) = ${anoSuffix}${input.empresa ? sql` AND empresa = ${input.empresa}` : sql``}`);
 
       // Classificar tipo de operação
       const getTipo = (row: { situacao?: string | null; troco?: any; financiado?: any }): 'NOVO' | 'REFIN' | 'CANC' => {
@@ -1494,9 +1489,10 @@ export const febrabanRouter = {
         return 'REFIN';
       };
 
-      // Extrair mês de mesano (formato AAAAMM: ex: 202601 → mes=1, 202612 → mes=12)
+      // Extrair mês de mesano (ex: 126 → mes=1, 1226 → mes=12)
       const getMes = (mesano: number): number => {
-        return mesano % 100;
+        const s = String(mesano);
+        return parseInt(s.slice(0, s.length - 2));
       };
 
       // Trimestre do mês (1-4)
