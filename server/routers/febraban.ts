@@ -1216,9 +1216,8 @@ export const febrabanRouter = {
 
       const { agentes: agentesTable } = await import('../../drizzle/schema');
 
-      // Calcular mesano no formato usado na Febraban (ex: 526 para maio/2026)
-      const anoSuffix = String(input.ano).slice(-2);
-      const mesano = Number(`${input.mes}${anoSuffix}`);
+      // Calcular mesano no formato usado na Febraban (ex: 202605 para maio/2026)
+      const mesano = input.ano * 100 + input.mes;
       const isTodas = input.empresa === 'TODAS';
 
       // Buscar operadores únicos da Febraban para este mesano e empresa
