@@ -662,25 +662,34 @@ export default function FebrabanPage() {
             // Detectar formato: novo (Operação/Produto/ChaveJ/Data/Liquido/Bruto) ou antigo (PROPOSTA/LINHA/OPERADOR/SOLICITACAO/TROCO/FINANCIADO)
         const isNovoFormato = colMap[norm("OPERACAO")] !== undefined || colMap[norm("OPERAÇÃO")] !== undefined;
 
-        // Converte Mês/Ano (Date ou número) para MESANO numérico (ex: 04/2026 → 426)
+        // Converte Mês/Ano (Date ou número) para MESANO numérico no formato AAAAMM (ex: 04/2026 → 202604)
         const toMesano = (v: any): number | undefined => {
           if (!v) return undefined;
           if (v instanceof Date && !isNaN(v.getTime())) {
             const mes = v.getMonth() + 1;
-            const ano = v.getFullYear() % 100; // últimos 2 dígitos
-            return mes * 100 + ano; // ex: 4*100+26 = 426
+            const ano = v.getFullYear(); // ano completo
+            return ano * 100 + mes; // ex: 2026*100+4 = 202604
           }
-          // string MM/AAAA
+          // string MM/AAAA ou MM/AA
           const s = String(v).trim();
           const m = s.match(/^(\d{1,2})[/\-](\d{2,4})$/);
           if (m) {
             const mes = parseInt(m[1]);
-            const ano = parseInt(m[2]) % 100;
-            return mes * 100 + ano;
+            const anoRaw = parseInt(m[2]);
+            const ano = anoRaw < 100 ? 2000 + anoRaw : anoRaw; // converte AA para AAAA
+            return ano * 100 + mes; // ex: 2026*100+4 = 202604
           }
-          // número direto (ex: 426)
+          // número direto — se for formato antigo (ex: 426), converter para AAAAMM
           const n = parseInt(s);
-          return isNaN(n) ? undefined : n;
+          if (isNaN(n)) return undefined;
+          // Se o número tem 3-4 dígitos (formato antigo MMA ou MMAA), converter
+          if (n >= 100 && n <= 9999) {
+            const mes = Math.floor(n / 100);
+            const anoSuffix = n % 100;
+            const ano = 2000 + anoSuffix;
+            return ano * 100 + mes;
+          }
+          return n; // já está no formato AAAAMM
         };
 
         const registros: any[] = [];
