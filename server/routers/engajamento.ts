@@ -20,14 +20,22 @@ function getMesAtualBrasilia(): string {
   return `${mes}/${ano}`;
 }
 
-// Converte "MM/YYYY" para o formato numérico do febraban (ex: "05/2026" → 526)
+// Converte "MM/YYYY" para o formato numérico do febraban (ex: "05/2026" → 202605)
 function mesAnoParaFebMesano(mesAno: string): number {
   const [mes, ano] = mesAno.split('/');
-  return parseInt(mes, 10) * 100 + (parseInt(ano, 10) % 100);
+  return parseInt(ano, 10) * 100 + parseInt(mes, 10);
 }
 
-// Converte mesano numérico do febraban para "MM/YYYY" (ex: 526 → "05/2026")
+// Converte mesano numérico do febraban para "MM/YYYY" (ex: 202605 → "05/2026")
 function febMesanoParaMesAno(mesano: number): string {
+  const s = String(mesano).padStart(6, '0');
+  // Formato AAAAMM (6 dígitos)
+  if (s.length === 6) {
+    const ano = s.slice(0, 4);
+    const mes = s.slice(4, 6);
+    return `${mes}/${ano}`;
+  }
+  // Fallback para formato antigo MMA (3-4 dígitos) — nunca deve acontecer agora
   const mes = Math.floor(mesano / 100);
   const anoSufixo = mesano % 100;
   const anoCompleto = anoSufixo + (anoSufixo < 50 ? 2000 : 1900);

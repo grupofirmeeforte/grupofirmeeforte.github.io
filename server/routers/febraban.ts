@@ -4,9 +4,16 @@ import { getDb } from "../db";
 import { febraban, consignados, feriados, tabelasComissao, agentes, contratos } from "../../drizzle/schema";
 import { eq, and, like, or, desc, asc, sql, isNotNull, isNull, ne } from "drizzle-orm";
 
-// Converte número MESANO (ex: 126) para string legível (ex: "01/2026")
+// Converte número MESANO (ex: 202605) para string legível (ex: "05/2026")
 export function mesanoToStr(mesano: number): string {
-  const s = String(mesano);
+  const s = String(mesano).padStart(6, "0");
+  // Formato AAAAMM (6 dígitos)
+  if (s.length === 6) {
+    const ano = s.slice(0, 4);
+    const mes = s.slice(4, 6);
+    return `${mes}/${ano}`;
+  }
+  // Fallback para formato antigo (nunca deve acontecer)
   const mes = s.slice(0, s.length - 2).padStart(2, "0");
   const ano = "20" + s.slice(-2);
   return `${mes}/${ano}`;
@@ -1489,10 +1496,11 @@ export const febrabanRouter = {
         return 'REFIN';
       };
 
-      // Extrair mês de mesano (ex: 126 → mes=1, 1226 → mes=12)
+      // Extrair mês de mesano (ex: 202605 → mes=5, 202612 → mes=12)
       const getMes = (mesano: number): number => {
-        const s = String(mesano);
-        return parseInt(s.slice(0, s.length - 2));
+        const s = String(mesano).padStart(6, '0');
+        // Formato AAAAMM: últimos 2 dígitos são o mês
+        return parseInt(s.slice(4, 6));
       };
 
       // Trimestre do mês (1-4)
