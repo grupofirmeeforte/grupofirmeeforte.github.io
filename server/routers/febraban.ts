@@ -641,13 +641,12 @@ export const febrabanRouter = {
         }
         if (!mesano) continue;
 
-        const mesanoStr = String(mesano).padStart(6, '0');
-        const anoFull = mesanoStr.slice(0, 4);
-        const anoSuffix = mesanoStr.slice(0, 2);
+        const anoFull = Math.floor(mesano / 100);
+        const mesSuffix = mesano % 100;
 
         const baseWhere = sql`empresa = ${emp} AND mesano = ${mesano}`;
         // ANO: soma todos os meses do mesmo ano do mesano mais recente desta empresa
-        const anoWhere = sql`empresa = ${emp} AND SUBSTRING(LPAD(CAST(mesano AS CHAR), 6, '0'), 1, 4) = ${anoFull}`;
+        const anoWhere = sql`empresa = ${emp} AND FLOOR(mesano / 100) = ${anoFull}`;
 
         const [contratado, pendente, diaAtual, diaAnterior, ano,
                qtdContratado, qtdPendente, qtdDiaAtual, qtdDiaAnterior, qtdAno,
@@ -666,7 +665,7 @@ export const febrabanRouter = {
             .from(febraban).where(sql`${baseWhere} AND solicitacao = ${ontemStr} AND situacao = 'Contratada'`),
           // Líquido do ano
           db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
-            .from(febraban).where(sql`empresa = ${emp} AND SUBSTRING(LPAD(CAST(mesano AS CHAR), 6, '0'), 1, 4) = ${anoFull} AND situacao = 'Contratada'`),
+            .from(febraban).where(sql`empresa = ${emp} AND FLOOR(mesano / 100) = ${anoFull} AND situacao = 'Contratada'`),
           // Contagem de operações contratadas
           db.select({ cnt: sql<number>`COUNT(*)` })
             .from(febraban).where(sql`${baseWhere} AND situacao = 'Contratada'`),
@@ -681,10 +680,10 @@ export const febrabanRouter = {
             .from(febraban).where(sql`${baseWhere} AND solicitacao = ${ontemStr} AND situacao = 'Contratada'`),
           // Contagem do ano
           db.select({ cnt: sql<number>`COUNT(*)` })
-            .from(febraban).where(sql`empresa = ${emp} AND SUBSTRING(LPAD(CAST(mesano AS CHAR), 6, '0'), 1, 4) = ${anoFull} AND situacao = 'Contratada'`),
+            .from(febraban).where(sql`empresa = ${emp} AND FLOOR(mesano / 100) = ${anoFull} AND situacao = 'Contratada'`),
           // SRCC: valor total do ANO VIGENTE (manual pago=2 OU auto via restricaoSRCC=Sim) usando financiado
           db.select({ total: sql<string>`COALESCE(SUM(CAST(financiado AS DECIMAL(15,2))), 0)` })
-            .from(febraban).where(sql`empresa = ${emp} AND SUBSTRING(LPAD(CAST(mesano AS CHAR), 6, '0'), 1, 4) = ${anoFull} AND (
+            .from(febraban).where(sql`empresa = ${emp} AND FLOOR(mesano / 100) = ${anoFull} AND (
               pago = 2
               OR EXISTS (
                 SELECT 1 FROM consignados c
@@ -694,7 +693,7 @@ export const febrabanRouter = {
             )`),
           // SRCC: contagem do ANO VIGENTE (manual pago=2 OU auto via restricaoSRCC=Sim)
           db.select({ cnt: sql<number>`COUNT(*)` })
-            .from(febraban).where(sql`empresa = ${emp} AND SUBSTRING(LPAD(CAST(mesano AS CHAR), 6, '0'), 1, 4) = ${anoFull} AND (
+            .from(febraban).where(sql`empresa = ${emp} AND FLOOR(mesano / 100) = ${anoFull} AND (
               pago = 2
               OR EXISTS (
                 SELECT 1 FROM consignados c
@@ -704,10 +703,10 @@ export const febrabanRouter = {
             )`),
           // Canceladas: valor troco do ANO VIGENTE
           db.select({ total: sql<string>`COALESCE(SUM(CAST(troco AS DECIMAL(15,2))), 0)` })
-            .from(febraban).where(sql`empresa = ${emp} AND SUBSTRING(LPAD(CAST(mesano AS CHAR), 6, '0'), 1, 4) = ${anoFull} AND LOWER(situacao) LIKE '%cancel%'`),
+            .from(febraban).where(sql`empresa = ${emp} AND FLOOR(mesano / 100) = ${anoFull} AND LOWER(situacao) LIKE '%cancel%'`),
           // Canceladas: contagem do ANO VIGENTE
           db.select({ cnt: sql<number>`COUNT(*)` })
-            .from(febraban).where(sql`empresa = ${emp} AND SUBSTRING(LPAD(CAST(mesano AS CHAR), 6, '0'), 1, 4) = ${anoFull} AND LOWER(situacao) LIKE '%cancel%'`),
+            .from(febraban).where(sql`empresa = ${emp} AND FLOOR(mesano / 100) = ${anoFull} AND LOWER(situacao) LIKE '%cancel%'`),
         ]);
 
         result.push({
