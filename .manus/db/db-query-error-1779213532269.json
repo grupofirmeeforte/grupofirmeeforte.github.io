@@ -1,8 +1,0 @@
-{
-  "query": "SELECT mesano, proposta, parcLiberada, chaveJ, agente FROM consorcios WHERE proposta = '8515021' ORDER BY parcLiberada;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT mesano, proposta, parcLiberada, chaveJ, agente FROM consorcios WHERE proposta = '8515021' ORDER BY parcLiberada;",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 1: Unknown column 'agente' in 'field list'"
-  ]
-}

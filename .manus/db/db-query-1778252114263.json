@@ -1,9 +1,0 @@
-{
-  "query": "\nCREATE TABLE `febraban` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `empresa` varchar(100),\n  `mesano` int,\n  `proposta` varchar(20) NOT NULL,\n  `linha` int,\n  `situacao` varchar(100),\n  `operador` varchar(50),\n  `solicitacao` varchar(20),\n  `prazo` varchar(20),\n  `troco` decimal(15,2),\n  `financiado` decimal(15,2),\n  `situacao2` varchar(100),\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `febraban_id` PRIMARY KEY(`id`)\n);\nCREATE INDEX `idx_febraban_proposta` ON `febraban` (`proposta`);\nCREATE INDEX `idx_febraban_mesano` ON `febraban` (`mesano`);\nCREATE INDEX `idx_febraban_empresa` ON `febraban` (`empresa`);\nCREATE INDEX `idx_febraban_operador` ON `febraban` (`operador`);\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nCREATE TABLE `febraban` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `empresa` varchar(100),\n  `mesano` int,\n  `proposta` varchar(20) NOT NULL,\n  `linha` int,\n  `situacao` varchar(100),\n  `operador` varchar(50),\n  `solicitacao` varchar(20),\n  `prazo` varchar(20),\n  `troco` decimal(15,2),\n  `financiado` decimal(15,2),\n  `situacao2` varchar(100),\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  `updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `febraban_id` PRIMARY KEY(`id`)\n);\nCREATE INDEX `idx_febraban_proposta` ON `febraban` (`proposta`);\nCREATE INDEX `idx_febraban_mesano` ON `febraban` (`mesano`);\nCREATE INDEX `idx_febraban_empresa` ON `febraban` (`empresa`);\nCREATE INDEX `idx_febraban_operador` ON `febraban` (`operador`);\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1799
-}

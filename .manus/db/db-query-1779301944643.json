@@ -1,9 +1,0 @@
-{
-  "query": "UPDATE calculos\nSET mesRef = CONCAT(LPAD(SUBSTRING(mesRef, 1, LENGTH(mesRef)-2), 2, '0'), '/20', SUBSTRING(mesRef, LENGTH(mesRef)-1))\nWHERE mesRef REGEXP '^[0-9]{3,4}$' AND mesRef NOT LIKE '%/%';",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute UPDATE calculos\nSET mesRef = CONCAT(LPAD(SUBSTRING(mesRef, 1, LENGTH(mesRef)-2), 2, '0'), '/20', SUBSTRING(mesRef, LENGTH(mesRef)-1))\nWHERE mesRef REGEXP '^[0-9]{3,4}$' AND mesRef NOT LIKE '%/%';",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 290
-}

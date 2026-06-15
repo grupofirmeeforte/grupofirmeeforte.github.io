@@ -1,8 +1,0 @@
-{
-  "query": "SELECT DISTINCT cidadeUF FROM agentes WHERE cidadeUF IS NOT NULL AND cidadeUF != '' ORDER BY cidadeUF;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT DISTINCT cidadeUF FROM agentes WHERE cidadeUF IS NOT NULL AND cidadeUF != '' ORDER BY cidadeUF;",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 1: Unknown column 'cidadeuf' in 'where clause'"
-  ]
-}

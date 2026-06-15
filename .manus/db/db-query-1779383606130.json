@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `contasLojas` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `loja` varchar(100) NOT NULL,\n  `tipo` varchar(100) NOT NULL,\n  `mesAno` varchar(7),\n  `valor` varchar(20),\n  `vencimento` varchar(10),\n  `pago` boolean NOT NULL DEFAULT false,\n  `dataPagto` varchar(10),\n  `observacao` text,\n  `arquivoUrl` varchar(500),\n  `arquivoKey` varchar(500),\n  `arquivoNome` varchar(255),\n  `adicionadoPor` varchar(100),\n  `pagoPor` varchar(100),\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute CREATE TABLE IF NOT EXISTS `contasLojas` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `loja` varchar(100) NOT NULL,\n  `tipo` varchar(100) NOT NULL,\n  `mesAno` varchar(7),\n  `valor` varchar(20),\n  `vencimento` varchar(10),\n  `pago` boolean NOT NULL DEFAULT false,\n  `dataPagto` varchar(10),\n  `observacao` text,\n  `arquivoUrl` varchar(500),\n  `arquivoKey` varchar(500),\n  `arquivoNome` varchar(255),\n  `adicionadoPor` varchar(100),\n  `pagoPor` varchar(100),\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 413
-}

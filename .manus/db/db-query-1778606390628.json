@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS pro_rata_encerradas (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  importacaoId VARCHAR(36) NOT NULL,\n  importacaoData TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  nrOperacao VARCHAR(50) NOT NULL,\n  chaveJ VARCHAR(50),\n  agenciaBB VARCHAR(20),\n  empresa VARCHAR(100),\n  valorFinanciado DECIMAL(15,2),\n  comissao DECIMAL(15,4),\n  dataFinal VARCHAR(10),\n  qtdParcelasPagas INT,\n  qtdParcelasTotal INT,\n  vlrPerdido DECIMAL(15,4),\n  motivo VARCHAR(50) DEFAULT 'encerrada',\n  INDEX idx_enc_nrOperacao (nrOperacao),\n  INDEX idx_enc_importacao (importacaoId)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute CREATE TABLE IF NOT EXISTS pro_rata_encerradas (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  importacaoId VARCHAR(36) NOT NULL,\n  importacaoData TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,\n  nrOperacao VARCHAR(50) NOT NULL,\n  chaveJ VARCHAR(50),\n  agenciaBB VARCHAR(20),\n  empresa VARCHAR(100),\n  valorFinanciado DECIMAL(15,2),\n  comissao DECIMAL(15,4),\n  dataFinal VARCHAR(10),\n  qtdParcelasPagas INT,\n  qtdParcelasTotal INT,\n  vlrPerdido DECIMAL(15,4),\n  motivo VARCHAR(50) DEFAULT 'encerrada',\n  INDEX idx_enc_nrOperacao (nrOperacao),\n  INDEX idx_enc_importacao (importacaoId)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 325
-}

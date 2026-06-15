@@ -1,9 +1,0 @@
-{
-  "query": "\nINSERT INTO minutos_sabedoria (numero, titulo, conteudo, ativo) VALUES\n(157, 'Ajude a todos, como desejaria ser ajudado', 'Ajude a todos, como desejaria ser ajudado.\\nSe tem empregados, saiba compreender suas dificuldades, tanto quanto você deseja que eles compreendam as suas.\\nColoque-se no lugar deles, e trate-os como você gostaria de ser tratado se ocupasse a posição deles.\\nSeu empregado é um irmão seu, que está iniciando a sua carreira.\\nAjude-o o mais que puder e não se arrependerá.', 1);\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nINSERT INTO minutos_sabedoria (numero, titulo, conteudo, ativo) VALUES\n(157, 'Ajude a todos, como desejaria ser ajudado', 'Ajude a todos, como desejaria ser ajudado.\\nSe tem empregados, saiba compreender suas dificuldades, tanto quanto você deseja que eles compreendam as suas.\\nColoque-se no lugar deles, e trate-os como você gostaria de ser tratado se ocupasse a posição deles.\\nSeu empregado é um irmão seu, que está iniciando a sua carreira.\\nAjude-o o mais que puder e não se arrependerá.', 1);\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 264
-}
