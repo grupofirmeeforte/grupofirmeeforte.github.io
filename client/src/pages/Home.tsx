@@ -1,7 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles, FolderOpen, Star, Package, Shirt, Zap, LayoutDashboard, Shield, DatabaseBackup, MessageSquare, PhoneOff, RefreshCw } from "lucide-react";
+import { Users, FileCheck, Building2, Briefcase, DollarSign, LogOut, TableProperties, BookUser, ChevronRight, X, Factory, Landmark, ShieldCheck, UserRound, FileText, Mail, ClipboardList, TrendingUp, Phone, CheckSquare, BarChart2, Coins, Stethoscope, ShieldPlus, Gem, BookOpen, BookMarked, Sparkles, FolderOpen, Star, Package, Shirt, Zap, LayoutDashboard, Shield, DatabaseBackup, MessageSquare, PhoneOff, RefreshCw, Upload } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { useLocation } from "wouter";
 import { UsuariosConectados } from "@/components/UsuariosConectados";
@@ -270,6 +270,7 @@ export default function Home() {
         { title: 'Relatórios CRM', description: 'Funil e produtividade', icon: BarChart2, color: 'bg-teal-600', path: '/crm?aba=relatorios', subKey: 'relatorios' },
         { title: 'Mailing / Leads', description: 'Gestão de mailing e leads do banco', icon: Users, color: 'bg-cyan-600', path: '/mailing-crm', subKey: 'mailing-crm' },
         { title: 'Contratos PDF', description: 'Upload e análise de contratos BB Consignado + CRM Refinanciamento', icon: FileText, color: 'bg-emerald-600', path: '/contratos', subKey: 'contratos' },
+        { title: 'Upload Documentos', description: 'Upload de documentos diversos', icon: Upload, color: 'bg-orange-600', path: '/upload', subKey: 'upload' },
         { title: 'Não Perturbe', description: 'Lista de telefones bloqueados para contato', icon: PhoneOff, color: 'bg-red-700', path: '/nao-perturbe', subKey: 'nao-perturbe' },
       ],
     },
