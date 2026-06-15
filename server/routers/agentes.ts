@@ -169,7 +169,51 @@ export const agentesRouter = router({
       if (!db) throw new Error("Database not available");
 
       const result = await db
-        .select()
+        .select({
+          id: agentes.id,
+          numCadastro: agentes.numCadastro,
+          empresa: agentes.empresa,
+          chaveJ: agentes.chaveJ,
+          senha: agentes.senha,
+          nomeAgente: agentes.nomeAgente,
+          dataAdmissao: agentes.dataAdmissao,
+          cargo: agentes.cargo,
+          area: agentes.area,
+          vinculo: agentes.vinculo,
+          situacao: agentes.situacao,
+          nivel: agentes.nivel,
+          nrAgencia: agentes.nrAgencia,
+          cidade: agentes.cidade,
+          uf: agentes.uf,
+          supervisor: agentes.supervisor,
+          email: agentes.email,
+          favorecido: agentes.favorecido,
+          favProprio: agentes.favProprio,
+          banco: agentes.banco,
+          agencia: agentes.agencia,
+          conta: agentes.conta,
+          tipo: agentes.tipo,
+          cpfAgente: agentes.cpfAgente,
+          pix: agentes.pix,
+          dataNascimento: agentes.dataNascimento,
+          celular: agentes.celular,
+          pinAcesso: agentes.pinAcesso,
+          faceToken: agentes.faceToken,
+          faceFacesetToken: agentes.faceFacesetToken,
+          permissoes: agentes.permissoes,
+          permissoesModulos: agentes.permissoesModulos,
+          signo: agentes.signo,
+          cep: agentes.cep,
+          endereco: agentes.endereco,
+          numero: agentes.numero,
+          complemento: agentes.complemento,
+          bairro: agentes.bairro,
+          rg: agentes.rg,
+          estadoCivil: agentes.estadoCivil,
+          nacionalidade: agentes.nacionalidade,
+          createdAt: agentes.createdAt,
+          updatedAt: agentes.updatedAt,
+        })
         .from(agentes)
         .where(eq(agentes.id, input.id))
         .limit(1);
