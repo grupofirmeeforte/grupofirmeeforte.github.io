@@ -10,6 +10,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { gerarFeriadosAno } from "../routers/feriados";
 import { executarBackupAutomatico } from "../routers/backup";
+import uploadRouter from "../routers/upload";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -38,6 +39,7 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
+  app.use("/api/upload", uploadRouter);
 
   // Cron: backup automático semanal (toda segunda-feira às 06:00 BRT)
   app.post("/api/scheduled/backup-semanal", async (req, res) => {

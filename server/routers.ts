@@ -42,6 +42,7 @@ import { arquivoMortoRouter } from "./routers/arquivoMorto";
 import { retornoDocumentosRouter } from "./routers/retornoDocumentos";
 import { agenciasBbRouter } from "./routers/agenciasBb";
 import { reajustesRouter } from "./routers/reajustes";
+import uploadRouter from "./routers/upload";
 import { z } from "zod";
 import { getAgenteByChaveJ, getLoginAttempts, incrementLoginAttempts, resetLoginAttempts, createAuditLog, unlockLoginAttempts, getAllBlockedAttempts, getLoginAttemptsHistory, upsertUser, createSessao, getSessaoByChaveJ, getTodasSessoesAtivas, updateSessaoUltimoAcesso, encerrarSessao, criarMensagem, obterMensagensPrivadas, obterMensagensNaoLidas, marcarMensagensComoLidas, getDb, obterValoresCalculo, atualizarValoresCalculo, calcularPercPago, updateAuditLogSaidaPorChaveJ } from "./db";
 import { users, agentes, despesasFixas, pagamentos } from "../drizzle/schema";
