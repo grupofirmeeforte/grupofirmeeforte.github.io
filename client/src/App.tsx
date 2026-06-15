@@ -54,6 +54,7 @@ import PreviewEstacoes from './pages/PreviewEstacoes';
 import RetornoDocumentosPage from './pages/RetornoDocumentosPage';
 import ReajustePage from './pages/Reajuste';
 import UploadDocumento from "./pages/UploadDocumento";
+import ListaArquivos from "./pages/ListaArquivos";
 
 // import ChangePasswordPage from "./pages/change-password";
 import { useInactivityLogout } from "./hooks/useInactivityLogout";
@@ -169,6 +170,7 @@ function RouterWithInactivity() {
       <Route path={"/mensagem-do-dia/motivacional"} component={MensagemMotivacional} />
       <Route path={"/mensagem-do-dia"} component={MensagemDoDiaHub} />
       <Route path={"/upload"} component={UploadDocumento} />
+      <Route path={"/arquivos"} component={ListaArquivos} />
 
       {/* <Route path={"/change-password"} component={ChangePasswordPage} /> */}
       <Route path={"/404"} component={NotFound} />
