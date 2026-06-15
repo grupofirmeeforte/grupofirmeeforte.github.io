@@ -60,4 +60,33 @@ router.get("/", (req: Request, res: Response) => {
   }
 });
 
+// Rota para deletar arquivo
+router.delete("/:nomeArquivo", (req: Request, res: Response) => {
+  try {
+    const nomeArquivo = req.params.nomeArquivo;
+    const uploadsDir = path.join(process.cwd(), "uploads");
+    const filePath = path.join(uploadsDir, nomeArquivo);
+    
+    // Validar que o arquivo está dentro da pasta uploads (segurança)
+    if (!filePath.startsWith(uploadsDir)) {
+      return res.status(403).json({ erro: "Acesso negado" });
+    }
+    
+    // Verificar se arquivo existe
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ erro: "Arquivo não encontrado" });
+    }
+    
+    // Deletar arquivo
+    fs.unlinkSync(filePath);
+    
+    res.json({
+      msg: "Arquivo deletado com sucesso!",
+      arquivo: nomeArquivo
+    });
+  } catch (error: any) {
+    res.status(500).json({ erro: error.message });
+  }
+});
+
 export default router;

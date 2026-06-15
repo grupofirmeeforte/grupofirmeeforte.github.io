@@ -2,8 +2,17 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { ArrowLeft, Download, Eye, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Download, Eye, Loader2, AlertCircle, Trash2 } from "lucide-react";
 import { useLocation } from "wouter";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Arquivo {
   nome: string;
@@ -18,6 +27,11 @@ export default function ListaArquivos() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [, navigate] = useLocation();
+  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; arquivo: string | null }>({
+    open: false,
+    arquivo: null,
+  });
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     carregarArquivos();
@@ -57,6 +71,26 @@ export default function ListaArquivos() {
   const handleVisualizar = (nomeArquivo: string) => {
     window.open(`/api/upload/view/${nomeArquivo}`, "_blank");
     toast.info("Abrindo arquivo...");
+  };
+
+  const handleExcluir = async (nomeArquivo: string) => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/upload/${encodeURIComponent(nomeArquivo)}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        toast.success("Arquivo deletado com sucesso!");
+        setArquivos(arquivos.filter((a) => a.nome !== nomeArquivo));
+      } else {
+        toast.error("Erro ao deletar arquivo");
+      }
+    } catch (error) {
+      toast.error("Falha na conexão");
+    } finally {
+      setDeleting(false);
+      setDeleteConfirm({ open: false, arquivo: null });
+    }
   };
 
   return (
@@ -180,6 +214,16 @@ export default function ListaArquivos() {
                           >
                             <Download className="w-4 h-4" />
                           </Button>
+                          <Button
+                            onClick={() =>
+                              setDeleteConfirm({ open: true, arquivo: arquivo.nome })
+                            }
+                            size="sm"
+                            variant="destructive"
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -205,6 +249,32 @@ export default function ListaArquivos() {
           )}
         </div>
       </div>
+
+      {/* Modal de Confirmação de Exclusão */}
+      <AlertDialog open={deleteConfirm.open} onOpenChange={(open) => {
+        if (!open) setDeleteConfirm({ open: false, arquivo: null });
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o arquivo "{deleteConfirm.arquivo}"? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-3 justify-end">
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() =>
+                deleteConfirm.arquivo && handleExcluir(deleteConfirm.arquivo)
+              }
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleting ? "Deletando..." : "Deletar"}
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
