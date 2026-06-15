@@ -623,6 +623,9 @@ export const febrabanRouter = {
       const empresas = ["BMF", "FLEX"];
       const result = [];
 
+      // Usar ano 2026 para cálculos de ANO (não o mesano mais recente)
+      const anoParaCalculo = 2026;
+      
       for (const emp of empresas) {
         // Determinar o mesano mais recente desta empresa
         // MESANO formato MMAA (ex: 626=jun/2026, 1225=dez/2025)
@@ -641,7 +644,7 @@ export const febrabanRouter = {
         }
         if (!mesano) continue;
 
-        const anoFull = Math.floor(mesano / 100);
+        const anoFull = anoParaCalculo;
         const mesSuffix = mesano % 100;
 
         const baseWhere = sql`empresa = ${emp} AND mesano = ${mesano}`;
