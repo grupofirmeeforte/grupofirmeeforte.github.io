@@ -160,7 +160,7 @@ export default function Login() {
 
   const loginMutation = trpc.auth.loginCustom.useMutation({
     onSuccess: (data) => {
-      setWelcomeData({ nome: data.agente.nomeAgente || '', isAniversario: data.isAniversario, diasParaAniversario: data.diasParaAniversario ?? 0 });
+      setWelcomeData({ nome: data.agente.nome || '', isAniversario: data.isAniversario, diasParaAniversario: data.diasParaAniversario ?? 0 });
       // Não redirecionar automaticamente no aniversário — o usuário fecha com o botão X
       if (!data.isAniversario) setTimeout(() => setLocation('/'), 3000);
     },
@@ -253,7 +253,7 @@ export default function Login() {
       }
       setRapidoStatus('success');
       setRapidoMessage('Acesso confirmado! Entrando...');
-      setWelcomeData({ nome: data.agente.nomeAgente || '', isAniversario: data.isAniversario, diasParaAniversario: data.diasParaAniversario ?? 0 });
+      setWelcomeData({ nome: data.agente.nome || '', isAniversario: data.isAniversario, diasParaAniversario: data.diasParaAniversario ?? 0 });
       // Não redirecionar automaticamente no aniversário — o usuário fecha com o botão X
       if (!data.isAniversario) setTimeout(() => setLocation('/'), 3000);
     } catch (e: any) {
