@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Trash2, Search, FileText } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, FileText, Zap } from "lucide-react";
 import { toast } from "sonner";
 
 interface DocRow {
@@ -222,7 +222,8 @@ export default function RetornoDocumentos() {
                 <td className="px-1 py-0.5 text-center whitespace-nowrap">{formatDate(row.dataAtualizacao)}</td>
                 <td className="px-1 py-0.5 text-center whitespace-nowrap">
                   <button onClick={() => openEdit(row)} className="text-blue-600 hover:text-blue-800 mr-1" title="Editar"><Pencil className="w-3 h-3 inline" /></button>
-                  <button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-800" title="Excluir"><Trash2 className="w-3 h-3 inline" /></button>
+                  <button onClick={() => handleDelete(row.id)} className="text-red-600 hover:text-red-800 mr-1" title="Excluir"><Trash2 className="w-3 h-3 inline" /></button>
+                  <button className="text-orange-500 hover:text-orange-700 font-bold" title="Zebrado" disabled><Zap className="w-4 h-4 inline" style={{filter: 'drop-shadow(0 0 2px rgba(255,140,0,0.8))'}} /></button>
                 </td>
               </tr>
             ))}
