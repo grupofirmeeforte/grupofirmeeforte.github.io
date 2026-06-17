@@ -1,6 +1,6 @@
 import { eq, and, lt, desc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao, mensagens, InsertMensagem, Mensagem, valoresCalculo, ValoresCalculo, consignados, tabelasComissao } from "../drizzle/schema";
+import { InsertUser, users, agentes, loginAttempts, auditoria, sessoes, InsertSessao, mensagens, InsertMensagem, Mensagem, valoresCalculo, type ValoresCalculo, consignados, tabelasComissao } from "../../drizzle/schema";
 import { ENV } from "./env";
 import { or } from "drizzle-orm";
 
