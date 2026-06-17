@@ -1,1 +1,0 @@
-ALTER TABLE `consignados` DROP COLUMN `srcc`;
