@@ -1,9 +1,0 @@
-{
-  "query": "\n-- 1. Corrigir comissão: dividir por 100 onde valor > 10 (estava multiplicado por 100)\nUPDATE pro_rata SET comissao = comissao / 100 WHERE comissao > 10;\n\n-- 2. Recalcular VLR = comissao * qtdFaltaReceber para todos os registros\nUPDATE pro_rata SET vlr = comissao * qtdFaltaReceber WHERE qtdFaltaReceber IS NOT NULL AND comissao IS NOT NULL;\n\n-- 3. Converter data serial do Excel para formato DD/MM/AAAA\n-- Serial do Excel: dias desde 30/12/1899. Converter para DATE e formatar.\nUPDATE pro_rata \nSET dataFinal = DATE_FORMAT(DATE_ADD('1899-12-30', INTERVAL CAST(dataFinal AS UNSIGNED) DAY), '%d/%m/%Y')\nWHERE dataFinal REGEXP '^[0-9]{4,5}$';\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \n-- 1. Corrigir comissão: dividir por 100 onde valor > 10 (estava multiplicado por 100)\nUPDATE pro_rata SET comissao = comissao / 100 WHERE comissao > 10;\n\n-- 2. Recalcular VLR = comissao * qtdFaltaReceber para todos os registros\nUPDATE pro_rata SET vlr = comissao * qtdFaltaReceber WHERE qtdFaltaReceber IS NOT NULL AND comissao IS NOT NULL;\n\n-- 3. Converter data serial do Excel para formato DD/MM/AAAA\n-- Serial do Excel: dias desde 30/12/1899. Converter para DATE e formatar.\nUPDATE pro_rata \nSET dataFinal = DATE_FORMAT(DATE_ADD('1899-12-30', INTERVAL CAST(dataFinal AS UNSIGNED) DAY), '%d/%m/%Y')\nWHERE dataFinal REGEXP '^[0-9]{4,5}$';\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1192
-}

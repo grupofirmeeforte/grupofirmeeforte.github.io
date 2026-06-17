@@ -1,9 +1,0 @@
-{
-  "query": "\nINSERT INTO minutos_sabedoria (numero, titulo, conteudo, ativo, fonte) VALUES\n(100, NULL, 'Não diga que não pode trabalhar em benefício dos outros.\\nQuantos mudos dariam uma fortuna para poderem falar como você!\\nQuantos paralíticos suspiram pelos passos que você pode dar!\\nQuantos milionários lhe entregariam suas riquezas, para terem um décimo da fé que você tem!\\nNão diga que não pode trabalhar!\\nDistribua os bens que Deus lhe concedeu, em gestos de bondade e palavras de carinho.', 1, 'Minutos de Sabedoria — C. Torres Pastorino');\n\nUPDATE documentosAgentes SET arquivoKey = 'docs-agentes/J9624265/1779394548010-Imagem_c50dd3ce.png' WHERE id = 1;\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nINSERT INTO minutos_sabedoria (numero, titulo, conteudo, ativo, fonte) VALUES\n(100, NULL, 'Não diga que não pode trabalhar em benefício dos outros.\\nQuantos mudos dariam uma fortuna para poderem falar como você!\\nQuantos paralíticos suspiram pelos passos que você pode dar!\\nQuantos milionários lhe entregariam suas riquezas, para terem um décimo da fé que você tem!\\nNão diga que não pode trabalhar!\\nDistribua os bens que Deus lhe concedeu, em gestos de bondade e palavras de carinho.', 1, 'Minutos de Sabedoria — C. Torres Pastorino');\n\nUPDATE documentosAgentes SET arquivoKey = 'docs-agentes/J9624265/1779394548010-Imagem_c50dd3ce.png' WHERE id = 1;\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 270
-}

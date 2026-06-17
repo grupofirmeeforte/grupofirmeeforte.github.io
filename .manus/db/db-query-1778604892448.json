@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `pro_rata` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `agenciaBB` varchar(20),\n  `nrOperacao` varchar(50) NOT NULL,\n  `chaveJ` varchar(50),\n  `valorFinanciado` decimal(15,2),\n  `comissao` decimal(15,4),\n  `dataFinal` varchar(10),\n  `qtdParcelasPagas` int,\n  `qtdParcelasTotal` int,\n  `codOps` varchar(20),\n  `codEst` varchar(20),\n  `qtdFaltaReceber` int,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`),\n  INDEX `idx_pro_rata_nrOperacao` (`nrOperacao`),\n  INDEX `idx_pro_rata_chaveJ` (`chaveJ`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute CREATE TABLE IF NOT EXISTS `pro_rata` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `agenciaBB` varchar(20),\n  `nrOperacao` varchar(50) NOT NULL,\n  `chaveJ` varchar(50),\n  `valorFinanciado` decimal(15,2),\n  `comissao` decimal(15,4),\n  `dataFinal` varchar(10),\n  `qtdParcelasPagas` int,\n  `qtdParcelasTotal` int,\n  `codOps` varchar(20),\n  `codEst` varchar(20),\n  `qtdFaltaReceber` int,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`),\n  INDEX `idx_pro_rata_nrOperacao` (`nrOperacao`),\n  INDEX `idx_pro_rata_chaveJ` (`chaveJ`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 431
-}

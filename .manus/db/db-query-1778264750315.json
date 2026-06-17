@@ -1,9 +1,0 @@
-{
-  "query": "\nALTER TABLE pagamentos\n  ADD COLUMN tipoPagto VARCHAR(100),\n  ADD COLUMN cidadeUF VARCHAR(150),\n  ADD COLUMN chaveJ VARCHAR(50),\n  ADD COLUMN cadastro VARCHAR(50),\n  ADD COLUMN nomeFavorecido VARCHAR(255),\n  ADD COLUMN banco VARCHAR(100),\n  ADD COLUMN agencia VARCHAR(50),\n  ADD COLUMN conta VARCHAR(50),\n  ADD COLUMN cpfCnpj VARCHAR(18),\n  ADD COLUMN tipoConta VARCHAR(50),\n  ADD COLUMN pix VARCHAR(255),\n  ADD COLUMN valor DECIMAL(15,2),\n  ADD COLUMN pago BOOLEAN NOT NULL DEFAULT FALSE,\n  ADD COLUMN dataPagto VARCHAR(10),\n  ADD COLUMN dataVencer VARCHAR(10),\n  ADD COLUMN origem VARCHAR(50) DEFAULT 'manual',\n  ADD COLUMN observacao TEXT;\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nALTER TABLE pagamentos\n  ADD COLUMN tipoPagto VARCHAR(100),\n  ADD COLUMN cidadeUF VARCHAR(150),\n  ADD COLUMN chaveJ VARCHAR(50),\n  ADD COLUMN cadastro VARCHAR(50),\n  ADD COLUMN nomeFavorecido VARCHAR(255),\n  ADD COLUMN banco VARCHAR(100),\n  ADD COLUMN agencia VARCHAR(50),\n  ADD COLUMN conta VARCHAR(50),\n  ADD COLUMN cpfCnpj VARCHAR(18),\n  ADD COLUMN tipoConta VARCHAR(50),\n  ADD COLUMN pix VARCHAR(255),\n  ADD COLUMN valor DECIMAL(15,2),\n  ADD COLUMN pago BOOLEAN NOT NULL DEFAULT FALSE,\n  ADD COLUMN dataPagto VARCHAR(10),\n  ADD COLUMN dataVencer VARCHAR(10),\n  ADD COLUMN origem VARCHAR(50) DEFAULT 'manual',\n  ADD COLUMN observacao TEXT;\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 2201
-}

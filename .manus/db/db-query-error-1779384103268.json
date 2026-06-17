@@ -1,8 +1,0 @@
-{
-  "query": "\nSELECT 'febraban' as tabela, COUNT(*) as total FROM febraban WHERE empresa LIKE '%Test%' OR chaveJ LIKE '%KEY177%' OR nomeAgente LIKE '%Unique Agent%'\nUNION ALL\nSELECT 'certificacoes' as tabela, COUNT(*) as total FROM certificacoes WHERE empresa LIKE '%Test%' OR chaveJ LIKE '%KEY177%' OR nomeAgente LIKE '%Unique Agent%'\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nSELECT 'febraban' as tabela, COUNT(*) as total FROM febraban WHERE empresa LIKE '%Test%' OR chaveJ LIKE '%KEY177%' OR nomeAgente LIKE '%Unique Agent%'\nUNION ALL\nSELECT 'certificacoes' as tabela, COUNT(*) as total FROM certificacoes WHERE empresa LIKE '%Test%' OR chaveJ LIKE '%KEY177%' OR nomeAgente LIKE '%Unique Agent%'\n",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1054 (42S22) at line 2: Unknown column 'chavej' in 'where clause'"
-  ]
-}

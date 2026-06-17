@@ -1,9 +1,0 @@
-{
-  "query": "ALTER TABLE `febraban` ADD `financNovo` decimal(15,2);\nALTER TABLE `febraban` ADD `trocoRefin` decimal(15,2);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute ALTER TABLE `febraban` ADD `financNovo` decimal(15,2);\nALTER TABLE `febraban` ADD `trocoRefin` decimal(15,2);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 1273
-}

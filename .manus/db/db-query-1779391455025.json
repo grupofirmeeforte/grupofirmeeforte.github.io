@@ -1,9 +1,0 @@
-{
-  "query": "\nCREATE TABLE IF NOT EXISTS `documentosAgentes` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `chaveJ` varchar(50) NOT NULL,\n  `nomeAgente` varchar(255) DEFAULT NULL,\n  `empresa` varchar(100) DEFAULT NULL,\n  `tipoDocumento` varchar(100) NOT NULL,\n  `descricao` varchar(255) DEFAULT NULL,\n  `arquivoUrl` varchar(500) DEFAULT NULL,\n  `arquivoKey` varchar(500) DEFAULT NULL,\n  `arquivoNome` varchar(255) DEFAULT NULL,\n  `arquivoTipo` varchar(100) DEFAULT NULL,\n  `tamanho` int DEFAULT NULL,\n  `adicionadoPor` varchar(100) DEFAULT NULL,\n  `observacao` text DEFAULT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`),\n  KEY `idx_docagentes_chavej` (`chaveJ`)\n);\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nCREATE TABLE IF NOT EXISTS `documentosAgentes` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `chaveJ` varchar(50) NOT NULL,\n  `nomeAgente` varchar(255) DEFAULT NULL,\n  `empresa` varchar(100) DEFAULT NULL,\n  `tipoDocumento` varchar(100) NOT NULL,\n  `descricao` varchar(255) DEFAULT NULL,\n  `arquivoUrl` varchar(500) DEFAULT NULL,\n  `arquivoKey` varchar(500) DEFAULT NULL,\n  `arquivoNome` varchar(255) DEFAULT NULL,\n  `arquivoTipo` varchar(100) DEFAULT NULL,\n  `tamanho` int DEFAULT NULL,\n  `adicionadoPor` varchar(100) DEFAULT NULL,\n  `observacao` text DEFAULT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`),\n  KEY `idx_docagentes_chavej` (`chaveJ`)\n);\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 511
-}

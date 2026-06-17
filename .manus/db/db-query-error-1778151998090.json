@@ -1,8 +1,0 @@
-{
-  "query": "ALTER TABLE `consignados` ADD `mesAno` varchar(10);\nALTER TABLE `consignados` ADD `percPago` decimal(10,4);\nALTER TABLE `consignados` ADD `totalComissao` decimal(15,2);\nALTER TABLE `consignados` ADD `difEmpresa` decimal(15,2);\nALTER TABLE `consignados` ADD `tabela` varchar(100);\nALTER TABLE `consignados` ADD `supervisor` varchar(255);\nALTER TABLE `consignados` ADD `parcelas` int;\nALTER TABLE `consignados` ADD `percentual` decimal(10,4);\nALTER TABLE `consignados` ADD `comissao` decimal(15,2);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute ALTER TABLE `consignados` ADD `mesAno` varchar(10);\nALTER TABLE `consignados` ADD `percPago` decimal(10,4);\nALTER TABLE `consignados` ADD `totalComissao` decimal(15,2);\nALTER TABLE `consignados` ADD `difEmpresa` decimal(15,2);\nALTER TABLE `consignados` ADD `tabela` varchar(100);\nALTER TABLE `consignados` ADD `supervisor` varchar(255);\nALTER TABLE `consignados` ADD `parcelas` int;\nALTER TABLE `consignados` ADD `percentual` decimal(10,4);\nALTER TABLE `consignados` ADD `comissao` decimal(15,2);",
-  "returncode": 1,
-  "logs": [
-    "ERROR 1060 (42S21) at line 1: Duplicate column name 'mesAno'"
-  ]
-}

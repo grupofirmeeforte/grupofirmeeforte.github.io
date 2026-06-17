@@ -1,9 +1,0 @@
-{
-  "query": "UPDATE contasCorrentes SET mesAno = '10/2025' WHERE mesAno = '459/2031';\nUPDATE contasCorrentes SET mesAno = '11/2025' WHERE mesAno = '459/2062';\nUPDATE contasCorrentes SET mesAno = '12/2025' WHERE mesAno = '459/2092';\nUPDATE contasCorrentes SET mesAno = '01/2026' WHERE mesAno = '460/2023';\nUPDATE contasCorrentes SET mesAno = '02/2026' WHERE mesAno = '460/2054';\nUPDATE contasCorrentes SET mesAno = '03/2026' WHERE mesAno = '460/2082';\nUPDATE contasCorrentes SET mesAno = '04/2026' WHERE mesAno = '461/2013';",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute UPDATE contasCorrentes SET mesAno = '10/2025' WHERE mesAno = '459/2031';\nUPDATE contasCorrentes SET mesAno = '11/2025' WHERE mesAno = '459/2062';\nUPDATE contasCorrentes SET mesAno = '12/2025' WHERE mesAno = '459/2092';\nUPDATE contasCorrentes SET mesAno = '01/2026' WHERE mesAno = '460/2023';\nUPDATE contasCorrentes SET mesAno = '02/2026' WHERE mesAno = '460/2054';\nUPDATE contasCorrentes SET mesAno = '03/2026' WHERE mesAno = '460/2082';\nUPDATE contasCorrentes SET mesAno = '04/2026' WHERE mesAno = '461/2013';",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 350
-}

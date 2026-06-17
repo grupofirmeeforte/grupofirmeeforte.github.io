@@ -1,9 +1,0 @@
-{
-  "query": "\nALTER TABLE crm_mailing_listas ADD COLUMN IF NOT EXISTS bloqueada TINYINT(1) DEFAULT 0;\nALTER TABLE crm_mailing_contatos ADD COLUMN IF NOT EXISTS naoPerturbe TINYINT(1) DEFAULT 0;\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nALTER TABLE crm_mailing_listas ADD COLUMN IF NOT EXISTS bloqueada TINYINT(1) DEFAULT 0;\nALTER TABLE crm_mailing_contatos ADD COLUMN IF NOT EXISTS naoPerturbe TINYINT(1) DEFAULT 0;\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 741
-}

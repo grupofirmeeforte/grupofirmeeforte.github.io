@@ -1,9 +1,0 @@
-{
-  "query": "CREATE TABLE IF NOT EXISTS `despesasFixas` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `mesAno` varchar(20),\n  `tipoPagto` varchar(100),\n  `cidadeUF` varchar(150),\n  `empresa` varchar(100),\n  `chaveResp` varchar(50),\n  `nome` varchar(255),\n  `banco` varchar(100),\n  `agencia` varchar(20),\n  `conta` varchar(30),\n  `cpfCnpj` varchar(20),\n  `tipoConta` varchar(50),\n  `pix` varchar(255),\n  `valor` decimal(15,2),\n  `pago` boolean DEFAULT false,\n  `dataPagto` varchar(20),\n  `dataVencer` varchar(20),\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`)\n);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute CREATE TABLE IF NOT EXISTS `despesasFixas` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `mesAno` varchar(20),\n  `tipoPagto` varchar(100),\n  `cidadeUF` varchar(150),\n  `empresa` varchar(100),\n  `chaveResp` varchar(50),\n  `nome` varchar(255),\n  `banco` varchar(100),\n  `agencia` varchar(20),\n  `conta` varchar(30),\n  `cpfCnpj` varchar(20),\n  `tipoConta` varchar(50),\n  `pix` varchar(255),\n  `valor` decimal(15,2),\n  `pago` boolean DEFAULT false,\n  `dataPagto` varchar(20),\n  `dataVencer` varchar(20),\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`)\n);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 344
-}

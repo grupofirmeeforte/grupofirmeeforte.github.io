@@ -1,9 +1,0 @@
-{
-  "query": "\n-- Converter formato MMAA (3 dígitos: 1 mês + 2 ano) para MM/AAAA\n-- Ex: \"126\" -> \"01/2026\", \"226\" -> \"02/2026\", \"526\" -> \"05/2026\"\nUPDATE consignados\nSET mes = CONCAT(LPAD(SUBSTRING(mes, 1, LENGTH(mes)-2), 2, '0'), '/20', SUBSTRING(mes, LENGTH(mes)-1))\nWHERE mes REGEXP '^[0-9]{3,4}$' AND mes NOT LIKE '%/%';\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \n-- Converter formato MMAA (3 dígitos: 1 mês + 2 ano) para MM/AAAA\n-- Ex: \"126\" -> \"01/2026\", \"226\" -> \"02/2026\", \"526\" -> \"05/2026\"\nUPDATE consignados\nSET mes = CONCAT(LPAD(SUBSTRING(mes, 1, LENGTH(mes)-2), 2, '0'), '/20', SUBSTRING(mes, LENGTH(mes)-1))\nWHERE mes REGEXP '^[0-9]{3,4}$' AND mes NOT LIKE '%/%';\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 362
-}

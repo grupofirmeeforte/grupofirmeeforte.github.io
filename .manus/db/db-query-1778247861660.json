@@ -1,9 +1,0 @@
-{
-  "query": "\nINSERT INTO certificacoes (empresa, chaveJ, nomeAgente, situacao, dataCertif, ventoCertif, nrCertificadoConsig, dataCertif2, ventoCertif3, nrCertificadoPldft, createdAt, updatedAt)\nSELECT \n  a.empresa,\n  a.chaveJ,\n  a.nomeAgente,\n  a.situacao,\n  NULL, NULL, NULL, NULL, NULL, NULL,\n  NOW(), NOW()\nFROM agentes a\nWHERE NOT EXISTS (\n  SELECT 1 FROM certificacoes c WHERE UPPER(TRIM(c.chaveJ)) = UPPER(TRIM(a.chaveJ))\n)\nAND a.chaveJ IS NOT NULL\nAND a.chaveJ != '';\n",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nINSERT INTO certificacoes (empresa, chaveJ, nomeAgente, situacao, dataCertif, ventoCertif, nrCertificadoConsig, dataCertif2, ventoCertif3, nrCertificadoPldft, createdAt, updatedAt)\nSELECT \n  a.empresa,\n  a.chaveJ,\n  a.nomeAgente,\n  a.situacao,\n  NULL, NULL, NULL, NULL, NULL, NULL,\n  NOW(), NOW()\nFROM agentes a\nWHERE NOT EXISTS (\n  SELECT 1 FROM certificacoes c WHERE UPPER(TRIM(c.chaveJ)) = UPPER(TRIM(a.chaveJ))\n)\nAND a.chaveJ IS NOT NULL\nAND a.chaveJ != '';\n",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 292
-}
