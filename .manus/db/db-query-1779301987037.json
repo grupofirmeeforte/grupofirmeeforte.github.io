@@ -1,0 +1,52 @@
+{
+  "query": "\nSELECT \n  s.id, s.chaveJ, s.nome,\n  s.pctConsig, s.pctConsorcio, s.pctCc, s.pctOurocap, s.pctSeguro, s.pctDental,\n  COALESCE(SUM(c.rbmCreditoC2), 0) as rbmConsig,\n  COALESCE(SUM(c.rbmConsorcioC2), 0) as rbmConsorcio,\n  COALESCE(SUM(c.rbmContaCorrente), 0) as rbmCc,\n  COALESCE(SUM(c.rbmOurocap), 0) as rbmOurocap,\n  COALESCE(SUM(c.rbmSeguros), 0) as rbmSeguros,\n  ROUND(COALESCE(SUM(c.rbmCreditoC2), 0) * s.pctConsig / 100, 2) as comissaoConsig,\n  ROUND(COALESCE(SUM(c.rbmConsorcioC2), 0) * s.pctConsorcio / 100, 2) as comissaoConsorcio,\n  ROUND(COALESCE(SUM(c.rbmContaCorrente), 0) * s.pctCc / 100, 2) as comissaoCc,\n  ROUND(COALESCE(SUM(c.rbmOurocap), 0) * s.pctOurocap / 100, 2) as comissaoOurocap,\n  ROUND(COALESCE(SUM(c.rbmSeguros), 0) * s.pctSeguro / 100, 2) as comissaoSeguros\nFROM supervisores s\nLEFT JOIN agentes a ON UPPER(s.nome) LIKE CONCAT('%', UPPER(a.supervisor), '%')\nLEFT JOIN calculos c ON c.chaveJ = a.chaveJ AND c.mesRef = '04/2026'\nGROUP BY s.id, s.chaveJ, s.nome, s.pctConsig, s.pctConsorcio, s.pctCc, s.pctOurocap, s.pctSeguro, s.pctDental;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nSELECT \n  s.id, s.chaveJ, s.nome,\n  s.pctConsig, s.pctConsorcio, s.pctCc, s.pctOurocap, s.pctSeguro, s.pctDental,\n  COALESCE(SUM(c.rbmCreditoC2), 0) as rbmConsig,\n  COALESCE(SUM(c.rbmConsorcioC2), 0) as rbmConsorcio,\n  COALESCE(SUM(c.rbmContaCorrente), 0) as rbmCc,\n  COALESCE(SUM(c.rbmOurocap), 0) as rbmOurocap,\n  COALESCE(SUM(c.rbmSeguros), 0) as rbmSeguros,\n  ROUND(COALESCE(SUM(c.rbmCreditoC2), 0) * s.pctConsig / 100, 2) as comissaoConsig,\n  ROUND(COALESCE(SUM(c.rbmConsorcioC2), 0) * s.pctConsorcio / 100, 2) as comissaoConsorcio,\n  ROUND(COALESCE(SUM(c.rbmContaCorrente), 0) * s.pctCc / 100, 2) as comissaoCc,\n  ROUND(COALESCE(SUM(c.rbmOurocap), 0) * s.pctOurocap / 100, 2) as comissaoOurocap,\n  ROUND(COALESCE(SUM(c.rbmSeguros), 0) * s.pctSeguro / 100, 2) as comissaoSeguros\nFROM supervisores s\nLEFT JOIN agentes a ON UPPER(s.nome) LIKE CONCAT('%', UPPER(a.supervisor), '%')\nLEFT JOIN calculos c ON c.chaveJ = a.chaveJ AND c.mesRef = '04/2026'\nGROUP BY s.id, s.chaveJ, s.nome, s.pctConsig, s.pctConsorcio, s.pctCc, s.pctOurocap, s.pctSeguro, s.pctDental;\n",
+  "rows": [
+    {
+      "id": "30001",
+      "chaveJ": "J1234567",
+      "nome": "LUANA ANDRADE FARIAS",
+      "pctConsig": "4.00",
+      "pctConsorcio": "1.00",
+      "pctCc": "0.50",
+      "pctOurocap": "0.50",
+      "pctSeguro": "0.50",
+      "pctDental": "0.50",
+      "rbmConsig": "94397.54",
+      "rbmConsorcio": "3380.46",
+      "rbmCc": "187.50",
+      "rbmOurocap": "0.00",
+      "rbmSeguros": "0",
+      "comissaoConsig": "3775.90",
+      "comissaoConsorcio": "33.80",
+      "comissaoCc": "0.94",
+      "comissaoOurocap": "0.00",
+      "comissaoSeguros": "0.00"
+    },
+    {
+      "id": "1",
+      "chaveJ": "J1234567",
+      "nome": "Luana Andrade Farias",
+      "pctConsig": "4.00",
+      "pctConsorcio": "1.00",
+      "pctCc": "1.00",
+      "pctOurocap": "0.50",
+      "pctSeguro": "0.60",
+      "pctDental": "0.50",
+      "rbmConsig": "94397.54",
+      "rbmConsorcio": "3380.46",
+      "rbmCc": "187.50",
+      "rbmOurocap": "0.00",
+      "rbmSeguros": "0",
+      "comissaoConsig": "3775.90",
+      "comissaoConsorcio": "33.80",
+      "comissaoCc": "1.88",
+      "comissaoOurocap": "0.00",
+      "comissaoSeguros": "0.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tchaveJ\tnome\tpctConsig\tpctConsorcio\tpctCc\tpctOurocap\tpctSeguro\tpctDental\trbmConsig\trbmConsorcio\trbmCc\trbmOurocap\trbmSeguros\tcomissaoConsig\tcomissaoConsorcio\tcomissaoCc\tcomissaoOurocap\tcomissaoSeguros\n30001\tJ1234567\tLUANA ANDRADE FARIAS\t4.00\t1.00\t0.50\t0.50\t0.50\t0.50\t94397.54\t3380.46\t187.50\t0.00\t0\t3775.90\t33.80\t0.94\t0.00\t0.00\n1\tJ1234567\tLuana Andrade Farias\t4.00\t1.00\t1.00\t0.50\t0.60\t0.50\t94397.54\t3380.46\t187.50\t0.00\t0\t3775.90\t33.80\t1.88\t0.00\t0.00\n",
+  "stderr": "",
+  "execution_time_ms": 273
+}

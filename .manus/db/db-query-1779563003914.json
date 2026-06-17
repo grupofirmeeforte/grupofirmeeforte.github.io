@@ -1,0 +1,18 @@
+{
+  "query": "SHOW COLUMNS FROM agentes LIKE '%chave%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SHOW COLUMNS FROM agentes LIKE '%chave%';",
+  "rows": [
+    {
+      "Field": "chaveJ",
+      "Type": "varchar(50)",
+      "Null": "YES",
+      "Key": "UNI",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nchaveJ\tvarchar(50)\tYES\tUNI\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 260
+}

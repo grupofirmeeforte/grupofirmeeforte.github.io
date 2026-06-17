@@ -1,0 +1,19 @@
+{
+  "query": "SELECT COUNT(*) as total FROM minutos_sabedoria WHERE numero <= 200;\nSELECT MIN(numero) as minimo, MAX(numero) as maximo FROM minutos_sabedoria;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COUNT(*) as total FROM minutos_sabedoria WHERE numero <= 200;\nSELECT MIN(numero) as minimo, MAX(numero) as maximo FROM minutos_sabedoria;",
+  "rows": [
+    {
+      "total": "200"
+    },
+    {
+      "total": "minimo\tmaximo"
+    },
+    {
+      "total": "1\t288"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n200\nminimo\tmaximo\n1\t288\n",
+  "stderr": "",
+  "execution_time_ms": 264
+}

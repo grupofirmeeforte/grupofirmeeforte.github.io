@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(*) as total, SUM(troco) as total_troco FROM febraban WHERE operador LIKE '%JH299827%' AND mesano = 526 AND situacao = 'Contratada';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COUNT(*) as total, SUM(troco) as total_troco FROM febraban WHERE operador LIKE '%JH299827%' AND mesano = 526 AND situacao = 'Contratada';",
+  "rows": [
+    {
+      "total": "5",
+      "total_troco": "15120.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\ttotal_troco\n5\t15120.00\n",
+  "stderr": "",
+  "execution_time_ms": 278
+}

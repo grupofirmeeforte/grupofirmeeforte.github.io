@@ -1,0 +1,36 @@
+{
+  "query": "SELECT mes, empresa, chaveJ, nomeAgente, convenio, descricaoProduto, parcela, juros, valorBruto, rbm, percPago FROM consignados WHERE mes = '05/2026' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT mes, empresa, chaveJ, nomeAgente, convenio, descricaoProduto, parcela, juros, valorBruto, rbm, percPago FROM consignados WHERE mes = '05/2026' LIMIT 5;",
+  "rows": [
+    {
+      "mes": "05/2026",
+      "empresa": "FLEX",
+      "chaveJ": "JI798214",
+      "nomeAgente": "ANA CLARA PIRES",
+      "convenio": "NULL",
+      "descricaoProduto": "CONVENIOS BANCO DO BRASIL",
+      "parcela": "72",
+      "juros": "2.4000",
+      "valorBruto": "15000.00",
+      "rbm": "900.00",
+      "percPago": "NULL"
+    },
+    {
+      "mes": "05/2026",
+      "empresa": "FLEX",
+      "chaveJ": "JI798214",
+      "nomeAgente": "ANA CLARA PIRES",
+      "convenio": "NULL",
+      "descricaoProduto": "CONVENIOS BANCO DO BRASIL",
+      "parcela": "60",
+      "juros": "2.4000",
+      "valorBruto": "8000.00",
+      "rbm": "480.00",
+      "percPago": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "mes\tempresa\tchaveJ\tnomeAgente\tconvenio\tdescricaoProduto\tparcela\tjuros\tvalorBruto\trbm\tpercPago\n05/2026\tFLEX\tJI798214\tANA CLARA PIRES\tNULL\tCONVENIOS BANCO DO BRASIL\t72\t2.4000\t15000.00\t900.00\tNULL\n05/2026\tFLEX\tJI798214\tANA CLARA PIRES\tNULL\tCONVENIOS BANCO DO BRASIL\t60\t2.4000\t8000.00\t480.00\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 271
+}

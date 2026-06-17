@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, nomeAgente, chaveJ, email FROM agentes WHERE nomeAgente LIKE '%ULTRAMARE%' OR chaveJ LIKE '%ULTRAMARE%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT id, nomeAgente, chaveJ, email FROM agentes WHERE nomeAgente LIKE '%ULTRAMARE%' OR chaveJ LIKE '%ULTRAMARE%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "30001",
+      "nomeAgente": "THIAGO VIANA ULTRAMARE",
+      "chaveJ": "J9624265",
+      "email": "NULL"
+    },
+    {
+      "id": "60001",
+      "nomeAgente": "THIAGO VIANA ULTRAMARE",
+      "chaveJ": "JG701582",
+      "email": "NULL"
+    },
+    {
+      "id": "90001",
+      "nomeAgente": "THALES VIANA ULTRAMARE",
+      "chaveJ": "JJ124183",
+      "email": "thales.ultra@brasilmaiscredito.com.br"
+    },
+    {
+      "id": "90002",
+      "nomeAgente": "SIDNEI HONORATO ULTRAMARE",
+      "chaveJ": "J1234568",
+      "email": "ultramare@gmail.com"
+    },
+    {
+      "id": "90003",
+      "nomeAgente": "SIDNEI HONORATO ULTRAMARE",
+      "chaveJ": "J1234569",
+      "email": "ultramare@gmail.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnomeAgente\tchaveJ\temail\n30001\tTHIAGO VIANA ULTRAMARE\tJ9624265\tNULL\n60001\tTHIAGO VIANA ULTRAMARE\tJG701582\tNULL\n90001\tTHALES VIANA ULTRAMARE\tJJ124183\tthales.ultra@brasilmaiscredito.com.br\n90002\tSIDNEI HONORATO ULTRAMARE\tJ1234568\tultramare@gmail.com\n90003\tSIDNEI HONORATO ULTRAMARE\tJ1234569\tultramare@gmail.com\n",
+  "stderr": "",
+  "execution_time_ms": 313
+}

@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, empresa, chaveJ, nomeAgente, nrOperacao FROM consignados WHERE empresa IS NULL OR empresa = '' OR empresa = '-' OR empresa = 'empresa' OR empresa = '0' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT id, empresa, chaveJ, nomeAgente, nrOperacao FROM consignados WHERE empresa IS NULL OR empresa = '' OR empresa = '-' OR empresa = 'empresa' OR empresa = '0' LIMIT 10;",
+  "rows": [
+    {
+      "id": "246229",
+      "empresa": "NULL",
+      "chaveJ": "J9660864",
+      "nomeAgente": "Edileia Alcantara de Oliviera Santos",
+      "nrOperacao": "201827866"
+    },
+    {
+      "id": "246544",
+      "empresa": "0",
+      "chaveJ": "1007",
+      "nomeAgente": "Ana Beatriz Silva Xavier dos Santos",
+      "nrOperacao": "202479254"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tempresa\tchaveJ\tnomeAgente\tnrOperacao\n246229\tNULL\tJ9660864\tEdileia Alcantara de Oliviera Santos\t201827866\n246544\t0\t1007\tAna Beatriz Silva Xavier dos Santos\t202479254\n",
+  "stderr": "",
+  "execution_time_ms": 267
+}

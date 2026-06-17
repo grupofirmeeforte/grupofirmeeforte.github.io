@@ -1,0 +1,16 @@
+{
+  "query": "SELECT a.chaveJ, a.nomeAgente, a.empresa, a.situacao FROM agentes a LEFT JOIN certificacoes c ON a.chaveJ = c.chaveJ WHERE c.chaveJ IS NULL AND a.chaveJ IS NOT NULL AND a.chaveJ != '' ORDER BY a.id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT a.chaveJ, a.nomeAgente, a.empresa, a.situacao FROM agentes a LEFT JOIN certificacoes c ON a.chaveJ = c.chaveJ WHERE c.chaveJ IS NULL AND a.chaveJ IS NOT NULL AND a.chaveJ != '' ORDER BY a.id DESC LIMIT 10;",
+  "rows": [
+    {
+      "chaveJ": "J1234567B",
+      "nomeAgente": "LUANA ANDRADE FARIAS",
+      "empresa": "NULL",
+      "situacao": "Ativo"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\tnomeAgente\tempresa\tsituacao\nJ1234567B\tLUANA ANDRADE FARIAS\tNULL\tAtivo\n",
+  "stderr": "",
+  "execution_time_ms": 265
+}

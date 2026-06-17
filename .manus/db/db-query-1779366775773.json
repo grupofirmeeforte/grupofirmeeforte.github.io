@@ -1,0 +1,25 @@
+{
+  "query": "SELECT juros FROM consignados WHERE juros IS NOT NULL LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT juros FROM consignados WHERE juros IS NOT NULL LIMIT 5;",
+  "rows": [
+    {
+      "juros": "1.8500"
+    },
+    {
+      "juros": "2.2700"
+    },
+    {
+      "juros": "2.2200"
+    },
+    {
+      "juros": "4.1100"
+    },
+    {
+      "juros": "6.9000"
+    }
+  ],
+  "messages": [],
+  "stdout": "juros\n1.8500\n2.2700\n2.2200\n4.1100\n6.9000\n",
+  "stderr": "",
+  "execution_time_ms": 261
+}

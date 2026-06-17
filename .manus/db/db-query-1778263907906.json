@@ -1,0 +1,15 @@
+{
+  "query": "\nSELECT \n  COUNT(*) as total_registros,\n  COUNT(DISTINCT nrOperacao) as numeros_unicos,\n  COUNT(*) - COUNT(DISTINCT nrOperacao) as total_duplicatas\nFROM consignados\nWHERE nrOperacao IS NOT NULL AND nrOperacao != '';\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nSELECT \n  COUNT(*) as total_registros,\n  COUNT(DISTINCT nrOperacao) as numeros_unicos,\n  COUNT(*) - COUNT(DISTINCT nrOperacao) as total_duplicatas\nFROM consignados\nWHERE nrOperacao IS NOT NULL AND nrOperacao != '';\n",
+  "rows": [
+    {
+      "total_registros": "2068",
+      "numeros_unicos": "1741",
+      "total_duplicatas": "327"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_registros\tnumeros_unicos\ttotal_duplicatas\n2068\t1741\t327\n",
+  "stderr": "",
+  "execution_time_ms": 274
+}

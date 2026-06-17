@@ -1,0 +1,1 @@
+ALTER TABLE `sessoes` MODIFY COLUMN `ativo` tinyint NOT NULL DEFAULT 1;

@@ -1,0 +1,8 @@
+{
+  "query": "\nUPDATE certificacoes c\nJOIN agentes a ON UPPER(c.chave_j) = UPPER(a.chave_j)\nSET \n  c.empresa = a.empresa,\n  c.nome_agente = a.nome_agente,\n  c.situacao = a.situacao;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nUPDATE certificacoes c\nJOIN agentes a ON UPPER(c.chave_j) = UPPER(a.chave_j)\nSET \n  c.empresa = a.empresa,\n  c.nome_agente = a.nome_agente,\n  c.situacao = a.situacao;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 2: Unknown column 'c.chave_j' in 'on clause'"
+  ]
+}

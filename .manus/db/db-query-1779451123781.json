@@ -1,0 +1,46 @@
+{
+  "query": "SELECT tabela, COUNT(*) as qtd FROM consignados GROUP BY tabela ORDER BY tabela LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT tabela, COUNT(*) as qtd FROM consignados GROUP BY tabela ORDER BY tabela LIMIT 20;",
+  "rows": [
+    {
+      "tabela": "NULL",
+      "qtd": "3"
+    },
+    {
+      "tabela": "0",
+      "qtd": "9"
+    },
+    {
+      "tabela": "Especial",
+      "qtd": "611"
+    },
+    {
+      "tabela": "Guilherme",
+      "qtd": "64"
+    },
+    {
+      "tabela": "Jefinho",
+      "qtd": "45"
+    },
+    {
+      "tabela": "Kelly",
+      "qtd": "76"
+    },
+    {
+      "tabela": "Tabela01",
+      "qtd": "133"
+    },
+    {
+      "tabela": "Tabela02",
+      "qtd": "399"
+    },
+    {
+      "tabela": "Tabela03",
+      "qtd": "738"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\tqtd\nNULL\t3\n0\t9\nEspecial\t611\nGuilherme\t64\nJefinho\t45\nKelly\t76\nTabela01\t133\nTabela02\t399\nTabela03\t738\n",
+  "stderr": "",
+  "execution_time_ms": 261
+}

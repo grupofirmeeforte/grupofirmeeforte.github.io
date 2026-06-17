@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE `consorcios` ADD COLUMN `empresa` varchar(20) AFTER `id`;\nALTER TABLE `consorcios` ADD COLUMN `proposta` varchar(50) AFTER `mesAno`;\nALTER TABLE `consorcios` ADD COLUMN `data` varchar(12) AFTER `proposta`;\nALTER TABLE `consorcios` ADD COLUMN `parcLiberada` varchar(20) AFTER `valorBem`;\nALTER TABLE `consorcios` ADD COLUMN `pctComissao1` decimal(10,6) AFTER `parcLiberada`;\nALTER TABLE `consorcios` ADD COLUMN `rbm` decimal(15,2) AFTER `pctComissao1`;\nALTER TABLE `consorcios` ADD COLUMN `pctComissao2` decimal(10,6) AFTER `rbm`;\nALTER TABLE `consorcios` ADD INDEX `idx_consorcios_empresa` (`empresa`);\nALTER TABLE `consorcios` ADD INDEX `idx_consorcios_proposta` (`proposta`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute ALTER TABLE `consorcios` ADD COLUMN `empresa` varchar(20) AFTER `id`;\nALTER TABLE `consorcios` ADD COLUMN `proposta` varchar(50) AFTER `mesAno`;\nALTER TABLE `consorcios` ADD COLUMN `data` varchar(12) AFTER `proposta`;\nALTER TABLE `consorcios` ADD COLUMN `parcLiberada` varchar(20) AFTER `valorBem`;\nALTER TABLE `consorcios` ADD COLUMN `pctComissao1` decimal(10,6) AFTER `parcLiberada`;\nALTER TABLE `consorcios` ADD COLUMN `rbm` decimal(15,2) AFTER `pctComissao1`;\nALTER TABLE `consorcios` ADD COLUMN `pctComissao2` decimal(10,6) AFTER `rbm`;\nALTER TABLE `consorcios` ADD INDEX `idx_consorcios_empresa` (`empresa`);\nALTER TABLE `consorcios` ADD INDEX `idx_consorcios_proposta` (`proposta`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1892
+}

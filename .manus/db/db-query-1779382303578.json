@@ -1,0 +1,90 @@
+{
+  "query": "SHOW COLUMNS FROM tabelasComissao WHERE Field LIKE 'ativo%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SHOW COLUMNS FROM tabelasComissao WHERE Field LIKE 'ativo%';",
+  "rows": [
+    {
+      "Field": "ativo01",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "ativo02",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "ativo03",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "ativo04",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "ativo05",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "ativo06",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "ativo07",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "ativo08",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "ativo09",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "ativo10",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nativo01\tvarchar(20)\tYES\t\tNULL\t\nativo02\tvarchar(20)\tYES\t\tNULL\t\nativo03\tvarchar(20)\tYES\t\tNULL\t\nativo04\tvarchar(20)\tYES\t\tNULL\t\nativo05\tvarchar(20)\tYES\t\tNULL\t\nativo06\tvarchar(20)\tYES\t\tNULL\t\nativo07\tvarchar(20)\tYES\t\tNULL\t\nativo08\tvarchar(20)\tYES\t\tNULL\t\nativo09\tvarchar(20)\tYES\t\tNULL\t\nativo10\tvarchar(20)\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 261
+}

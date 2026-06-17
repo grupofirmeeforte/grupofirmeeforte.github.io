@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = 'consignados' AND COLUMN_NAME LIKE '%srcc%' OR TABLE_NAME = 'consignados' AND COLUMN_NAME LIKE '%restricao%' OR TABLE_NAME = 'consignados' AND COLUMN_NAME LIKE '%SRCC%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COLUMN_NAME, DATA_TYPE FROM information_schema.COLUMNS WHERE TABLE_NAME = 'consignados' AND COLUMN_NAME LIKE '%srcc%' OR TABLE_NAME = 'consignados' AND COLUMN_NAME LIKE '%restricao%' OR TABLE_NAME = 'consignados' AND COLUMN_NAME LIKE '%SRCC%';",
+  "rows": [
+    {
+      "COLUMN_NAME": "restricaoSRCC",
+      "DATA_TYPE": "varchar"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\nrestricaoSRCC\tvarchar\n",
+  "stderr": "",
+  "execution_time_ms": 432
+}

@@ -1,0 +1,30 @@
+{
+  "query": "SELECT mes, COUNT(*) as qtd, CAST(CONCAT('20', RIGHT(mes, 2), LPAD(FLOOR(CAST(mes AS UNSIGNED) / 100), 2, '0')) AS UNSIGNED) as ordem FROM consignados WHERE mes IS NOT NULL AND mes != '' GROUP BY mes ORDER BY ordem DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT mes, COUNT(*) as qtd, CAST(CONCAT('20', RIGHT(mes, 2), LPAD(FLOOR(CAST(mes AS UNSIGNED) / 100), 2, '0')) AS UNSIGNED) as ordem FROM consignados WHERE mes IS NOT NULL AND mes != '' GROUP BY mes ORDER BY ordem DESC LIMIT 20;",
+  "rows": [
+    {
+      "mes": "02/2026",
+      "qtd": "696",
+      "ordem": "202600"
+    },
+    {
+      "mes": "01/2026",
+      "qtd": "388",
+      "ordem": "202600"
+    },
+    {
+      "mes": "03/2026",
+      "qtd": "591",
+      "ordem": "202600"
+    },
+    {
+      "mes": "04/2026",
+      "qtd": "400",
+      "ordem": "202600"
+    }
+  ],
+  "messages": [],
+  "stdout": "mes\tqtd\tordem\n02/2026\t696\t202600\n01/2026\t388\t202600\n03/2026\t591\t202600\n04/2026\t400\t202600\n",
+  "stderr": "",
+  "execution_time_ms": 266
+}

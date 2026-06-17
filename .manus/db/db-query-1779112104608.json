@@ -1,0 +1,80 @@
+{
+  "query": "SELECT f.empresa, f.proposta, f.troco, f.financiado, c.restricaoSRCC FROM febraban f INNER JOIN consignados c ON c.nrOperacao = f.proposta WHERE LOWER(TRIM(c.restricaoSRCC)) = 'sim' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT f.empresa, f.proposta, f.troco, f.financiado, c.restricaoSRCC FROM febraban f INNER JOIN consignados c ON c.nrOperacao = f.proposta WHERE LOWER(TRIM(c.restricaoSRCC)) = 'sim' LIMIT 10;",
+  "rows": [
+    {
+      "empresa": "BMF",
+      "proposta": "200203169",
+      "troco": "1810.00",
+      "financiado": "1810.00",
+      "restricaoSRCC": "Sim"
+    },
+    {
+      "empresa": "BMF",
+      "proposta": "202974616",
+      "troco": "10000.00",
+      "financiado": "10000.00",
+      "restricaoSRCC": "Sim"
+    },
+    {
+      "empresa": "BMF",
+      "proposta": "203428337",
+      "troco": "1535.00",
+      "financiado": "1535.00",
+      "restricaoSRCC": "Sim"
+    },
+    {
+      "empresa": "BMF",
+      "proposta": "203466744",
+      "troco": "1572.00",
+      "financiado": "1572.00",
+      "restricaoSRCC": "Sim"
+    },
+    {
+      "empresa": "BMF",
+      "proposta": "203706405",
+      "troco": "2000.00",
+      "financiado": "2000.00",
+      "restricaoSRCC": "Sim"
+    },
+    {
+      "empresa": "BMF",
+      "proposta": "205599024",
+      "troco": "2500.00",
+      "financiado": "2500.00",
+      "restricaoSRCC": "Sim"
+    },
+    {
+      "empresa": "BMF",
+      "proposta": "206312998",
+      "troco": "1550.00",
+      "financiado": "1550.00",
+      "restricaoSRCC": "Sim"
+    },
+    {
+      "empresa": "BMF",
+      "proposta": "208839881",
+      "troco": "24200.00",
+      "financiado": "24200.00",
+      "restricaoSRCC": "Sim"
+    },
+    {
+      "empresa": "BMF",
+      "proposta": "208860326",
+      "troco": "700.00",
+      "financiado": "700.00",
+      "restricaoSRCC": "Sim"
+    },
+    {
+      "empresa": "BMF",
+      "proposta": "210437747",
+      "troco": "4600.00",
+      "financiado": "4600.00",
+      "restricaoSRCC": "Sim"
+    }
+  ],
+  "messages": [],
+  "stdout": "empresa\tproposta\ttroco\tfinanciado\trestricaoSRCC\nBMF\t200203169\t1810.00\t1810.00\tSim\nBMF\t202974616\t10000.00\t10000.00\tSim\nBMF\t203428337\t1535.00\t1535.00\tSim\nBMF\t203466744\t1572.00\t1572.00\tSim\nBMF\t203706405\t2000.00\t2000.00\tSim\nBMF\t205599024\t2500.00\t2500.00\tSim\nBMF\t206312998\t1550.00\t1550.00\tSim\nBMF\t208839881\t24200.00\t24200.00\tSim\nBMF\t208860326\t700.00\t700.00\tSim\nBMF\t210437747\t4600.00\t4600.00\tSim\n",
+  "stderr": "",
+  "execution_time_ms": 278
+}

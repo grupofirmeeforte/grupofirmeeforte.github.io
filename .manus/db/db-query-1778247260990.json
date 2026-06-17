@@ -1,0 +1,37 @@
+{
+  "query": "\nSELECT COUNT(*) as total_certs FROM certificacoes;\nSELECT COUNT(*) as com_match FROM certificacoes c JOIN agentes a ON UPPER(c.chaveJ) = UPPER(a.chaveJ);\nSELECT c.chaveJ, a.chaveJ as agente_chaveJ, a.nomeAgente, a.empresa FROM certificacoes c LEFT JOIN agentes a ON UPPER(c.chaveJ) = UPPER(a.chaveJ) LIMIT 5;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nSELECT COUNT(*) as total_certs FROM certificacoes;\nSELECT COUNT(*) as com_match FROM certificacoes c JOIN agentes a ON UPPER(c.chaveJ) = UPPER(a.chaveJ);\nSELECT c.chaveJ, a.chaveJ as agente_chaveJ, a.nomeAgente, a.empresa FROM certificacoes c LEFT JOIN agentes a ON UPPER(c.chaveJ) = UPPER(a.chaveJ) LIMIT 5;\n",
+  "rows": [
+    {
+      "total_certs": "45"
+    },
+    {
+      "total_certs": "com_match"
+    },
+    {
+      "total_certs": "40"
+    },
+    {
+      "total_certs": "chaveJ\tagente_chaveJ\tnomeAgente\tempresa"
+    },
+    {
+      "total_certs": "JI830167\tJI830167\tAYALLA RAYANE DE SANTANA\tFLEX"
+    },
+    {
+      "total_certs": "J9663285\tJ9663285\tCARLA BONFIM DOS SANTOS \tBMF"
+    },
+    {
+      "total_certs": "JJ596288\tJJ596288\tCARMITA RIBEIRO NUNES NETA\tFLEX"
+    },
+    {
+      "total_certs": "JJ596281\tJJ596281\tCLARICE FRANCISCA ITACARAMBY SANTOS \tFLEX"
+    },
+    {
+      "total_certs": "JJ596294\tJJ596294\tAMAURICIO REAIS FERREIRAS DOS SANTOS \tFLEX"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_certs\n45\ncom_match\n40\nchaveJ\tagente_chaveJ\tnomeAgente\tempresa\nJI830167\tJI830167\tAYALLA RAYANE DE SANTANA\tFLEX\nJ9663285\tJ9663285\tCARLA BONFIM DOS SANTOS \tBMF\nJJ596288\tJJ596288\tCARMITA RIBEIRO NUNES NETA\tFLEX\nJJ596281\tJJ596281\tCLARICE FRANCISCA ITACARAMBY SANTOS \tFLEX\nJJ596294\tJJ596294\tAMAURICIO REAIS FERREIRAS DOS SANTOS \tFLEX\n",
+  "stderr": "",
+  "execution_time_ms": 282
+}

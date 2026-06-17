@@ -1,0 +1,30 @@
+{
+  "query": "SELECT mes, chaveJ, COUNT(*) as total FROM consignados WHERE chaveJ LIKE '%JH299827%' GROUP BY mes, chaveJ LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT mes, chaveJ, COUNT(*) as total FROM consignados WHERE chaveJ LIKE '%JH299827%' GROUP BY mes, chaveJ LIMIT 10;",
+  "rows": [
+    {
+      "mes": "126",
+      "chaveJ": "JH299827",
+      "total": "10"
+    },
+    {
+      "mes": "326",
+      "chaveJ": "jh299827",
+      "total": "15"
+    },
+    {
+      "mes": "226",
+      "chaveJ": "JH299827",
+      "total": "20"
+    },
+    {
+      "mes": "426",
+      "chaveJ": "JH299827",
+      "total": "17"
+    }
+  ],
+  "messages": [],
+  "stdout": "mes\tchaveJ\ttotal\n126\tJH299827\t10\n326\tjh299827\t15\n226\tJH299827\t20\n426\tJH299827\t17\n",
+  "stderr": "",
+  "execution_time_ms": 261
+}

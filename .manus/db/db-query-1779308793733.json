@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE minutos_sabedoria SET fonte = 'PASTORINO, C. Torres. Minutos de Sabedoria. São Paulo: Índigo Editora Ltda. ISBN: 978-85-45567-01-1';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute UPDATE minutos_sabedoria SET fonte = 'PASTORINO, C. Torres. Minutos de Sabedoria. São Paulo: Índigo Editora Ltda. ISBN: 978-85-45567-01-1';",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 352
+}

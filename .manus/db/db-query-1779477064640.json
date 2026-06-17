@@ -1,0 +1,50 @@
+{
+  "query": "\nSELECT f.operador, a.nomeAgente\nFROM febraban f\nLEFT JOIN agentes a ON a.chaveJ = f.operador\nWHERE f.mesano = 526 AND f.situacao = 'Contratada'\nGROUP BY f.operador, a.nomeAgente\nORDER BY SUM(f.troco) DESC\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nSELECT f.operador, a.nomeAgente\nFROM febraban f\nLEFT JOIN agentes a ON a.chaveJ = f.operador\nWHERE f.mesano = 526 AND f.situacao = 'Contratada'\nGROUP BY f.operador, a.nomeAgente\nORDER BY SUM(f.troco) DESC\nLIMIT 10;\n",
+  "rows": [
+    {
+      "operador": "JJ596288",
+      "nomeAgente": "CARMITA RIBEIRO NUNES NETA"
+    },
+    {
+      "operador": "JJ425794",
+      "nomeAgente": "HILDENE DIAS DE CARVALHO OLIVEIRA"
+    },
+    {
+      "operador": "JJ596263",
+      "nomeAgente": "KAUE HERIQUE CAMPOS GOMES "
+    },
+    {
+      "operador": "JJ124185",
+      "nomeAgente": "PATRICIA MEDEIROS COSTA"
+    },
+    {
+      "operador": "JJ204048",
+      "nomeAgente": "KELLY JOSAINA MENDES DA SILVA DO NASCIMENTO"
+    },
+    {
+      "operador": "JJ058926",
+      "nomeAgente": "WALQUIRIA DIAS DE SOUZA"
+    },
+    {
+      "operador": "J9663285",
+      "nomeAgente": "CARLA BONFIM DOS SANTOS "
+    },
+    {
+      "operador": "JJ596281",
+      "nomeAgente": "CLARICE FRANCISCA ITACARAMBY SANTOS "
+    },
+    {
+      "operador": "JI819740",
+      "nomeAgente": "MAIARA DOS SANTOS LIMA MARQUES"
+    },
+    {
+      "operador": "J9661460",
+      "nomeAgente": "GLORIA BARBOSA DOS SANTOS SILVA"
+    }
+  ],
+  "messages": [],
+  "stdout": "operador\tnomeAgente\nJJ596288\tCARMITA RIBEIRO NUNES NETA\nJJ425794\tHILDENE DIAS DE CARVALHO OLIVEIRA\nJJ596263\tKAUE HERIQUE CAMPOS GOMES \nJJ124185\tPATRICIA MEDEIROS COSTA\nJJ204048\tKELLY JOSAINA MENDES DA SILVA DO NASCIMENTO\nJJ058926\tWALQUIRIA DIAS DE SOUZA\nJ9663285\tCARLA BONFIM DOS SANTOS \nJJ596281\tCLARICE FRANCISCA ITACARAMBY SANTOS \nJI819740\tMAIARA DOS SANTOS LIMA MARQUES\nJ9661460\tGLORIA BARBOSA DOS SANTOS SILVA\n",
+  "stderr": "",
+  "execution_time_ms": 278
+}

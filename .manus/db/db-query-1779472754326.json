@@ -1,0 +1,28 @@
+{
+  "query": "SELECT chaveJ, nomeAgente, senha, permissoes FROM agentes LIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT chaveJ, nomeAgente, senha, permissoes FROM agentes LIMIT 3;",
+  "rows": [
+    {
+      "chaveJ": "J9624265",
+      "nomeAgente": "THIAGO VIANA ULTRAMARE",
+      "senha": "123",
+      "permissoes": "leitor"
+    },
+    {
+      "chaveJ": "JG701582",
+      "nomeAgente": "THIAGO VIANA ULTRAMARE",
+      "senha": "123",
+      "permissoes": "leitor"
+    },
+    {
+      "chaveJ": "JJ124183",
+      "nomeAgente": "THALES VIANA ULTRAMARE",
+      "senha": "123",
+      "permissoes": "leitor"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\tnomeAgente\tsenha\tpermissoes\nJ9624265\tTHIAGO VIANA ULTRAMARE\t123\tleitor\nJG701582\tTHIAGO VIANA ULTRAMARE\t123\tleitor\nJJ124183\tTHALES VIANA ULTRAMARE\t123\tleitor\n",
+  "stderr": "",
+  "execution_time_ms": 266
+}

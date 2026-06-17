@@ -1,0 +1,60 @@
+{
+  "query": "SELECT mesano, empresa, COUNT(*) as qtd FROM febraban WHERE mesano >= 526 GROUP BY mesano, empresa ORDER BY mesano DESC LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT mesano, empresa, COUNT(*) as qtd FROM febraban WHERE mesano >= 526 GROUP BY mesano, empresa ORDER BY mesano DESC LIMIT 10",
+  "rows": [
+    {
+      "mesano": "1225",
+      "empresa": "FLEX",
+      "qtd": "330"
+    },
+    {
+      "mesano": "1225",
+      "empresa": "BMF",
+      "qtd": "184"
+    },
+    {
+      "mesano": "1125",
+      "empresa": "BMF",
+      "qtd": "193"
+    },
+    {
+      "mesano": "1125",
+      "empresa": "FLEX",
+      "qtd": "352"
+    },
+    {
+      "mesano": "1025",
+      "empresa": "FLEX",
+      "qtd": "364"
+    },
+    {
+      "mesano": "1025",
+      "empresa": "BMF",
+      "qtd": "287"
+    },
+    {
+      "mesano": "925",
+      "empresa": "FLEX",
+      "qtd": "305"
+    },
+    {
+      "mesano": "925",
+      "empresa": "BMF",
+      "qtd": "287"
+    },
+    {
+      "mesano": "825",
+      "empresa": "BMF",
+      "qtd": "348"
+    },
+    {
+      "mesano": "825",
+      "empresa": "FLEX",
+      "qtd": "210"
+    }
+  ],
+  "messages": [],
+  "stdout": "mesano\tempresa\tqtd\n1225\tFLEX\t330\n1225\tBMF\t184\n1125\tBMF\t193\n1125\tFLEX\t352\n1025\tFLEX\t364\n1025\tBMF\t287\n925\tFLEX\t305\n925\tBMF\t287\n825\tBMF\t348\n825\tFLEX\t210\n",
+  "stderr": "",
+  "execution_time_ms": 274
+}

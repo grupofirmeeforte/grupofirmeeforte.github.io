@@ -1,0 +1,16 @@
+{
+  "query": "SELECT chaveJ, nomeAgente, situacao, empresa FROM agentes WHERE chaveJ IN ('JI798214') LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT chaveJ, nomeAgente, situacao, empresa FROM agentes WHERE chaveJ IN ('JI798214') LIMIT 5;",
+  "rows": [
+    {
+      "chaveJ": "JI798214",
+      "nomeAgente": "ANA CLARA PIRES",
+      "situacao": "Ativo",
+      "empresa": "FLEX"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\tnomeAgente\tsituacao\tempresa\nJI798214\tANA CLARA PIRES\tAtivo\tFLEX\n",
+  "stderr": "",
+  "execution_time_ms": 262
+}

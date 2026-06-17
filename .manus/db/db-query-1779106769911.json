@@ -1,0 +1,66 @@
+{
+  "query": "SELECT empresa, mesano, COUNT(*) as cnt, MIN(solicitacao) as min_sol, MAX(solicitacao) as max_sol FROM febraban WHERE empresa='FLEX' GROUP BY empresa, mesano ORDER BY mesano DESC LIMIT 8;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT empresa, mesano, COUNT(*) as cnt, MIN(solicitacao) as min_sol, MAX(solicitacao) as max_sol FROM febraban WHERE empresa='FLEX' GROUP BY empresa, mesano ORDER BY mesano DESC LIMIT 8;",
+  "rows": [
+    {
+      "empresa": "FLEX",
+      "mesano": "1225",
+      "cnt": "330",
+      "min_sol": "01/12/2025",
+      "max_sol": "31/12/2025"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "1125",
+      "cnt": "352",
+      "min_sol": "03/11/2025",
+      "max_sol": "28/11/2025"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "1025",
+      "cnt": "364",
+      "min_sol": "01/10/2025",
+      "max_sol": "31/10/2025"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "925",
+      "cnt": "305",
+      "min_sol": "01/09/2025",
+      "max_sol": "30/09/2025"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "825",
+      "cnt": "210",
+      "min_sol": "01/08/2025",
+      "max_sol": "29/08/2025"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "725",
+      "cnt": "177",
+      "min_sol": "01/07/2025",
+      "max_sol": "30/07/2025"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "626",
+      "cnt": "6",
+      "min_sol": "15/05/2026",
+      "max_sol": "18/05/2026"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "625",
+      "cnt": "85",
+      "min_sol": "02/06/2025",
+      "max_sol": "30/06/2025"
+    }
+  ],
+  "messages": [],
+  "stdout": "empresa\tmesano\tcnt\tmin_sol\tmax_sol\nFLEX\t1225\t330\t01/12/2025\t31/12/2025\nFLEX\t1125\t352\t03/11/2025\t28/11/2025\nFLEX\t1025\t364\t01/10/2025\t31/10/2025\nFLEX\t925\t305\t01/09/2025\t30/09/2025\nFLEX\t825\t210\t01/08/2025\t29/08/2025\nFLEX\t725\t177\t01/07/2025\t30/07/2025\nFLEX\t626\t6\t15/05/2026\t18/05/2026\nFLEX\t625\t85\t02/06/2025\t30/06/2025\n",
+  "stderr": "",
+  "execution_time_ms": 332
+}

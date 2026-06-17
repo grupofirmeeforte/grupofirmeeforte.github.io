@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(*) as total, COALESCE(SUM(CAST(comissao AS DECIMAL(10,4))), 0) as totalComissao\nFROM pro_rata \nWHERE codEst = '1';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COUNT(*) as total, COALESCE(SUM(CAST(comissao AS DECIMAL(10,4))), 0) as totalComissao\nFROM pro_rata \nWHERE codEst = '1';",
+  "rows": [
+    {
+      "total": "15644",
+      "totalComissao": "101258.9700"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\ttotalComissao\n15644\t101258.9700\n",
+  "stderr": "",
+  "execution_time_ms": 315
+}

@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as total FROM pro_rata;\nSELECT nrOperacao, CAST(comissao AS DECIMAL(10,4)) as comissao, CAST(valorFinanciado AS DECIMAL(12,2)) as valorFinanciado, CAST(vlr AS DECIMAL(10,4)) as vlr, qtdFaltaReceber FROM pro_rata LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COUNT(*) as total FROM pro_rata;\nSELECT nrOperacao, CAST(comissao AS DECIMAL(10,4)) as comissao, CAST(valorFinanciado AS DECIMAL(12,2)) as valorFinanciado, CAST(vlr AS DECIMAL(10,4)) as vlr, qtdFaltaReceber FROM pro_rata LIMIT 5;",
+  "rows": [
+    {
+      "total": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n0\n",
+  "stderr": "",
+  "execution_time_ms": 323
+}

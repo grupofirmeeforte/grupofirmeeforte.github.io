@@ -1,0 +1,22 @@
+{
+  "query": "SELECT COUNT(*) as total, MIN(qtdFaltaReceber) as minFalta, MAX(qtdFaltaReceber) as maxFalta\nFROM pro_rata \nWHERE codEst = '1' \nAND dataFinal LIKE '%/04/2026';\n\nSELECT nrOperacao, comissao, vlr, qtdFaltaReceber, dataFinal\nFROM pro_rata \nWHERE codEst = '1' \nAND dataFinal LIKE '%/04/2026'\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COUNT(*) as total, MIN(qtdFaltaReceber) as minFalta, MAX(qtdFaltaReceber) as maxFalta\nFROM pro_rata \nWHERE codEst = '1' \nAND dataFinal LIKE '%/04/2026';\n\nSELECT nrOperacao, comissao, vlr, qtdFaltaReceber, dataFinal\nFROM pro_rata \nWHERE codEst = '1' \nAND dataFinal LIKE '%/04/2026'\nLIMIT 5;",
+  "rows": [
+    {
+      "total": "158",
+      "minFalta": "0",
+      "maxFalta": "0"
+    }
+  ],
+  "messages": [
+    "nrOperacao\tcomissao\tvlr\tqtdFaltaReceber\tdataFinal",
+    "984080309\t0.0700\t0.0000\t0\t01/04/2026",
+    "938038171\t2.5800\t0.0000\t0\t01/04/2026",
+    "976702400\t2.5400\t0.0000\t0\t01/04/2026",
+    "897830293\t1.0300\t0.0000\t0\t01/04/2026",
+    "126430337\t1.0400\t0.0000\t0\t01/04/2026"
+  ],
+  "stdout": "total\tminFalta\tmaxFalta\n158\t0\t0\nnrOperacao\tcomissao\tvlr\tqtdFaltaReceber\tdataFinal\n984080309\t0.0700\t0.0000\t0\t01/04/2026\n938038171\t2.5800\t0.0000\t0\t01/04/2026\n976702400\t2.5400\t0.0000\t0\t01/04/2026\n897830293\t1.0300\t0.0000\t0\t01/04/2026\n126430337\t1.0400\t0.0000\t0\t01/04/2026\n",
+  "stderr": "",
+  "execution_time_ms": 360
+}

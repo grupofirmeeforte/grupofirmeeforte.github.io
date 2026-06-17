@@ -1,0 +1,95 @@
+{
+  "query": "SELECT 'consignados' as tabela, mes as campo, COUNT(*) as qtd FROM consignados GROUP BY mes ORDER BY qtd DESC LIMIT 10;\nSELECT 'consorcios' as tabela, mesAno as campo, COUNT(*) as qtd FROM consorcios GROUP BY mesAno ORDER BY qtd DESC LIMIT 5;\nSELECT 'contasCorrentes' as tabela, mesAno as campo, COUNT(*) as qtd FROM contasCorrentes GROUP BY mesAno ORDER BY qtd DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT 'consignados' as tabela, mes as campo, COUNT(*) as qtd FROM consignados GROUP BY mes ORDER BY qtd DESC LIMIT 10;\nSELECT 'consorcios' as tabela, mesAno as campo, COUNT(*) as qtd FROM consorcios GROUP BY mesAno ORDER BY qtd DESC LIMIT 5;\nSELECT 'contasCorrentes' as tabela, mesAno as campo, COUNT(*) as qtd FROM contasCorrentes GROUP BY mesAno ORDER BY qtd DESC LIMIT 5;",
+  "rows": [
+    {
+      "tabela": "consignados",
+      "campo": "226",
+      "qtd": "696"
+    },
+    {
+      "tabela": "consignados",
+      "campo": "326",
+      "qtd": "591"
+    },
+    {
+      "tabela": "consignados",
+      "campo": "426",
+      "qtd": "400"
+    },
+    {
+      "tabela": "consignados",
+      "campo": "126",
+      "qtd": "388"
+    },
+    {
+      "tabela": "consignados",
+      "campo": "NULL",
+      "qtd": "1"
+    },
+    {
+      "tabela": "tabela",
+      "campo": "campo",
+      "qtd": "qtd"
+    },
+    {
+      "tabela": "consorcios",
+      "campo": "12/2025",
+      "qtd": "31"
+    },
+    {
+      "tabela": "consorcios",
+      "campo": "11/2025",
+      "qtd": "30"
+    },
+    {
+      "tabela": "consorcios",
+      "campo": "02/2026",
+      "qtd": "25"
+    },
+    {
+      "tabela": "consorcios",
+      "campo": "01/2026",
+      "qtd": "24"
+    },
+    {
+      "tabela": "consorcios",
+      "campo": "03/2026",
+      "qtd": "22"
+    },
+    {
+      "tabela": "tabela",
+      "campo": "campo",
+      "qtd": "qtd"
+    },
+    {
+      "tabela": "contasCorrentes",
+      "campo": "04/2026",
+      "qtd": "34"
+    },
+    {
+      "tabela": "contasCorrentes",
+      "campo": "03/2026",
+      "qtd": "28"
+    },
+    {
+      "tabela": "contasCorrentes",
+      "campo": "10/2025",
+      "qtd": "18"
+    },
+    {
+      "tabela": "contasCorrentes",
+      "campo": "11/2025",
+      "qtd": "6"
+    },
+    {
+      "tabela": "contasCorrentes",
+      "campo": "01/2026",
+      "qtd": "4"
+    }
+  ],
+  "messages": [],
+  "stdout": "tabela\tcampo\tqtd\nconsignados\t226\t696\nconsignados\t326\t591\nconsignados\t426\t400\nconsignados\t126\t388\nconsignados\tNULL\t1\ntabela\tcampo\tqtd\nconsorcios\t12/2025\t31\nconsorcios\t11/2025\t30\nconsorcios\t02/2026\t25\nconsorcios\t01/2026\t24\nconsorcios\t03/2026\t22\ntabela\tcampo\tqtd\ncontasCorrentes\t04/2026\t34\ncontasCorrentes\t03/2026\t28\ncontasCorrentes\t10/2025\t18\ncontasCorrentes\t11/2025\t6\ncontasCorrentes\t01/2026\t4\n",
+  "stderr": "",
+  "execution_time_ms": 281
+}

@@ -1,0 +1,30 @@
+{
+  "query": "-- Confirmar migração\nSELECT DISTINCT mesRef, COUNT(*) as qtd FROM calculos GROUP BY mesRef ORDER BY qtd DESC;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute -- Confirmar migração\nSELECT DISTINCT mesRef, COUNT(*) as qtd FROM calculos GROUP BY mesRef ORDER BY qtd DESC;\n",
+  "rows": [
+    {
+      "mesRef": "03/2026",
+      "qtd": "50"
+    },
+    {
+      "mesRef": "01/2026",
+      "qtd": "49"
+    },
+    {
+      "mesRef": "02/2026",
+      "qtd": "48"
+    },
+    {
+      "mesRef": "04/2026",
+      "qtd": "41"
+    },
+    {
+      "mesRef": "05/2026",
+      "qtd": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "mesRef\tqtd\n03/2026\t50\n01/2026\t49\n02/2026\t48\n04/2026\t41\n05/2026\t2\n",
+  "stderr": "",
+  "execution_time_ms": 264
+}

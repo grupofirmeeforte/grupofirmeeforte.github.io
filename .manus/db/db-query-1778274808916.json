@@ -1,0 +1,60 @@
+{
+  "query": "SELECT id, empresa, chaveJ, nrOperacao, nomeAgente, mes, mesAno, dtContratacao FROM consignados WHERE mes IS NULL AND mesAno IS NULL LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT id, empresa, chaveJ, nrOperacao, nomeAgente, mes, mesAno, dtContratacao FROM consignados WHERE mes IS NULL AND mesAno IS NULL LIMIT 5;",
+  "rows": [
+    {
+      "id": "210001",
+      "empresa": "NULL",
+      "chaveJ": "NULL",
+      "nrOperacao": "201827866",
+      "nomeAgente": "NULL",
+      "mes": "NULL",
+      "mesAno": "NULL",
+      "dtContratacao": "NULL"
+    },
+    {
+      "id": "210002",
+      "empresa": "NULL",
+      "chaveJ": "NULL",
+      "nrOperacao": "198276414",
+      "nomeAgente": "NULL",
+      "mes": "NULL",
+      "mesAno": "NULL",
+      "dtContratacao": "NULL"
+    },
+    {
+      "id": "210003",
+      "empresa": "NULL",
+      "chaveJ": "NULL",
+      "nrOperacao": "203177202",
+      "nomeAgente": "NULL",
+      "mes": "NULL",
+      "mesAno": "NULL",
+      "dtContratacao": "NULL"
+    },
+    {
+      "id": "210004",
+      "empresa": "NULL",
+      "chaveJ": "NULL",
+      "nrOperacao": "201249045",
+      "nomeAgente": "NULL",
+      "mes": "NULL",
+      "mesAno": "NULL",
+      "dtContratacao": "NULL"
+    },
+    {
+      "id": "210005",
+      "empresa": "NULL",
+      "chaveJ": "NULL",
+      "nrOperacao": "199848707",
+      "nomeAgente": "NULL",
+      "mes": "NULL",
+      "mesAno": "NULL",
+      "dtContratacao": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tempresa\tchaveJ\tnrOperacao\tnomeAgente\tmes\tmesAno\tdtContratacao\n210001\tNULL\tNULL\t201827866\tNULL\tNULL\tNULL\tNULL\n210002\tNULL\tNULL\t198276414\tNULL\tNULL\tNULL\tNULL\n210003\tNULL\tNULL\t203177202\tNULL\tNULL\tNULL\tNULL\n210004\tNULL\tNULL\t201249045\tNULL\tNULL\tNULL\tNULL\n210005\tNULL\tNULL\t199848707\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 267
+}

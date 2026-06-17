@@ -1,0 +1,42 @@
+{
+  "query": "SHOW COLUMNS FROM tabelasComissao WHERE Field LIKE '%De' OR Field LIKE '%Ate';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SHOW COLUMNS FROM tabelasComissao WHERE Field LIKE '%De' OR Field LIKE '%Ate';",
+  "rows": [
+    {
+      "Field": "txJurosDe",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "txJurosAte",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "mesesDe",
+      "Type": "varchar(10)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "mesesAte",
+      "Type": "varchar(10)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\ntxJurosDe\tvarchar(20)\tYES\t\tNULL\t\ntxJurosAte\tvarchar(20)\tYES\t\tNULL\t\nmesesDe\tvarchar(10)\tYES\t\tNULL\t\nmesesAte\tvarchar(10)\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 269
+}

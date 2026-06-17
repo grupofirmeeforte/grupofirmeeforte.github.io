@@ -1,0 +1,165 @@
+{
+  "query": "SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH \nFROM INFORMATION_SCHEMA.COLUMNS \nWHERE TABLE_NAME = 'consignados' \nORDER BY ORDINAL_POSITION;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH \nFROM INFORMATION_SCHEMA.COLUMNS \nWHERE TABLE_NAME = 'consignados' \nORDER BY ORDINAL_POSITION;",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "DATA_TYPE": "int",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "mesAno",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "10"
+    },
+    {
+      "COLUMN_NAME": "chaveJ",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "50"
+    },
+    {
+      "COLUMN_NAME": "nomeAgente",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "255"
+    },
+    {
+      "COLUMN_NAME": "nrOperacao",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "100"
+    },
+    {
+      "COLUMN_NAME": "parcelas",
+      "DATA_TYPE": "int",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "convenio",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "100"
+    },
+    {
+      "COLUMN_NAME": "juros",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "valorLiquido",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "percentual",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "comissao",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "createdAt",
+      "DATA_TYPE": "timestamp",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "updatedAt",
+      "DATA_TYPE": "timestamp",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "empresa",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "100"
+    },
+    {
+      "COLUMN_NAME": "mes",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "10"
+    },
+    {
+      "COLUMN_NAME": "valorBruto",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "rbm",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "parcela",
+      "DATA_TYPE": "int",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "prefixoBB",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "20"
+    },
+    {
+      "COLUMN_NAME": "dtContratacao",
+      "DATA_TYPE": "date",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "produto",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "100"
+    },
+    {
+      "COLUMN_NAME": "descricaoProduto",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "255"
+    },
+    {
+      "COLUMN_NAME": "tabelaMes",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "50"
+    },
+    {
+      "COLUMN_NAME": "percAVista",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "restricaoSRCC",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "100"
+    },
+    {
+      "COLUMN_NAME": "percPago",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "totalComissao",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "difEmpresa",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    },
+    {
+      "COLUMN_NAME": "tabela",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "100"
+    },
+    {
+      "COLUMN_NAME": "supervisor",
+      "DATA_TYPE": "varchar",
+      "CHARACTER_MAXIMUM_LENGTH": "255"
+    },
+    {
+      "COLUMN_NAME": "isDuplicate",
+      "DATA_TYPE": "tinyint",
+      "CHARACTER_MAXIMUM_LENGTH": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\tCHARACTER_MAXIMUM_LENGTH\nid\tint\tNULL\nmesAno\tvarchar\t10\nchaveJ\tvarchar\t50\nnomeAgente\tvarchar\t255\nnrOperacao\tvarchar\t100\nparcelas\tint\tNULL\nconvenio\tvarchar\t100\njuros\tdecimal\tNULL\nvalorLiquido\tdecimal\tNULL\npercentual\tdecimal\tNULL\ncomissao\tdecimal\tNULL\ncreatedAt\ttimestamp\tNULL\nupdatedAt\ttimestamp\tNULL\nempresa\tvarchar\t100\nmes\tvarchar\t10\nvalorBruto\tdecimal\tNULL\nrbm\tdecimal\tNULL\nparcela\tint\tNULL\nprefixoBB\tvarchar\t20\ndtContratacao\tdate\tNULL\nproduto\tvarchar\t100\ndescricaoProduto\tvarchar\t255\ntabelaMes\tvarchar\t50\npercAVista\tdecimal\tNULL\nrestricaoSRCC\tvarchar\t100\npercPago\tdecimal\tNULL\ntotalComissao\tdecimal\tNULL\ndifEmpresa\tdecimal\tNULL\ntabela\tvarchar\t100\nsupervisor\tvarchar\t255\nisDuplicate\ttinyint\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 256
+}

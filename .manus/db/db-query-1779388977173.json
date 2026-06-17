@@ -1,0 +1,118 @@
+{
+  "query": "SELECT id, empresa, convenio, mesesDe, mesesAte, txJurosDe, txJurosAte FROM tabelasComissao WHERE convenio LIKE '%INSS%' ORDER BY empresa, convenio, CAST(mesesDe AS UNSIGNED), CAST(REPLACE(txJurosDe, ',', '.') AS DECIMAL(10,4)) LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT id, empresa, convenio, mesesDe, mesesAte, txJurosDe, txJurosAte FROM tabelasComissao WHERE convenio LIKE '%INSS%' ORDER BY empresa, convenio, CAST(mesesDe AS UNSIGNED), CAST(REPLACE(txJurosDe, ',', '.') AS DECIMAL(10,4)) LIMIT 20;",
+  "rows": [
+    {
+      "id": "4",
+      "empresa": "BMF",
+      "convenio": "CONSIGNADO INSS",
+      "mesesDe": "48",
+      "mesesAte": "60",
+      "txJurosDe": "0.01",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "1",
+      "empresa": "BMF",
+      "convenio": "CONSIGNADO INSS",
+      "mesesDe": "48",
+      "mesesAte": "60",
+      "txJurosDe": "0.0185",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "5",
+      "empresa": "BMF",
+      "convenio": "CONSIGNADO INSS",
+      "mesesDe": "61",
+      "mesesAte": "83",
+      "txJurosDe": "0.01",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "2",
+      "empresa": "BMF",
+      "convenio": "CONSIGNADO INSS",
+      "mesesDe": "61",
+      "mesesAte": "83",
+      "txJurosDe": "0.0185",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "6",
+      "empresa": "BMF",
+      "convenio": "CONSIGNADO INSS",
+      "mesesDe": "84",
+      "mesesAte": "96",
+      "txJurosDe": "0.01",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "3",
+      "empresa": "BMF",
+      "convenio": "CONSIGNADO INSS",
+      "mesesDe": "84",
+      "mesesAte": "96",
+      "txJurosDe": "0.0185",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "58",
+      "empresa": "FLEX",
+      "convenio": "INSS",
+      "mesesDe": "48",
+      "mesesAte": "60",
+      "txJurosDe": "0.01",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "55",
+      "empresa": "FLEX",
+      "convenio": "INSS",
+      "mesesDe": "48",
+      "mesesAte": "60",
+      "txJurosDe": "0.0185",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "59",
+      "empresa": "FLEX",
+      "convenio": "INSS",
+      "mesesDe": "61",
+      "mesesAte": "83",
+      "txJurosDe": "0.01",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "56",
+      "empresa": "FLEX",
+      "convenio": "INSS",
+      "mesesDe": "61",
+      "mesesAte": "83",
+      "txJurosDe": "0.0185",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "60",
+      "empresa": "FLEX",
+      "convenio": "INSS",
+      "mesesDe": "84",
+      "mesesAte": "96",
+      "txJurosDe": "0.01",
+      "txJurosAte": "acima"
+    },
+    {
+      "id": "57",
+      "empresa": "FLEX",
+      "convenio": "INSS",
+      "mesesDe": "84",
+      "mesesAte": "96",
+      "txJurosDe": "0.0185",
+      "txJurosAte": "acima"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tempresa\tconvenio\tmesesDe\tmesesAte\ttxJurosDe\ttxJurosAte\n4\tBMF\tCONSIGNADO INSS\t48\t60\t0.01\tacima\n1\tBMF\tCONSIGNADO INSS\t48\t60\t0.0185\tacima\n5\tBMF\tCONSIGNADO INSS\t61\t83\t0.01\tacima\n2\tBMF\tCONSIGNADO INSS\t61\t83\t0.0185\tacima\n6\tBMF\tCONSIGNADO INSS\t84\t96\t0.01\tacima\n3\tBMF\tCONSIGNADO INSS\t84\t96\t0.0185\tacima\n58\tFLEX\tINSS\t48\t60\t0.01\tacima\n55\tFLEX\tINSS\t48\t60\t0.0185\tacima\n59\tFLEX\tINSS\t61\t83\t0.01\tacima\n56\tFLEX\tINSS\t61\t83\t0.0185\tacima\n60\tFLEX\tINSS\t84\t96\t0.01\tacima\n57\tFLEX\tINSS\t84\t96\t0.0185\tacima\n",
+  "stderr": "",
+  "execution_time_ms": 268
+}

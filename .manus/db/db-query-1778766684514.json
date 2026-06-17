@@ -1,0 +1,78 @@
+{
+  "query": "\nSELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS \nWHERE TABLE_NAME = 'febraban' \nORDER BY ORDINAL_POSITION;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nSELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS \nWHERE TABLE_NAME = 'febraban' \nORDER BY ORDINAL_POSITION;\n",
+  "rows": [
+    {
+      "COLUMN_NAME": "id",
+      "DATA_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "empresa",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "mesano",
+      "DATA_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "proposta",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "linha",
+      "DATA_TYPE": "int"
+    },
+    {
+      "COLUMN_NAME": "situacao",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "operador",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "solicitacao",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "prazo",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "troco",
+      "DATA_TYPE": "decimal"
+    },
+    {
+      "COLUMN_NAME": "financiado",
+      "DATA_TYPE": "decimal"
+    },
+    {
+      "COLUMN_NAME": "situacao2",
+      "DATA_TYPE": "varchar"
+    },
+    {
+      "COLUMN_NAME": "createdAt",
+      "DATA_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "updatedAt",
+      "DATA_TYPE": "timestamp"
+    },
+    {
+      "COLUMN_NAME": "financNovo",
+      "DATA_TYPE": "decimal"
+    },
+    {
+      "COLUMN_NAME": "trocoRefin",
+      "DATA_TYPE": "decimal"
+    },
+    {
+      "COLUMN_NAME": "ordemExcel",
+      "DATA_TYPE": "int"
+    }
+  ],
+  "messages": [],
+  "stdout": "COLUMN_NAME\tDATA_TYPE\nid\tint\nempresa\tvarchar\nmesano\tint\nproposta\tvarchar\nlinha\tint\nsituacao\tvarchar\noperador\tvarchar\nsolicitacao\tvarchar\nprazo\tvarchar\ntroco\tdecimal\nfinanciado\tdecimal\nsituacao2\tvarchar\ncreatedAt\ttimestamp\nupdatedAt\ttimestamp\nfinancNovo\tdecimal\ntrocoRefin\tdecimal\nordemExcel\tint\n",
+  "stderr": "",
+  "execution_time_ms": 265
+}

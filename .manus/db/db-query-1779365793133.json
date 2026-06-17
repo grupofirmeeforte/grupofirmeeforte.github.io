@@ -1,0 +1,35 @@
+{
+  "query": "SELECT solicitacao, mesano, empresa FROM febraban WHERE mesano = 525 LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT solicitacao, mesano, empresa FROM febraban WHERE mesano = 525 LIMIT 5;",
+  "rows": [
+    {
+      "solicitacao": "02/05/2025",
+      "mesano": "525",
+      "empresa": "FLEX"
+    },
+    {
+      "solicitacao": "02/05/2025",
+      "mesano": "525",
+      "empresa": "FLEX"
+    },
+    {
+      "solicitacao": "02/05/2025",
+      "mesano": "525",
+      "empresa": "FLEX"
+    },
+    {
+      "solicitacao": "02/05/2025",
+      "mesano": "525",
+      "empresa": "FLEX"
+    },
+    {
+      "solicitacao": "02/05/2025",
+      "mesano": "525",
+      "empresa": "FLEX"
+    }
+  ],
+  "messages": [],
+  "stdout": "solicitacao\tmesano\tempresa\n02/05/2025\t525\tFLEX\n02/05/2025\t525\tFLEX\n02/05/2025\t525\tFLEX\n02/05/2025\t525\tFLEX\n02/05/2025\t525\tFLEX\n",
+  "stderr": "",
+  "execution_time_ms": 260
+}

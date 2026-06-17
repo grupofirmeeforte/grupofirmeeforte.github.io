@@ -1,0 +1,46 @@
+{
+  "query": "SELECT empresa, mesano, situacao, COUNT(*) as qtd FROM febraban WHERE mesano = '526' GROUP BY empresa, mesano, situacao ORDER BY empresa, situacao;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT empresa, mesano, situacao, COUNT(*) as qtd FROM febraban WHERE mesano = '526' GROUP BY empresa, mesano, situacao ORDER BY empresa, situacao;",
+  "rows": [
+    {
+      "empresa": "BMF",
+      "mesano": "526",
+      "situacao": "Cancelada",
+      "qtd": "19"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "526",
+      "situacao": "Contratada",
+      "qtd": "90"
+    },
+    {
+      "empresa": "BMF",
+      "mesano": "526",
+      "situacao": "Pendente",
+      "qtd": "9"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "526",
+      "situacao": "Cancelada",
+      "qtd": "11"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "526",
+      "situacao": "Contratada",
+      "qtd": "135"
+    },
+    {
+      "empresa": "FLEX",
+      "mesano": "526",
+      "situacao": "Pendente",
+      "qtd": "8"
+    }
+  ],
+  "messages": [],
+  "stdout": "empresa\tmesano\tsituacao\tqtd\nBMF\t526\tCancelada\t19\nBMF\t526\tContratada\t90\nBMF\t526\tPendente\t9\nFLEX\t526\tCancelada\t11\nFLEX\t526\tContratada\t135\nFLEX\t526\tPendente\t8\n",
+  "stderr": "",
+  "execution_time_ms": 277
+}

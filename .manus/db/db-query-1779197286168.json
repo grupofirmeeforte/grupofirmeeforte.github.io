@@ -1,0 +1,64 @@
+{
+  "query": "SELECT DISTINCT mesano FROM febraban ORDER BY mesano DESC LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT DISTINCT mesano FROM febraban ORDER BY mesano DESC LIMIT 20",
+  "rows": [
+    {
+      "mesano": "1225"
+    },
+    {
+      "mesano": "1125"
+    },
+    {
+      "mesano": "1025"
+    },
+    {
+      "mesano": "925"
+    },
+    {
+      "mesano": "825"
+    },
+    {
+      "mesano": "725"
+    },
+    {
+      "mesano": "625"
+    },
+    {
+      "mesano": "526"
+    },
+    {
+      "mesano": "525"
+    },
+    {
+      "mesano": "426"
+    },
+    {
+      "mesano": "425"
+    },
+    {
+      "mesano": "326"
+    },
+    {
+      "mesano": "325"
+    },
+    {
+      "mesano": "226"
+    },
+    {
+      "mesano": "225"
+    },
+    {
+      "mesano": "126"
+    },
+    {
+      "mesano": "125"
+    },
+    {
+      "mesano": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "mesano\n1225\n1125\n1025\n925\n825\n725\n625\n526\n525\n426\n425\n326\n325\n226\n225\n126\n125\nNULL\n",
+  "stderr": "",
+  "execution_time_ms": 270
+}

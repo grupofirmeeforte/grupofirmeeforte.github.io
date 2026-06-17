@@ -1,0 +1,60 @@
+{
+  "query": "SELECT percPago, totalComissao, valorLiquido FROM consignados WHERE percPago IS NOT NULL AND percPago != '' AND percPago != '0' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT percPago, totalComissao, valorLiquido FROM consignados WHERE percPago IS NOT NULL AND percPago != '' AND percPago != '0' LIMIT 10;",
+  "rows": [
+    {
+      "percPago": "0.0140",
+      "totalComissao": "318.50",
+      "valorLiquido": "22750.00"
+    },
+    {
+      "percPago": "0.0170",
+      "totalComissao": "56.10",
+      "valorLiquido": "3300.00"
+    },
+    {
+      "percPago": "0.0170",
+      "totalComissao": "340.00",
+      "valorLiquido": "20000.00"
+    },
+    {
+      "percPago": "0.0080",
+      "totalComissao": "16.18",
+      "valorLiquido": "1982.21"
+    },
+    {
+      "percPago": "0.0285",
+      "totalComissao": "111.15",
+      "valorLiquido": "3900.00"
+    },
+    {
+      "percPago": "0.0285",
+      "totalComissao": "96.01",
+      "valorLiquido": "3318.77"
+    },
+    {
+      "percPago": "0.0285",
+      "totalComissao": "44.74",
+      "valorLiquido": "1560.24"
+    },
+    {
+      "percPago": "0.0085",
+      "totalComissao": "51.00",
+      "valorLiquido": "6000.00"
+    },
+    {
+      "percPago": "0.0140",
+      "totalComissao": "322.00",
+      "valorLiquido": "23000.00"
+    },
+    {
+      "percPago": "0.0140",
+      "totalComissao": "21.00",
+      "valorLiquido": "1500.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "percPago\ttotalComissao\tvalorLiquido\n0.0140\t318.50\t22750.00\n0.0170\t56.10\t3300.00\n0.0170\t340.00\t20000.00\n0.0080\t16.18\t1982.21\n0.0285\t111.15\t3900.00\n0.0285\t96.01\t3318.77\n0.0285\t44.74\t1560.24\n0.0085\t51.00\t6000.00\n0.0140\t322.00\t23000.00\n0.0140\t21.00\t1500.00\n",
+  "stderr": "",
+  "execution_time_ms": 267
+}

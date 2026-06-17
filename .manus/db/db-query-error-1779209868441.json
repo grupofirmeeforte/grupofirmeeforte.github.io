@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE `consorcios`\n  ADD COLUMN `empresa` varchar(20) AFTER `id`,\n  ADD COLUMN `proposta` varchar(50) AFTER `mesAno`,\n  ADD COLUMN `data` varchar(12) AFTER `proposta`,\n  ADD COLUMN `parcLiberada` varchar(20) AFTER `valorBem`,\n  ADD COLUMN `pctComissao1` decimal(10,6) AFTER `parcLiberada`,\n  ADD COLUMN `rbm` decimal(15,2) AFTER `pctComissao1`,\n  ADD COLUMN `pctComissao2` decimal(10,6) AFTER `rbm`,\n  DROP COLUMN `nrOperacao`,\n  DROP COLUMN `parcelas`;\n\nALTER TABLE `consorcios`\n  ADD INDEX `idx_consorcios_empresa` (`empresa`),\n  ADD INDEX `idx_consorcios_proposta` (`proposta`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute ALTER TABLE `consorcios`\n  ADD COLUMN `empresa` varchar(20) AFTER `id`,\n  ADD COLUMN `proposta` varchar(50) AFTER `mesAno`,\n  ADD COLUMN `data` varchar(12) AFTER `proposta`,\n  ADD COLUMN `parcLiberada` varchar(20) AFTER `valorBem`,\n  ADD COLUMN `pctComissao1` decimal(10,6) AFTER `parcLiberada`,\n  ADD COLUMN `rbm` decimal(15,2) AFTER `pctComissao1`,\n  ADD COLUMN `pctComissao2` decimal(10,6) AFTER `rbm`,\n  DROP COLUMN `nrOperacao`,\n  DROP COLUMN `parcelas`;\n\nALTER TABLE `consorcios`\n  ADD INDEX `idx_consorcios_empresa` (`empresa`),\n  ADD INDEX `idx_consorcios_proposta` (`proposta`);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'proposta' in 'consorcios'"
+  ]
+}

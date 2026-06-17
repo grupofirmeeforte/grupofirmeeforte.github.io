@@ -1,0 +1,14 @@
+{
+  "query": "\nSELECT \n  COUNT(*) as total_no_banco,\n  COUNT(CASE WHEN nrOperacao IN (\n    '209088202','209648648','210006660','209088202','209648648','210006660',\n    '203203566','203278004','203371694','203471249','203572821','203626854',\n    '204224265','206643554','206725227','206741035','206741035','207013266',\n    '207013266','207013266','207013266','207013266','207013266','207013266',\n    '210382241','210434190','210437747','210516805','210519271','210521462',\n    '210521957','210529823','210530895','210533181','210535058'\n  ) THEN 1 END) as encontrados_no_banco\nFROM consignados;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute \nSELECT \n  COUNT(*) as total_no_banco,\n  COUNT(CASE WHEN nrOperacao IN (\n    '209088202','209648648','210006660','209088202','209648648','210006660',\n    '203203566','203278004','203371694','203471249','203572821','203626854',\n    '204224265','206643554','206725227','206741035','206741035','207013266',\n    '207013266','207013266','207013266','207013266','207013266','207013266',\n    '210382241','210434190','210437747','210516805','210519271','210521462',\n    '210521957','210529823','210530895','210533181','210535058'\n  ) THEN 1 END) as encontrados_no_banco\nFROM consignados;\n",
+  "rows": [
+    {
+      "total_no_banco": "2068",
+      "encontrados_no_banco": "37"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_no_banco\tencontrados_no_banco\n2068\t37\n",
+  "stderr": "",
+  "execution_time_ms": 264
+}

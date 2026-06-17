@@ -1,0 +1,25 @@
+{
+  "query": "SELECT situacao, COUNT(*) as qtd, SUM(CAST(financiado AS DECIMAL(15,2))) as total FROM febraban WHERE empresa = 'BMF' AND mesano = 526 GROUP BY situacao;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT situacao, COUNT(*) as qtd, SUM(CAST(financiado AS DECIMAL(15,2))) as total FROM febraban WHERE empresa = 'BMF' AND mesano = 526 GROUP BY situacao;",
+  "rows": [
+    {
+      "situacao": "Contratada",
+      "qtd": "80",
+      "total": "641393.34"
+    },
+    {
+      "situacao": "Cancelada",
+      "qtd": "16",
+      "total": "208913.94"
+    },
+    {
+      "situacao": "Pendente",
+      "qtd": "6",
+      "total": "80220.02"
+    }
+  ],
+  "messages": [],
+  "stdout": "situacao\tqtd\ttotal\nContratada\t80\t641393.34\nCancelada\t16\t208913.94\nPendente\t6\t80220.02\n",
+  "stderr": "",
+  "execution_time_ms": 266
+}

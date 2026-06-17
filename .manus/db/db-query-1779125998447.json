@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, CONCAT('[', chaveJ, ']') as chaveJ_raw, LENGTH(chaveJ) as len FROM agentes WHERE chaveJ LIKE '%726228%';\nSELECT COUNT(*) as total_agentes FROM agentes;\nSELECT COUNT(*) as total_certs FROM certificacoes;\nSELECT COUNT(DISTINCT UPPER(TRIM(chaveJ))) as chaves_cert FROM certificacoes WHERE chaveJ IS NOT NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT id, CONCAT('[', chaveJ, ']') as chaveJ_raw, LENGTH(chaveJ) as len FROM agentes WHERE chaveJ LIKE '%726228%';\nSELECT COUNT(*) as total_agentes FROM agentes;\nSELECT COUNT(*) as total_certs FROM certificacoes;\nSELECT COUNT(DISTINCT UPPER(TRIM(chaveJ))) as chaves_cert FROM certificacoes WHERE chaveJ IS NOT NULL;",
+  "rows": [
+    {
+      "id": "900001",
+      "chaveJ_raw": "[JJ726228]",
+      "len": "8"
+    }
+  ],
+  "messages": [
+    "total_agentes",
+    "54",
+    "total_certs",
+    "57",
+    "chaves_cert",
+    "57"
+  ],
+  "stdout": "id\tchaveJ_raw\tlen\n900001\t[JJ726228]\t8\ntotal_agentes\n54\ntotal_certs\n57\nchaves_cert\n57\n",
+  "stderr": "",
+  "execution_time_ms": 284
+}

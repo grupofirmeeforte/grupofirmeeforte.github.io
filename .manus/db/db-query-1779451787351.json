@@ -1,0 +1,75 @@
+{
+  "query": "SELECT id, empresa, tabelaCalculo, convenio, ativo04, ativo05, ativo06, ativo07, ativo08, ativo09, ativo10 FROM tabelasComissao WHERE empresa = 'FLEX' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT id, empresa, tabelaCalculo, convenio, ativo04, ativo05, ativo06, ativo07, ativo08, ativo09, ativo10 FROM tabelasComissao WHERE empresa = 'FLEX' LIMIT 5;",
+  "rows": [
+    {
+      "id": "55",
+      "empresa": "FLEX",
+      "tabelaCalculo": "0.022",
+      "convenio": "INSS",
+      "ativo04": "0.01",
+      "ativo05": "0.0063",
+      "ativo06": "0.012",
+      "ativo07": "0.012",
+      "ativo08": "0.012",
+      "ativo09": "NULL",
+      "ativo10": "NULL"
+    },
+    {
+      "id": "56",
+      "empresa": "FLEX",
+      "tabelaCalculo": "0.027",
+      "convenio": "INSS",
+      "ativo04": "0.012",
+      "ativo05": "0.00756",
+      "ativo06": "0.0135",
+      "ativo07": "0.0135",
+      "ativo08": "0.0135",
+      "ativo09": "NULL",
+      "ativo10": "NULL"
+    },
+    {
+      "id": "57",
+      "empresa": "FLEX",
+      "tabelaCalculo": "0.036",
+      "convenio": "INSS",
+      "ativo04": "0.0185",
+      "ativo05": "0.013284",
+      "ativo06": "0.0235",
+      "ativo07": "0.0235",
+      "ativo08": "0.0235",
+      "ativo09": "NULL",
+      "ativo10": "NULL"
+    },
+    {
+      "id": "58",
+      "empresa": "FLEX",
+      "tabelaCalculo": "0.022",
+      "convenio": "INSS",
+      "ativo04": "0.01",
+      "ativo05": "0.0063",
+      "ativo06": "0.012",
+      "ativo07": "0.012",
+      "ativo08": "0.012",
+      "ativo09": "NULL",
+      "ativo10": "NULL"
+    },
+    {
+      "id": "59",
+      "empresa": "FLEX",
+      "tabelaCalculo": "0.026",
+      "convenio": "INSS",
+      "ativo04": "0.012",
+      "ativo05": "0.00756",
+      "ativo06": "0.0135",
+      "ativo07": "0.0135",
+      "ativo08": "0.0135",
+      "ativo09": "NULL",
+      "ativo10": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tempresa\ttabelaCalculo\tconvenio\tativo04\tativo05\tativo06\tativo07\tativo08\tativo09\tativo10\n55\tFLEX\t0.022\tINSS\t0.01\t0.0063\t0.012\t0.012\t0.012\tNULL\tNULL\n56\tFLEX\t0.027\tINSS\t0.012\t0.00756\t0.0135\t0.0135\t0.0135\tNULL\tNULL\n57\tFLEX\t0.036\tINSS\t0.0185\t0.013284\t0.0235\t0.0235\t0.0235\tNULL\tNULL\n58\tFLEX\t0.022\tINSS\t0.01\t0.0063\t0.012\t0.012\t0.012\tNULL\tNULL\n59\tFLEX\t0.026\tINSS\t0.012\t0.00756\t0.0135\t0.0135\t0.0135\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 265
+}

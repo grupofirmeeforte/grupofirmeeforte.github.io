@@ -1,0 +1,31 @@
+{
+  "query": "SELECT COUNT(*) as total FROM certificacoes; SELECT id, chaveJ, nomeAgente, empresa, situacao FROM certificacoes LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT COUNT(*) as total FROM certificacoes; SELECT id, chaveJ, nomeAgente, empresa, situacao FROM certificacoes LIMIT 5;",
+  "rows": [
+    {
+      "total": "45"
+    },
+    {
+      "total": "id\tchaveJ\tnomeAgente\tempresa\tsituacao"
+    },
+    {
+      "total": "30001\tJJ596294\tAMAURICIO REAIS FERREIRAS DOS SANTOS \tFLEX\tAtivo"
+    },
+    {
+      "total": "30002\tJI830167\tAYALLA RAYANE DE SANTANA\tFLEX\tAtivo"
+    },
+    {
+      "total": "30003\tJ9663285\tCARLA BONFIM DOS SANTOS \tBMF\tAtivo"
+    },
+    {
+      "total": "30004\tJJ596288\tCARMITA RIBEIRO NUNES NETA\tFLEX\tAtivo04"
+    },
+    {
+      "total": "30005\tJJ596281\tCLARICE FRANCISCA ITACARAMBY SANTOS \tFLEX\tAtivo"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\n45\nid\tchaveJ\tnomeAgente\tempresa\tsituacao\n30001\tJJ596294\tAMAURICIO REAIS FERREIRAS DOS SANTOS \tFLEX\tAtivo\n30002\tJI830167\tAYALLA RAYANE DE SANTANA\tFLEX\tAtivo\n30003\tJ9663285\tCARLA BONFIM DOS SANTOS \tBMF\tAtivo\n30004\tJJ596288\tCARMITA RIBEIRO NUNES NETA\tFLEX\tAtivo04\n30005\tJJ596281\tCLARICE FRANCISCA ITACARAMBY SANTOS \tFLEX\tAtivo\n",
+  "stderr": "",
+  "execution_time_ms": 433
+}

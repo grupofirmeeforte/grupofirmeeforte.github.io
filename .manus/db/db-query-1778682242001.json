@@ -1,0 +1,42 @@
+{
+  "query": "SELECT c.chaveJ, c.nomeAgente, c.empresa, c.situacao, a.chaveJ as agente_chaveJ, a.nomeAgente as agente_nome FROM certificacoes c LEFT JOIN agentes a ON c.chaveJ = a.chaveJ WHERE c.nomeAgente IS NULL OR c.nomeAgente = '' OR c.empresa IS NULL OR c.empresa = '' LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT c.chaveJ, c.nomeAgente, c.empresa, c.situacao, a.chaveJ as agente_chaveJ, a.nomeAgente as agente_nome FROM certificacoes c LEFT JOIN agentes a ON c.chaveJ = a.chaveJ WHERE c.nomeAgente IS NULL OR c.nomeAgente = '' OR c.empresa IS NULL OR c.empresa = '' LIMIT 10;",
+  "rows": [
+    {
+      "chaveJ": "JH306647",
+      "nomeAgente": "NULL",
+      "empresa": "NULL",
+      "situacao": "NULL",
+      "agente_chaveJ": "NULL",
+      "agente_nome": "NULL"
+    },
+    {
+      "chaveJ": "J9666994",
+      "nomeAgente": "NULL",
+      "empresa": "NULL",
+      "situacao": "NULL",
+      "agente_chaveJ": "NULL",
+      "agente_nome": "NULL"
+    },
+    {
+      "chaveJ": "J9663603",
+      "nomeAgente": "NULL",
+      "empresa": "NULL",
+      "situacao": "NULL",
+      "agente_chaveJ": "NULL",
+      "agente_nome": "NULL"
+    },
+    {
+      "chaveJ": "JI827175",
+      "nomeAgente": "NULL",
+      "empresa": "NULL",
+      "situacao": "NULL",
+      "agente_chaveJ": "NULL",
+      "agente_nome": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\tnomeAgente\tempresa\tsituacao\tagente_chaveJ\tagente_nome\nJH306647\tNULL\tNULL\tNULL\tNULL\tNULL\nJ9666994\tNULL\tNULL\tNULL\tNULL\tNULL\nJ9663603\tNULL\tNULL\tNULL\tNULL\tNULL\nJI827175\tNULL\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 268
+}

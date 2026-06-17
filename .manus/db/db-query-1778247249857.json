@@ -1,0 +1,43 @@
+{
+  "query": "SELECT chaveJ FROM certificacoes LIMIT 5; SELECT chaveJ FROM agentes LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user axRHbWZqKReZrAb.b2cf85c9ad94 --database SMgJn6AGQCNfDq7mPzPqc9 --execute SELECT chaveJ FROM certificacoes LIMIT 5; SELECT chaveJ FROM agentes LIMIT 5;",
+  "rows": [
+    {
+      "chaveJ": "JJ596294"
+    },
+    {
+      "chaveJ": "JI830167"
+    },
+    {
+      "chaveJ": "J9663285"
+    },
+    {
+      "chaveJ": "JJ596288"
+    },
+    {
+      "chaveJ": "JJ596281"
+    },
+    {
+      "chaveJ": "chaveJ"
+    },
+    {
+      "chaveJ": "J1234567"
+    },
+    {
+      "chaveJ": "J1234568"
+    },
+    {
+      "chaveJ": "J1234569"
+    },
+    {
+      "chaveJ": "J9624265"
+    },
+    {
+      "chaveJ": "J9660864"
+    }
+  ],
+  "messages": [],
+  "stdout": "chaveJ\nJJ596294\nJI830167\nJ9663285\nJJ596288\nJJ596281\nchaveJ\nJ1234567\nJ1234568\nJ1234569\nJ9624265\nJ9660864\n",
+  "stderr": "",
+  "execution_time_ms": 337
+}
